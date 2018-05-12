@@ -1,0 +1,63 @@
+#######################################
+# Syntax Coloring Map for AceRoutine library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Routine	KEYWORD1
+RoutineScheduler	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+# Macros from Routine.h
+ROUTINE	KEYWORD2
+ROUTINE_NAMED	KEYWORD2
+ROUTINE_BEGIN	KEYWORD2
+ROUTINE_END	KEYWORD2
+ROUTINE_LOOP	KEYWORD2
+ROUTINE_YIELD	KEYWORD2
+ROUTINE_DELAY	KEYWORD2
+EXTERN_ROUTINE	KEYWORD2
+# public methods
+getRoot	KEYWORD2
+getNext	KEYWORD2
+getName	KEYWORD2
+run	KEYWORD2
+getStatus	KEYWORD2
+getDelayStart	KEYWORD2
+getDelay	KEYWORD2
+isYielding	KEYWORD2
+isDelaying	KEYWORD2
+isEnding	KEYWORD2
+isTerminated	KEYWORD2
+setTerminated	KEYWORD2
+# protected methods
+init	KEYWORD2
+setJump	KEYWORD2
+getJump	KEYWORD2
+setYield	KEYWORD2
+setDelay	KEYWORD2
+setEnd	KEYWORD2
+
+# public methods from RoutineScheduler.h
+setup	KEYWORD2
+loop	KEYWORD2
+list	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+# Routine.h
+kStatusYielding	LITERAL1
+kStatusDelaying	LITERAL1
+kStatusEnding	LITERAL1
+kStatusTerminated	LITERAL1

@@ -1,3 +1,4 @@
+/*
 MIT License
 
 Copyright (c) 2018 Brian T. Park
@@ -19,3 +20,46 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+*/
+
+#include <Arduino.h> // millis()
+#include "Routine.h"
+
+namespace ace_routine {
+
+// Use a static variable inside a function to solve the static initialization
+// ordering problem.
+Routine** Routine::getRoot() {
+  static Routine* root;
+  return &root;
+}
+
+namespace internal {
+
+// Version of strcmp() that supports null getName().
+int compareName(const char* n, const char* m) {
+  if (n == m) return 0;
+  if (n == nullptr) return -1;
+  if (m == nullptr) return 1;
+  return strcmp(n, m);
+}
+
+}
+
+void Routine::insert() {
+  Routine** p = getRoot();
+
+  while (*p != nullptr) {
+    if (internal::compareName(getName(), (*p)->getName()) <= 0) break;
+    p = &(*p)->mNext;
+  }
+
+  mNext = *p;
+  *p = this;
+}
+
+unsigned long Routine::millis() const {
+  return ::millis();
+}
+
+}

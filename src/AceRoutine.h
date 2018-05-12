@@ -1,3 +1,4 @@
+/*
 MIT License
 
 Copyright (c) 2018 Brian T. Park
@@ -19,3 +20,21 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+*/
+
+/**
+ * @mainpage AceRoutine Library
+ *
+ * This is the Doxygen documentation for the
+ * <a href="https://github.com/bxparks/AceRoutine">AceRoutine Library</a>.
+ */
+
+#ifndef ACE_ROUTINE_ACE_ROUTINE_H
+
+#include "ace_routine/Routine.h"
+#include "ace_routine/RoutineScheduler.h"
+
+// Version format: xxyyzz == "xx.yy.zz"
+#define ACE_ROUTINE_VERSION 000100
+
+#endif

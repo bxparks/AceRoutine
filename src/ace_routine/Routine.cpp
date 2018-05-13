@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <stdint.h> // uintptr_t
 #include <Arduino.h> // millis()
 #include "Routine.h"
 
@@ -60,6 +61,16 @@ void Routine::insert() {
 
 unsigned long Routine::millis() const {
   return ::millis();
+}
+
+void Routine::printName(Print* printer) {
+  const char* name = getName();
+  if (name == nullptr) {
+    printer->print("0x");
+    printer->print((uintptr_t) this, HEX);
+  } else {
+    printer->print(name);
+  }
 }
 
 }

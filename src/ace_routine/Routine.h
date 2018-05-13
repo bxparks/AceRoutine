@@ -26,6 +26,7 @@ SOFTWARE.
 #define ACE_ROUTINE_ROUTINE_H
 
 #include <stdint.h>
+#include <Print.h> // Print
 
 /**
  * @file Routine.h
@@ -245,6 +246,14 @@ class Routine {
      * this will return the human-readable name of the routine.
      */
     const char* getName() const { return mName; }
+
+    /**
+     * Print a human-readable name for this routine to the given printer.
+     * Usually the printer will be '&Serial'. If the name is null (when using
+     * ROUTINE() instead of ROUTINE_NAMED()), then the printed name is the
+     * hexadecimal value of the 'this' pointer.
+     */
+    void printName(Print* printer);
 
     /**
      * The body of the routine. The return value is never used. It exists

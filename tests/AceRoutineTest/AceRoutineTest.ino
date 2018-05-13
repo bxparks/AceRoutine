@@ -4,22 +4,9 @@
 #include <AUnitVerbose.h>
 #include "ace_routine/testing/TestableRoutine.h"
 
-namespace ace_routine {
-namespace internal {
-int compareName(const char* n, const char* m);
-}
-}
-
 using namespace ace_routine;
 using namespace ace_routine::testing;
 using namespace aunit;
-
-test(compareName) {
-  assertEqual(0, ace_routine::internal::compareName(nullptr, nullptr));
-  assertEqual(-1, ace_routine::internal::compareName(nullptr, "a"));
-  assertEqual(1, ace_routine::internal::compareName("a", nullptr));
-  assertEqual(-1, ace_routine::internal::compareName("a", "b"));
-}
 
 // c is defined in another .cpp file
 EXTERN_ROUTINE(TestableRoutine, c);

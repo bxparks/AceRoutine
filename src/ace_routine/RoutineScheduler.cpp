@@ -26,7 +26,6 @@ SOFTWARE.
 // Serial. You must run Serial.begin(speed) in setup().
 #define ACE_ROUTINE_DEBUG 0
 
-#include <stdint.h> //uintptr_t
 #include "RoutineScheduler.h"
 
 #if ACE_ROUTINE_DEBUG == 1
@@ -44,21 +43,6 @@ void RoutineScheduler::setupScheduler() {
   mCurrent = Routine::getRoot();
 }
 
-namespace internal {
-
-// Print the name of the routine. If nullptr, print the address of the
-// routine as a HEX number.
-void printRoutineName(Print* printer, Routine* routine) {
-  const char* name = routine->getName();
-  if (name == nullptr) {
-    printer->print((uintptr_t) routine, HEX);
-  } else {
-    printer->print(name);
-  }
-}
-
-}
-
 void RoutineScheduler::runRoutine() {
   // If reached the end, start from the beginning again.
   if (*mCurrent == nullptr) {
@@ -71,7 +55,7 @@ void RoutineScheduler::runRoutine() {
 
 #if ACE_ROUTINE_DEBUG == 1
   Serial.print(F("Processing "));
-  internal::printRoutineName(&Serial, *mCurrent);
+  (*mCurrent)->printeName(&Serial);
   Serial.println();
 #endif
 
@@ -102,7 +86,7 @@ void RoutineScheduler::listRoutines(Print* printer) {
   for (Routine** p = Routine::getRoot(); (*p) != nullptr;
       p = (*p)->getNext()) {
     printer->print(F("Routine "));
-    internal::printRoutineName(printer, *p);
+    (*p)->printName(printer);
     printer->print(F("; status: "));
     printer->println((*p)->getStatus());
   }

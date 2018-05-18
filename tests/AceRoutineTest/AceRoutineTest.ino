@@ -3,10 +3,32 @@
 #include <AceRoutine.h>
 #include <AUnitVerbose.h>
 #include "ace_routine/testing/TestableRoutine.h"
+#include "ace_routine/testing/FakePrinter.h"
 
 using namespace ace_routine;
 using namespace ace_routine::testing;
 using namespace aunit;
+
+// Import an internal function in Routine.cpp or RoutineScheduler.cpp.
+namespace ace_routine {
+namespace internal {
+extern int compareName(const char* n, const char* m);
+}
+}
+
+using namespace ace_routine::internal;
+
+// Initially suspended.
+ROUTINE(TestableRoutine, unamed) {
+  ROUTINE_BEGIN();
+  ROUTINE_END();
+}
+
+// Initially suspended.
+ROUTINE_NAMED(TestableRoutine, named) {
+  ROUTINE_BEGIN();
+  ROUTINE_END();
+}
 
 // c is defined in another .cpp file
 EXTERN_ROUTINE(TestableRoutine, c);
@@ -28,6 +50,7 @@ ROUTINE_NAMED(TestableRoutine, a) {
   }
 }
 
+// Only 3 routines are initially active: a, b, c
 test(testRoutineMacros) {
   // initially everything is enabled
   assertEqual(Routine::kStatusYielding, a.getStatus());
@@ -183,6 +206,60 @@ test(testRoutineMacros) {
   // run a - continues to run the ROUTINE_LOOP()
   RoutineScheduler::loop();
   assertEqual(Routine::kStatusYielding, a.getStatus());
+
+  a.millis(131);
+  b.millis(131);
+  c.millis(131);
+  named.millis(131);
+
+  // resume 'named'
+  assertEqual(Routine::kStatusSuspended, named.getStatus());
+  named.resume();
+
+  // run 'named'
+  RoutineScheduler::loop();
+  assertEqual(Routine::kStatusEnding, named.getStatus());
+  assertEqual(Routine::kStatusYielding, a.getStatus());
+
+  // run 'a'
+  RoutineScheduler::loop();
+  assertEqual(Routine::kStatusEnding, named.getStatus());
+  assertEqual(Routine::kStatusDelaying, a.getStatus());
+
+  a.millis(132);
+  b.millis(132);
+  c.millis(132);
+  named.millis(132);
+
+  // run 'named'
+  RoutineScheduler::loop();
+  assertEqual(Routine::kStatusTerminated, named.getStatus());
+  assertEqual(Routine::kStatusDelaying, a.getStatus());
+
+  // run 'a'
+  RoutineScheduler::loop();
+  assertEqual(Routine::kStatusDelaying, a.getStatus());
+}
+
+test(compareName) {
+  assertEqual(0, compareName(
+      (const char*) nullptr, (const char*) nullptr));
+  assertEqual(-1, compareName(nullptr, "a"));
+  assertEqual(1, compareName("a", nullptr));
+  assertEqual(-1, compareName("a", "b"));
+}
+
+test(printName) {
+  FakePrinter fakePrinter;
+
+  assertEqual("named", named.getName());
+
+  // Verify that the name of the routine with null getName() is printed as a
+  // hexadecimal number of the 'this' pointer.
+  assertEqual((const char*) nullptr, unamed.getName());
+  unamed.printName(&fakePrinter);
+  int compare = strncmp("0x", (const char*) fakePrinter.getBuffer(), 2);
+  assertEqual(0, compare);
 }
 
 void setup() {
@@ -190,6 +267,8 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 
+  unamed.suspend();
+  named.suspend();
   RoutineScheduler::setup();
 }
 

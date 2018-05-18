@@ -223,7 +223,8 @@ class Routine {
     typedef uint8_t Status;
     static const Status kStatusYielding = 0;
     static const Status kStatusDelaying = 1;
-    static const Status kStatusEnding = 3;
+    static const Status kStatusEnding = 2;
+    static const Status kStatusSuspended = 3;
     static const Status kStatusTerminated = 4;
 
     /**
@@ -275,6 +276,24 @@ class Routine {
      */
     virtual unsigned long millis() const;
 
+    /**
+     * Suspend the routine at the next scheduler iteration.
+     * Valid only for routines in Yielding or Delaying states.
+     * This method does nothing if the routine is in any other state.
+     */
+    void suspend() {
+      if (mStatus == kStatusYielding || mStatus == kStatusDelaying) {
+        mStatus = kStatusSuspended;
+      }
+    }
+
+    /**
+     * Add a Suspended routine into the head of the scheduler linked list, and
+     * change the state to Yielding. If the routine is in any other state, this
+     * method does nothing.
+     */
+    void resume();
+
     /** Return the status of the routine. Used by the RoutineScheduler. */
     Status getStatus() const { return mStatus; }
 
@@ -293,6 +312,9 @@ class Routine {
     /** The routine returned using ROUTINE_END(). */
     bool isEnding() const { return mStatus == kStatusEnding; }
 
+    /** The routine was suspended with a call to suspend(). */
+    bool isSuspended() const { return mStatus == kStatusSuspended; }
+
     /**
      * The routine in an kStatusEnding state is set to kStatusTerminated when
      * removed from Scheduler queue.
@@ -310,7 +332,8 @@ class Routine {
     Routine() {}
 
     /**
-     * Initialize the routine and add it to the linked list of routines.
+     * Initialize the routine, set it to Yielding state, and add it to the
+     * linked list of routines.
      *
      * @param name The human-readable name of the routine will normally be a
      * nullptr when using the ROUTINE() macro. Use the ROUTINE_NAMED() macro to
@@ -321,6 +344,7 @@ class Routine {
      */
     void init(const char* name) {
       mName = name;
+      mStatus = kStatusYielding;
       insert();
     }
 
@@ -360,7 +384,7 @@ class Routine {
     const char* mName = nullptr;
     Routine* mNext = nullptr;
     void* mJumpPoint = nullptr;
-    Status mStatus = kStatusYielding;
+    Status mStatus = kStatusSuspended;
     uint16_t mDelayMillisStart;
     uint16_t mDelayMillisDuration;
 };

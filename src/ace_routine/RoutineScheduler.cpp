@@ -41,6 +41,20 @@ RoutineScheduler* RoutineScheduler::getScheduler() {
 
 void RoutineScheduler::setupScheduler() {
   mCurrent = Routine::getRoot();
+
+  // Pre-scan to remove any routines whose suspend() was called before the
+  // RoutineScheduler::setup(). This makes unit tests easier to write because
+  // they can just concentrate on only the active routines. And this is also
+  // more intuitive because we don't need to wait a complete run() cycle to
+  // remove these from the queue.
+  Routine** current = Routine::getRoot();
+  while (*current != nullptr) {
+    if ((*current)->isSuspended()) {
+      *current = *((*current)->getNext());
+    } else {
+      current = (*current)->getNext();
+    }
+  }
 }
 
 void RoutineScheduler::runRoutine() {
@@ -77,6 +91,10 @@ void RoutineScheduler::runRoutine() {
     case Routine::kStatusEnding:
       // take the routine out of the list, and mark it terminated
       (*mCurrent)->setTerminated();
+      *mCurrent = *((*mCurrent)->getNext());
+      break;
+    case Routine::kStatusSuspended:
+      // take the routine out of the list
       *mCurrent = *((*mCurrent)->getNext());
       break;
   }

@@ -59,6 +59,16 @@ void Routine::insert() {
   *p = this;
 }
 
+void Routine::resume() {
+  if (mStatus != kStatusSuspended) return;
+  mStatus = kStatusYielding;
+
+  // insert at the head of the linked list
+  Routine** p = getRoot();
+  mNext = *p;
+  *p = this;
+}
+
 unsigned long Routine::millis() const {
   return ::millis();
 }

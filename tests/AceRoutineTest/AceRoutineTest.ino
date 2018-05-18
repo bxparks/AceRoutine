@@ -19,13 +19,7 @@ extern int compareName(const char* n, const char* m);
 using namespace ace_routine::internal;
 
 // Initially suspended.
-ROUTINE(TestableRoutine, unamed) {
-  ROUTINE_BEGIN();
-  ROUTINE_END();
-}
-
-// Initially suspended.
-ROUTINE_NAMED(TestableRoutine, named) {
+ROUTINE(TestableRoutine, named) {
   ROUTINE_BEGIN();
   ROUTINE_END();
 }
@@ -34,7 +28,7 @@ ROUTINE_NAMED(TestableRoutine, named) {
 EXTERN_ROUTINE(TestableRoutine, c);
 
 // b is defined before a because 'a' uses 'b'
-ROUTINE_NAMED(TestableRoutine, b) {
+ROUTINE(TestableRoutine, b) {
   ROUTINE_BEGIN();
   ROUTINE_YIELD();
   ROUTINE_DELAY(25);
@@ -42,7 +36,7 @@ ROUTINE_NAMED(TestableRoutine, b) {
   ROUTINE_END();
 }
 
-ROUTINE_NAMED(TestableRoutine, a) {
+ROUTINE(TestableRoutine, a) {
   ROUTINE_LOOP() {
     ROUTINE_DELAY(25);
     ROUTINE_YIELD();
@@ -249,17 +243,9 @@ test(compareName) {
   assertEqual(-1, compareName("a", "b"));
 }
 
+// TODO: fill this out
 test(printName) {
-  FakePrinter fakePrinter;
-
-  assertEqual("named", named.getName());
-
-  // Verify that the name of the routine with null getName() is printed as a
-  // hexadecimal number of the 'this' pointer.
-  assertEqual((const char*) nullptr, unamed.getName());
-  unamed.printName(&fakePrinter);
-  int compare = strncmp("0x", (const char*) fakePrinter.getBuffer(), 2);
-  assertEqual(0, compare);
+  const FCString& name = named.getName();
 }
 
 void setup() {
@@ -267,7 +253,6 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 
-  unamed.suspend();
   named.suspend();
   RoutineScheduler::setup();
 }

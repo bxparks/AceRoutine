@@ -27,6 +27,7 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <Print.h> // Print
+#include "FCString.h"
 
 /**
  * @file Routine.h
@@ -72,47 +73,11 @@ struct Routine_##name : ace_routine::Routine { \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 Routine_##name :: Routine_##name() { \
-  init(nullptr); \
-} \
-int Routine_##name :: run()
-
-#define ROUTINE2(className, name) \
-struct className##_##name : className { \
-  className##_##name(); \
-  virtual int run() override \
-    __attribute__((__noinline__,__noclone__)); \
-} name; \
-className##_##name :: className##_##name() { \
-  init(nullptr); \
-} \
-int className##_##name :: run()
-
-/**
- * A debug version of ROUTINE that saves the human-readable name of the
- * routine in getName(), at the cost of extra flash and static memory. Meant
- * to be used for debugging and unit tests.
- *
- *   - ROUTINE_NAMED(name) {...}
- *   - ROUTINE_NAMED(className, name) {...}
- */
-#define ROUTINE_NAMED(...) \
-    GET_ROUTINE_NAMED(\
-        __VA_ARGS__, ROUTINE_NAMED2, ROUTINE_NAMED1)(__VA_ARGS__)
-
-#define GET_ROUTINE_NAMED(_1, _2, NAME, ...) NAME
-
-#define ROUTINE_NAMED1(name) \
-struct Routine_##name : ace_routine::Routine { \
-  Routine_##name(); \
-  virtual int run() override \
-    __attribute__((__noinline__,__noclone__)); \
-} name; \
-Routine_##name :: Routine_##name() { \
   init(#name); \
 } \
 int Routine_##name :: run()
 
-#define ROUTINE_NAMED2(className, name) \
+#define ROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
   virtual int run() override \
@@ -241,20 +206,8 @@ class Routine {
      */
     Routine** getNext() { return &mNext; }
 
-    /**
-     * Human readable name of the routine. Normally, this will return nullptr
-     * when using the ROUTINE() macro. If the ROUTINE_NAMED() macro is used,
-     * this will return the human-readable name of the routine.
-     */
-    const char* getName() const { return mName; }
-
-    /**
-     * Print a human-readable name for this routine to the given printer.
-     * Usually the printer will be '&Serial'. If the name is null (when using
-     * ROUTINE() instead of ROUTINE_NAMED()), then the printed name is the
-     * hexadecimal value of the 'this' pointer.
-     */
-    void printName(Print* printer);
+    /** Human-readable name of the routine. */
+    FCString getName() const { return mName; }
 
     /**
      * The body of the routine. The return value is never used. It exists
@@ -343,7 +296,14 @@ class Routine {
      * for debugging and testing.
      */
     void init(const char* name) {
-      mName = name;
+      mName = FCString(name);
+      mStatus = kStatusYielding;
+      insert();
+    }
+
+    /** Same as init(const char*) except using flash string type. */
+    void init(const __FlashStringHelper* name) {
+      mName = FCString(name);
       mStatus = kStatusYielding;
       insert();
     }
@@ -381,7 +341,7 @@ class Routine {
      */
     void insert();
 
-    const char* mName = nullptr;
+    FCString mName;
     Routine* mNext = nullptr;
     void* mJumpPoint = nullptr;
     Status mStatus = kStatusSuspended;

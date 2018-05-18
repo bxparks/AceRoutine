@@ -5,7 +5,7 @@
 using namespace ace_routine;
 using namespace ace_routine::testing;
 
-ROUTINE_NAMED(TestableRoutine, c) {
+ROUTINE(TestableRoutine, c) {
   ROUTINE_BEGIN();
 
   ROUTINE_DELAY(100);

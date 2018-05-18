@@ -22,55 +22,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <stdint.h> // uintptr_t
-#include <Arduino.h> // millis()
-#include "Routine.h"
+#include <Print.h>
+#include "FCString.h"
 
 namespace ace_routine {
 
-// Use a static variable inside a function to solve the static initialization
-// ordering problem.
-Routine** Routine::getRoot() {
-  static Routine* root;
-  return &root;
-}
-
-namespace internal {
-
-// Version of strcmp() that supports null getName().
-int compareName(const char* n, const char* m) {
-  if (n == m) return 0;
-  if (n == nullptr) return -1;
-  if (m == nullptr) return 1;
-  return strcmp(n, m);
-}
-
-}
-
-void Routine::insert() {
-  Routine** p = getRoot();
-
-  while (*p != nullptr) {
-    if (internal::compareName(getName(), (*p)->getName()) <= 0) break;
-    p = &(*p)->mNext;
+void FCString::print(Print* printer) const {
+  if (mStringType == kCStringType) {
+    printer->print(getCString());
+  } else {
+    printer->print(getFString());
   }
-
-  mNext = *p;
-  *p = this;
 }
 
-void Routine::resume() {
-  if (mStatus != kStatusSuspended) return;
-  mStatus = kStatusYielding;
-
-  // insert at the head of the linked list
-  Routine** p = getRoot();
-  mNext = *p;
-  *p = this;
-}
-
-unsigned long Routine::millis() const {
-  return ::millis();
+void FCString::println(Print* printer) const {
+  if (mStringType == kCStringType) {
+    printer->println(getCString());
+  } else {
+    printer->println(getFString());
+  }
 }
 
 }

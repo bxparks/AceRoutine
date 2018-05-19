@@ -15,6 +15,10 @@ test(FCString_compareTo) {
   FCString fa(F("a"));
   FCString fb(F("b"));
 
+  assertEqual(n.compareTo(n), 0);
+  assertLess(n.compareTo(a), 0);
+  assertLess(n.compareTo(fa), 0);
+
   assertEqual(a.compareTo(fa), 0);
   assertEqual(fb.compareTo(b), 0);
 

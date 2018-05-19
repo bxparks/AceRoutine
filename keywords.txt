@@ -39,9 +39,9 @@ setTerminated	KEYWORD2
 init	KEYWORD2
 setJump	KEYWORD2
 getJump	KEYWORD2
-setYield	KEYWORD2
-setDelay	KEYWORD2
-setEnd	KEYWORD2
+setYielding	KEYWORD2
+setDelaying	KEYWORD2
+setEnding	KEYWORD2
 
 # public methods from RoutineScheduler.h
 setup	KEYWORD2
@@ -60,4 +60,5 @@ list	KEYWORD2
 kStatusYielding	LITERAL1
 kStatusDelaying	LITERAL1
 kStatusEnding	LITERAL1
+kStatusSuspended	LITERAL1
 kStatusTerminated	LITERAL1

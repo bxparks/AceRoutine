@@ -126,7 +126,10 @@ extern className##_##name name
       goto *p; \
     }
 
-/** Mark the beginning of a routine loop. Alternative to ROUTINE_BEGIN(). */
+/**
+ * Mark the beginning of a routine loop. Can be used instead of
+ * ROUTINE_BEGIN() at the beginning of a Routine.
+ */
 #define ROUTINE_LOOP() \
    ROUTINE_BEGIN(); \
    while (true) \
@@ -136,7 +139,7 @@ extern className##_##name name
     do { \
       __label__ jumpLabel; \
       setJump(&& jumpLabel); \
-      setYield(); \
+      setYielding(); \
       return 0; \
       jumpLabel: ; \
     } while (false)
@@ -151,7 +154,7 @@ extern className##_##name name
     do { \
       __label__ jumpLabel; \
       setJump(&& jumpLabel); \
-      setDelay(delayMillis); \
+      setDelaying(delayMillis); \
       return 0; \
       jumpLabel: ; \
     } while (false)
@@ -172,7 +175,7 @@ extern className##_##name name
 #define ROUTINE_END() \
     do { \
       setJump(nullptr); \
-      setEnd(); \
+      setEnding(); \
       return 0; \
     } while (false)
 
@@ -311,17 +314,17 @@ class Routine {
     void* getJump() const { return mJumpPoint; }
 
     /** Implement the ROUTINE_YIELD() macro. */
-    void setYield() { mStatus = kStatusYielding; }
+    void setYielding() { mStatus = kStatusYielding; }
 
     /** Implement the ROUTINE_DELAY() macro. */
-    void setDelay(uint16_t delayMillisDuration) {
+    void setDelaying(uint16_t delayMillisDuration) {
       mDelayMillisStart = millis();
       mDelayMillisDuration = delayMillisDuration;
       mStatus = kStatusDelaying;
     }
 
     /** Implement the ROUTINE_END() macro. */
-    void setEnd() { mStatus = kStatusEnding; }
+    void setEnding() { mStatus = kStatusEnding; }
 
   private:
     // Disable copy-constructor and assignment operator

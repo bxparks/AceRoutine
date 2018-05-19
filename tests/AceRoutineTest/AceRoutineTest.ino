@@ -3,7 +3,6 @@
 #include <AceRoutine.h>
 #include <AUnitVerbose.h>
 #include "ace_routine/testing/TestableRoutine.h"
-#include "ace_routine/testing/FakePrinter.h"
 
 using namespace ace_routine;
 using namespace ace_routine::testing;

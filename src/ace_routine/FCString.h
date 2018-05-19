@@ -84,7 +84,7 @@ class FCString {
 
     /** Convenience method for printing an FCString. */
     void print(Print* printer) const;
-  
+
     /** Convenience method for printing an FCString. */
     void println(Print* printer) const;
 

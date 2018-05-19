@@ -28,7 +28,7 @@ SOFTWARE.
  * Various macros to smooth over the differences among the various platforms
  * with regards to their support for flash strings and the various macros used
  * to create and access them.
- * 
+ *
  * Copied from AUnit/src/aunit/Flash.h, see that file for more info.
  *
  * In summary, we support flash strings for AVR because those MCUs have very

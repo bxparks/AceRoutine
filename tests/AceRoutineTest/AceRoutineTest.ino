@@ -8,6 +8,22 @@ using namespace ace_routine;
 using namespace ace_routine::testing;
 using namespace aunit;
 
+test(FCString_compareTo) {
+  FCString n;
+  FCString a("a");
+  FCString b("b");
+  FCString fa(F("a"));
+  FCString fb(F("b"));
+
+  assertEqual(a.compareTo(fa), 0);
+  assertEqual(fb.compareTo(b), 0);
+
+  assertLess(a.compareTo(b), 0);
+  assertLess(a.compareTo(fb), 0);
+  assertMore(fb.compareTo(a), 0);
+  assertMore(fb.compareTo(fa), 0);
+}
+
 // c is defined in another .cpp file
 EXTERN_ROUTINE(TestableRoutine, c);
 

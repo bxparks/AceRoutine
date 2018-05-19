@@ -9,21 +9,6 @@ using namespace ace_routine;
 using namespace ace_routine::testing;
 using namespace aunit;
 
-// Import an internal function in Routine.cpp or RoutineScheduler.cpp.
-namespace ace_routine {
-namespace internal {
-extern int compareName(const char* n, const char* m);
-}
-}
-
-using namespace ace_routine::internal;
-
-// Initially suspended.
-ROUTINE(TestableRoutine, named) {
-  ROUTINE_BEGIN();
-  ROUTINE_END();
-}
-
 // c is defined in another .cpp file
 EXTERN_ROUTINE(TestableRoutine, c);
 
@@ -42,6 +27,12 @@ ROUTINE(TestableRoutine, a) {
     ROUTINE_YIELD();
     ROUTINE_AWAIT(b.isTerminated());
   }
+}
+
+// An extra routine, initially suspended using extra.suspend().
+ROUTINE(TestableRoutine, extra) {
+  ROUTINE_BEGIN();
+  ROUTINE_END();
 }
 
 // Only 3 routines are initially active: a, b, c
@@ -204,48 +195,35 @@ test(testRoutineMacros) {
   a.millis(131);
   b.millis(131);
   c.millis(131);
-  named.millis(131);
+  extra.millis(131);
 
-  // resume 'named'
-  assertEqual(Routine::kStatusSuspended, named.getStatus());
-  named.resume();
+  // resume 'extra'
+  assertEqual(Routine::kStatusSuspended, extra.getStatus());
+  extra.resume();
 
-  // run 'named'
+  // run 'extra'
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusEnding, named.getStatus());
+  assertEqual(Routine::kStatusEnding, extra.getStatus());
   assertEqual(Routine::kStatusYielding, a.getStatus());
 
   // run 'a'
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusEnding, named.getStatus());
+  assertEqual(Routine::kStatusEnding, extra.getStatus());
   assertEqual(Routine::kStatusDelaying, a.getStatus());
 
   a.millis(132);
   b.millis(132);
   c.millis(132);
-  named.millis(132);
+  extra.millis(132);
 
-  // run 'named'
+  // run 'extra'
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusTerminated, named.getStatus());
+  assertEqual(Routine::kStatusTerminated, extra.getStatus());
   assertEqual(Routine::kStatusDelaying, a.getStatus());
 
   // run 'a'
   RoutineScheduler::loop();
   assertEqual(Routine::kStatusDelaying, a.getStatus());
-}
-
-test(compareName) {
-  assertEqual(0, compareName(
-      (const char*) nullptr, (const char*) nullptr));
-  assertEqual(-1, compareName(nullptr, "a"));
-  assertEqual(1, compareName("a", nullptr));
-  assertEqual(-1, compareName("a", "b"));
-}
-
-// TODO: fill this out
-test(printName) {
-  const FCString& name = named.getName();
 }
 
 void setup() {
@@ -253,7 +231,7 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 
-  named.suspend();
+  extra.suspend();
   RoutineScheduler::setup();
 }
 

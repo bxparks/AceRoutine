@@ -104,7 +104,7 @@ void RoutineScheduler::listRoutines(Print* printer) {
   for (Routine** p = Routine::getRoot(); (*p) != nullptr;
       p = (*p)->getNext()) {
     printer->print(F("Routine "));
-    (*p)->printName(printer);
+    (*p)->getName().print(printer);
     printer->print(F("; status: "));
     printer->println((*p)->getStatus());
   }

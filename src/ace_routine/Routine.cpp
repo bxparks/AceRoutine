@@ -35,23 +35,12 @@ Routine** Routine::getRoot() {
   return &root;
 }
 
-namespace internal {
-
-// Version of strcmp() that supports null getName().
-int compareName(const char* n, const char* m) {
-  if (n == m) return 0;
-  if (n == nullptr) return -1;
-  if (m == nullptr) return 1;
-  return strcmp(n, m);
-}
-
-}
-
-void Routine::insert() {
+void Routine::insertSorted() {
   Routine** p = getRoot();
 
+  // O(N^2) insertion, good enough for small (O(100)?) number of routines.
   while (*p != nullptr) {
-    if (internal::compareName(getName(), (*p)->getName()) <= 0) break;
+    if (getName().compareTo((*p)->getName()) <= 0) break;
     p = &(*p)->mNext;
   }
 

@@ -25,6 +25,8 @@ SOFTWARE.
 #ifndef ACE_ROUTINE_FSTRING_H
 #define ACE_ROUTINE_FSTRING_H
 
+// Much of this copied from AUnit/src/aunit/FCString.h and Compare.h.
+
 #include <stdint.h>
 
 class Print;
@@ -85,6 +87,9 @@ class FCString {
   
     /** Convenience method for printing an FCString. */
     void println(Print* printer) const;
+
+    /** Compare to another FCString. */
+    int compareTo(const FCString& that) const;
 
   private:
     // NOTE: It might be possible just use a (void *) instead of a union.

@@ -36,8 +36,6 @@ The library provides a number of macros to help create and manage life cycle
 of these routines:
 * `ROUTINE()`: defines an instance of `Routine` class or a user-provided
   custom subclass of `Routine`
-* `ROUTINE_NAMED()`: defines an instance of `Routine` class that knows its
-  human-readable name, needed for unit tests
 * `ROUTINE_BEGIN()`: must occur at the start of a routine body
 * `ROUTINE_END()`: must occur at the end of the routine body
 * `ROUTINE_YIELD()`: yields execution back to the `RoutineScheduler`
@@ -183,8 +181,6 @@ using namespace ace_routine;
 The following macros are used:
 * `ROUTINE()`: defines an instance of `Routine` class or a user-provided
   custom subclass of `Routine`
-* `ROUTINE_NAMED()`: defines an instance of `Routine` class that knows its
-  human-readable name, needed for unit tests
 * `ROUTINE_BEGIN()`: must occur at the start of a routine body
 * `ROUTINE_END()`: must occur at the end of the routine body
 * `ROUTINE_YIELD()`: yields execution back to the `RoutineScheduler`
@@ -246,10 +242,11 @@ list, in a simple round-robin scheduling algorithm. When a routine executes a
 `Routine` instance, execution control returns to the `RoutineScheduler` which
 resumes the execution of the next routine in the list.
 
-The order of `Routine` instance list is undefined. This is because the
-registration process relies the C++ static initialization (which occurs before
-`setup()`), and the order of static initializiation is not defined by the
-language spec.
+The `Routine` instances are initially ordered by using `getName()` as the
+sorting key. This makes the scheduling deterministic, which allows unit tests to
+be written. However, if `Routine.suspend()` and `Routine.resume()` puts the
+routine at the beginning of the scheduling list, so the ordering may become
+mixed up.
 
 ### Stackless Routines
 

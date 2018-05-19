@@ -27,6 +27,7 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <Print.h> // Print
+#include "Flash.h" // ACE_ROUTINE_F()
 #include "FCString.h"
 
 /**
@@ -73,7 +74,7 @@ struct Routine_##name : ace_routine::Routine { \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 Routine_##name :: Routine_##name() { \
-  init(#name); \
+  init(ACE_ROUTINE_F(#name)); \
 } \
 int Routine_##name :: run()
 
@@ -84,7 +85,7 @@ struct className##_##name : className { \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 className##_##name :: className##_##name() { \
-  init(#name); \
+  init(ACE_ROUTINE_F(#name)); \
 } \
 int className##_##name :: run()
 
@@ -207,7 +208,7 @@ class Routine {
     Routine** getNext() { return &mNext; }
 
     /** Human-readable name of the routine. */
-    FCString getName() const { return mName; }
+    const FCString& getName() const { return mName; }
 
     /**
      * The body of the routine. The return value is never used. It exists
@@ -288,24 +289,19 @@ class Routine {
      * Initialize the routine, set it to Yielding state, and add it to the
      * linked list of routines.
      *
-     * @param name The human-readable name of the routine will normally be a
-     * nullptr when using the ROUTINE() macro. Use the ROUTINE_NAMED() macro to
-     * set to the string name of the routine. This will cost both flash and
-     * static memory. It does not seem worth adding extra code to use
-     * __FlashStringHelper strings on AVR because we expect this to be used only
-     * for debugging and testing.
+     * @param name The name of the routine as a human-readable string.
      */
     void init(const char* name) {
       mName = FCString(name);
       mStatus = kStatusYielding;
-      insert();
+      insertSorted();
     }
 
     /** Same as init(const char*) except using flash string type. */
     void init(const __FlashStringHelper* name) {
       mName = FCString(name);
       mStatus = kStatusYielding;
-      insert();
+      insertSorted();
     }
 
     /** Pointer to label where execute will start on the next call to run(). */
@@ -334,12 +330,17 @@ class Routine {
 
     /**
      * Insert the current routine into the singly linked list. The order of
-     * C++ static initialization is undefined. If getName() is not null (using
-     * the ROUTINE_NAMED() macro), the routine will be inserted using
-     * getName() as the sorting key. This makes the ordering deterministic,
-     * which is required for unit tests.
+     * C++ static initialization is undefined, but if getName() is not null
+     * (which will normally be the case when using the ROUTINE() macro), the
+     * routine will be inserted using getName() as the sorting key. This makes
+     * the ordering deterministic, which is required for unit tests.
+     *
+     * The insertion algorithm is O(N) per insertion, for a total complexity
+     * of O(N^2). That's probably good enough for a "small" number of routines,
+     * where small is around O(100). If a large number of routines are
+     * inserted, then this method needs to be optimized.
      */
-    void insert();
+    void insertSorted();
 
     FCString mName;
     Routine* mNext = nullptr;

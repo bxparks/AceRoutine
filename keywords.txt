@@ -8,6 +8,7 @@
 
 Routine	KEYWORD1
 RoutineScheduler	KEYWORD1
+FCString	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -15,7 +16,6 @@ RoutineScheduler	KEYWORD1
 
 # Macros from Routine.h
 ROUTINE	KEYWORD2
-ROUTINE_NAMED	KEYWORD2
 ROUTINE_BEGIN	KEYWORD2
 ROUTINE_END	KEYWORD2
 ROUTINE_LOOP	KEYWORD2

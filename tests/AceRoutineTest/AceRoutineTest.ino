@@ -232,6 +232,7 @@ void setup() {
 
   extra.suspend();
   RoutineScheduler::setup();
+  RoutineScheduler::list(&Serial);
 }
 
 void loop() {

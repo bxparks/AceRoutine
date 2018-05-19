@@ -190,10 +190,10 @@ class Routine {
     // The execution recovery status of the routine, corresponding to the
     // ROUTINE_YIELD(), ROUTINE_DELAY(), and ROUTINE_END() macros.
     typedef uint8_t Status;
-    static const Status kStatusYielding = 0;
-    static const Status kStatusDelaying = 1;
-    static const Status kStatusEnding = 2;
-    static const Status kStatusSuspended = 3;
+    static const Status kStatusSuspended = 0;
+    static const Status kStatusYielding = 1;
+    static const Status kStatusDelaying = 2;
+    static const Status kStatusEnding = 3;
     static const Status kStatusTerminated = 4;
 
     /**

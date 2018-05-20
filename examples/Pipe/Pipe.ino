@@ -63,10 +63,9 @@ void setup() {
   delay(1000);
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
-
-  RoutineScheduler::setup();
 }
 
 void loop() {
-  RoutineScheduler::loop();
+  reader.run();
+  writer.run();
 }

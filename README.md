@@ -3,7 +3,7 @@
 A low-memory footprint, fast-switching, cooperative multitasking library using
 stackless routines on Arduino platforms.
 
-Version: (2018-05-11)
+Version: (2018-05-20)
 
 ## Summary
 
@@ -111,6 +111,28 @@ void setup() {
   delay(1000);
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
+}
+
+void loop() {
+  blinkLed.run();
+  printHello.run();
+  printWorld.run();
+}
+```
+
+This prints "Hello, ", then waits one second, and then prints "World!".
+At the same time, the LED blinks on and off.
+
+Another variation in `HelloScheduler` uses the `RoutineScheduler` to
+run the routines:
+
+```
+// same as above
+
+void setup() {
+  delay(1000);
+  Serial.begin(115200);
+  while (!Serial); // Leonardo/Micro
 
   RoutineScheduler::setup();
 }
@@ -119,9 +141,6 @@ void loop() {
   RoutineScheduler::loop();
 }
 ```
-
-This prints "Hello, ", then waits one second, and then prints "World!".
-At the same time, the LED blinks on and off.
 
 ## Installation
 
@@ -154,10 +173,12 @@ The [docs/](docs/) directory contains the
 The following example sketches are provided:
 
 * [HelloRoutine.ino](examples/HelloRoutine)
-* [BlinkRoutine.ino](examples/BlinkRoutine): use routines to read a button
-  and control how the LED blinks
-* [BlinkCustomRoutine.ino](examples/BlinkCustomRoutine): same as BlinkRoutine
-  but using a custom `Routine` class
+* [HelloScheduler.ino](examples/HelloScheduler): same as `HelloRoutine`
+  except using the `RoutineScheduler` instead of manually running the routines
+* [BlinkSlowFastRoutine.ino](examples/BlinkSlowFastRoutine): use routines
+  to read a button and control how the LED blinks
+* [BlinkSlowFastCustomRoutine.ino](examples/BlinkSlowFastCustomRoutine): same
+  as BlinkSlowFastRoutine but using a custom `Routine` class
 * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same time
 * [AutoBenchmark.ino](examples/AutoBenchmark):
   a program that performs CPU benchmarking
@@ -267,13 +288,23 @@ run another routines. Upon the next iteration, execution continues just after
 function, but the `ROUTINE_BEGIN()` contains a dispatcher that gives the
 illusion that the execution continues further down the function.)
 
+### Await
+
+`ROUTINE_AWAIT(condition)` yields until the `condition` evaluates to `true`.
+This is a convenience macro that is identical to:
+```
+while(!condition) ROUTINE_YIELD();
+```
+
 ### Delay
 
 `ROUTINE_DELAY(millis)` delays the return of control until `millis` milliseconds
 has elapsed. The argument is a `uint16_t`, a 16-bit unsigned integer, which
 saves 4 bytes on each instance of `Routine`. However, the drawback is that the
-largest value is 65535 milliseconds. To delay for longer, an explicit loop can
-be used:
+largest value is 65534 (not 65535 due to an edge-case) milliseconds.
+
+To delay for longer, an explicit loop can be used. For example, to delay
+for 1000 seconds, we can do this:
 ```
 ROUTINE(waitThousandSeconds) {
   ROUTINE_BEGIN();
@@ -286,14 +317,6 @@ ROUTINE(waitThousandSeconds) {
 }
 ```
 See **For Loop** section below for a description of the for-loop construct.
-
-### Await
-
-`ROUTINE_AWAIT(condition)` yields until the `condition` evaluates to `true`.
-This is a convenience macro that is identical to:
-```
-while(!condition) ROUTINE_YIELD();
-```
 
 ### One-Shot Routines
 
@@ -320,7 +343,7 @@ ROUTINE(doStraightThrough) {
 
 Conditional if-statements work as expected with the various macros:
 ```
-ROUTINE(doStraightThrough) {
+ROUTINE(doIfThenElse) {
   ROUTINE_BEGIN();
 
   if (condition) {
@@ -367,9 +390,9 @@ ROUTINE(doThingsBasedOnSwitchConditions) {
 ### For Loops
 
 You cannot use a local variable in the `for-loop` because the variable counter
-would be created on the stack, and get destroyed as soon as you `YIELD()` or
-`DELAY()`. However, a reasonable solution is to use `static` variables. For
-example:
+would be created on the stack, and the stack gets destroyed as soon as
+`ROUTINE_YIELD()`, `ROUTINE_DELAY()`, or `ROUTINE_AWAIT()` is executed. However,
+a reasonable solution is to use `static` variables. For example:
 
 ```
 ROUTINE(countToTen) {
@@ -417,8 +440,10 @@ ROUTINE(loopForever) {
   ROUTINE_END();
 }
 ```
-but a forever-loop occurs so often that there is a convenience macro
-named `ROUTINE_LOOP()` to make this easy:
+
+A forever-loop occurs so often that there is a convenience macro named
+`ROUTINE_LOOP()` to make this easy:
+
 ```
 ROUTINE(loopForever) {
   ROUTINE_LOOP() {
@@ -493,19 +518,24 @@ unlikely that you will need know the exact name of this generated class.
 
 ### Routine State
 
-A routine has 4 internal states:
+A routine has several internal states:
+* `kStatusSuspended`: routine was suspended using `Routine::suspend`
 * `kStatusYielding`: routine returned using `ROUTINE_YIELD()`
-* `kStatusDelaying`: routine returned using `ROUTINE_DELAYING()`
+* `kStatusAwaiting`: routine returned using `ROUTINE_AWAIT()`
+* `kStatusDelaying`: routine returned using `ROUTINE_DELAY()`
 * `kStatusEnding`: routine returned using `ROUTINE_END()`
 * `kStatusTerminated`: routine has been removed from the scheduler queue and
   is permanently terminated
 
 You can query these internal states using the following methods on the
 `Routine` class:
+* `Routine::isSuspended()`
 * `Routine::isYielding()`
+* `Routine::isAwaiting()`
 * `Routine::isDelaying()`
 * `Routine::isEnding()`
-* `Routine::isEndingOrTerminated()`
+* `Routine::isEndingOrTerminated()`: works when the `Routine` is executed
+  manually or through the `RoutineScheduler`
 
 To call one of these functions, use the `Routine` instance variable that
 was created using the `ROUTINE()` macro:
@@ -532,7 +562,7 @@ ROUTINE(doSomethingElse) {
 
 Notice that the `ROUTINE_YIELD()` macro in the above example appears on the
 same line as the `while`, without the optional `{ }` braces. These macros have
-been carefully constructed to allow them to be used almost everywhere a valid
+been constructed to allow them to be used almost everywhere a valid
 C/C++ statement is allowed.
 
 ### External Routines
@@ -566,14 +596,12 @@ ROUTINE(doSomethingExternal) {
 The AceRoutine library does not provide any internal mechanism to
 pass data between routines. Here are some options:
 
-The easiest is to use **global variables** which are modified by multiple
-routines.
-
-You can use custom Routine classes and define a class static variables which can
-be shared among routines which sublcass The same class.
-
-You can define methods on the custom Routine class, and pass messages back and
-forth between routines by method calls.
+* The easiest is to use **global variables** which are modified by multiple
+  routines.
+* You can use custom Routine classes and define a class static variables which
+  can be shared among routines which sublcass The same class.
+* You can define methods on the custom Routine class, and pass messages back and
+  forth between routines by method calls.
 
 ### Advanced Custom Routines
 
@@ -681,14 +709,14 @@ turned out.
 All objects are statically allocated (i.e. not heap or stack).
 
 * 8-bit processors (AVR Nano, UNO, etc):
-    * sizeof(Routine): 13
+    * sizeof(Routine): 14
     * sizeof(RoutineScheduler): 2
 * 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32)
-    * sizeof(Routine): 24
+    * sizeof(Routine): 28
     * sizeof(RoutineScheduler): 4
 
 In other words, you can create 100 `Routine` instances and they would use only
-1300 bytes of static RAM on an 8-bit AVR processor.
+1400 bytes of static RAM on an 8-bit AVR processor.
 
 The `RoutineScheduler` consumes only 2 bytes of memory no matter how many
 routines are created. That's because it depends on a singly-link list whose

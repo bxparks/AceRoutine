@@ -1,6 +1,5 @@
 /*
- * HelloRoutine. Use 2 Routines to print "Hello, World", the hard way.
- * A 3rd Routine spins away on the side, blinking the LED.
+ * Same as HelloRoutine, but using the RoutineScheduler.
  */
 
 #include <AceRoutine.h>
@@ -43,11 +42,11 @@ void setup() {
   delay(1000);
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
+
+  // Auto-register all routines into the scheduler.
+  RoutineScheduler::setup();
 }
 
-// Manually execute the routines.
 void loop() {
-  blinkLed.run();
-  printHello.run();
-  printWorld.run();
+  RoutineScheduler::loop();
 }

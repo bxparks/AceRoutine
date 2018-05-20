@@ -76,7 +76,7 @@ ROUTINE(TestableRoutine, b) {
   ROUTINE_BEGIN();
   ROUTINE_YIELD();
   ROUTINE_DELAY(25);
-  ROUTINE_AWAIT(c.isTerminated());
+  ROUTINE_AWAIT(c.isEndingOrTerminated());
   ROUTINE_END();
 }
 
@@ -84,7 +84,7 @@ ROUTINE(TestableRoutine, a) {
   ROUTINE_LOOP() {
     ROUTINE_DELAY(25);
     ROUTINE_YIELD();
-    ROUTINE_AWAIT(b.isTerminated());
+    ROUTINE_AWAIT(b.isEndingOrTerminated());
   }
 }
 
@@ -198,46 +198,32 @@ test(scheduler) {
   // run b
   RoutineScheduler::loop();
   assertEqual(Routine::kStatusAwaiting, a.getStatus());
-  assertEqual(Routine::kStatusAwaiting, b.getStatus());
+  assertEqual(Routine::kStatusEnding, b.getStatus());
   assertEqual(Routine::kStatusEnding, c.getStatus());
 
   // run c - removed from list
   RoutineScheduler::loop();
   assertEqual(Routine::kStatusAwaiting, a.getStatus());
-  assertEqual(Routine::kStatusAwaiting, b.getStatus());
+  assertEqual(Routine::kStatusEnding, b.getStatus());
   assertEqual(Routine::kStatusTerminated, c.getStatus());
 
   a.millis(103);
   b.millis(103);
   c.millis(103);
 
-  // run a
+  // run a, waiting for b over, loops around to delay(25)
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusAwaiting, a.getStatus());
-  assertEqual(Routine::kStatusAwaiting, b.getStatus());
-
-  // run b
-  RoutineScheduler::loop();
-  assertEqual(Routine::kStatusAwaiting, a.getStatus());
-  assertEqual(Routine::kStatusEnding, b.getStatus());
-
-  a.millis(104);
-  b.millis(104);
-  c.millis(104);
-
-  // run a
-  RoutineScheduler::loop();
-  assertEqual(Routine::kStatusAwaiting, a.getStatus());
+  assertEqual(Routine::kStatusDelaying, a.getStatus());
   assertEqual(Routine::kStatusEnding, b.getStatus());
 
   // run b - removed from list
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusAwaiting, a.getStatus());
+  assertEqual(Routine::kStatusDelaying, a.getStatus());
   assertEqual(Routine::kStatusTerminated, b.getStatus());
 
-  a.millis(105);
-  b.millis(105);
-  c.millis(105);
+  a.millis(104);
+  b.millis(104);
+  c.millis(104);
 
   // run a - continues to run the ROUTINE_LOOP()
   RoutineScheduler::loop();

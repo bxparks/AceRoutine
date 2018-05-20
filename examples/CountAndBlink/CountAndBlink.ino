@@ -65,8 +65,8 @@ ROUTINE(slowDownBlinking) {
 
   Serial.println(F("slowDownBlinking: Hello!"));
   Serial.println(F("slowDownBlinking: Waiting for countTo10 and countTo20..."));
-  ROUTINE_AWAIT(countTo10.isTerminated());
-  ROUTINE_AWAIT(countTo20.isTerminated());
+  ROUTINE_AWAIT(countTo10.isEndingOrTerminated());
+  ROUTINE_AWAIT(countTo20.isEndingOrTerminated());
   Serial.println(F("slowDownBlinking: Slowing LED blink rate."));
   ledDelayMillis = 600;
 

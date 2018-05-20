@@ -213,20 +213,41 @@ namespace ace_routine {
 
 /**
  * Base class of all routines. The actual routine code is an implementation
- * of the run() method.
+ * of the virtual run() method.
  */
 class Routine {
   public:
-    // The execution recovery status of the routine, corresponding to the
-    // ROUTINE_YIELD(), ROUTINE_DELAY(), ROUTINE_AWAIT() and ROUTINE_END()
-    // macros.
+    /**
+     * The execution recovery status of the routine, corresponding to the
+     * ROUTINE_YIELD(), ROUTINE_DELAY(), ROUTINE_AWAIT() and ROUTINE_END()
+     * macros.
+     */
     typedef uint8_t Status;
+
+    /**
+     * Routine has been suspended using suspend() and the scheduler should
+     * remove it from the queue upon the next iteration. We don't distinguish
+     * whether the routine is still in the queue or not with this status. We
+     * can add that later if we need to.
+     */
     static const Status kStatusSuspended = 0;
+
+    /** Routine is currenly running. True only within the routine itself. */
     static const Status kStatusRunning = 1;
+
+    /** Routine returned using the ROUTINE_YIELD() statement. */
     static const Status kStatusYielding = 2;
+
+    /** Routine returned using the ROUTINE_AWAIT() statement. */
     static const Status kStatusAwaiting = 3;
+
+    /** Routine returned using the ROUTINE_DELAY() statement. */
     static const Status kStatusDelaying = 4;
+
+    /** Routine executed the ROUTINE_END() statement. */
     static const Status kStatusEnding = 5;
+
+    /** Routine has ended and no longer in the scheduler queue. */
     static const Status kStatusTerminated = 6;
 
     /**
@@ -272,7 +293,7 @@ class Routine {
      * method does nothing.
      */
     void suspend() {
-      if (mStatus == kStatusTerminated || mStatus == kStatusEnding) return;
+      if (isEndingOrTerminated()) return;
       mStatus = kStatusSuspended;
     }
 
@@ -311,12 +332,13 @@ class Routine {
     bool isSuspended() const { return mStatus == kStatusSuspended; }
 
     /**
-     * The routine was in isEnding() state and has been removed from the
-     * RoutineScheduler queue. This method works only if the Routine is
-     * executed using the RoutineScheduler. If the Routine is invoked directly,
-     * then use isEnding().
+     * The routine is either in mStatusEnding state or has been terminated by
+     * the scheduler. This method works for both Routines which are executed
+     * manually, or Routines executed through the RoutineScheduler.
      */
-    bool isTerminated() const { return mStatus == kStatusTerminated; }
+    bool isEndingOrTerminated() const {
+      return mStatus == kStatusEnding || mStatus == kStatusTerminated;
+    }
 
     /**
      * Indicate that the Routine has been removed from the Scheduler queue.

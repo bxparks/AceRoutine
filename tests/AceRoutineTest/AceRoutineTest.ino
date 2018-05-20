@@ -28,6 +28,46 @@ test(FCString_compareTo) {
   assertMore(fb.compareTo(fa), 0);
 }
 
+bool simpleRoutineFlag = false;
+
+// A routine that yields then ends. Verify that multiple calls to
+// Routine::run() after it ends is ok.
+ROUTINE(TestableRoutine, simpleRoutine) {
+  ROUTINE_BEGIN();
+  ROUTINE_YIELD();
+  ROUTINE_DELAY(1);
+  ROUTINE_AWAIT(simpleRoutineFlag);
+  ROUTINE_END();
+}
+
+test(simpleRoutine) {
+  simpleRoutine.millis(0);
+  assertEqual(Routine::kStatusSuspended, simpleRoutine.getStatus());
+
+  simpleRoutine.run();
+  assertEqual(Routine::kStatusYielding, simpleRoutine.getStatus());
+
+  simpleRoutine.run();
+  assertEqual(Routine::kStatusDelaying, simpleRoutine.getStatus());
+
+  simpleRoutine.run();
+  assertEqual(Routine::kStatusDelaying, simpleRoutine.getStatus());
+
+  simpleRoutine.millis(1);
+  simpleRoutine.run();
+  assertEqual(Routine::kStatusAwaiting, simpleRoutine.getStatus());
+
+  simpleRoutine.run();
+  assertEqual(Routine::kStatusAwaiting, simpleRoutine.getStatus());
+
+  simpleRoutineFlag = true;
+  simpleRoutine.run();
+  assertEqual(Routine::kStatusEnding, simpleRoutine.getStatus());
+
+  simpleRoutine.run();
+  assertEqual(Routine::kStatusEnding, simpleRoutine.getStatus());
+}
+
 // c is defined in another .cpp file
 EXTERN_ROUTINE(TestableRoutine, c);
 
@@ -55,7 +95,7 @@ ROUTINE(TestableRoutine, extra) {
 }
 
 // Only 3 routines are initially active: a, b, c
-test(testRoutineMacros) {
+test(scheduler) {
   // initially everything is enabled
   assertEqual(Routine::kStatusYielding, a.getStatus());
   assertEqual(Routine::kStatusYielding, b.getStatus());
@@ -251,6 +291,7 @@ void setup() {
   while (!Serial); // Leonardo/Micro
 
   extra.suspend();
+  simpleRoutine.suspend();
   RoutineScheduler::setup();
   RoutineScheduler::list(&Serial);
 }

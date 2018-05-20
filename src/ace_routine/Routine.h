@@ -311,8 +311,10 @@ class Routine {
     bool isSuspended() const { return mStatus == kStatusSuspended; }
 
     /**
-     * The routine in an kStatusEnding state is set to kStatusTerminated when
-     * removed from Scheduler queue.
+     * The routine was in isEnding() state and has been removed from the
+     * RoutineScheduler queue. This method works only if the Routine is
+     * executed using the RoutineScheduler. If the Routine is invoked directly,
+     * then use isEnding().
      */
     bool isTerminated() const { return mStatus == kStatusTerminated; }
 

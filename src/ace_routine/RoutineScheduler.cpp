@@ -83,10 +83,10 @@ void RoutineScheduler::runRoutine() {
       mCurrent = (*mCurrent)->getNext();
       break;
     case Routine::kStatusDelaying: {
-      // Checking isDelayExpired() here is an optimizating that avoids an extra
-      // call into the Routine::run(). Everything would still work if we just
-      // dispatched into the Routine::run() because that method checks for
-      // delay timer expiration as well.
+      // Check isDelayExpired() here to optimize away an extra call into the
+      // Routine::run(). Everything would still work if we just dispatched into
+      // the Routine::run() because that method checks isDelayExpired() as
+      // well.
       if ((*mCurrent)->isDelayExpired()) {
         (*mCurrent)->run();
       }
@@ -101,6 +101,10 @@ void RoutineScheduler::runRoutine() {
     case Routine::kStatusSuspended:
       // take the routine out of the list
       *mCurrent = *((*mCurrent)->getNext());
+      break;
+    default:
+      // Should never happen but skip to next routine to prevent infinite loop.
+      mCurrent = (*mCurrent)->getNext();
       break;
   }
 }

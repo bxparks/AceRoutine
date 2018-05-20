@@ -76,7 +76,7 @@ ROUTINE(TestableRoutine, b) {
   ROUTINE_BEGIN();
   ROUTINE_YIELD();
   ROUTINE_DELAY(25);
-  ROUTINE_AWAIT(c.isEndingOrTerminated());
+  ROUTINE_AWAIT(c.isDone());
   ROUTINE_END();
 }
 
@@ -84,7 +84,7 @@ ROUTINE(TestableRoutine, a) {
   ROUTINE_LOOP() {
     ROUTINE_DELAY(25);
     ROUTINE_YIELD();
-    ROUTINE_AWAIT(b.isEndingOrTerminated());
+    ROUTINE_AWAIT(b.isDone());
   }
 }
 

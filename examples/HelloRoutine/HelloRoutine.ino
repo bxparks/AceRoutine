@@ -33,7 +33,7 @@ ROUTINE(printHello) {
 ROUTINE(printWorld) {
   ROUTINE_BEGIN();
 
-  ROUTINE_AWAIT(printHello.isEndingOrTerminated());
+  ROUTINE_AWAIT(printHello.isDone());
   Serial.println(F("World!"));
 
   ROUTINE_END();

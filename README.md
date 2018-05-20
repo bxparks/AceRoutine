@@ -101,7 +101,7 @@ ROUTINE(printHello) {
 ROUTINE(printWorld) {
   ROUTINE_BEGIN();
 
-  ROUTINE_AWAIT(printHello.isEndingOrTerminated());
+  ROUTINE_AWAIT(printHello.isDone());
   Serial.println(F("World!"));
 
   ROUTINE_END();
@@ -534,8 +534,10 @@ You can query these internal states using the following methods on the
 * `Routine::isAwaiting()`
 * `Routine::isDelaying()`
 * `Routine::isEnding()`
-* `Routine::isEndingOrTerminated()`: works when the `Routine` is executed
-  manually or through the `RoutineScheduler`
+* `Routine::isTerminated()`
+* `Routine::isDone()`: same as (isEnding() || isTerminated()). This version
+  is more robust because it works when the `Routine` is executed manually or
+  executed through the `RoutineScheduler`.
 
 To call one of these functions, use the `Routine` instance variable that
 was created using the `ROUTINE()` macro:
@@ -551,7 +553,7 @@ ROUTINE(doSomethingElse) {
   ROUTINE_BEGIN();
 
   ...
-  ROUTINE_AWAIT(doSomething.isEndingOrTerminated());
+  ROUTINE_AWAIT(doSomething.isDone());
 
   ...
   ROUTINE_END();
@@ -585,7 +587,7 @@ EXTERN_ROUTINE(doSomethingExternal);
 ROUTINE(doSomethingExternal) {
 
   ...
-  if (!doSomethingExternal.isEndingOrTerminated()) ROUTINE_DELAY(1000);
+  if (!doSomethingExternal.isDone()) ROUTINE_DELAY(1000);
   ...
 
 }

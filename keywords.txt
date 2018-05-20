@@ -36,7 +36,8 @@ isYielding	KEYWORD2
 isAwaiting	KEYWORD2
 isDelaying	KEYWORD2
 isEnding	KEYWORD2
-isEndingOrTerminated	KEYWORD2
+isTerminated	KEYWORD2
+isDone	KEYWORD2
 setTerminated	KEYWORD2
 # protected methods
 init	KEYWORD2

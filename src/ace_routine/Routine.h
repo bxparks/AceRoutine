@@ -293,7 +293,7 @@ class Routine {
      * method does nothing.
      */
     void suspend() {
-      if (isEndingOrTerminated()) return;
+      if (isDone()) return;
       mStatus = kStatusSuspended;
     }
 
@@ -331,12 +331,15 @@ class Routine {
     /** The routine was suspended with a call to suspend(). */
     bool isSuspended() const { return mStatus == kStatusSuspended; }
 
+    /** The routine was suspended with a call to suspend(). */
+    bool isTerminated() const { return mStatus == kStatusTerminated; }
+
     /**
-     * The routine is either in mStatusEnding state or has been terminated by
-     * the scheduler. This method works for both Routines which are executed
-     * manually, or Routines executed through the RoutineScheduler.
+     * The routine is either Ending or Terminated. This method is recommended
+     * over isEnding() or isTerminated() because it works when the routine is
+     * executed either manually or through the RoutineScheduler.
      */
-    bool isEndingOrTerminated() const {
+    bool isDone() const {
       return mStatus == kStatusEnding || mStatus == kStatusTerminated;
     }
 

@@ -50,6 +50,11 @@ void Routine::insertSorted() {
 
 void Routine::resume() {
   if (mStatus != kStatusSuspended) return;
+
+  // We lost the original state of the routine when suspend() was called but
+  // the routine will automatically go back into the original state when
+  // Routine::run() is called because ROUTINE_YIELD(), ROUTINE_DELAY() and
+  // ROUTINE_AWAIT() are written to restore their status.
   mStatus = kStatusYielding;
 
   // insert at the head of the linked list

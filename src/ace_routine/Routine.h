@@ -25,7 +25,7 @@ SOFTWARE.
 #ifndef ACE_ROUTINE_ROUTINE_H
 #define ACE_ROUTINE_ROUTINE_H
 
-#include <stdint.h>
+#include <stdint.h> // UINT16_MAX
 #include <Print.h> // Print
 #include "Flash.h" // ACE_ROUTINE_F()
 #include "FCString.h"
@@ -134,48 +134,78 @@ extern className##_##name name
    ROUTINE_BEGIN(); \
    while (true) \
 
-/** Yield execution to another routine. */
-#define ROUTINE_YIELD() \
+#define ROUTINE_YIELD_INTERNAL() \
     do { \
       __label__ jumpLabel; \
       setJump(&& jumpLabel); \
-      setYielding(); \
       return 0; \
       jumpLabel: ; \
+    } while (false)
+
+/** Yield execution to another routine. */
+#define ROUTINE_YIELD() \
+    do { \
+      setYielding(); \
+      ROUTINE_YIELD_INTERNAL(); \
+      setRunning(); \
+    } while (false)
+
+/**
+ * Yield until condition is true, then execution continues. This is
+ * functionally equivalent to:
+ *
+ * @code
+ *    while (!condition) ROUTINE_YIELD();
+ * @endcode
+ *
+ * but the getStatus() during the waiting is set to kStatusAwaiting instead of
+ * kStatusYielding. The current scheduler treats the two states the same, but
+ * it's possible that a different scheduler may want to treat them differently.
+ */
+#define ROUTINE_AWAIT(condition) \
+    do { \
+      while (!(condition)) { \
+        setAwaiting(); \
+        ROUTINE_YIELD_INTERNAL(); \
+      } \
+      setRunning(); \
     } while (false)
 
 /**
 * Yield for delayMillis. A delayMillis of 0 is functionally equivalent to
 * ROUTINE_YIELD(). To save memory, the delayMillis is stored as a uint16_t so
-* the maximum delay is 65535 milliseconds. If you need to wait for longer than
-* that, use a for-loop to call ROUTINE_DELAY() as many times as necessary.
+* the maximum delay is technically 65535 milliseconds. However, to avoid an
+* edge-case when using RoutineSchedule, the practical maximum of 65534
+* milliseconds is imposed by the Routine::delay() method.
+*
+* If you need to wait for longer than that, use a for-loop to call
+* ROUTINE_DELAY() as many times as necessary.
+*
+* This could have been implemented using ROUTINE_AWAIT() but this macro matches
+* the global delay(millis) function already provided by the Arduino API, and
+* the separate kStatusDelaying allows the scheduler to perform some
+* optimization.
 */
 #define ROUTINE_DELAY(delayMillis) \
     do { \
-      __label__ jumpLabel; \
-      setJump(&& jumpLabel); \
-      setDelaying(delayMillis); \
-      return 0; \
-      jumpLabel: ; \
+      setDelay(delayMillis); \
+      while (!isDelayExpired()) { \
+        setDelaying(); \
+        ROUTINE_YIELD_INTERNAL(); \
+      } \
+      setRunning(); \
     } while (false)
 
 /**
- * Yield until condition is true, then execution continues.
- * This is functionally equivalent to:
- * @code
- *    while (!condition) ROUTINE_YIELD();
- * @endcode
+ * Mark the end of a routine. Subsequent calls to Routine::run() will do
+ * nothing.
  */
-#define ROUTINE_AWAIT(condition) \
-    do { \
-      while (!(condition)) ROUTINE_YIELD(); \
-    } while (false)
-
-/** Mark the end of a routine. */
 #define ROUTINE_END() \
     do { \
-      setJump(nullptr); \
+      __label__ jumpLabel; \
       setEnding(); \
+      setJump(&& jumpLabel); \
+      jumpLabel: ; \
       return 0; \
     } while (false)
 
@@ -188,13 +218,16 @@ namespace ace_routine {
 class Routine {
   public:
     // The execution recovery status of the routine, corresponding to the
-    // ROUTINE_YIELD(), ROUTINE_DELAY(), and ROUTINE_END() macros.
+    // ROUTINE_YIELD(), ROUTINE_DELAY(), ROUTINE_AWAIT() and ROUTINE_END()
+    // macros.
     typedef uint8_t Status;
     static const Status kStatusSuspended = 0;
-    static const Status kStatusYielding = 1;
-    static const Status kStatusDelaying = 2;
-    static const Status kStatusEnding = 3;
-    static const Status kStatusTerminated = 4;
+    static const Status kStatusRunning = 1;
+    static const Status kStatusYielding = 2;
+    static const Status kStatusAwaiting = 3;
+    static const Status kStatusDelaying = 4;
+    static const Status kStatusEnding = 5;
+    static const Status kStatusTerminated = 6;
 
     /**
      * Get the pointer to the root pointer. Implemented as a function static to
@@ -234,14 +267,13 @@ class Routine {
     virtual unsigned long millis() const;
 
     /**
-     * Suspend the routine at the next scheduler iteration.
-     * Valid only for routines in Yielding or Delaying states.
-     * This method does nothing if the routine is in any other state.
+     * Suspend the routine at the next scheduler iteration. If the routine is
+     * already in the process of ending or is already terminated, then this
+     * method does nothing.
      */
     void suspend() {
-      if (mStatus == kStatusYielding || mStatus == kStatusDelaying) {
-        mStatus = kStatusSuspended;
-      }
+      if (mStatus == kStatusTerminated || mStatus == kStatusEnding) return;
+      mStatus = kStatusSuspended;
     }
 
     /**
@@ -254,14 +286,20 @@ class Routine {
     /** Return the status of the routine. Used by the RoutineScheduler. */
     Status getStatus() const { return mStatus; }
 
-    /** Return the start time of the routine delay. */
-    uint16_t getDelayStart() const { return mDelayMillisStart; }
+    /** Check if delay time is over. */
+    bool isDelayExpired() {
+      uint16_t elapsedMillis = millis() - mDelayStartMillis;
+      return elapsedMillis >= mDelayDurationMillis;
+    }
 
-    /** Return the duration of the delay. */
-    uint16_t getDelay() const { return mDelayMillisDuration; }
+    /** The routine is currently running. True only within the routine. */
+    bool isRunning() const { return mStatus == kStatusRunning; }
 
     /** The routine returned using ROUTINE_YIELD(). */
     bool isYielding() const { return mStatus == kStatusYielding; }
+
+    /** The routine returned using ROUTINE_AWAIT(). */
+    bool isAwaiting() const { return mStatus == kStatusAwaiting; }
 
     /** The routine returned using ROUTINE_DELAY(). */
     bool isDelaying() const { return mStatus == kStatusDelaying; }
@@ -313,17 +351,32 @@ class Routine {
     /** Pointer to label where execute will start on the next call to run(). */
     void* getJump() const { return mJumpPoint; }
 
-    /** Implement the ROUTINE_YIELD() macro. */
+    /** Set the kStatusRunning state. */
+    void setRunning() { mStatus = kStatusRunning; }
+
+    /** Set the kStatusDelaying state. */
     void setYielding() { mStatus = kStatusYielding; }
 
-    /** Implement the ROUTINE_DELAY() macro. */
-    void setDelaying(uint16_t delayMillisDuration) {
-      mDelayMillisStart = millis();
-      mDelayMillisDuration = delayMillisDuration;
-      mStatus = kStatusDelaying;
+    /** Set the kStatusAwaiting state. */
+    void setAwaiting() { mStatus = kStatusAwaiting; }
+
+    /** Set the kStatusDelaying state. */
+    void setDelaying() { mStatus = kStatusDelaying; }
+
+    /**
+     * Configure the delay timer. The maximum duration is (UINT16_MAX-1) (i.e.
+     * 65534) to avoid an edge-case when using the RoutineScheduler to optimize
+     * the ROUTINE_DELAY() macro. If UINT16_MAX is given, the duration is set
+     * to (UINT16_MAX-1).
+     */
+    void setDelay(uint16_t delayMillisDuration) {
+      mDelayStartMillis = millis();
+      mDelayDurationMillis = (delayMillisDuration == UINT16_MAX)
+          ? UINT16_MAX - 1
+          : delayMillisDuration;
     }
 
-    /** Implement the ROUTINE_END() macro. */
+    /** Set the kStatusEnding state. */
     void setEnding() { mStatus = kStatusEnding; }
 
   private:
@@ -349,8 +402,8 @@ class Routine {
     Routine* mNext = nullptr;
     void* mJumpPoint = nullptr;
     Status mStatus = kStatusSuspended;
-    uint16_t mDelayMillisStart;
-    uint16_t mDelayMillisDuration;
+    uint16_t mDelayStartMillis;
+    uint16_t mDelayDurationMillis;
 };
 
 }

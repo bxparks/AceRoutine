@@ -61,7 +61,9 @@ void RoutineScheduler::runRoutine() {
   // If reached the end, start from the beginning again.
   if (*mCurrent == nullptr) {
     mCurrent = Routine::getRoot();
-    // Return if the list is empty
+    // Return if the list is empty. Checking for a null getRoot() inside the
+    // if-statement is deliberate, since it optimizes the common case where the
+    // linked list is not empty.
     if (*mCurrent == nullptr) {
       return;
     }
@@ -76,13 +78,16 @@ void RoutineScheduler::runRoutine() {
   // Handle the routine's dispatch back to the last known internal status.
   switch ((*mCurrent)->getStatus()) {
     case Routine::kStatusYielding:
+    case Routine::kStatusAwaiting:
       (*mCurrent)->run();
       mCurrent = (*mCurrent)->getNext();
       break;
     case Routine::kStatusDelaying: {
-      uint16_t elapsedMillis =
-          (*mCurrent)->millis() - (*mCurrent)->getDelayStart();
-      if (elapsedMillis >= (*mCurrent)->getDelay()) {
+      // Checking isDelayExpired() here is an optimizating that avoids an extra
+      // call into the Routine::run(). Everything would still work if we just
+      // dispatched into the Routine::run() because that method checks for
+      // delay timer expiration as well.
+      if ((*mCurrent)->isDelayExpired()) {
         (*mCurrent)->run();
       }
       mCurrent = (*mCurrent)->getNext();

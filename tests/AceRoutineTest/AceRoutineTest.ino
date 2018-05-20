@@ -114,13 +114,13 @@ test(testRoutineMacros) {
   // run b
   RoutineScheduler::loop();
   assertEqual(Routine::kStatusYielding, a.getStatus());
-  assertEqual(Routine::kStatusYielding, b.getStatus());
+  assertEqual(Routine::kStatusAwaiting, b.getStatus());
   assertEqual(Routine::kStatusDelaying, c.getStatus());
 
   // run c
   RoutineScheduler::loop();
   assertEqual(Routine::kStatusYielding, a.getStatus());
-  assertEqual(Routine::kStatusYielding, b.getStatus());
+  assertEqual(Routine::kStatusAwaiting, b.getStatus());
   assertEqual(Routine::kStatusDelaying, c.getStatus());
 
   a.millis(101);
@@ -129,20 +129,20 @@ test(testRoutineMacros) {
 
   // run a
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusYielding, a.getStatus());
-  assertEqual(Routine::kStatusYielding, b.getStatus());
+  assertEqual(Routine::kStatusAwaiting, a.getStatus());
+  assertEqual(Routine::kStatusAwaiting, b.getStatus());
   assertEqual(Routine::kStatusDelaying, c.getStatus());
 
   // run b
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusYielding, a.getStatus());
-  assertEqual(Routine::kStatusYielding, b.getStatus());
+  assertEqual(Routine::kStatusAwaiting, a.getStatus());
+  assertEqual(Routine::kStatusAwaiting, b.getStatus());
   assertEqual(Routine::kStatusDelaying, c.getStatus());
 
   // run c
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusYielding, a.getStatus());
-  assertEqual(Routine::kStatusYielding, b.getStatus());
+  assertEqual(Routine::kStatusAwaiting, a.getStatus());
+  assertEqual(Routine::kStatusAwaiting, b.getStatus());
   assertEqual(Routine::kStatusEnding, c.getStatus());
 
   a.millis(102);
@@ -151,20 +151,20 @@ test(testRoutineMacros) {
 
   // run a
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusYielding, a.getStatus());
-  assertEqual(Routine::kStatusYielding, b.getStatus());
+  assertEqual(Routine::kStatusAwaiting, a.getStatus());
+  assertEqual(Routine::kStatusAwaiting, b.getStatus());
   assertEqual(Routine::kStatusEnding, c.getStatus());
 
   // run b
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusYielding, a.getStatus());
-  assertEqual(Routine::kStatusYielding, b.getStatus());
+  assertEqual(Routine::kStatusAwaiting, a.getStatus());
+  assertEqual(Routine::kStatusAwaiting, b.getStatus());
   assertEqual(Routine::kStatusEnding, c.getStatus());
 
   // run c - removed from list
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusYielding, a.getStatus());
-  assertEqual(Routine::kStatusYielding, b.getStatus());
+  assertEqual(Routine::kStatusAwaiting, a.getStatus());
+  assertEqual(Routine::kStatusAwaiting, b.getStatus());
   assertEqual(Routine::kStatusTerminated, c.getStatus());
 
   a.millis(103);
@@ -173,12 +173,12 @@ test(testRoutineMacros) {
 
   // run a
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusYielding, a.getStatus());
-  assertEqual(Routine::kStatusYielding, b.getStatus());
+  assertEqual(Routine::kStatusAwaiting, a.getStatus());
+  assertEqual(Routine::kStatusAwaiting, b.getStatus());
 
   // run b
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusYielding, a.getStatus());
+  assertEqual(Routine::kStatusAwaiting, a.getStatus());
   assertEqual(Routine::kStatusEnding, b.getStatus());
 
   a.millis(104);
@@ -187,12 +187,12 @@ test(testRoutineMacros) {
 
   // run a
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusYielding, a.getStatus());
+  assertEqual(Routine::kStatusAwaiting, a.getStatus());
   assertEqual(Routine::kStatusEnding, b.getStatus());
 
   // run b - removed from list
   RoutineScheduler::loop();
-  assertEqual(Routine::kStatusYielding, a.getStatus());
+  assertEqual(Routine::kStatusAwaiting, a.getStatus());
   assertEqual(Routine::kStatusTerminated, b.getStatus());
 
   a.millis(105);

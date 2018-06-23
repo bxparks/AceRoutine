@@ -296,10 +296,10 @@ round-robin scheduling algorithm.
 
 The list of scheduled coroutines is initially ordered by using
 `Coroutine::getName()` as the sorting key. This makes the scheduling
-deterministic, which allows unit tests to be work. However,
-`Coroutine.suspend()` then a subsequent `Coroutine.resume()` puts the coroutine
-at the beginning of the scheduling list, so the ordering may become mixed up
-over time if these functions are used.
+deterministic, which allows unit tests to work. However,
+calling `Coroutine.suspend()` then subsequently calling`Coroutine.resume()` puts
+the coroutine at the beginning of the scheduling list, so the ordering may
+become mixed up over time if these functions are used.
 
 ### Suspend and Resume
 
@@ -524,11 +524,10 @@ COROUTINE(loopForever) {
 I hadn't designed this syntax to work from the start, and was surprised to find
 that it actually worked.
 
-### Nested Coroutines
+### No Nested Coroutine Macros
 
-Coroutines **cannot** be nested. In other words, if you call another function
-from within a coroutine, that nested function is just a regular C++ function,
-not a coroutine. You should not (and cannot) use the various `COROUTINE_XXX()`
+Coroutines macros **cannot** be nested. In other words, if you call another
+function from within a coroutine, you cannot use the various `COROUTINE_XXX()`
 macros inside the nested function. The macros will trigger compiler errors if
 you try:
 ```
@@ -538,7 +537,7 @@ void doSomething() {
   ...
 }
 
-COROUTINE(cannotUseNestedRoutines) {
+COROUTINE(cannotUseNestedMacros) {
   COROUTINE_LOOP() {
     if (condition) {
       doSomething(); // doesn't work
@@ -548,6 +547,33 @@ COROUTINE(cannotUseNestedRoutines) {
   }
 }
 ```
+
+### Chaining Coroutines
+
+Coroutines can be chained, in other words, one coroutine *can* explicitly
+call another coroutine, like this:
+```
+COROUTINE(inner) {
+  COROUTINE_LOOP() {
+    ...
+    COROUTINE_YIELD();
+    ...
+  }
+}
+
+COROUTINE(outer) {
+  COROUTINE_LOOP() {
+    ...
+    inner.run();
+    ...
+    COROUTINE_YIELD();
+  }
+}
+
+```
+
+Although this is techically allowed, I have not yet discovered a practical
+use-case for this feature.
 
 ### Coroutine Instance
 
@@ -622,7 +648,7 @@ is allowed. For example, the following is allowed:
   ...
 ```
 
-### Advanced Custom Coroutines
+### Custom Coroutines
 
 All coroutines are instances of the `Coroutine` class, or one of its subclasses.
 You can create custom subclasses of `Coroutine` and create coroutines which are
@@ -682,12 +708,12 @@ If the 2-argument version of `COROUTINE()` was used, then the corresponding
 The AceRoutine library does not provide any internal mechanism to
 pass data between coroutines. Here are some options:
 
-* The easiest is to use **global variables** which are modified by multiple
-  coroutines.
-* You can use custom Coroutine classes and define a class static variables which
-  can be shared among coroutines which sublcass The same class.
+* The easiest method is to use **global variables** which are modified by
+  multiple coroutines.
+* You can subclass the `Coroutine` class and define a class static variables
+  which can be shared among coroutines which inherit this custom class
 * You can define methods on the custom Coroutine class, and pass messages back
-  and forth between coroutines by method calls.
+  and forth between coroutines using these methods.
 
 ### Functors
 

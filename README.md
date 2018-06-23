@@ -9,7 +9,7 @@ Version: (2018-06-23)
 
 This library is an implementation of the
 [ProtoThreads](http://dunkels.com/adam/pt) library for the
-Arduino platform. It emulates a stackless subroutine that can suspend execution
+Arduino platform. It emulates a stackless coroutine that can suspend execution
 using a `yield()` or `delay()` functionality to allow other coroutines to
 execute. When the scheduler makes it way back to the original coroutine, the
 execution continues right after the `yield()` or `delay()`.
@@ -18,22 +18,23 @@ There are only 2 classes in this library:
 * each coroutine is an instance of a subclass of the `Coroutine` class,
 * the optional `CoroutineScheduler` class handles the scheduling
 
-The library provides a number of macros to help create and manage life cycle
-of these coroutines:
+The library provides a number of macros to help create coroutines and manage
+their life cycle:
 * `COROUTINE()`: defines an instance of `Coroutine` class or a user-provided
-  custom subclass of `Coroutine`
+  subclass of `Coroutine`
 * `COROUTINE_BEGIN()`: must occur at the start of a coroutine body
 * `COROUTINE_END()`: must occur at the end of the coroutine body
-* `COROUTINE_YIELD()`: yields execution back to the `CoroutineScheduler`
+* `COROUTINE_YIELD()`: yields execution back to the caller, often
+  `CoroutineScheduler` but not necessarily
 * `COROUTINE_AWAIT(condition)`: yield until `condition` become `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
 
-Here are some of the strong features of this library compared to
+Here are some of the compelling features of this library compared to
 others (in my opinion of course):
 * low memory usage
-    * each coroutine consumes only 13 bytes of static memory (on AVR) and
+    * each coroutine consumes only 13 bytes of RAM (on AVR) and
       24 bytes on 32-bit processors (ARM, ESP8266, ESP32)
     * the `CoroutineScheduler` consumes only 2 bytes (8-bit) or 4 bytes (32-bit)
       no matter how many coroutines are active
@@ -44,7 +45,7 @@ others (in my opinion of course):
 * uses "computed goto" feature of GCC to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
     * allows `switch` statemens in the coroutines
-* macros eliminate boilerplate code and makes the code easy to read
+* C/C++ macros eliminate boilerplate code and make the code easy to read
 * the base `Coroutine` class is easy to subclass to add additional variables and
   functions
 * fully unit tested using [AUnit](https://github.com/bxparks/AUnit)
@@ -52,10 +53,11 @@ others (in my opinion of course):
 Some limitations are:
 * coroutines cannot return any values
 * coroutines are stackless, so they cannot presever local stack varaibles
-  across multiple calls. However, coroutines are objects, so member variables
-  may often be used to preserve state across calls.
+  across multiple calls. However, coroutines are instances of a class that can
+  be extended by the end-user, so member variables can be used as substitutes
+  for local stack variables.
 
-After I had completed most of the library, I discovered that I had essentially
+After I had completed most of this library, I discovered that I had essentially
 reimplemented the `<ProtoThread.h>` library in the
 [Cosa framework](https://github.com/mikaelpatel/Cosa). The difference is that
 AceRoutine is a self-contained library that works on any platform supporting the
@@ -160,6 +162,7 @@ The source files are organized as follows:
 * `src/ace_routine/testing/` - internal testing files
 * `tests/` - unit tests which depend on
   [AUnit](https://github.com/bxparks/AUnit)
+* `examples/` - example programs
 
 ### Docs
 
@@ -687,8 +690,7 @@ broader abstraction of threads or coroutines:
 ### Comparing AceRoutine to Other Libraries
 
 This library falls in the "Threads or Coroutines" camp. The inspiration for this
-library came from
-[ProtoThreads](http://dunkels.com/adam/pt) and
+library came from [ProtoThreads](http://dunkels.com/adam/pt) and
 [Coroutines in C](https://www.chiark.greenend.org.uk/~sgtatham/coroutines.html)
 where an incredibly brilliant and ugly technique called
 [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device)
@@ -706,9 +708,13 @@ that I could make the code a lot cleaner and easier to use in a number of ways:
   inside the coroutines, which wasn't possible using the Duff's Device.
 * Each "coroutine" needs to keep some small number of context variables.
   In the C language, this needs to be passed around using a `struct`. It
-  occurred to that in C++, we could make the context variables almost disappear
-  by making "coroutine" an instance of a class and moving the context variables
-  into the member variables.
+  occurred to me that in C++, we could make the context variables almost
+  disappear by making "coroutine" an instance of a class and moving the context
+  variables into the member variables.
+* I could use C-processor macros similar to the ones used in
+  [AUnit](https://github.com/bxparks/AUnit) to hide much of the boilerplate code
+  and complexity from the user, making the library a lot easier to use, and
+  producing code that's easier to maintain.
 
 I looked around to see if there already was a library that implemented these
 ideas and I couldn't see one. However, after essentially finishing this library,

@@ -655,7 +655,7 @@ You can create custom subclasses of `Coroutine` and create coroutines which are
 instances of the custom class. Use the 2-argument version of the `COROUTINE()`
 macro like this:
 ```
-class CustomRoutine : public Coroutine {
+class CustomCoroutine : public Coroutine {
   public:
     void enable(bool enable) { enabled = enable; }
 
@@ -663,7 +663,7 @@ class CustomRoutine : public Coroutine {
     bool enabled = 0;
 };
 
-COROUTINE(CustomRoutine, blinkSlow) {
+COROUTINE(CustomCoroutine, blinkSlow) {
   COROUTINE_LOOP() {
     ...
   }
@@ -671,7 +671,7 @@ COROUTINE(CustomRoutine, blinkSlow) {
 ...
 ```
 The 2-argument version created an instance called `blinkSlow` which is an
-instance of a subclass of `CustomRoutine`. Everything else remains the same.
+instance of a subclass of `CustomCoroutine`. Everything else remains the same.
 
 ### External Coroutines
 
@@ -693,15 +693,32 @@ this:
 ```
 EXTERN_COROUTINE(external);
 
-COROUTINE(doSomethingElse) {
+COROUTINE(doSomething) {
   ...
-  if (!doSomethingExternal.isDone()) COROUTINE_DELAY(1000);
+  if (!external.isDone()) COROUTINE_DELAY(1000);
   ...
 }
 ```
 
 If the 2-argument version of `COROUTINE()` was used, then the corresponding
-2-argument version of `EXTERN_COROUTINE()` must be used, like this:
+2-argument version of `EXTERN_COROUTINE()` must be used, like this in
+`External.cpp`:
+```
+COROUTINE(CustomCoroutine, external) {
+  ...
+}
+```
+
+then this in `Main.ino`:
+```
+EXTERN_COROUTINE(CustomCoroutine, external);
+
+COROUTINE(doSomething) {
+  ...
+  if (!external.isDone()) COROUTINE_DELAY(1000);
+  ...
+}
+```
 
 ### Communication Between Coroutines
 

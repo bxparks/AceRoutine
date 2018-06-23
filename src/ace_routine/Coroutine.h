@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_ROUTINE_ROUTINE_H
-#define ACE_ROUTINE_ROUTINE_H
+#ifndef ACE_ROUTINE_COROUTINE_H
+#define ACE_ROUTINE_COROUTINE_H
 
 #include <stdint.h> // UINT16_MAX
 #include <Print.h> // Print
@@ -31,16 +31,15 @@ SOFTWARE.
 #include "FCString.h"
 
 /**
- * @file Routine.h
+ * @file Coroutine.h
  *
- * All (co)routines are instances of the Routine base class. The ROUTINE() macro
- * creates these instances, and registers them to automatically run when
- * RoutineScheduler::loop() is called.
+ * All coroutines are instances of the Coroutine base class. The COROUTINE()
+ * macro creates these instances, and registers them to automatically run when
+ * CoroutineScheduler::loop() is called.
  *
  * Various macros use macro overloading to implement a 1-argument and
- * a 2-argument version. See
- * https://stackoverflow.com/questions/11761703/overloading-macro-on-number-of-arguments
- * to description of how that works.
+ * a 2-argument version. See https://stackoverflow.com/questions/11761703 to
+ * description of how that works.
  *
  * The computed goto is a GCC extension:
  * https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html
@@ -50,35 +49,35 @@ SOFTWARE.
  */
 
 /**
- * Create a Routine instance named 'name'. Two forms are supported
+ * Create a Coroutine instance named 'name'. Two forms are supported
  *
- *   - ROUTINE(name) {...}
- *   - ROUTINE(className, name) {...}
+ *   - COROUTINE(name) {...}
+ *   - COROUTINE(className, name) {...}
  *
- * The 1-argument form uses the Routine class as the base class of the
- * routine. The 2-argument form uses the user-provided className which must be
- * a subclass of Routine.
+ * The 1-argument form uses the Coroutine class as the base class of the
+ * coroutine. The 2-argument form uses the user-provided className which must be
+ * a subclass of Coroutine.
  *
  * The code in {} following this macro becomes the body of the
- * Routine::run() method.
+ * Coroutine::run() method.
  */
-#define ROUTINE(...) \
-    GET_ROUTINE(__VA_ARGS__, ROUTINE2, ROUTINE1)(__VA_ARGS__)
+#define COROUTINE(...) \
+    GET_COROUTINE(__VA_ARGS__, COROUTINE2, COROUTINE1)(__VA_ARGS__)
 
-#define GET_ROUTINE(_1, _2, NAME, ...) NAME
+#define GET_COROUTINE(_1, _2, NAME, ...) NAME
 
-#define ROUTINE1(name) \
-struct Routine_##name : ace_routine::Routine { \
-  Routine_##name(); \
+#define COROUTINE1(name) \
+struct Coroutine_##name : ace_routine::Coroutine { \
+  Coroutine_##name(); \
   virtual int run() override \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
-Routine_##name :: Routine_##name() { \
+Coroutine_##name :: Coroutine_##name() { \
   init(ACE_ROUTINE_F(#name)); \
 } \
-int Routine_##name :: run()
+int Coroutine_##name :: run()
 
-#define ROUTINE2(className, name) \
+#define COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
   virtual int run() override \
@@ -90,28 +89,28 @@ className##_##name :: className##_##name() { \
 int className##_##name :: run()
 
 /**
- * Create an extern reference to a routine that is defined in another .cpp
+ * Create an extern reference to a coroutine that is defined in another .cpp
  * file. The extern reference is needed before it can be used. Two forms are
  * supported:
  *
- *    - EXTERN_ROUTINE(name);
- *    - EXTERN_ROUTINE(className, name);
+ *    - EXTERN_COROUTINE(name);
+ *    - EXTERN_COROUTINE(className, name);
  */
-#define EXTERN_ROUTINE(...) \
-    GET_EXTERN_ROUTINE(\
-        __VA_ARGS__, EXTERN_ROUTINE2, EXTERN_ROUTINE1)(__VA_ARGS__)
+#define EXTERN_COROUTINE(...) \
+    GET_EXTERN_COROUTINE(\
+        __VA_ARGS__, EXTERN_COROUTINE2, EXTERN_COROUTINE1)(__VA_ARGS__)
 
-#define GET_EXTERN_ROUTINE(_1, _2, NAME, ...) NAME
+#define GET_EXTERN_COROUTINE(_1, _2, NAME, ...) NAME
 
-#define EXTERN_ROUTINE1(name) \
-struct Routine_##name : ace_routine::Routine { \
-  Routine_##name(); \
+#define EXTERN_COROUTINE1(name) \
+struct Coroutine_##name : ace_routine::Coroutine { \
+  Coroutine_##name(); \
   virtual int run() override \
     __attribute__((__noinline__,__noclone__)); \
 }; \
-extern Routine_##name name
+extern Coroutine_##name name
 
-#define EXTERN_ROUTINE2(className, name) \
+#define EXTERN_COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
   virtual int run() override \
@@ -119,22 +118,22 @@ struct className##_##name : className { \
 }; \
 extern className##_##name name
 
-/** Mark the beginning of a routine. */
-#define ROUTINE_BEGIN() \
+/** Mark the beginning of a coroutine. */
+#define COROUTINE_BEGIN() \
     void* p = getJump(); \
     if (p != nullptr) { \
       goto *p; \
     }
 
 /**
- * Mark the beginning of a routine loop. Can be used instead of
- * ROUTINE_BEGIN() at the beginning of a Routine.
+ * Mark the beginning of a coroutine loop. Can be used instead of
+ * COROUTINE_BEGIN() at the beginning of a Coroutine.
  */
-#define ROUTINE_LOOP() \
-   ROUTINE_BEGIN(); \
+#define COROUTINE_LOOP() \
+   COROUTINE_BEGIN(); \
    while (true) \
 
-#define ROUTINE_YIELD_INTERNAL() \
+#define COROUTINE_YIELD_INTERNAL() \
     do { \
       __label__ jumpLabel; \
       setJump(&& jumpLabel); \
@@ -142,11 +141,11 @@ extern className##_##name name
       jumpLabel: ; \
     } while (false)
 
-/** Yield execution to another routine. */
-#define ROUTINE_YIELD() \
+/** Yield execution to another coroutine. */
+#define COROUTINE_YIELD() \
     do { \
       setYielding(); \
-      ROUTINE_YIELD_INTERNAL(); \
+      COROUTINE_YIELD_INTERNAL(); \
       setRunning(); \
     } while (false)
 
@@ -155,52 +154,52 @@ extern className##_##name name
  * functionally equivalent to:
  *
  * @code
- *    while (!condition) ROUTINE_YIELD();
+ *    while (!condition) COROUTINE_YIELD();
  * @endcode
  *
  * but the getStatus() during the waiting is set to kStatusAwaiting instead of
  * kStatusYielding. The current scheduler treats the two states the same, but
  * it's possible that a different scheduler may want to treat them differently.
  */
-#define ROUTINE_AWAIT(condition) \
+#define COROUTINE_AWAIT(condition) \
     do { \
       while (!(condition)) { \
         setAwaiting(); \
-        ROUTINE_YIELD_INTERNAL(); \
+        COROUTINE_YIELD_INTERNAL(); \
       } \
       setRunning(); \
     } while (false)
 
 /**
 * Yield for delayMillis. A delayMillis of 0 is functionally equivalent to
-* ROUTINE_YIELD(). To save memory, the delayMillis is stored as a uint16_t so
+* COROUTINE_YIELD(). To save memory, the delayMillis is stored as a uint16_t so
 * the maximum delay is technically 65535 milliseconds. However, to avoid an
-* edge-case when using RoutineSchedule, the practical maximum of 65534
-* milliseconds is imposed by the Routine::delay() method.
+* edge-case when using CoroutineSchedule, the practical maximum of 65534
+* milliseconds is imposed by the Coroutine::delay() method.
 *
 * If you need to wait for longer than that, use a for-loop to call
-* ROUTINE_DELAY() as many times as necessary.
+* COROUTINE_DELAY() as many times as necessary.
 *
-* This could have been implemented using ROUTINE_AWAIT() but this macro matches
-* the global delay(millis) function already provided by the Arduino API, and
-* the separate kStatusDelaying allows the scheduler to perform some
+* This could have been implemented using COROUTINE_AWAIT() but this macro
+* matches the global delay(millis) function already provided by the Arduino
+* API, and the separate kStatusDelaying allows the scheduler to perform some
 * optimization.
 */
-#define ROUTINE_DELAY(delayMillis) \
+#define COROUTINE_DELAY(delayMillis) \
     do { \
       setDelay(delayMillis); \
       while (!isDelayExpired()) { \
         setDelaying(); \
-        ROUTINE_YIELD_INTERNAL(); \
+        COROUTINE_YIELD_INTERNAL(); \
       } \
       setRunning(); \
     } while (false)
 
 /**
- * Mark the end of a routine. Subsequent calls to Routine::run() will do
+ * Mark the end of a coroutine. Subsequent calls to Coroutine::run() will do
  * nothing.
  */
-#define ROUTINE_END() \
+#define COROUTINE_END() \
     do { \
       __label__ jumpLabel; \
       setEnding(); \
@@ -212,42 +211,42 @@ extern className##_##name name
 namespace ace_routine {
 
 /**
- * Base class of all routines. The actual routine code is an implementation
+ * Base class of all coroutines. The actual coroutine code is an implementation
  * of the virtual run() method.
  */
-class Routine {
+class Coroutine {
   public:
     /**
-     * The execution recovery status of the routine, corresponding to the
-     * ROUTINE_YIELD(), ROUTINE_DELAY(), ROUTINE_AWAIT() and ROUTINE_END()
-     * macros.
+     * The execution recovery status of the coroutine, corresponding to the
+     * COROUTINE_YIELD(), COROUTINE_DELAY(), COROUTINE_AWAIT() and
+     * COROUTINE_END() macros.
      */
     typedef uint8_t Status;
 
     /**
-     * Routine has been suspended using suspend() and the scheduler should
+     * Coroutine has been suspended using suspend() and the scheduler should
      * remove it from the queue upon the next iteration. We don't distinguish
-     * whether the routine is still in the queue or not with this status. We
+     * whether the coroutine is still in the queue or not with this status. We
      * can add that later if we need to.
      */
     static const Status kStatusSuspended = 0;
 
-    /** Routine is currenly running. True only within the routine itself. */
+    /** Coroutine is currenly running. True only within the coroutine itself. */
     static const Status kStatusRunning = 1;
 
-    /** Routine returned using the ROUTINE_YIELD() statement. */
+    /** Coroutine returned using the COROUTINE_YIELD() statement. */
     static const Status kStatusYielding = 2;
 
-    /** Routine returned using the ROUTINE_AWAIT() statement. */
+    /** Coroutine returned using the COROUTINE_AWAIT() statement. */
     static const Status kStatusAwaiting = 3;
 
-    /** Routine returned using the ROUTINE_DELAY() statement. */
+    /** Coroutine returned using the COROUTINE_DELAY() statement. */
     static const Status kStatusDelaying = 4;
 
-    /** Routine executed the ROUTINE_END() statement. */
+    /** Coroutine executed the COROUTINE_END() statement. */
     static const Status kStatusEnding = 5;
 
-    /** Routine has ended and no longer in the scheduler queue. */
+    /** Coroutine has ended and no longer in the scheduler queue. */
     static const Status kStatusTerminated = 6;
 
     /**
@@ -255,29 +254,29 @@ class Routine {
      * fix the C++ static initialization problem, making it safe to use this in
      * other static contexts.
      */
-    static Routine** getRoot();
+    static Coroutine** getRoot();
 
     /**
      * Return the next pointer as a pointer to the pointer, similar to
      * getRoot(). This makes it much easier to manipulate a singly-linked list.
      * Also makes setNext() method unnecessary.
      */
-    Routine** getNext() { return &mNext; }
+    Coroutine** getNext() { return &mNext; }
 
-    /** Human-readable name of the routine. */
+    /** Human-readable name of the coroutine. */
     const FCString& getName() const { return mName; }
 
     /**
-     * The body of the routine. The return value is never used. It exists
-     * solely to prevent the various ROUTINE_YIELD(), ROUTINE_DELAY()
-     * and ROUTINE_END() macros from accidentally compiling inside a nested
+     * The body of the coroutine. The return value is never used. It exists
+     * solely to prevent the various COROUTINE_YIELD(), COROUTINE_DELAY()
+     * and COROUTINE_END() macros from accidentally compiling inside a nested
      * method.
      *
      * @return The return value is always ignored. This method is declared to
      * return an int to prevent the user from accidentally returning from this
      * method incorrectly. This method should always return using one of the
-     * ROUTINE_YIELD(), ROUTINE_DELAY() or ROUTINE_END() macros, or not
-     * return at all is using the ROUTINE_LOOP() macro.
+     * COROUTINE_YIELD(), COROUTINE_DELAY() or COROUTINE_END() macros, or not
+     * return at all is using the COROUTINE_LOOP() macro.
      */
     virtual int run() = 0;
 
@@ -288,8 +287,8 @@ class Routine {
     virtual unsigned long millis() const;
 
     /**
-     * Suspend the routine at the next scheduler iteration. If the routine is
-     * already in the process of ending or is already terminated, then this
+     * Suspend the coroutine at the next scheduler iteration. If the coroutine
+     * is already in the process of ending or is already terminated, then this
      * method does nothing.
      */
     void suspend() {
@@ -298,13 +297,13 @@ class Routine {
     }
 
     /**
-     * Add a Suspended routine into the head of the scheduler linked list, and
-     * change the state to Yielding. If the routine is in any other state, this
-     * method does nothing.
+     * Add a Suspended coroutine into the head of the scheduler linked list,
+     * and change the state to Yielding. If the coroutine is in any other
+     * state, this method does nothing.
      */
     void resume();
 
-    /** Return the status of the routine. Used by the RoutineScheduler. */
+    /** Return the status of the coroutine. Used by the CoroutineScheduler. */
     Status getStatus() const { return mStatus; }
 
     /** Check if delay time is over. */
@@ -313,51 +312,51 @@ class Routine {
       return elapsedMillis >= mDelayDurationMillis;
     }
 
-    /** The routine is currently running. True only within the routine. */
+    /** The coroutine is currently running. True only within the coroutine. */
     bool isRunning() const { return mStatus == kStatusRunning; }
 
-    /** The routine returned using ROUTINE_YIELD(). */
+    /** The coroutine returned using COROUTINE_YIELD(). */
     bool isYielding() const { return mStatus == kStatusYielding; }
 
-    /** The routine returned using ROUTINE_AWAIT(). */
+    /** The coroutine returned using COROUTINE_AWAIT(). */
     bool isAwaiting() const { return mStatus == kStatusAwaiting; }
 
-    /** The routine returned using ROUTINE_DELAY(). */
+    /** The coroutine returned using COROUTINE_DELAY(). */
     bool isDelaying() const { return mStatus == kStatusDelaying; }
 
-    /** The routine returned using ROUTINE_END(). */
+    /** The coroutine returned using COROUTINE_END(). */
     bool isEnding() const { return mStatus == kStatusEnding; }
 
-    /** The routine was suspended with a call to suspend(). */
+    /** The coroutine was suspended with a call to suspend(). */
     bool isSuspended() const { return mStatus == kStatusSuspended; }
 
-    /** The routine was suspended with a call to suspend(). */
+    /** The coroutine was suspended with a call to suspend(). */
     bool isTerminated() const { return mStatus == kStatusTerminated; }
 
     /**
-     * The routine is either Ending or Terminated. This method is recommended
-     * over isEnding() or isTerminated() because it works when the routine is
-     * executed either manually or through the RoutineScheduler.
+     * The coroutine is either Ending or Terminated. This method is recommended
+     * over isEnding() or isTerminated() because it works when the coroutine is
+     * executed either manually or through the CoroutineScheduler.
      */
     bool isDone() const {
       return mStatus == kStatusEnding || mStatus == kStatusTerminated;
     }
 
     /**
-     * Indicate that the Routine has been removed from the Scheduler queue.
-     * Should be used only by the RoutineScheduler.
+     * Indicate that the Coroutine has been removed from the Scheduler queue.
+     * Should be used only by the CoroutineScheduler.
      */
     void setTerminated() { mStatus = kStatusTerminated; }
 
   protected:
     /** Constructor. */
-    Routine() {}
+    Coroutine() {}
 
     /**
-     * Initialize the routine, set it to Yielding state, and add it to the
-     * linked list of routines.
+     * Initialize the coroutine, set it to Yielding state, and add it to the
+     * linked list of coroutines.
      *
-     * @param name The name of the routine as a human-readable string.
+     * @param name The name of the coroutine as a human-readable string.
      */
     void init(const char* name) {
       mName = FCString(name);
@@ -392,9 +391,9 @@ class Routine {
 
     /**
      * Configure the delay timer. The maximum duration is (UINT16_MAX-1) (i.e.
-     * 65534) to avoid an edge-case when using the RoutineScheduler to optimize
-     * the ROUTINE_DELAY() macro. If UINT16_MAX is given, the duration is set
-     * to (UINT16_MAX-1).
+     * 65534) to avoid an edge-case when using the CoroutineScheduler to
+     * optimize the COROUTINE_DELAY() macro. If UINT16_MAX is given, the
+     * duration is set to (UINT16_MAX-1).
      */
     void setDelay(uint16_t delayMillisDuration) {
       mDelayStartMillis = millis();
@@ -408,25 +407,25 @@ class Routine {
 
   private:
     // Disable copy-constructor and assignment operator
-    Routine(const Routine&) = delete;
-    Routine& operator=(const Routine&) = delete;
+    Coroutine(const Coroutine&) = delete;
+    Coroutine& operator=(const Coroutine&) = delete;
 
     /**
-     * Insert the current routine into the singly linked list. The order of
+     * Insert the current coroutine into the singly linked list. The order of
      * C++ static initialization is undefined, but if getName() is not null
-     * (which will normally be the case when using the ROUTINE() macro), the
-     * routine will be inserted using getName() as the sorting key. This makes
+     * (which will normally be the case when using the COROUTINE() macro), the
+     * coroutine will be inserted using getName() as the sorting key. This makes
      * the ordering deterministic, which is required for unit tests.
      *
      * The insertion algorithm is O(N) per insertion, for a total complexity
-     * of O(N^2). That's probably good enough for a "small" number of routines,
-     * where small is around O(100). If a large number of routines are
-     * inserted, then this method needs to be optimized.
+     * of O(N^2). That's probably good enough for a "small" number of
+     * coroutines, where small is around O(100). If a large number of
+     * coroutines are inserted, then this method needs to be optimized.
      */
     void insertSorted();
 
     FCString mName;
-    Routine* mNext = nullptr;
+    Coroutine* mNext = nullptr;
     void* mJumpPoint = nullptr;
     Status mStatus = kStatusSuspended;
     uint16_t mDelayStartMillis;

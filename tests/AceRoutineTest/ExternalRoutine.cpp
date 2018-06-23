@@ -1,14 +1,12 @@
-#line 2 "ExternalRoutine.cpp"
+#line 2 "ExternalCoroutine.cpp"
 
 #include <AceRoutine.h>
-#include "ace_routine/testing/TestableRoutine.h"
+#include "ace_routine/testing/TestableCoroutine.h"
 using namespace ace_routine;
 using namespace ace_routine::testing;
 
-ROUTINE(TestableRoutine, c) {
-  ROUTINE_BEGIN();
-
-  ROUTINE_DELAY(100);
-
-  ROUTINE_END();
+COROUTINE(TestableCoroutine, c) {
+  COROUTINE_BEGIN();
+  COROUTINE_DELAY(100);
+  COROUTINE_END();
 }

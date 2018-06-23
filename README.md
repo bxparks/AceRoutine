@@ -1,18 +1,59 @@
 # AceRoutine
 
-A low-memory footprint, fast-switching, cooperative multitasking library using
-stackless routines on Arduino platforms.
+A low-memory, fast-switching, cooperative multitasking library using
+stackless coroutines on Arduino platforms.
 
-Version: (2018-05-20)
+Version: (2018-06-23)
 
 ## Summary
 
 This library is an implementation of the
 [ProtoThreads](http://dunkels.com/adam/pt) library for the
 Arduino platform. It emulates a stackless subroutine that can suspend execution
-using a `yield()` or `delay()` functionality to allow other routines to execute.
-When the scheduler makes it way back to the original routine, the execution
-continues right after the `yield()` or `delay()`.
+using a `yield()` or `delay()` functionality to allow other coroutines to
+execute. When the scheduler makes it way back to the original coroutine, the
+execution continues right after the `yield()` or `delay()`.
+
+There are only 2 classes in this library:
+* each coroutine is an instance of a subclass of the `Coroutine` class,
+* the optional `CoroutineScheduler` class handles the scheduling
+
+The library provides a number of macros to help create and manage life cycle
+of these coroutines:
+* `COROUTINE()`: defines an instance of `Coroutine` class or a user-provided
+  custom subclass of `Coroutine`
+* `COROUTINE_BEGIN()`: must occur at the start of a coroutine body
+* `COROUTINE_END()`: must occur at the end of the coroutine body
+* `COROUTINE_YIELD()`: yields execution back to the `CoroutineScheduler`
+* `COROUTINE_AWAIT(condition)`: yield until `condition` become `true`
+* `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
+  parameter is defined as a `uint16_t`.
+* `COROUTINE_LOOP()`: convenience macro that loops forever
+
+Here are some of the strong features of this library compared to
+others (in my opinion of course):
+* low memory usage
+    * each coroutine consumes only 13 bytes of static memory (on AVR) and
+      24 bytes on 32-bit processors (ARM, ESP8266, ESP32)
+    * the `CoroutineScheduler` consumes only 2 bytes (8-bit) or 4 bytes (32-bit)
+      no matter how many coroutines are active
+* extremely fast context switching
+    * ~5 microseconds on a 16 MHz ATmega328P
+    * ~0.8 microseconds on Teensy 3.2 (depending on compiler settings)
+    * ~0.4 microseconds on a ESP32
+* uses "computed goto" feature of GCC to avoid the
+  [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
+    * allows `switch` statemens in the coroutines
+* macros eliminate boilerplate code and makes the code easy to read
+* the base `Coroutine` class is easy to subclass to add additional variables and
+  functions
+* fully unit tested using [AUnit](https://github.com/bxparks/AUnit)
+
+Some limitations are:
+* coroutines cannot return any values
+* coroutines are stackless, so they cannot presever local stack varaibles
+  across multiple calls. However, coroutines are objects, so member variables
+  may often be used to preserve state across calls.
 
 After I had completed most of the library, I discovered that I had essentially
 reimplemented the `<ProtoThread.h>` library in the
@@ -20,55 +61,9 @@ reimplemented the `<ProtoThread.h>` library in the
 AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc).
 
-I could not justify calling these "coroutines" because they cannot be called
-aribtrarily, and they do not return any values. They are not really "threads"
-either because they are stackless and cannot retain local variables persistently
-across multiple invocations. I call them just "routines" in this library, you
-can call them "ace routines" if you wish. ("ACE" used to mean something for some
-of my other libraries, but it's just a generic marker that doesn't mean anything
-right now.)
+### HelloCoroutine
 
-There are only 2 classes in this library:
-* each routine is an instance of a subclass of the `Routine` class,
-* the `RoutineScheduler` ojbect handles the scheduling
-
-The library provides a number of macros to help create and manage life cycle
-of these routines:
-* `ROUTINE()`: defines an instance of `Routine` class or a user-provided
-  custom subclass of `Routine`
-* `ROUTINE_BEGIN()`: must occur at the start of a routine body
-* `ROUTINE_END()`: must occur at the end of the routine body
-* `ROUTINE_YIELD()`: yields execution back to the `RoutineScheduler`
-* `ROUTINE_AWAIT(condition)`: yield until `condition` become `true`
-* `ROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
-  parameter is defined as a `uint16_t`.
-* `ROUTINE_LOOP()`: convenience macro that loops forever
-
-Here are some of the strong features of this library compared to
-others (in my opinion of course):
-* extremely low memory usage
-    * each routine consumes only 13 bytes of static memory (on AVR) and
-      24 bytes on 32-bit processors (ARM, ESP8266, ESP32)
-    * the `RoutineScheduler` consumes only 2 (or 4) bytes no matter how
-      many routines are active
-* extremely fast context switching
-    * ~5 microseconds on a 16 MHz ATmega328P
-    * ~0.8 microseconds on Teensy 3.2 (depending on compiler settings)
-    * ~0.4 microseconds on a ESP32
-    * the `RoutineScheduler` simply walks along a singly linked list without
-      much overhead
-* uses "computed goto" feature of GCC to avoid the
-  [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack,
-  allowing `switch` statemens in the routines
-* macros eliminate a lot of boilerplate code and makes the code easy to read
-* easy to subclass the base `Routine` class and add additional variables and
-  functions
-    * macros can support these custom classes easily
-* fully unit tested using [AUnit](https://github.com/bxparks/AUnit)
-
-### HelloRoutine
-
-This is the [HelloRoutine.ino](examples/HelloRoutine) sample sketch.
+This is the [HelloCoroutine.ino](examples/HelloCoroutine) sample sketch.
 
 ```
 #include <AceRoutine.h>
@@ -80,31 +75,31 @@ const int LED_OFF = LOW;
 
 const int LED_DELAY = 200;
 
-ROUTINE(blinkLed) {
-  ROUTINE_LOOP() {
+COROUTINE(blinkLed) {
+  COROUTINE_LOOP() {
     digitalWrite(LED, LED_ON);
-    ROUTINE_DELAY(LED_DELAY);
+    COROUTINE_DELAY(LED_DELAY);
     digitalWrite(LED, LED_OFF);
-    ROUTINE_DELAY(LED_DELAY);
+    COROUTINE_DELAY(LED_DELAY);
   }
 }
 
-ROUTINE(printHello) {
-  ROUTINE_BEGIN();
+COROUTINE(printHello) {
+  COROUTINE_BEGIN();
 
   Serial.print(F("Hello, "));
-  ROUTINE_DELAY(1000);
+  COROUTINE_DELAY(1000);
 
-  ROUTINE_END();
+  COROUTINE_END();
 }
 
-ROUTINE(printWorld) {
-  ROUTINE_BEGIN();
+COROUTINE(printWorld) {
+  COROUTINE_BEGIN();
 
-  ROUTINE_AWAIT(printHello.isDone());
+  COROUTINE_AWAIT(printHello.isDone());
   Serial.println(F("World!"));
 
-  ROUTINE_END();
+  COROUTINE_END();
 }
 
 void setup() {
@@ -123,8 +118,7 @@ void loop() {
 This prints "Hello, ", then waits one second, and then prints "World!".
 At the same time, the LED blinks on and off.
 
-Another variation in `HelloScheduler` uses the `RoutineScheduler` to
-run the routines:
+`HelloScheduler` implements the same thing using the `CoroutineScheduler`:
 
 ```
 // same as above
@@ -134,13 +128,17 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 
-  RoutineScheduler::setup();
+  CoroutineScheduler::setup();
 }
 
 void loop() {
-  RoutineScheduler::loop();
+  CoroutineScheduler::loop();
 }
 ```
+
+The `CoroutineScheduler` can automatically manage all coroutines defined by the
+`COROUTINE` macro, which eliminates the need to itemize all your coroutines in
+the `loop()` method manually.
 
 ## Installation
 
@@ -172,13 +170,14 @@ The [docs/](docs/) directory contains the
 
 The following example sketches are provided:
 
-* [HelloRoutine.ino](examples/HelloRoutine)
-* [HelloScheduler.ino](examples/HelloScheduler): same as `HelloRoutine`
-  except using the `RoutineScheduler` instead of manually running the routines
-* [BlinkSlowFastRoutine.ino](examples/BlinkSlowFastRoutine): use routines
+* [HelloCoroutine.ino](examples/HelloCoroutine)
+* [HelloScheduler.ino](examples/HelloScheduler): same as `HelloCoroutine`
+  except using the `CoroutineScheduler` instead of manually running the
+  coroutines
+* [BlinkSlowFastRoutine.ino](examples/BlinkSlowFastRoutine): use coroutines
   to read a button and control how the LED blinks
 * [BlinkSlowFastCustomRoutine.ino](examples/BlinkSlowFastCustomRoutine): same
-  as BlinkSlowFastRoutine but using a custom `Routine` class
+  as BlinkSlowFastRoutine but using a custom `Coroutine` class
 * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same time
 * [AutoBenchmark.ino](examples/AutoBenchmark):
   a program that performs CPU benchmarking
@@ -200,42 +199,39 @@ using namespace ace_routine;
 ### Macros
 
 The following macros are used:
-* `ROUTINE()`: defines an instance of `Routine` class or a user-provided
-  custom subclass of `Routine`
-* `ROUTINE_BEGIN()`: must occur at the start of a routine body
-* `ROUTINE_END()`: must occur at the end of the routine body
-* `ROUTINE_YIELD()`: yields execution back to the `RoutineScheduler`
-* `ROUTINE_AWAIT(condition)`: yield until `condition` become `true`
-* `ROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
+* `COROUTINE()`: defines an instance of `Coroutine` class or a user-provided
+  custom subclass of `Coroutine`
+* `COROUTINE_BEGIN()`: must occur at the start of a coroutine body
+* `COROUTINE_END()`: must occur at the end of the coroutine body
+* `COROUTINE_YIELD()`: yields execution back to the `CoroutineScheduler`
+* `COROUTINE_AWAIT(condition)`: yield until `condition` become `true`
+* `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
-* `ROUTINE_LOOP()`: convenience macro that loops forever
+* `COROUTINE_LOOP()`: convenience macro that loops forever
 
-### Defining Routines
+### Defining Coroutines
 
 The overall structure looks like this:
 ```
 #include <AceRoutine.h>
 using namespace ace_routine;
 
-ROUTINE(oneShotRoutine) {
-  ROUTINE_BEGIN();
-
+COROUTINE(oneShotRoutine) {
+  COROUTINE_BEGIN();
   ...
-  ROUTINE_YIELD();
-
-  ROUTINE_AWAIT(condition);
-
+  COROUTINE_YIELD();
   ...
-  ROUTINE_DELAY(100);
-
+  COROUTINE_AWAIT(condition);
   ...
-  ROUTINE_END();
+  COROUTINE_DELAY(100);
+  ...
+  COROUTINE_END();
 }
 
-ROUTINE(loopingRoutine) {
-  ROUTINE_LOOP() {
+COROUTINE(loopingRoutine) {
+  COROUTINE_LOOP() {
     ...
-    ROUTINE_YIELD();
+    COROUTINE_YIELD();
     ...
   }
 }
@@ -243,98 +239,99 @@ ROUTINE(loopingRoutine) {
 void setup() {
   Serial.begin(115200); // optional
   while (!Serial); // Leonardo/Micro
-
   ...
-  RoutineScheduler::setup();
+  CoroutineScheduler::setup();
   ...
 }
 
 void loop() {
-  RoutineScheduler::loop();
+  CoroutineScheduler::loop();
 }
 ```
 
 ### Running and Scheduling
 
-Routines are registered with `RoutineScheduler` when `RoutineScheduler::setup()`
-is called. Each call to `RoutineScheduler::loop()` executes one routine in the
-list, in a simple round-robin scheduling algorithm. When a routine executes a
-`ROUTINE_YIELD()` or a `ROUTINE_DELAY()`, the return context is saved to the
-`Routine` instance, execution control returns to the `RoutineScheduler` which
-resumes the execution of the next routine in the list.
+Coroutines are registered with `CoroutineScheduler` when
+`CoroutineScheduler::setup()` is called. Each call to
+`CoroutineScheduler::loop()` executes one coroutine in the list, in a simple
+round-robin scheduling algorithm. When a coroutine executes a
+`COROUTINE_YIELD()` or a `COROUTINE_DELAY()`, the return context is saved to the
+`Coroutine` instance, execution control returns to the `CoroutineScheduler`
+which resumes the execution of the next coroutine in the list.
 
-The `Routine` instances are initially ordered by using `getName()` as the
+The `Coroutine` instances are initially ordered by using `getName()` as the
 sorting key. This makes the scheduling deterministic, which allows unit tests to
-be written. However, if `Routine.suspend()` and `Routine.resume()` puts the
-routine at the beginning of the scheduling list, so the ordering may become
+be written. However, if `Coroutine.suspend()` and `Coroutine.resume()` puts the
+coroutine at the beginning of the scheduling list, so the ordering may become
 mixed up.
 
-### Stackless Routines
+### Stackless Coroutines
 
-Each routine is stackless, or more accurately, the stack of the routine
-is destroyed and recreated on every invocation of the routine. Therefore,
-any local variable created on the stack in the routine will not preserve
-its value after a `ROUTINE_YIELD()` or a `ROUTINE_DELAY()`.
+Each coroutine is stackless, or more accurately, the stack of the coroutine
+is destroyed and recreated on every invocation of the coroutine. Therefore,
+any local variable created on the stack in the coroutine will not preserve
+its value after a `COROUTINE_YIELD()` or a `COROUTINE_DELAY()`.
 
 The easiest way to get around ths problem is to use `static` variables inside
-a `ROUTINE()`. Static variables are initialized once and preserve their value
+a `COROUTINE()`. Static variables are initialized once and preserve their value
 through multiple calls to the function, which is exactly what is needed.
 
 ### Yield
 
-`ROUTINE_YIELD()` returns control to the `RoutineSchedule` which is then able to
-run another routines. Upon the next iteration, execution continues just after
-`ROUTINE_YIELD()`. (Technically, the execution always begins at the top of the
-function, but the `ROUTINE_BEGIN()` contains a dispatcher that gives the
-illusion that the execution continues further down the function.)
+`COROUTINE_YIELD()` returns control to the `CoroutineSchedule` which is then
+able to run another coroutines. Upon the next iteration, execution continues
+just after `COROUTINE_YIELD()`. (Technically, the execution always begins at the
+top of the function, but the `COROUTINE_BEGIN()` contains a dispatcher that
+gives the illusion that the execution continues further down the function.)
 
 ### Await
 
-`ROUTINE_AWAIT(condition)` yields until the `condition` evaluates to `true`.
+`COROUTINE_AWAIT(condition)` yields until the `condition` evaluates to `true`.
 This is a convenience macro that is identical to:
 ```
-while(!condition) ROUTINE_YIELD();
+while (!condition) COROUTINE_YIELD();
 ```
 
 ### Delay
 
-`ROUTINE_DELAY(millis)` delays the return of control until `millis` milliseconds
-has elapsed. The argument is a `uint16_t`, a 16-bit unsigned integer, which
-saves 4 bytes on each instance of `Routine`. However, the drawback is that the
-largest value is 65534 (not 65535 due to an edge-case) milliseconds.
+`COROUTINE_DELAY(millis)` delays the return of control until `millis`
+milliseconds has elapsed. The argument is a `uint16_t`, a 16-bit unsigned
+integer, which saves 4 bytes on each instance of `Coroutine`. However, the
+drawback is that the largest value is 65534 (not 65535 due to an edge-case)
+milliseconds.
 
 To delay for longer, an explicit loop can be used. For example, to delay
 for 1000 seconds, we can do this:
 ```
-ROUTINE(waitThousandSeconds) {
-  ROUTINE_BEGIN();
+COROUTINE(waitThousandSeconds) {
+  COROUTINE_BEGIN();
   static i = 0;
   for (i = 0; i < 1000; i++) {
-    ROUTINE_DELAY(1000);
+    COROUTINE_DELAY(1000);
   }
   ...
-  ROUTINE_END();
+  COROUTINE_END();
 }
 ```
 See **For Loop** section below for a description of the for-loop construct.
 
-### One-Shot Routines
+### One-Shot Coroutines
 
-A one-shot routine starts the begining, finishes at the end, and permanently
+A one-shot coroutine starts the begining, finishes at the end, and permanently
 terminates. The code looks like this:
 ```
-ROUTINE(doStraightThrough) {
-  ROUTINE_BEGIN();
+COROUTINE(doStraightThrough) {
+  COROUTINE_BEGIN();
 
   ...
-  ROUTINE_YIELD();
+  COROUTINE_YIELD();
 
   ...
-  ROUTINE_DELAY(100);
+  COROUTINE_DELAY(100);
 
   ...
 
-  ROUTINE_END();
+  COROUTINE_END();
 }
 
 ```
@@ -343,47 +340,47 @@ ROUTINE(doStraightThrough) {
 
 Conditional if-statements work as expected with the various macros:
 ```
-ROUTINE(doIfThenElse) {
-  ROUTINE_BEGIN();
+COROUTINE(doIfThenElse) {
+  COROUTINE_BEGIN();
 
   if (condition) {
     ...
-    ROUTINE_YIELD();
+    COROUTINE_YIELD();
   } else {
     ...
-    ROUTINE_DELAY(100);
+    COROUTINE_DELAY(100);
   }
 
   ...
 
-  ROUTINE_END();
+  COROUTINE_END();
 }
 ```
 
 ### Switch Statements
 
-Unlike some implementations of stackless routines, AceRoutine routines are
+Unlike some implementations of stackless coroutines, AceRoutine coroutines are
 compatible with `switch` statements:
 
 ```
-ROUTINE(doThingsBasedOnSwitchConditions) {
-  ROUTINE_BEGIN();
+COROUTINE(doThingsBasedOnSwitchConditions) {
+  COROUTINE_BEGIN();
   ...
 
   switch (value) {
     case VAL_A:
       ...
-      ROUTINE_YIELD();
+      COROUTINE_YIELD();
       break;
     case VAL_B:
       ...
-      ROUTINE_DELAY(100);
+      COROUTINE_DELAY(100);
       break;
     default:
       ...
   }
   ...
-  ROUTINE_END();
+  COROUTINE_END();
 }
 ```
 
@@ -391,228 +388,194 @@ ROUTINE(doThingsBasedOnSwitchConditions) {
 
 You cannot use a local variable in the `for-loop` because the variable counter
 would be created on the stack, and the stack gets destroyed as soon as
-`ROUTINE_YIELD()`, `ROUTINE_DELAY()`, or `ROUTINE_AWAIT()` is executed. However,
-a reasonable solution is to use `static` variables. For example:
+`COROUTINE_YIELD()`, `COROUTINE_DELAY()`, or `COROUTINE_AWAIT()` is executed.
+However, a reasonable solution is to use `static` variables. For example:
 
 ```
-ROUTINE(countToTen) {
-  ROUTINE_BEGIN();
+COROUTINE(countToTen) {
+  COROUTINE_BEGIN();
   static i = 0;
   for (i = 0; i < 10; i++) {
     ...
-    ROUTINE_DELAY(100);
+    COROUTINE_DELAY(100);
     ...
   }
-  ROUTINE_END();
+  COROUTINE_END();
 }
 ```
 
 ### While Loops
 
-You can write a routine that loops while certain condition is valid like this,
-just like you would normally, except that you call the `ROUTINE_YIELD()`
-macro to cooperatively allow other routines to execute.
+You can write a coroutine that loops while certain condition is valid like this,
+just like you would normally, except that you call the `COROUTINE_YIELD()`
+macro to cooperatively allow other coroutines to execute.
 
 ```
-ROUTINE(loopWhileCondition) {
-  ROUTINE_BEGIN();
+COROUTINE(loopWhileCondition) {
+  COROUTINE_BEGIN();
   while (condition) {
     ...
-    ROUTINE_YIELD();
+    COROUTINE_YIELD();
     ...
   }
-  ROUTINE_END();
+  COROUTINE_END();
 }
 ```
 
 ### Forever Loops
 
 In many cases, you just want to loop forever. You could use a `while (true)`
-statement in the above code, like this:
+statement, like this:
 
 ```
-ROUTINE(loopForever) {
-  ROUTINE_BEGIN();
+COROUTINE(loopForever) {
+  COROUTINE_BEGIN();
   while (true) {
     ...
-    ROUTINE_YIELD();
+    COROUTINE_YIELD();
   }
-  ROUTINE_END();
+  COROUTINE_END();
 }
 ```
 
-A forever-loop occurs so often that there is a convenience macro named
-`ROUTINE_LOOP()` to make this easy:
+However, a forever-loop occurs so often that I provided a convenience macro
+named `COROUTINE_LOOP()` to make this easy:
 
 ```
-ROUTINE(loopForever) {
-  ROUTINE_LOOP() {
+COROUTINE(loopForever) {
+  COROUTINE_LOOP() {
     ...
-    ROUTINE_YIELD();
+    COROUTINE_YIELD();
     ...
   }
 }
 ```
 
-Note that the terminating `ROUTINE_END()` is no longer required,
-because the loop doesn't exit in this case. (Technically, it
-isn't required with the `while (true)` version either, but I'm trying hard to
-preserve the rule that a `BEGIN()` must always be matched by an `END()`).
+Note that the terminating `COROUTINE_END()` is no longer required,
+because the loop does not terminate. (Technically, it isn't required with the
+`while (true)` version either, but I'm trying hard to preserve the rule that a
+`COROUTINE_BEGIN()` must always be matched by a `COROUTINE_END()`).
 
-You could actually exit the loop using `ROUTINE_END()` in the middle of the
+You could actually exit the loop using `COROUTINE_END()` in the middle of the
 loop:
 ```
-ROUTINE(loopForever) {
-  ROUTINE_LOOP() {
+COROUTINE(loopForever) {
+  COROUTINE_LOOP() {
     if (condition) {
-      ROUTINE_END();
+      COROUTINE_END();
     }
     ...
-    ROUTINE_YIELD();
+    COROUTINE_YIELD();
   }
 }
 ```
 I hadn't designed this syntax to work from the start, and was surprised to find
 that it actually worked.
 
-### Nested Routines
+### Nested Coroutines
 
-Routines **cannot** be nested. In other words, if you call another function
-from within a routine, that nested function is just a regular C++ function,
-not a routine. You should not (and cannot) use the various `ROUTINE_XXX()`
-macros inside the nested function. The macros have been designed to trigger
-compiler errors if you try:
+Coroutines **cannot** be nested. In other words, if you call another function
+from within a coroutine, that nested function is just a regular C++ function,
+not a coroutine. You should not (and cannot) use the various `COROUTINE_XXX()`
+macros inside the nested function. The macros will trigger compiler errors if
+you try:
 ```
 void doSomething() {
   ...
-  ROUTINE_YIELD(); // ***compiler error***
+  COROUTINE_YIELD(); // ***compiler error***
   ...
 }
 
-ROUTINE(cannotUseNestedRoutines) {
-  ROUTINE_LOOP() {
+COROUTINE(cannotUseNestedRoutines) {
+  COROUTINE_LOOP() {
     if (condition) {
       doSomething(); // doesn't work
     } else {
-      ROUTINE_YIELD();
+      COROUTINE_YIELD();
     }
   }
 }
 ```
 
-### Routine Instance
+### Coroutine Instance
 
-All routines are instances of the `Routine` class or one of its
-subclasses. The name of the routine instance is the name provided
-in the `ROUTINE()` macro. So for
+All coroutines are instances of the `Coroutine` class or one of its
+subclasses. The name of the coroutine instance is the name provided
+in the `COROUTINE()` macro. For example, in the following example:
 ```
-ROUTINE(doSomething) {
-  ROUTINE_BEGIN();
+COROUTINE(doSomething) {
+  COROUTINE_BEGIN();
   ...
-  ROUTINE_END();
+  COROUTINE_END();
 }
 ```
-there is a globally scoped instance of a subclass of `Routine` named
+there is a globally scoped instance of a subclass of `Coroutine` named
 `doSomething`. The name of this subclass is `Routine_doSomething` but it is
 unlikely that you will need know the exact name of this generated class.
 
-### Routine State
+### Coroutine State
 
-A routine has several internal states:
-* `kStatusSuspended`: routine was suspended using `Routine::suspend`
-* `kStatusYielding`: routine returned using `ROUTINE_YIELD()`
-* `kStatusAwaiting`: routine returned using `ROUTINE_AWAIT()`
-* `kStatusDelaying`: routine returned using `ROUTINE_DELAY()`
-* `kStatusEnding`: routine returned using `ROUTINE_END()`
-* `kStatusTerminated`: routine has been removed from the scheduler queue and
+A coroutine has several internal states:
+* `kStatusSuspended`: coroutine was suspended using `Coroutine::suspend`
+* `kStatusYielding`: coroutine returned using `COROUTINE_YIELD()`
+* `kStatusAwaiting`: coroutine returned using `COROUTINE_AWAIT()`
+* `kStatusDelaying`: coroutine returned using `COROUTINE_DELAY()`
+* `kStatusEnding`: coroutine returned using `COROUTINE_END()`
+* `kStatusTerminated`: coroutine has been removed from the scheduler queue and
   is permanently terminated
 
 You can query these internal states using the following methods on the
-`Routine` class:
-* `Routine::isSuspended()`
-* `Routine::isYielding()`
-* `Routine::isAwaiting()`
-* `Routine::isDelaying()`
-* `Routine::isEnding()`
-* `Routine::isTerminated()`
-* `Routine::isDone()`: same as (isEnding() || isTerminated()). This version
-  is more robust because it works when the `Routine` is executed manually or
-  executed through the `RoutineScheduler`.
+`Coroutine` class:
+* `Coroutine::isSuspended()`
+* `Coroutine::isYielding()`
+* `Coroutine::isAwaiting()`
+* `Coroutine::isDelaying()`
+* `Coroutine::isEnding()`
+* `Coroutine::isTerminated()`
+* `Coroutine::isDone()`: same as (isEnding() || isTerminated()). This version
+  is more robust because it works when the `Coroutine` is executed manually or
+  executed through the `CoroutineScheduler`.
 
-To call one of these functions, use the `Routine` instance variable that
-was created using the `ROUTINE()` macro:
+To call one of these functions, use the `Coroutine` instance variable that
+was created using the `COROUTINE()` macro:
 
 ```
-ROUTINE(doSomething) {
-  ROUTINE_BEGIN();
+COROUTINE(doSomething) {
+  COROUTINE_BEGIN();
   ...
-  ROUTINE_END();
+  COROUTINE_END();
 }
 
-ROUTINE(doSomethingElse) {
-  ROUTINE_BEGIN();
+COROUTINE(doSomethingElse) {
+  COROUTINE_BEGIN();
 
   ...
-  ROUTINE_AWAIT(doSomething.isDone());
+  COROUTINE_AWAIT(doSomething.isDone());
 
   ...
-  ROUTINE_END();
+  COROUTINE_END();
 }
 ```
 
 ### Macros Can Be Used As Statements
 
-Notice that the `ROUTINE_YIELD()` macro in the above example appears on the
-same line as the `while`, without the optional `{ }` braces. These macros have
-been constructed to allow them to be used almost everywhere a valid
-C/C++ statement is allowed.
-
-### External Routines
-
-A routine defined in another `.cpp` file will initialize and run just like any
-other routine. However, if you want to reference an externally defined
-routine, you must provide an `extern` declaration for that instance. The macro
-that will do that for you is `EXTERN_ROUTINE()`.
-
-If the routine in the external `.cpp` file was defined like this:
+The `COROUTINE_YIELD()`, `COROUTINE_DELAY()`, `COROUTINE_AWAIT()` macros have
+been designed to allow them to be used almost everywhere a valid C/C++ statement
+is allowed. For example, the following is allowed:
 ```
-ROUTINE(doSomethingExternal) {
   ...
-}
-```
-then the extern declaration is defined like this:
-```
-EXTERN_ROUTINE(doSomethingExternal);
-
-ROUTINE(doSomethingExternal) {
-
+  if (condition) COROUTINE_YIELD();
   ...
-  if (!doSomethingExternal.isDone()) ROUTINE_DELAY(1000);
-  ...
-
-}
 ```
 
-### Communication Between Routines
+### Advanced Custom Coroutines
 
-The AceRoutine library does not provide any internal mechanism to
-pass data between routines. Here are some options:
-
-* The easiest is to use **global variables** which are modified by multiple
-  routines.
-* You can use custom Routine classes and define a class static variables which
-  can be shared among routines which sublcass The same class.
-* You can define methods on the custom Routine class, and pass messages back and
-  forth between routines by method calls.
-
-### Advanced Custom Routines
-
-We have said that all routines are instances of the `Routine` class.
-You can create custom subclasses of `Routine` and create routines which
-are instances of the custom class. Use the 2-argument version of the
-`ROUTINE` macro like this:
+All coroutines are instances of the `Coroutine` class, or one of its subclasses.
+You can create custom subclasses of `Coroutine` and create coroutines which are
+instances of the custom class. Use the 2-argument version of the `COROUTINE()`
+macro like this:
 ```
-class CustomRoutine : public Routine {
+class CustomRoutine : public Coroutine {
   public:
     void enable(bool enable) { enabled = enable; }
 
@@ -620,15 +583,64 @@ class CustomRoutine : public Routine {
     bool enabled = 0;
 };
 
-ROUTINE(CustomRoutine, blinkSlow) {
-  ROUTINE_LOOP() {
+COROUTINE(CustomRoutine, blinkSlow) {
+  COROUTINE_LOOP() {
     ...
   }
 }
 ...
 ```
-The 2-argument version created an instace called `blinkSlow` which is an
+The 2-argument version created an instance called `blinkSlow` which is an
 instance of a subclass of `CustomRoutine`. Everything else remains the same.
+
+### External Coroutines
+
+A coroutine can be defined in a separate `.cpp` file. However, if you want to
+refer to an externally defined coroutine, you must provide an `extern`
+declaration for that instance. The macro that makes this easy is
+`EXTERN_COROUTINE()`.
+
+For example, supposed we define a coroutine named `external` like
+this in a `External.cpp` file:
+```
+COROUTINE(external) {
+  ...
+}
+```
+
+To use this in `Main.ino` file, we must use the `EXTERN_COROUTINE()` macro like
+this:
+```
+EXTERN_COROUTINE(external);
+
+COROUTINE(doSomethingElse) {
+  ...
+  if (!doSomethingExternal.isDone()) COROUTINE_DELAY(1000);
+  ...
+}
+```
+
+If the 2-argument version of `COROUTINE()` was used, then the corresponding
+2-argument version of `EXTERN_COROUTINE()` must be used, like this:
+
+### Communication Between Coroutines
+
+The AceRoutine library does not provide any internal mechanism to
+pass data between coroutines. Here are some options:
+
+* The easiest is to use **global variables** which are modified by multiple
+  coroutines.
+* You can use custom Coroutine classes and define a class static variables which
+  can be shared among coroutines which sublcass The same class.
+* You can define methods on the custom Coroutine class, and pass messages back
+  and forth between coroutines by method calls.
+
+### Functors
+
+C++ allows the creation of objects that look syntactically like functions.
+by defining the `operator()` method on the class. I have not defined this method
+in the `Coroutine` class because I have not found a use-case for it. However, if
+someone can demonstrate a compelling use-case, then I would be happy to add it.
 
 ## Comparisons to Other Multitasking Libraries
 
@@ -711,18 +723,18 @@ turned out.
 All objects are statically allocated (i.e. not heap or stack).
 
 * 8-bit processors (AVR Nano, UNO, etc):
-    * sizeof(Routine): 14
-    * sizeof(RoutineScheduler): 2
+    * sizeof(Coroutine): 14
+    * sizeof(CoroutineScheduler): 2
 * 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32)
-    * sizeof(Routine): 28
-    * sizeof(RoutineScheduler): 4
+    * sizeof(Coroutine): 28
+    * sizeof(CoroutineScheduler): 4
 
-In other words, you can create 100 `Routine` instances and they would use only
+In other words, you can create 100 `Coroutine` instances and they would use only
 1400 bytes of static RAM on an 8-bit AVR processor.
 
-The `RoutineScheduler` consumes only 2 bytes of memory no matter how many
-routines are created. That's because it depends on a singly-link list whose
-pointers live on the `Routine` object, not in the `RoutineScheduler`.
+The `CoroutineScheduler` consumes only 2 bytes of memory no matter how many
+coroutines are created. That's because it depends on a singly-link list whose
+pointers live on the `Coroutine` object, not in the `CoroutineScheduler`.
 
 ### CPU
 

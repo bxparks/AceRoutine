@@ -6,23 +6,23 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-Routine	KEYWORD1
-RoutineScheduler	KEYWORD1
+Coroutine	KEYWORD1
+CoroutineScheduler	KEYWORD1
 FCString	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-# Macros from Routine.h
-ROUTINE	KEYWORD2
-ROUTINE_BEGIN	KEYWORD2
-ROUTINE_LOOP	KEYWORD2
-ROUTINE_YIELD	KEYWORD2
-ROUTINE_AWAIT	KEYWORD2
-ROUTINE_DELAY	KEYWORD2
-ROUTINE_END	KEYWORD2
-EXTERN_ROUTINE	KEYWORD2
+# Macros from Coroutine.h
+COROUTINE	KEYWORD2
+COROUTINE_BEGIN	KEYWORD2
+COROUTINE_LOOP	KEYWORD2
+COROUTINE_YIELD	KEYWORD2
+COROUTINE_AWAIT	KEYWORD2
+COROUTINE_DELAY	KEYWORD2
+COROUTINE_END	KEYWORD2
+EXTERN_COROUTINE	KEYWORD2
 # public methods
 getRoot	KEYWORD2
 getNext	KEYWORD2
@@ -48,7 +48,7 @@ setAwaiting	KEYWORD2
 setDelaying	KEYWORD2
 setEnding	KEYWORD2
 
-# public methods from RoutineScheduler.h
+# public methods from CoroutineScheduler.h
 setup	KEYWORD2
 loop	KEYWORD2
 list	KEYWORD2
@@ -61,7 +61,7 @@ list	KEYWORD2
 # Constants (LITERAL1)
 #######################################
 
-# Routine.h
+# Coroutine.h
 kStatusSuspended	LITERAL1
 kStatusYielding	LITERAL1
 kStatusAwaiting	LITERAL1

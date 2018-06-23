@@ -1,5 +1,10 @@
 # Changelog
 
+* (2018-06-23)
+    * After allowing Coroutine::run() to be called directly,
+      bypassing CoroutineScheduler, these things do actually look like
+      coroutines, so changed names back to "Coroutine" and "COROUTINE*()"
+      macros.
 * (2018-05-11)
     * Changed names of everything from "Coroutine" to just "Routine" because
       this is not really a coroutine.

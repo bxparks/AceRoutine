@@ -24,21 +24,21 @@ SOFTWARE.
 
 #include <stdint.h> // uintptr_t
 #include <Arduino.h> // millis()
-#include "Routine.h"
+#include "Coroutine.h"
 
 namespace ace_routine {
 
 // Use a static variable inside a function to solve the static initialization
 // ordering problem.
-Routine** Routine::getRoot() {
-  static Routine* root;
+Coroutine** Coroutine::getRoot() {
+  static Coroutine* root;
   return &root;
 }
 
-void Routine::insertSorted() {
-  Routine** p = getRoot();
+void Coroutine::insertSorted() {
+  Coroutine** p = getRoot();
 
-  // O(N^2) insertion, good enough for small (O(100)?) number of routines.
+  // O(N^2) insertion, good enough for small (O(100)?) number of coroutines.
   while (*p != nullptr) {
     if (getName().compareTo((*p)->getName()) <= 0) break;
     p = &(*p)->mNext;
@@ -48,22 +48,22 @@ void Routine::insertSorted() {
   *p = this;
 }
 
-void Routine::resume() {
+void Coroutine::resume() {
   if (mStatus != kStatusSuspended) return;
 
-  // We lost the original state of the routine when suspend() was called but
-  // the routine will automatically go back into the original state when
-  // Routine::run() is called because ROUTINE_YIELD(), ROUTINE_DELAY() and
-  // ROUTINE_AWAIT() are written to restore their status.
+  // We lost the original state of the coroutine when suspend() was called but
+  // the coroutine will automatically go back into the original state when
+  // Coroutine::run() is called because COROUTINE_YIELD(), COROUTINE_DELAY()
+  // and COROUTINE_AWAIT() are written to restore their status.
   mStatus = kStatusYielding;
 
   // insert at the head of the linked list
-  Routine** p = getRoot();
+  Coroutine** p = getRoot();
   mNext = *p;
   *p = this;
 }
 
-unsigned long Routine::millis() const {
+unsigned long Coroutine::millis() const {
   return ::millis();
 }
 

@@ -1,6 +1,6 @@
 /*
- * HelloRoutine. Use 2 Routines to print "Hello, World", the hard way.
- * A 3rd Routine spins away on the side, blinking the LED.
+ * HelloCoroutine. Use 2 coroutines to print "Hello, World", the hard way.
+ * A 3rd coroutine spins away on the side, blinking the LED.
  */
 
 #include <AceRoutine.h>
@@ -12,31 +12,31 @@ const int LED_OFF = LOW;
 
 const int LED_DELAY = 200;
 
-ROUTINE(blinkLed) {
-  ROUTINE_LOOP() {
+COROUTINE(blinkLed) {
+  COROUTINE_LOOP() {
     digitalWrite(LED, LED_ON);
-    ROUTINE_DELAY(LED_DELAY);
+    COROUTINE_DELAY(LED_DELAY);
     digitalWrite(LED, LED_OFF);
-    ROUTINE_DELAY(LED_DELAY);
+    COROUTINE_DELAY(LED_DELAY);
   }
 }
 
-ROUTINE(printHello) {
-  ROUTINE_BEGIN();
+COROUTINE(printHello) {
+  COROUTINE_BEGIN();
 
   Serial.print(F("Hello, "));
-  ROUTINE_DELAY(1000);
+  COROUTINE_DELAY(1000);
 
-  ROUTINE_END();
+  COROUTINE_END();
 }
 
-ROUTINE(printWorld) {
-  ROUTINE_BEGIN();
+COROUTINE(printWorld) {
+  COROUTINE_BEGIN();
 
-  ROUTINE_AWAIT(printHello.isDone());
+  COROUTINE_AWAIT(printHello.isDone());
   Serial.println(F("World!"));
 
-  ROUTINE_END();
+  COROUTINE_END();
 }
 
 void setup() {
@@ -45,7 +45,7 @@ void setup() {
   while (!Serial); // Leonardo/Micro
 }
 
-// Manually execute the routines.
+// Manually execute the coroutines.
 void loop() {
   blinkLed.run();
   printHello.run();

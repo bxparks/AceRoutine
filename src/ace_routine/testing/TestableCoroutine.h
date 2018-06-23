@@ -22,16 +22,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_ROUTINE_TESTABLE_ROUTINE_H
-#define ACE_ROUTINE_TESTABLE_ROUTINE_H
+#ifndef ACE_ROUTINE_TESTABLE_COROUTINE_H
+#define ACE_ROUTINE_TESTABLE_COROUTINE_H
 
-#include "../Routine.h"
+#include "../Coroutine.h"
 
 namespace ace_routine {
 namespace testing {
 
-/** A Routine that overrides the millis() clock for unit testing purposes. */
-class TestableRoutine: public Routine {
+/** A Coroutine that overrides the millis() clock for unit testing purposes. */
+class TestableCoroutine: public Coroutine {
   public:
     virtual unsigned long millis() const override { return mMillis; }
 

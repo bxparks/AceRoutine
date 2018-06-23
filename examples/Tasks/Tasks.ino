@@ -36,14 +36,14 @@ class LineBuffer {
 
 LineBuffer lineBuffer;
 
-ROUTINE(reader) {
-  ROUTINE_LOOP() {
-    ROUTINE_AWAIT(Serial.available() > 0);
+COROUTINE(reader) {
+  COROUTINE_LOOP() {
+    COROUTINE_AWAIT(Serial.available() > 0);
     char c = Serial.read();
     if (c == '\n' || c == '\r') {
       const char* line = lineBuffer.getLine();
       if (strcmp(line, "list") == 0) {
-        RoutineScheduler::list(&Serial);
+        CoroutineScheduler::list(&Serial);
       } else if (strcmp(line, "millis") == 0) {
         Serial.println(millis());
       } else if (strcmp(line, "micros") == 0) {
@@ -61,9 +61,9 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 
-  RoutineScheduler::setup();
+  CoroutineScheduler::setup();
 }
 
 void loop() {
-  RoutineScheduler::loop();
+  CoroutineScheduler::loop();
 }

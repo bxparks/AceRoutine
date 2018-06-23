@@ -1,8 +1,8 @@
 /*
- * This sketch is the same as BlinkRoutine except that it uses the 2-argument
- * version of ROUTINE() to create routines which using custom Routine
+ * This sketch is the same as BlinkCoroutine except that it uses the 2-argument
+ * version of COROUTINE() to create coroutines which using custom Coroutine
  * classes. The custom classes are able to support additional variables and
- * methods that can be used by the routines to communicate with each other.
+ * methods that can be used by the coroutines to communicate with each other.
  */
 
 #include <AceRoutine.h>
@@ -13,7 +13,7 @@ const int LED_ON = HIGH;
 const int LED_OFF = LOW;
 const int BUTTON_PIN = 2;
 
-class BlinkRoutine : public Routine {
+class BlinkCoroutine : public Coroutine {
   public:
     void enable(bool enable) { enabled = enable; }
 
@@ -21,45 +21,45 @@ class BlinkRoutine : public Routine {
     bool enabled = 0;
 };
 
-ROUTINE(BlinkRoutine, blinkSlow) {
-  ROUTINE_LOOP() {
+COROUTINE(BlinkCoroutine, blinkSlow) {
+  COROUTINE_LOOP() {
     if (enabled) {
       digitalWrite(LED, LED_ON);
       Serial.print("S1 ");
-      ROUTINE_DELAY(500);
+      COROUTINE_DELAY(500);
       Serial.print("S1a ");
 
       Serial.print("S0 ");
       digitalWrite(LED, LED_OFF);
-      ROUTINE_DELAY(500);
+      COROUTINE_DELAY(500);
       Serial.print("S0a ");
     } else {
       Serial.print("S ");
-      ROUTINE_DELAY(1000);
+      COROUTINE_DELAY(1000);
     }
   }
 }
 
-ROUTINE(BlinkRoutine, blinkFast) {
-  ROUTINE_LOOP() {
+COROUTINE(BlinkCoroutine, blinkFast) {
+  COROUTINE_LOOP() {
     if (enabled) {
       Serial.print("F1 ");
       digitalWrite(LED, LED_ON);
-      ROUTINE_DELAY(300);
+      COROUTINE_DELAY(300);
       Serial.print("F1a ");
 
       Serial.print("F0 ");
       digitalWrite(LED, LED_OFF);
-      ROUTINE_DELAY(300);
+      COROUTINE_DELAY(300);
       Serial.print("F0a ");
     } else {
       Serial.print("F ");
-      ROUTINE_DELAY(600);
+      COROUTINE_DELAY(600);
     }
   }
 }
 
-class ButtonRoutine : public Routine {
+class ButtonCoroutine : public Coroutine {
   protected:
     static const int BLINK_STATE_BOTH = 0;
     static const int BLINK_STATE_FAST = 1;
@@ -86,19 +86,19 @@ class ButtonRoutine : public Routine {
     int prevButtonState = HIGH;
 };
 
-int ButtonRoutine::blinkState = BLINK_STATE_BOTH;
+int ButtonCoroutine::blinkState = BLINK_STATE_BOTH;
 
-ROUTINE(ButtonRoutine, button) {
-  ROUTINE_BEGIN();
+COROUTINE(ButtonCoroutine, button) {
+  COROUTINE_BEGIN();
 
   configureBlinkers();
-  ROUTINE_YIELD();
+  COROUTINE_YIELD();
 
   while (true ) {
     buttonState = digitalRead(BUTTON_PIN);
     if (prevButtonState == HIGH && buttonState == LOW) {
       // primitive debouncing
-      ROUTINE_DELAY(20);
+      COROUTINE_DELAY(20);
       buttonState = digitalRead(BUTTON_PIN);
       if (prevButtonState == HIGH && buttonState == LOW) {
         blinkState++;
@@ -109,10 +109,10 @@ ROUTINE(ButtonRoutine, button) {
       }
     }
     prevButtonState = buttonState;
-    ROUTINE_DELAY(20);
+    COROUTINE_DELAY(20);
   }
 
-  ROUTINE_END();
+  COROUTINE_END();
 }
 
 void setup() {
@@ -122,9 +122,9 @@ void setup() {
 
   pinMode(LED, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
-  RoutineScheduler::setup();
+  CoroutineScheduler::setup();
 }
 
 void loop() {
-  RoutineScheduler::loop();
+  CoroutineScheduler::loop();
 }

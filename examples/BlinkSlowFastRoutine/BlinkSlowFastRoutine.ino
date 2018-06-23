@@ -1,13 +1,13 @@
 /*
- * This sketch uses the 'blinkSlow' routine to blink the LED slowly.
- * The 'blinkFast' routine blinks the LED quickly.
- * The 'button' routine scans the D2 pin for a button press. Each time
+ * This sketch uses the 'blinkSlow' coroutine to blink the LED slowly.
+ * The 'blinkFast' coroutine blinks the LED quickly.
+ * The 'button' coroutine scans the D2 pin for a button press. Each time
  * the button is pressed, the blink mode cycles from "both", "fast" only,
  * to "slow" only, then "both" again.
  *
- * Communication between the routines happens through the 'blinkState' global
- * variable. See BlinkCustomRoutine to see how this communication can happen
- * through methods on custom Routine classes.
+ * Communication between the coroutines happens through the 'blinkState' global
+ * variable. See BlinkCustomCoroutine to see how this communication can happen
+ * through methods on custom Coroutine classes.
  */
 
 #include <AceRoutine.h>
@@ -23,61 +23,61 @@ const int BLINK_STATE_FAST = 1;
 const int BLINK_STATE_SLOW = 2;
 int blinkState = BLINK_STATE_BOTH;
 
-ROUTINE(blinkSlow) {
-  ROUTINE_LOOP() {
+COROUTINE(blinkSlow) {
+  COROUTINE_LOOP() {
     switch (blinkState) {
       case BLINK_STATE_BOTH:
       case BLINK_STATE_SLOW:
         Serial.print("S1 ");
         digitalWrite(LED, LED_ON);
-        ROUTINE_DELAY(500);
+        COROUTINE_DELAY(500);
         Serial.print("S1a ");
 
         Serial.print("S0 ");
         digitalWrite(LED, LED_OFF);
-        ROUTINE_DELAY(500);
+        COROUTINE_DELAY(500);
         Serial.print("S0a ");
         break;
 
       default:
         Serial.print("S ");
-        ROUTINE_DELAY(1000);
+        COROUTINE_DELAY(1000);
     }
   }
 }
 
-ROUTINE(blinkFast) {
-  ROUTINE_LOOP() {
+COROUTINE(blinkFast) {
+  COROUTINE_LOOP() {
     switch (blinkState) {
       case BLINK_STATE_BOTH:
       case BLINK_STATE_FAST:
         Serial.print("F1 ");
         digitalWrite(LED, LED_ON);
-        ROUTINE_DELAY(300);
+        COROUTINE_DELAY(300);
         Serial.print("F1a ");
 
         Serial.print("F0 ");
         digitalWrite(LED, LED_OFF);
-        ROUTINE_DELAY(300);
+        COROUTINE_DELAY(300);
         Serial.print("F0a ");
         break;
 
       default:
         Serial.print("F ");
-        ROUTINE_DELAY(600);
+        COROUTINE_DELAY(600);
     }
   }
 }
 
-ROUTINE(button) {
+COROUTINE(button) {
   static int buttonState;
   static int prevButtonState;
 
-  ROUTINE_LOOP() {
+  COROUTINE_LOOP() {
     buttonState = digitalRead(BUTTON_PIN);
     if (prevButtonState == HIGH && buttonState == LOW) {
       // primitive debouncing
-      ROUTINE_DELAY(20);
+      COROUTINE_DELAY(20);
       buttonState = digitalRead(BUTTON_PIN);
       if (prevButtonState == HIGH && buttonState == LOW) {
         blinkState++;
@@ -94,7 +94,7 @@ ROUTINE(button) {
       }
     }
     prevButtonState = buttonState;
-    ROUTINE_DELAY(20);
+    COROUTINE_DELAY(20);
   }
 }
 
@@ -106,9 +106,9 @@ void setup() {
   pinMode(LED, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
-  RoutineScheduler::setup();
+  CoroutineScheduler::setup();
 }
 
 void loop() {
-  RoutineScheduler::loop();
+  CoroutineScheduler::loop();
 }

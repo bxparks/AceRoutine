@@ -22,65 +22,65 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_ROUTINE_ROUTINE_SCHEDULER_H
-#define ACE_ROUTINE_ROUTINE_SCHEDULER_H
+#ifndef ACE_ROUTINE_COROUTINE_SCHEDULER_H
+#define ACE_ROUTINE_COROUTINE_SCHEDULER_H
 
 #include <Print.h>
-#include "Routine.h"
+#include "Coroutine.h"
 
 namespace ace_routine {
 
 /**
- * Class that manages instances of the `Routine` class, and executes them
+ * Class that manages instances of the `Coroutine` class, and executes them
  * in a round-robin fashion.
  */
-class RoutineScheduler {
+class CoroutineScheduler {
   public:
     /** Set up the scheduler. Should be called from the global setup(). */
     static void setup() { getScheduler()->setupScheduler(); }
 
     /**
-     * Run the current routine using the current scheduler. This method returns
-     * when the underlying Routine suspends execution, which allows the system
-     * loop() to return to do systems processing, such as WiFi. Everyone must
-     * cooperate to make the whole thing work.
+     * Run the current coroutine using the current scheduler. This method
+     * returns when the underlying Coroutine suspends execution, which allows
+     * the system loop() to return to do systems processing, such as WiFi.
+     * Everyone must cooperate to make the whole thing work.
      */
-    static void loop() { getScheduler()->runRoutine(); }
+    static void loop() { getScheduler()->runCoroutine(); }
 
     /**
-     * Print out the known routines to the printer (usually Serial). Note that
+     * Print out the known coroutines to the printer (usually Serial). Note that
      * if this method is never called, the linker will strip out the code. If
      * Serial is never configured in setup(), then this method causes no
      * additional flash memory consumption.
      */
     static void list(Print* printer) {
-      getScheduler()->listRoutines(printer);
+      getScheduler()->listCoroutines(printer);
     }
 
   private:
     // Disable copy-constructor and assignment operator
-    RoutineScheduler(const RoutineScheduler&) = delete;
-    RoutineScheduler& operator=(const RoutineScheduler&) = delete;
+    CoroutineScheduler(const CoroutineScheduler&) = delete;
+    CoroutineScheduler& operator=(const CoroutineScheduler&) = delete;
 
-    /** Return the singleton RoutineScheduler. */
-    static RoutineScheduler* getScheduler();
+    /** Return the singleton CoroutineScheduler. */
+    static CoroutineScheduler* getScheduler();
 
     /** Constructor. */
-    RoutineScheduler() {}
+    CoroutineScheduler() {}
 
     /** Set up the Scheduler. */
     void setupScheduler();
 
-    /** Run the current routine. */
-    void runRoutine();
+    /** Run the current coroutine. */
+    void runCoroutine();
 
     /** List all the routines in the linked list to the printer. */
-    void listRoutines(Print* printer);
+    void listCoroutines(Print* printer);
 
-    // The current routine is represented by a pointer to a pointer. This
+    // The current coroutine is represented by a pointer to a pointer. This
     // allows the root node to be treated the same as all the other nodes, and
     // simplifies the code that traverses the singly-linked list.
-    Routine** mCurrent = nullptr;
+    Coroutine** mCurrent = nullptr;
 };
 
 }

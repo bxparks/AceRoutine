@@ -1,7 +1,9 @@
 /*
- * A sketch that illustrates using two AceRoutines and a circular buffer to
- * create a pipe between the two routines. Not sure if this is of any practical
- * use though.
+ * A sketch that illustrates using two coroutines and a circular buffer to
+ * create a pipe between the two coroutines. Not sure if this is of any
+ * practical use though.
+ *
+ * WORK IN PROGRESS
  */
 
 #include <Arduino.h>
@@ -40,9 +42,9 @@ class Channel {
 
 Channel channel;
 
-ROUTINE(reader) {
-  ROUTINE_LOOP() {
-    ROUTINE_AWAIT(Serial.available() > 0 && channel.isWritePossible());
+COROUTINE(reader) {
+  COROUTINE_LOOP() {
+    COROUTINE_AWAIT(Serial.available() > 0 && channel.isWritePossible());
     // copy as many characters as possible without yielding
     while (Serial.available() > 0 && channel.isWritePossible()) {
       char c = Serial.read();
@@ -51,9 +53,9 @@ ROUTINE(reader) {
   }
 }
 
-ROUTINE(writer) {
-  ROUTINE_LOOP() {
-    ROUTINE_AWAIT(channel.isReadPossible());
+COROUTINE(writer) {
+  COROUTINE_LOOP() {
+    COROUTINE_AWAIT(channel.isReadPossible());
     char c = channel.read();
     Serial.print(c);
   }

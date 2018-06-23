@@ -22,11 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// Set this to 1 to send debugging from RoutineScheduler::runRoutine() to
+// Set this to 1 to send debugging from CoroutineScheduler::runCoroutine() to
 // Serial. You must run Serial.begin(speed) in setup().
 #define ACE_ROUTINE_DEBUG 0
 
-#include "RoutineScheduler.h"
+#include "CoroutineScheduler.h"
 
 #if ACE_ROUTINE_DEBUG == 1
   #include <Arduino.h> // Serial, Print
@@ -34,20 +34,20 @@ SOFTWARE.
 
 namespace ace_routine {
 
-RoutineScheduler* RoutineScheduler::getScheduler() {
-  static RoutineScheduler singletonScheduler;
+CoroutineScheduler* CoroutineScheduler::getScheduler() {
+  static CoroutineScheduler singletonScheduler;
   return &singletonScheduler;
 }
 
-void RoutineScheduler::setupScheduler() {
-  mCurrent = Routine::getRoot();
+void CoroutineScheduler::setupScheduler() {
+  mCurrent = Coroutine::getRoot();
 
-  // Pre-scan to remove any routines whose suspend() was called before the
-  // RoutineScheduler::setup(). This makes unit tests easier to write because
-  // they can just concentrate on only the active routines. And this is also
+  // Pre-scan to remove any coroutines whose suspend() was called before the
+  // CoroutineScheduler::setup(). This makes unit tests easier to write because
+  // they can just concentrate on only the active coroutines. And this is also
   // more intuitive because we don't need to wait a complete run() cycle to
   // remove these from the queue.
-  Routine** current = Routine::getRoot();
+  Coroutine** current = Coroutine::getRoot();
   while (*current != nullptr) {
     if ((*current)->isSuspended()) {
       *current = *((*current)->getNext());
@@ -57,10 +57,10 @@ void RoutineScheduler::setupScheduler() {
   }
 }
 
-void RoutineScheduler::runRoutine() {
+void CoroutineScheduler::runCoroutine() {
   // If reached the end, start from the beginning again.
   if (*mCurrent == nullptr) {
-    mCurrent = Routine::getRoot();
+    mCurrent = Coroutine::getRoot();
     // Return if the list is empty. Checking for a null getRoot() inside the
     // if-statement is deliberate, since it optimizes the common case where the
     // linked list is not empty.
@@ -75,44 +75,45 @@ void RoutineScheduler::runRoutine() {
   Serial.println();
 #endif
 
-  // Handle the routine's dispatch back to the last known internal status.
+  // Handle the coroutine's dispatch back to the last known internal status.
   switch ((*mCurrent)->getStatus()) {
-    case Routine::kStatusYielding:
-    case Routine::kStatusAwaiting:
+    case Coroutine::kStatusYielding:
+    case Coroutine::kStatusAwaiting:
       (*mCurrent)->run();
       mCurrent = (*mCurrent)->getNext();
       break;
-    case Routine::kStatusDelaying: {
+    case Coroutine::kStatusDelaying: {
       // Check isDelayExpired() here to optimize away an extra call into the
-      // Routine::run(). Everything would still work if we just dispatched into
-      // the Routine::run() because that method checks isDelayExpired() as
-      // well.
+      // Coroutine::run(). Everything would still work if we just dispatched
+      // into the Coroutine::run() because that method checks isDelayExpired()
+      // as well.
       if ((*mCurrent)->isDelayExpired()) {
         (*mCurrent)->run();
       }
       mCurrent = (*mCurrent)->getNext();
       break;
     }
-    case Routine::kStatusEnding:
-      // take the routine out of the list, and mark it terminated
+    case Coroutine::kStatusEnding:
+      // take the coroutine out of the list, and mark it terminated
       (*mCurrent)->setTerminated();
       *mCurrent = *((*mCurrent)->getNext());
       break;
-    case Routine::kStatusSuspended:
-      // take the routine out of the list
+    case Coroutine::kStatusSuspended:
+      // take the coroutine out of the list
       *mCurrent = *((*mCurrent)->getNext());
       break;
     default:
-      // Should never happen but skip to next routine to prevent infinite loop.
+      // Should never happen but skip to next coroutine to prevent infinite
+      // loop.
       mCurrent = (*mCurrent)->getNext();
       break;
   }
 }
 
-void RoutineScheduler::listRoutines(Print* printer) {
-  for (Routine** p = Routine::getRoot(); (*p) != nullptr;
+void CoroutineScheduler::listCoroutines(Print* printer) {
+  for (Coroutine** p = Coroutine::getRoot(); (*p) != nullptr;
       p = (*p)->getNext()) {
-    printer->print(F("Routine "));
+    printer->print(F("Coroutine "));
     (*p)->getName().print(printer);
     printer->print(F("; status: "));
     printer->println((*p)->getStatus());

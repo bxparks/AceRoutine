@@ -1,6 +1,6 @@
 /*
  * This sketch attempts to find how much overhead is introduced by the context
- * switching performed by the RoutineScheduler among the various routines.
+ * switching performed by the CoroutineScheduler among the various coroutines.
  *
  * For the Teensy ARM microcontrollers, the benchmark numbers seem highly
  * dependent on compiler optimizer settings.
@@ -13,17 +13,17 @@ const unsigned long DURATION = 5000;
 
 unsigned long counter = 0;
 
-ROUTINE(counterA) {
-  ROUTINE_LOOP() {
+COROUTINE(counterA) {
+  COROUTINE_LOOP() {
     counter++;
-    ROUTINE_YIELD();
+    COROUTINE_YIELD();
   }
 }
 
-ROUTINE(counterB) {
-  ROUTINE_LOOP() {
+COROUTINE(counterB) {
+  COROUTINE_LOOP() {
     counter++;
-    ROUTINE_YIELD();
+    COROUTINE_YIELD();
   }
 }
 
@@ -32,13 +32,13 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 
-  RoutineScheduler::setup();
-  RoutineScheduler::list(&Serial);
+  CoroutineScheduler::setup();
+  CoroutineScheduler::list(&Serial);
 
-  Serial.print(F("sizeof(Routine): "));
-  Serial.println(sizeof(Routine));
-  Serial.print(F("sizeof(RoutineScheduler): "));
-  Serial.println(sizeof(RoutineScheduler));
+  Serial.print(F("sizeof(Coroutine): "));
+  Serial.println(sizeof(Coroutine));
+  Serial.print(F("sizeof(CoroutineScheduler): "));
+  Serial.println(sizeof(CoroutineScheduler));
 
   Serial.println(
       F("------------+------+------+"));
@@ -51,18 +51,18 @@ void setup() {
   float baseline = DURATION * 1000.0 / counter;
 
   doAceRoutine();
-  float aceRoutine = DURATION * 1000.0 / counter;
+  float aceCoroutine = DURATION * 1000.0 / counter;
 
-  printStats(baseline, aceRoutine);
+  printStats(baseline, aceCoroutine);
   Serial.println(
       F("------------+------+------+"));
 }
 
-void printStats(float baseline, float aceRoutine) {
+void printStats(float baseline, float aceCoroutine) {
   char buf[100];
-  float diff = aceRoutine - baseline;
+  float diff = aceCoroutine - baseline;
   sprintf(buf, "      %2d.%02d |%2d.%02d |%2d.%02d |",
-      (int)aceRoutine, (int)(aceRoutine*100)%100,
+      (int)aceCoroutine, (int)(aceCoroutine*100)%100,
       (int)baseline, (int)(baseline*100)%100,
       (int)diff, (int)(diff*100)%100);
   Serial.println(buf);
@@ -72,7 +72,7 @@ void doAceRoutine() {
   counter = 0;
   unsigned long start = millis();
   while (millis() - start < DURATION) {
-    RoutineScheduler::loop();
+    CoroutineScheduler::loop();
     yield();
   }
 }

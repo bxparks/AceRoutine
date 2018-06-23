@@ -34,8 +34,8 @@ their life cycle:
 Here are some of the compelling features of this library compared to
 others (in my opinion of course):
 * low memory usage
-    * each coroutine consumes only 13 bytes of RAM (on AVR) and
-      24 bytes on 32-bit processors (ARM, ESP8266, ESP32)
+    * each coroutine consumes only 14 bytes of RAM on 8-bit processors (AVR) and
+      28 bytes on 32-bit processors (ARM, ESP8266, ESP32)
     * the `CoroutineScheduler` consumes only 2 bytes (8-bit) or 4 bytes (32-bit)
       no matter how many coroutines are active
 * extremely fast context switching
@@ -254,23 +254,72 @@ void loop() {
 
 ### Running and Scheduling
 
-Coroutines are registered with `CoroutineScheduler` when
-`CoroutineScheduler::setup()` is called. Each call to
-`CoroutineScheduler::loop()` executes one coroutine in the list, in a simple
-round-robin scheduling algorithm. When a coroutine executes a
-`COROUTINE_YIELD()` or a `COROUTINE_DELAY()`, the return context is saved to the
-`Coroutine` instance, execution control returns to the `CoroutineScheduler`
-which resumes the execution of the next coroutine in the list.
+There are 2 ways to run the coroutines:
+* manually calling the coroutines in the `loop()` method, or
+* using the `CoroutineScheduler`.
 
-The `Coroutine` instances are initially ordered by using `getName()` as the
-sorting key. This makes the scheduling deterministic, which allows unit tests to
-be written. However, if `Coroutine.suspend()` and `Coroutine.resume()` puts the
-coroutine at the beginning of the scheduling list, so the ordering may become
-mixed up.
+#### Manual Scheduling
+
+If you have only a small number of coroutines, the manual method may be the
+easiest. This requires you to explicitly call the `run()` method of all the
+coroutines that you wish to run in the `loop()` method, like this:
+```
+void loop() {
+  blinkLed.run();
+  printHello.run();
+  printWorld.run();
+}
+```
+
+#### CoroutineScheduler
+
+If you have a large number of coroutines, especially if some of them are
+defined in multiple `.cpp` files, then the `CoroutineScheduler` will
+make things easy. You just need to call `CoroutineScheduler::setup()`
+in the global `setup()` method, and `CoroutineScheduler::loop()`
+in the global `loop()` method, like this:
+```
+void setup() {
+  ...
+  CoroutineScheduler::setup();
+}
+
+void loop() {
+  CoroutineScheduler::loop();
+}
+```
+
+The `CoroutineScheduler::setup()` method creates an internal list of active
+coroutines that are managed by the scheduler. Each call to
+`CoroutineScheduler::loop()` executes one coroutine in that list in a simple
+round-robin scheduling algorithm.
+
+The list of scheduled coroutines is initially ordered by using
+`Coroutine::getName()` as the sorting key. This makes the scheduling
+deterministic, which allows unit tests to be work. However,
+`Coroutine.suspend()` then a subsequent `Coroutine.resume()` puts the coroutine
+at the beginning of the scheduling list, so the ordering may become mixed up
+over time if these functions are used.
+
+### Suspend and Resume
+
+The `Coroutine::suspend()` and `Coroutine::resume()` methods are available
+*only* if the `CoroutineScheduler` is used. If the coroutines are called
+explicitly in the global `loop()` method, then these methods have no impact.
+
+A coroutine can suspend itself or be suspended by another coroutine.
+It causes the `CoroutineScheduler` to remove the coroutine from the list of
+actively running coroutines, just before the next time the scheduler attempts to
+run the coroutine.
+
+If the `Coroutine::suspend()` method is called on the coroutine *before*
+`CoroutineScheduler::setup()` is called, the scheduler will not insert the
+coroutine into the active list of coroutines at all. This is useful in unit
+tests to prevent extraneous coroutines from interfering with test validation.
 
 ### Stackless Coroutines
 
-Each coroutine is stackless, or more accurately, the stack of the coroutine
+Each coroutine is stackless. More accurately, the stack of the coroutine
 is destroyed and recreated on every invocation of the coroutine. Therefore,
 any local variable created on the stack in the coroutine will not preserve
 its value after a `COROUTINE_YIELD()` or a `COROUTINE_DELAY()`.
@@ -516,27 +565,29 @@ there is a globally scoped instance of a subclass of `Coroutine` named
 `doSomething`. The name of this subclass is `Routine_doSomething` but it is
 unlikely that you will need know the exact name of this generated class.
 
-### Coroutine State
+### Coroutine States
 
 A coroutine has several internal states:
-* `kStatusSuspended`: coroutine was suspended using `Coroutine::suspend`
+* `kStatusSuspended`: coroutine was suspended using `Coroutine::suspend()`
+* `kStatusRunning`: coroutine is currently running
 * `kStatusYielding`: coroutine returned using `COROUTINE_YIELD()`
 * `kStatusAwaiting`: coroutine returned using `COROUTINE_AWAIT()`
 * `kStatusDelaying`: coroutine returned using `COROUTINE_DELAY()`
 * `kStatusEnding`: coroutine returned using `COROUTINE_END()`
 * `kStatusTerminated`: coroutine has been removed from the scheduler queue and
-  is permanently terminated
+  is permanently terminated. Set only by the `CoroutineScheduler`.
 
 You can query these internal states using the following methods on the
 `Coroutine` class:
 * `Coroutine::isSuspended()`
+* `Coroutine::isRunning()`
 * `Coroutine::isYielding()`
 * `Coroutine::isAwaiting()`
 * `Coroutine::isDelaying()`
 * `Coroutine::isEnding()`
 * `Coroutine::isTerminated()`
-* `Coroutine::isDone()`: same as (isEnding() || isTerminated()). This version
-  is more robust because it works when the `Coroutine` is executed manually or
+* `Coroutine::isDone()`: same as (isEnding() || isTerminated()). This method
+  is preferred because it works when the `Coroutine` is executed manually or
   executed through the `CoroutineScheduler`.
 
 To call one of these functions, use the `Coroutine` instance variable that

@@ -289,7 +289,8 @@ class Coroutine {
     /**
      * Suspend the coroutine at the next scheduler iteration. If the coroutine
      * is already in the process of ending or is already terminated, then this
-     * method does nothing.
+     * method does nothing. This method works only if the
+     * CoroutineScheduler::loop() is used.
      */
     void suspend() {
       if (isDone()) return;
@@ -299,7 +300,8 @@ class Coroutine {
     /**
      * Add a Suspended coroutine into the head of the scheduler linked list,
      * and change the state to Yielding. If the coroutine is in any other
-     * state, this method does nothing.
+     * state, this method does nothing. This method works only if the
+     * CoroutineScheduler::loop() is used.
      */
     void resume();
 
@@ -330,7 +332,10 @@ class Coroutine {
     /** The coroutine was suspended with a call to suspend(). */
     bool isSuspended() const { return mStatus == kStatusSuspended; }
 
-    /** The coroutine was suspended with a call to suspend(). */
+    /**
+     * The coroutine was terminated by the scheduler with a call to
+     * setTerminated(). Normally, isDone() should be used instead.
+     */
     bool isTerminated() const { return mStatus == kStatusTerminated; }
 
     /**

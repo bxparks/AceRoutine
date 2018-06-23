@@ -612,7 +612,7 @@ You can query these internal states using the following methods on the
 * `Coroutine::isDelaying()`
 * `Coroutine::isEnding()`
 * `Coroutine::isTerminated()`
-* `Coroutine::isDone()`: same as (isEnding() || isTerminated()). This method
+* `Coroutine::isDone()`: same as `(isEnding() || isTerminated())`. This method
   is preferred because it works when the `Coroutine` is executed manually or
   executed through the `CoroutineScheduler`.
 

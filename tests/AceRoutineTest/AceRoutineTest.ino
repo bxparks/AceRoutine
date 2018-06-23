@@ -72,7 +72,7 @@ test(simpleCoroutine) {
 // c is defined in another .cpp file
 EXTERN_COROUTINE(TestableCoroutine, c);
 
-// b is defined before a because 'a' uses 'b'
+// Define b before a because 'a' uses 'b'
 COROUTINE(TestableCoroutine, b) {
   COROUTINE_BEGIN();
   COROUTINE_YIELD();
@@ -81,6 +81,9 @@ COROUTINE(TestableCoroutine, b) {
   COROUTINE_END();
 }
 
+// Define a last. If there is a circular dependency between a and b, we can use
+// a pointer (Coroutine *a and Coroutine* b) to break the circular dependency,
+// just like any other normal objects.
 COROUTINE(TestableCoroutine, a) {
   COROUTINE_LOOP() {
     COROUTINE_DELAY(25);

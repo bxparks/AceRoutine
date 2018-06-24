@@ -301,6 +301,20 @@ calling `Coroutine.suspend()` then subsequently calling`Coroutine.resume()` puts
 the coroutine at the beginning of the scheduling list, so the ordering may
 become mixed up over time if these functions are used.
 
+#### Manual Scheduling or the CoroutineScheduler
+
+Manual scheduling has the smallest overhead for context switching between
+coroutines. But it is not possible to suspend and resume a coroutine.
+
+The `CoroutineScheduler` is easier to use because it automatically keeps track
+of all coroutines defined by the `COROUTINE()` macro. It allows coroutines to be
+suspended and resumed (see below). However, there is a small overhead in
+switching between coroutines because the scheduler needs to walk down the list
+of active coroutines to find the next one.
+
+If performance is not critical, then using the `CoroutineScheduler` is probably
+the most convenient.
+
 ### Suspend and Resume
 
 The `Coroutine::suspend()` and `Coroutine::resume()` methods are available
@@ -588,7 +602,7 @@ COROUTINE(doSomething) {
 }
 ```
 there is a globally scoped instance of a subclass of `Coroutine` named
-`doSomething`. The name of this subclass is `Routine_doSomething` but it is
+`doSomething`. The name of this subclass is `Coroutine_doSomething` but it is
 unlikely that you will need know the exact name of this generated class.
 
 ### Coroutine States
@@ -657,7 +671,7 @@ macro like this:
 ```
 class CustomCoroutine : public Coroutine {
   public:
-    void enable(bool enable) { enabled = enable; }
+    void enable(bool isEnabled) { enabled = isEnabled; }
 
   protected:
     bool enabled = 0;
@@ -670,8 +684,9 @@ COROUTINE(CustomCoroutine, blinkSlow) {
 }
 ...
 ```
-The 2-argument version created an instance called `blinkSlow` which is an
-instance of a subclass of `CustomCoroutine`. Everything else remains the same.
+The 2-argument version created an object instance called `blinkSlow` which is an
+instance of an internally generated class named `CustomCoroutine_blinkSlow`
+which is a subclass of `CustomCoroutine`.
 
 ### External Coroutines
 
@@ -778,13 +793,13 @@ broader abstraction of threads or coroutines:
     * Includes various ways of multi-tasking (Events, ProtoThreads, Threads,
       Coroutines).
     * The `<ProtoThread.h>` library in the Cosa framework uses basically the
-      same technique as this `AceRoutine` library. I did not discover this
-      until I had pretty much completed the library.
+      same technique as this `AceRoutine` library.
 
 ### Comparing AceRoutine to Other Libraries
 
-This library falls in the "Threads or Coroutines" camp. The inspiration for this
-library came from [ProtoThreads](http://dunkels.com/adam/pt) and
+The AceRoutine library falls in the "Threads or Coroutines" camp. The
+inspiration for this library came from
+[ProtoThreads](http://dunkels.com/adam/pt) and
 [Coroutines in C](https://www.chiark.greenend.org.uk/~sgtatham/coroutines.html)
 where an incredibly brilliant and ugly technique called
 [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device)
@@ -807,14 +822,18 @@ that I could make the code a lot cleaner and easier to use in a number of ways:
   variables into the member variables.
 * I could use C-processor macros similar to the ones used in
   [AUnit](https://github.com/bxparks/AUnit) to hide much of the boilerplate code
-  and complexity from the user, making the library a lot easier to use, and
-  producing code that's easier to maintain.
+  and complexity from the user
 
 I looked around to see if there already was a library that implemented these
-ideas and I couldn't see one. However, after essentially finishing this library,
-I discovered I had pretty much reimplemented the `<ProtoThread.h>` library in
-the Cosa framework. It was eerie to see how similar the 2 implementations had
-turned out.
+ideas and I couldn't find one. However, after writing most of this library, I
+discovered that my implementation was very close to the `<ProtoThread.h>` module
+in the Cosa framework. It was eerie to see how similar the 2 implementations had
+turned out at the lower level. I think the AceRoutine library has a couple of
+advantages:
+* it provides additional macros (i.e. `COROUTINE()` and `EXTERN_COROUTINE()`) to
+  eliminate boilerplate code, and
+* it is a standalone Arduino library that does not depend on a larger
+  framework.
 
 ## Resource Consumption
 

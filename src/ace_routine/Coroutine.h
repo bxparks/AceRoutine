@@ -172,18 +172,18 @@ extern className##_##name name
 
 /**
 * Yield for delayMillis. A delayMillis of 0 is functionally equivalent to
-* COROUTINE_YIELD(). To save memory, the delayMillis is stored as a uint16_t so
-* the maximum delay is technically 65535 milliseconds. However, to avoid an
-* edge-case when using CoroutineSchedule, the practical maximum of 65534
-* milliseconds is imposed by the Coroutine::delay() method.
+* COROUTINE_YIELD(). To save memory, the delayMillis is stored as a uint16_t
+* but the actual maximum is limited to 32767 millliseconds. See setDelay()
+* for the reason for this limitation.
 *
 * If you need to wait for longer than that, use a for-loop to call
 * COROUTINE_DELAY() as many times as necessary.
 *
 * This could have been implemented using COROUTINE_AWAIT() but this macro
 * matches the global delay(millis) function already provided by the Arduino
-* API, and the separate kStatusDelaying allows the scheduler to perform some
-* optimization.
+* API. Also having a separate kStatusDelaying state allows the
+* CoroutineScheduler to be slightly more efficient by avoiding the call to
+* Coroutine::run() if the delay has not expired.
 */
 #define COROUTINE_DELAY(delayMillis) \
     do { \
@@ -395,15 +395,20 @@ class Coroutine {
     void setDelaying() { mStatus = kStatusDelaying; }
 
     /**
-     * Configure the delay timer. The maximum duration is (UINT16_MAX-1) (i.e.
-     * 65534) to avoid an edge-case when using the CoroutineScheduler to
-     * optimize the COROUTINE_DELAY() macro. If UINT16_MAX is given, the
-     * duration is set to (UINT16_MAX-1).
+     * Configure the delay timer. The maximum duration is set to (UINT16_MAX /
+     * 2) (i.e. 32767 milliseconds) if given a larger value. This makes the
+     * longest allowable time between two successive calls to isDelayExpired()
+     * for a given coroutine to be 32767 (UINT16_MAX - UINT16_MAX / 2 - 1)
+     * milliseconds, which should be long enough for basically all real
+     * use-cases. (The '- 1' comes from an edge case where isDelayExpired()
+     * evaluates to be true in the CoroutineScheduler::runCoroutine() but
+     * becomes to be false in the COROUTINE_DELAY() macro inside
+     * Coroutine::run()) because the clock increments by 1 millisecond.
      */
     void setDelay(uint16_t delayMillisDuration) {
       mDelayStartMillis = millis();
-      mDelayDurationMillis = (delayMillisDuration == UINT16_MAX)
-          ? UINT16_MAX - 1
+      mDelayDurationMillis = (delayMillisDuration >= UINT16_MAX / 2)
+          ? UINT16_MAX / 2
           : delayMillisDuration;
     }
 

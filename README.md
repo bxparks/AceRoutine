@@ -3,7 +3,7 @@
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
 
-Version: (2018-06-23)
+Version: (2018-06-25)
 
 ## Summary
 
@@ -208,8 +208,8 @@ The following macros are used:
 * `COROUTINE_END()`: must occur at the end of the coroutine body
 * `COROUTINE_YIELD()`: yields execution back to the `CoroutineScheduler`
 * `COROUTINE_AWAIT(condition)`: yield until `condition` become `true`
-* `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
-  parameter is defined as a `uint16_t`.
+* `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The maximum
+  allowable delay is 32767 milliseconds.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
 
 ### Defining Coroutines
@@ -303,17 +303,22 @@ become mixed up over time if these functions are used.
 
 #### Manual Scheduling or the CoroutineScheduler
 
-Manual scheduling has the smallest overhead for context switching between
-coroutines. But it is not possible to suspend and resume a coroutine.
+Manual scheduling has the smallest context switching overhead between
+coroutines. However, it is not possible to `suspend()` or `resume()` a coroutine
+because those methods affect how the `CoroutineScheduler` chooses to run a
+particular coroutine. Similarly, the list of coroutines in the global `loop()`
+is fixed by the code at compile-time. So when a coroutine finishes with the
+`COROUTINE_END()` macro, it will continue to be called by the `loop()` method.
 
 The `CoroutineScheduler` is easier to use because it automatically keeps track
-of all coroutines defined by the `COROUTINE()` macro. It allows coroutines to be
-suspended and resumed (see below). However, there is a small overhead in
-switching between coroutines because the scheduler needs to walk down the list
-of active coroutines to find the next one.
-
-If performance is not critical, then using the `CoroutineScheduler` is probably
-the most convenient.
+of all coroutines defined by the `COROUTINE()` macro, even if they are
+defined in multiple files. It allows coroutines to be suspended and resumed (see
+below). However, there is a small overhead in switching between coroutines
+because the scheduler needs to walk down the list of active coroutines to find
+the next one. The scheduler is able to remove coroutines which are not running,
+if there are a significant number of these inactive coroutines, then the
+`CoroutineScheduler` may actually be more efficient than manually calling the
+coroutines through the global `loop()` method.
 
 ### Suspend and Resume
 
@@ -361,10 +366,15 @@ while (!condition) COROUTINE_YIELD();
 ### Delay
 
 `COROUTINE_DELAY(millis)` delays the return of control until `millis`
-milliseconds has elapsed. The argument is a `uint16_t`, a 16-bit unsigned
-integer, which saves 4 bytes on each instance of `Coroutine`. However, the
-drawback is that the largest value is 65534 (not 65535 due to an edge-case)
-milliseconds.
+milliseconds have elapsed. The `millis` argument is a `uint16_t`, a 16-bit
+unsigned integer, which saves 4 bytes on each instance of `Coroutine`. However,
+the actual maximum delay is limited to 32767 milliseconds to avoid overflow
+situations if the other coroutines in the system take to much time for their
+work before returning control to the waiting coroutine. With this limit, the
+other coroutines have as much as 32767 milliseconds to complete their work,
+which should be more than enough time for any conceivable situation. In
+practice, coroutines should complete their work within several milliseconds and
+yield control to the other coroutines as soon as possible.
 
 To delay for longer, an explicit loop can be used. For example, to delay
 for 1000 seconds, we can do this:
@@ -372,8 +382,8 @@ for 1000 seconds, we can do this:
 COROUTINE(waitThousandSeconds) {
   COROUTINE_BEGIN();
   static i = 0;
-  for (i = 0; i < 1000; i++) {
-    COROUTINE_DELAY(1000);
+  for (i = 0; i < 100; i++) {
+    COROUTINE_DELAY(10000);
   }
   ...
   COROUTINE_END();

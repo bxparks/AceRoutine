@@ -1,8 +1,13 @@
+// The AUNITER_ARDUINO_BINARY environment variable is defined in the Jenkins
+// system configuration.
+//
+// The WORKSPACE variable is automatically filled in by Jenkins.
+//
+// The BOARDS variable is defined in the "This project is
+// parameterized" section of the Pipeline configuration.
+//
 pipeline {
     agent { label 'master' }
-    environment {
-        AUNITER_ARDUINO_BINARY = '/var/lib/jenkins/arduino-1.8.5/arduino'
-    }
     stages {
         stage('Setup') {
             steps {
@@ -21,7 +26,7 @@ pipeline {
                 sh "AUniter/auniter.sh --verify \
                     --pref sketchbook.path=$WORKSPACE \
                     --config libraries/AceRoutine/tests/auniter.conf \
-                    --boards nano \
+                    --boards $BOARDS \
                     libraries/AceRoutine/examples/*"
             }
         }
@@ -30,7 +35,7 @@ pipeline {
                 sh "AUniter/auniter.sh --verify \
                     --pref sketchbook.path=$WORKSPACE \
                     --config libraries/AceRoutine/tests/auniter.conf \
-                    --boards nano \
+                    --boards $BOARDS \
                     libraries/AceRoutine/tests/*Test"
             }
         }
@@ -39,7 +44,7 @@ pipeline {
                 sh "AUniter/auniter.sh --test \
                     --pref sketchbook.path=$WORKSPACE \
                     --config libraries/AceRoutine/tests/auniter.conf \
-                    --boards nano:$PORT \
+                    --boards $BOARDS \
                     libraries/AceRoutine/tests/*Test"
             }
         }

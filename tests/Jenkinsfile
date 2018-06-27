@@ -31,7 +31,6 @@ pipeline {
                     --pref sketchbook.path=$WORKSPACE \
                     --config libraries/AceRoutine/tests/auniter.conf \
                     --boards nano \
-                    --verify \
                     libraries/AceRoutine/tests/*Test"
             }
         }
@@ -40,7 +39,7 @@ pipeline {
                 sh "AUniter/auniter.sh --test \
                     --pref sketchbook.path=$WORKSPACE \
                     --config libraries/AceRoutine/tests/auniter.conf \
-                    --boards nano:/dev/ttyUSB0 \
+                    --boards nano:$PORT \
                     libraries/AceRoutine/tests/*Test"
             }
         }

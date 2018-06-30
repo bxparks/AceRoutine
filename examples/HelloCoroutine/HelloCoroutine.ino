@@ -6,7 +6,13 @@
 #include <AceRoutine.h>
 using namespace ace_routine;
 
-const int LED = LED_BUILTIN;
+#ifdef LED_BUILTIN
+  const int LED = LED_BUILTIN;
+#else
+  // Some ESP32 boards do not LED_BUILTIN, sometimes they have more than 1.
+  const int LED = 5;
+#endif
+
 const int LED_ON = HIGH;
 const int LED_OFF = LOW;
 

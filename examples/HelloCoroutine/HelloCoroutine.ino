@@ -16,14 +16,17 @@ using namespace ace_routine;
 const int LED_ON = HIGH;
 const int LED_OFF = LOW;
 
-const int LED_DELAY = 200;
+// Use asymmetric delays for blinking to demonstrate how easy it is using
+// COROUTINES.
+const int LED_SHORT_DELAY = 100;
+const int LED_LONG_DELAY = 500;
 
 COROUTINE(blinkLed) {
   COROUTINE_LOOP() {
     digitalWrite(LED, LED_ON);
-    COROUTINE_DELAY(LED_DELAY);
+    COROUTINE_DELAY(LED_SHORT_DELAY);
     digitalWrite(LED, LED_OFF);
-    COROUTINE_DELAY(LED_DELAY);
+    COROUTINE_DELAY(LED_LONG_DELAY);
   }
 }
 

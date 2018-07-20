@@ -9,6 +9,34 @@ namespace ace_routine {
 namespace cli {
 
 /**
+ * Abstract class of command handlers.
+ */
+class CommandHandler {
+  public:
+    /**
+     * Constructor.
+     *
+     * @param helpString the "usage" string, excluding the name of the command
+     * itself to save space.
+     * @param name Name of the command will be automatically added by the 'help
+     * command' handler.
+     */
+    CommandHandler(const char* name, const char* helpString):
+        mName(name),
+        mHelpString(helpString) {}
+
+    virtual void run(int argc, const char** argv) const = 0;
+
+    const char* getName() const { return mName; }
+
+    const char* getHelpString() const { return mHelpString; }
+
+  private:
+    const char* const mName;
+    const char* const mHelpString;
+};
+
+/**
  * A coroutine that reads lines from the Serial port, tokenizes the line on
  * whitespace boundaries, and calls the appropriate command handler to handle
  * the command. Command have the form "command arg1 arg2 ...", where the 'arg*'
@@ -24,35 +52,20 @@ class CommandDispatcher: public Coroutine {
     /** Maximum number of tokens for a command including flags. */
     static const uint8_t ARGV_SIZE = 10;
 
-    /** Signature for a command handler. */
-    typedef void (*CommandHandler)(int argc, const char** argv);
-
-    /**
-     * A record of the command name and its handler. The helpString is the
-     * "usage" string, excluding the name of the command itself to save space.
-     * The name of the command will be automatically added by the 'help
-     * command' handler.
-     */
-    struct DispatchRecord {
-      CommandHandler handler;
-      const char* name;
-      const char* helpString;
-    };
-
     /**
      * Constructor.
      *
      * @param serialReader Instance of SerialReader.
-     * @param numCommands Number of entries in dispatchTable
-     * @param dispatchTable An array of DispatchRecords.
+     * @param numCommands Number of entries in handlers
+     * @param handlers An array of CommandHandler
      */
     CommandDispatcher(
             SerialReader& serialReader,
             uint8_t numCommands,
-            const DispatchRecord* dispatchTable):
+            const CommandHandler* const* handlers):
         mSerialReader(serialReader),
         mNumCommands(numCommands),
-        mDispatchTable(dispatchTable) {
+        mComandHandlers(handlers) {
     }
 
   protected:
@@ -83,12 +96,12 @@ class CommandDispatcher: public Coroutine {
         }
 
         for (uint8_t i = 0; i < mNumCommands; i++) {
-          const DispatchRecord* record = &mDispatchTable[i];
-          if (strcmp(record->name, cmd) == 0) {
+          const CommandHandler* handler = mComandHandlers[i];
+          if (strcmp(handler->getName(), cmd) == 0) {
             Serial.print("Usage: ");
             Serial.print(cmd);
             Serial.print(' ');
-            Serial.println(record->helpString);
+            Serial.println(handler->getHelpString());
             return;
           }
         }
@@ -98,8 +111,8 @@ class CommandDispatcher: public Coroutine {
         Serial.println(F("Usage: help [command]"));
         Serial.print(F("Commands: help "));
         for (uint8_t i = 0; i < mNumCommands; i++) {
-          const DispatchRecord* record = &mDispatchTable[i];
-          Serial.print(record->name);
+          const CommandHandler* handler = mComandHandlers[i];
+          Serial.print(handler->getName());
           Serial.print(' ');
         }
         Serial.println();
@@ -120,14 +133,14 @@ class CommandDispatcher: public Coroutine {
         return;
       }
 
-      // Look for an entry in the dispatchTable.
+      // Look for an entry in the handlers.
       // NOTE: this is currently a linear scan O(N) which is good enough for
-      // small number of commands. If we sorted the dispatchTable, we could do
+      // small number of commands. If we sorted the handlers, we could do
       // a binary search for O(log(N)) and handle large number of commands.
       for (uint8_t i = 0; i < mNumCommands; i++) {
-        const DispatchRecord* record = &mDispatchTable[i];
-        if (strcmp(record->name, cmd) == 0) {
-          record->handler(argc, argv);
+        const CommandHandler* handler = mComandHandlers[i];
+        if (strcmp(handler->getName(), cmd) == 0) {
+          handler->run(argc, argv);
           return;
         }
       }
@@ -169,7 +182,7 @@ class CommandDispatcher: public Coroutine {
 
     SerialReader& mSerialReader;
     const uint8_t mNumCommands;
-    const DispatchRecord* const mDispatchTable;
+    const CommandHandler* const* const mComandHandlers;
 };
 
 }

@@ -69,57 +69,82 @@ int freeMemory() {
 
 //---------------------------------------------------------------------------
 
-SerialReader serialReader(Serial);
-
 /** List the coroutines. */
-void listCommandHandler(int /* argc */, const char** /* argv */) {
-  CoroutineScheduler::list(&Serial);
-}
+class ListCommandHandler: public CommandHandler {
+  public:
+    ListCommandHandler(): CommandHandler("list", nullptr) {}
+
+    virtual void run(int /* argc */, const char** /* argv */) const override {
+      CoroutineScheduler::list(&Serial);
+    }
+};
 
 /** Echo the command line arguments. */
-void echoCommandHandler(int argc, const char** argv) {
- for (int i = 1; i < argc; i++) {
-    Serial.print(argv[i]);
-    Serial.print(' ');
-  }
-  Serial.println();
-}
+class EchoCommandHandler: public CommandHandler {
+  public:
+    EchoCommandHandler(): CommandHandler("echo", "args ...") {}
+
+    virtual void run(int argc, const char** argv) const override {
+     for (int i = 1; i < argc; i++) {
+        Serial.print(argv[i]);
+        Serial.print(' ');
+      }
+      Serial.println();
+    }
+};
 
 /** Print amount of free memory between stack and heap. */
-void freeCommandHandler(int /* argc */, const char** /* argv */) {
-	Serial.print(F("Free memory: "));
-	Serial.println(freeMemory());
-}
+class FreeCommandHandler: public CommandHandler {
+  public:
+    FreeCommandHandler(): CommandHandler("free", nullptr) {}
+
+    virtual void run(int /* argc */, const char** /* argv */) const override {
+      Serial.print(F("Free memory: "));
+      Serial.println(freeMemory());
+    }
+};
 
 /** Change the blinking LED on and off delay parameters. */
-void delayCommandHandler(int argc, const char** argv) {
-  if (argc != 3) {
-    Serial.println(F("Invalid number of arguments"));
-    return;
-  }
-  const char* param = argv[1];
-  const char* value = argv[2];
-  if (strcmp(param, "on") == 0) {
-    ledOnDelay = atoi(value);
-  } else if (strcmp(param, "off") == 0) {
-    ledOffDelay = atoi(value);
-  } else {
-    Serial.print(F("Unknown argument: "));
-    Serial.println(param);
-  }
-}
+class DelayCommandHandler: public CommandHandler {
+  public:
+    DelayCommandHandler(): CommandHandler("delay", "(on | off) millis") {}
 
-static const CommandDispatcher::DispatchRecord dispatchTable[] = {
-  {delayCommandHandler, "delay", "(on | off) millis"},
-  {listCommandHandler, "list", nullptr},
-  {freeCommandHandler, "free", nullptr},
-  {echoCommandHandler, "echo", "args ..."},
+    virtual void run(int argc, const char** argv) const override {
+      if (argc != 3) {
+        Serial.println(F("Invalid number of arguments"));
+        return;
+      }
+      const char* param = argv[1];
+      const char* value = argv[2];
+      if (strcmp(param, "on") == 0) {
+        ledOnDelay = atoi(value);
+      } else if (strcmp(param, "off") == 0) {
+        ledOffDelay = atoi(value);
+      } else {
+        Serial.print(F("Unknown argument: "));
+        Serial.println(param);
+      }
+    }
 };
+
+DelayCommandHandler delayCommandHandler;
+ListCommandHandler listCommandHandler;
+FreeCommandHandler freeCommandHandler;
+EchoCommandHandler echoCommandHandler;
+
+static const CommandHandler* commands[] = {
+  &delayCommandHandler,
+  &listCommandHandler,
+  &freeCommandHandler,
+  &echoCommandHandler,
+};
+
+SerialReader serialReader(Serial);
 
 CommandDispatcher dispatcher(
     serialReader,
-    sizeof(dispatchTable) / sizeof(CommandDispatcher::DispatchRecord),
-    dispatchTable);
+    sizeof(commands) / sizeof(CommandHandler*),
+    commands);
 
 //---------------------------------------------------------------------------
 

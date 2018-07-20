@@ -90,20 +90,27 @@ void CommandDispatcher::runCommand(char* line) {
     return;
   }
 
-  // Look for an entry in the handlers.
-  // NOTE: this is currently a linear scan O(N) which is good enough for
-  // small number of commands. If we sorted the handlers, we could do
-  // a binary search for O(log(N)) and handle large number of commands.
-  for (uint8_t i = 0; i < mNumCommands; i++) {
-    const CommandHandler* handler = mComandHandlers[i];
-    if (strcmp(handler->getName(), cmd) == 0) {
-      handler->run(argc, mArgv);
-      return;
-    }
+  const CommandHandler* handler = findHandler(
+      mComandHandlers, mNumCommands, cmd);
+  if (handler != nullptr) {
+    handler->run(argc, mArgv);
+    return;
   }
 
   Serial.print(F("Unknown command: "));
   Serial.println(cmd);
+}
+
+const CommandHandler* CommandDispatcher::findHandler(
+    const CommandHandler* const* comandHandlers,
+    uint8_t numCommands, const char* cmd) {
+  for (uint8_t i = 0; i < numCommands; i++) {
+    const CommandHandler* handler = comandHandlers[i];
+    if (strcmp(handler->getName(), cmd) == 0) {
+      return handler;
+    }
+  }
+  return nullptr;
 }
 
 /** Tokenize the line, returning the number of tokens. */

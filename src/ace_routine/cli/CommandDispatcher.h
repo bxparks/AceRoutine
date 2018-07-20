@@ -95,6 +95,20 @@ class CommandDispatcher: public Coroutine {
         mArgv(argv),
         mArgvSize(argvSize) {}
 
+    /** Tokenize the line, returning the number of tokens. VisibleForTesting. */
+    static uint8_t tokenize(char* line, const char** argv, uint8_t argvSize);
+
+    /**
+     * Find the command handler using name. VisibleForTesting.
+     *
+     * NOTE: this is currently a linear O(N) scan which is good enough for
+     * small number of commands. If we sorted the handlers, we could do a
+     * binary search for O(log(N)) and handle larger number of commands.
+     */
+    static const CommandHandler* findHandler(
+        const CommandHandler* const* comandHandlers,
+        uint8_t numCommands, const char* cmd);
+
   private:
     static const uint8_t STATUS_SUCCESS = 0;
     static const uint8_t STATUS_BUFFER_OVERFLOW = 1;
@@ -109,9 +123,6 @@ class CommandDispatcher: public Coroutine {
 
     /** Tokenize the given line and run the command handler. */
     void runCommand(char* line);
-
-    /** Tokenize the line, returning the number of tokens. */
-    uint8_t tokenize(char* line, const char** argv, uint8_t argvSize);
 
     virtual int runRoutine() override;
 

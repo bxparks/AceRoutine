@@ -88,7 +88,8 @@ unsigned long freeMemory() {
 /** List the coroutines known by the CoroutineScheduler. */
 class ListCommandHandler: public CommandHandler {
   public:
-    ListCommandHandler(): CommandHandler("list", nullptr) {}
+    ListCommandHandler(const char* name, const char* helpString):
+        CommandHandler(name, helpString) {}
 
     virtual void run(int /* argc */, const char** /* argv */) const override {
       CoroutineScheduler::list(&Serial);
@@ -98,7 +99,8 @@ class ListCommandHandler: public CommandHandler {
 /** Echo the command line arguments. */
 class EchoCommandHandler: public CommandHandler {
   public:
-    EchoCommandHandler(): CommandHandler("echo", "args ...") {}
+    EchoCommandHandler(const char* name, const char* helpString):
+        CommandHandler(name, helpString) {}
 
     virtual void run(int argc, const char** argv) const override {
      for (int i = 1; i < argc; i++) {
@@ -112,7 +114,8 @@ class EchoCommandHandler: public CommandHandler {
 /** Print amount of free memory between stack and heap. */
 class FreeCommandHandler: public CommandHandler {
   public:
-    FreeCommandHandler(): CommandHandler("free", nullptr) {}
+    FreeCommandHandler(const char* name, const char* helpString):
+        CommandHandler(name, helpString) {}
 
     virtual void run(int /* argc */, const char** /* argv */) const override {
       Serial.print(F("Free memory: "));
@@ -123,7 +126,8 @@ class FreeCommandHandler: public CommandHandler {
 /** Change the blinking LED on and off delay parameters. */
 class DelayCommandHandler: public CommandHandler {
   public:
-    DelayCommandHandler(): CommandHandler("delay", "(on | off) millis") {}
+    DelayCommandHandler(const char* name, const char* helpString):
+        CommandHandler(name, helpString) {}
 
     virtual void run(int argc, const char** argv) const override {
       if (argc != 3) {
@@ -143,10 +147,10 @@ class DelayCommandHandler: public CommandHandler {
     }
 };
 
-DelayCommandHandler delayCommandHandler;
-ListCommandHandler listCommandHandler;
-FreeCommandHandler freeCommandHandler;
-EchoCommandHandler echoCommandHandler;
+DelayCommandHandler delayCommandHandler("list", nullptr);
+ListCommandHandler listCommandHandler("echo", "args ...");
+FreeCommandHandler freeCommandHandler("free", nullptr);
+EchoCommandHandler echoCommandHandler("delay", "(on | off) millis");
 
 static const CommandHandler* commands[] = {
   &delayCommandHandler,

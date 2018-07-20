@@ -39,9 +39,9 @@ others (in my opinion of course):
     * the `CoroutineScheduler` consumes only 2 bytes (8-bit) or 4 bytes (32-bit)
       no matter how many coroutines are active
 * extremely fast context switching
-    * ~5 microseconds on a 16 MHz ATmega328P
+    * ~7 microseconds on a 16 MHz ATmega328P
     * ~0.8 microseconds on Teensy 3.2 (depending on compiler settings)
-    * ~0.4 microseconds on a ESP32
+    * ~0.5 microseconds on a ESP32
 * uses "computed goto" feature of GCC to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
     * allows `switch` statemens in the coroutines

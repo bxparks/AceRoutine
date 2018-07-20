@@ -1,5 +1,7 @@
 # AutoBenchmark
 
+All times in microseconds.
+
 ## Arduino Nano
 
 ### Memory Size
@@ -14,7 +16,7 @@ sizeof(RoutineScheduler): 2
 ------------+------+------+
  AceRoutine | base | diff |
 ------------+------+------+
-       9.59 | 3.27 | 6.32 |
+      10.47 | 3.27 | 7.20 |
 ------------+------+------+
 ```
 
@@ -31,6 +33,8 @@ sizeof(RoutineScheduler): 4
 ```
 
 ### CPU
+
+(TODO: benchmarks need updating)
 
 ```
 ----------------------+------------+------+------+
@@ -57,7 +61,7 @@ Memory Size: (same as Teensy 3.2)
 ------------+------+------+
 AceRoutine  | base | diff |
 ------------+------+------+
-      10.77 | 9.28 | 1.48 |
+      11.05 | 9.11 | 1.94 |
 ------------+------+------+
 ```
 
@@ -69,6 +73,6 @@ Memory Size: (same as Teensy 3.2)
 ------------+------+------+
  AceRoutine | base | diff |
 ------------+------+------+
-       6.25 | 5.84 | 0.40 |
+       6.66 | 6.13 | 0.53 |
 ------------+------+------+
 ```

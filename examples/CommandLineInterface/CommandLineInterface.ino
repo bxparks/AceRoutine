@@ -1,8 +1,15 @@
 /*
- * A sketch that reads the serial port for a command, parses the command line,
- * then calls the appropriate command handler.
+ * A demo sketch for the src/ace_routine/cli/ classes. It reads the serial port
+ * for a command, parses the command line, then calls the appropriate command
+ * handler.
  *
- * Run the sketch, then type 'help' on the serial port.
+ * Run the sketch, then type 'help' on the serial port. The following
+ * commands are supported:
+ *  - `help [command]`
+ *  - `list`
+ *  - `free`
+ *  - `echo [args ...]`
+ *  - `delay (on | off) millis`
  */
 
 #include <Arduino.h>
@@ -152,25 +159,22 @@ ListCommandHandler listCommandHandler("echo", "args ...");
 FreeCommandHandler freeCommandHandler("free", nullptr);
 EchoCommandHandler echoCommandHandler("delay", "(on | off) millis");
 
-static const CommandHandler* commands[] = {
+const CommandHandler* commands[] = {
   &delayCommandHandler,
   &listCommandHandler,
   &freeCommandHandler,
   &echoCommandHandler,
 };
+const uint8_t NUM_COMMANDS = sizeof(commands) / sizeof(CommandHandler*);
 
-static const int BUF_SIZE = 64;
+const int BUF_SIZE = 64;
 char lineBuffer[BUF_SIZE];
 SerialReader serialReader(Serial, lineBuffer, BUF_SIZE);
 
-static const int8_t ARGV_SIZE = 10;
+const int8_t ARGV_SIZE = 10;
 const char* argv[ARGV_SIZE];
 CommandDispatcher dispatcher(
-    serialReader,
-    commands,
-    sizeof(commands) / sizeof(CommandHandler*),
-    argv,
-    ARGV_SIZE);
+    serialReader, commands, NUM_COMMANDS, argv, ARGV_SIZE);
 
 //---------------------------------------------------------------------------
 

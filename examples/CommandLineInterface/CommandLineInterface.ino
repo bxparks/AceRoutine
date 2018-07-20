@@ -155,12 +155,18 @@ static const CommandHandler* commands[] = {
   &echoCommandHandler,
 };
 
-SerialReader serialReader(Serial);
+static const int BUF_SIZE = 64;
+char lineBuffer[BUF_SIZE];
+SerialReader serialReader(Serial, lineBuffer, BUF_SIZE);
 
+static const int8_t ARGV_SIZE = 10;
+const char* argv[ARGV_SIZE];
 CommandDispatcher dispatcher(
     serialReader,
+    commands,
     sizeof(commands) / sizeof(CommandHandler*),
-    commands);
+    argv,
+    ARGV_SIZE);
 
 //---------------------------------------------------------------------------
 

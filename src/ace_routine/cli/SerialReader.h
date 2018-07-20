@@ -37,11 +37,18 @@ namespace cli {
  */
 class SerialReader {
   public:
-    /** Size of the line buffer. */
-    static const uint8_t READ_BUF_SIZE = 64;
-
-    SerialReader(Stream& serial):
-      mSerial(serial)
+    /**
+     * Constructor.
+     *
+     * @param serial The input stream, usually the global Serial object.
+     * @param buffer The input character buffer.
+     * @param bufferSize The size of the buffer, should be set large enough to
+     * hold the longest line without triggering buffer overflow.
+     */
+    SerialReader(Stream& serial, char* buf, int bufSize):
+      mSerial(serial),
+      mBuf(buf),
+      mBufSize(bufSize)
     {}
 
     /**
@@ -121,8 +128,9 @@ class SerialReader {
     bool addToBuffer(char c);
 
     Stream& mSerial;
-    uint8_t mIndex = 0;
-    char mBuf[READ_BUF_SIZE];
+    char* const mBuf;
+    int mBufSize;
+    int mIndex = 0;
     char mPushback = 0;
 };
 

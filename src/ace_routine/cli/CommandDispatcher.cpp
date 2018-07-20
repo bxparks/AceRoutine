@@ -80,14 +80,13 @@ void CommandDispatcher::helpCommandHandler(int argc, const char** argv) {
 /** Tokenize the given line and run the command handler. */
 void CommandDispatcher::runCommand(char* line) {
   // Tokenize the line.
-  const char* argv[ARGV_SIZE];
-  int argc = tokenize(line, ARGV_SIZE, argv);
+  int argc = tokenize(line, mArgv, mArgvSize);
   if (argc == 0) return;
-  const char* cmd = argv[0];
+  const char* cmd = mArgv[0];
 
   // The 'help' command is built-in.
   if (strcmp(cmd, "help") == 0) {
-    helpCommandHandler(argc, argv);
+    helpCommandHandler(argc, mArgv);
     return;
   }
 
@@ -98,7 +97,7 @@ void CommandDispatcher::runCommand(char* line) {
   for (uint8_t i = 0; i < mNumCommands; i++) {
     const CommandHandler* handler = mComandHandlers[i];
     if (strcmp(handler->getName(), cmd) == 0) {
-      handler->run(argc, argv);
+      handler->run(argc, mArgv);
       return;
     }
   }
@@ -108,7 +107,8 @@ void CommandDispatcher::runCommand(char* line) {
 }
 
 /** Tokenize the line, returning the number of tokens. */
-int CommandDispatcher::tokenize(char* line, int argvSize, const char** argv) {
+uint8_t CommandDispatcher::tokenize(char* line, const char** argv,
+    uint8_t argvSize) {
   char* token = strtok(line, DELIMS);
   int argc = 0;
   while (token != nullptr && argc < argvSize) {

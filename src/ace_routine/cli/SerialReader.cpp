@@ -111,7 +111,7 @@ bool SerialReader::getLine(bool* isError, char** line) {
     char c = mSerial.read();
     mBuf[mIndex] = c;
     mIndex++;
-    if (mIndex >= READ_BUF_SIZE - 1) {
+    if (mIndex >= mBufSize - 1) {
       resetBuffer();
       *isError = true;
       *line = mBuf;
@@ -130,7 +130,7 @@ bool SerialReader::getLine(bool* isError, char** line) {
 bool SerialReader::addToBuffer(char c) {
   mBuf[mIndex] = c;
   mIndex++;
-  if (mIndex >= READ_BUF_SIZE - 1) {
+  if (mIndex >= mBufSize - 1) {
     resetBuffer();
     return true;
   } else {

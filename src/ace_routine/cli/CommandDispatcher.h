@@ -40,10 +40,10 @@ class CommandHandler {
     /**
      * Constructor.
      *
-     * @param helpString The "usage" string, excluding the name of the command
-     *        itself to save space.
      * @param name Name of the command will be automatically added by the
-     *        'help' handler.
+     * 'help' handler to the help string.
+     * @param helpString The "usage" string, excluding the name of the command
+     * itself (to save space).
      */
     CommandHandler(const char* name, const char* helpString):
         mName(name), mHelpString(helpString) {}
@@ -72,23 +72,28 @@ class CommandHandler {
  */
 class CommandDispatcher: public Coroutine {
   public:
-    /** Maximum number of tokens for a command including flags. */
-    static const uint8_t ARGV_SIZE = 10;
-
     /**
      * Constructor.
      *
      * @param serialReader Instance of SerialReader.
-     * @param numCommands Number of entries in handlers.
      * @param handlers An array of CommandHandler pointers.
+     * @param numCommands Number of entries in handlers.
+     * @param argv Array of (const char*) that will be used to hold the word
+     * tokens of a command line.
+     * @param argvSize The size of the argv array. Tokens which are beyond this
+     * limit will be silently dropped from the call to CommandHandler::run().
      */
     CommandDispatcher(
             SerialReader& serialReader,
+            const CommandHandler* const* handlers,
             uint8_t numCommands,
-            const CommandHandler* const* handlers):
+            const char** argv,
+            uint8_t argvSize):
         mSerialReader(serialReader),
         mNumCommands(numCommands),
-        mComandHandlers(handlers) {}
+        mComandHandlers(handlers),
+        mArgv(argv),
+        mArgvSize(argvSize) {}
 
   private:
     static const uint8_t STATUS_SUCCESS = 0;
@@ -106,13 +111,15 @@ class CommandDispatcher: public Coroutine {
     void runCommand(char* line);
 
     /** Tokenize the line, returning the number of tokens. */
-    int tokenize(char* line, int argvSize, const char** argv);
+    uint8_t tokenize(char* line, const char** argv, uint8_t argvSize);
 
     virtual int runRoutine() override;
 
     SerialReader& mSerialReader;
     const uint8_t mNumCommands;
     const CommandHandler* const* const mComandHandlers;
+    const char** const mArgv;
+    const uint8_t mArgvSize;
 };
 
 }

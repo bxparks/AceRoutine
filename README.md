@@ -3,7 +3,7 @@
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
 
-Version: (2018-06-25)
+Version: (2018-07-19)
 
 ## Summary
 
@@ -689,6 +689,8 @@ class CustomCoroutine : public Coroutine {
   public:
     void enable(bool isEnabled) { enabled = isEnabled; }
 
+    // runRoutine() abstract method defined by COROUTINE() macro
+
   protected:
     bool enabled = 0;
 };
@@ -703,6 +705,66 @@ COROUTINE(CustomCoroutine, blinkSlow) {
 The 2-argument version created an object instance called `blinkSlow` which is an
 instance of an internally generated class named `CustomCoroutine_blinkSlow`
 which is a subclass of `CustomCoroutine`.
+
+Custom coroutines are useful if you need to create multiple coroutines which
+have shared methods or data structures.
+
+### Manual Coroutines
+
+A manual coroutine is a custom coroutine whose body of the coroutine (i.e
+the`runRoutine()` method) is defined manually instead of using the `COROUTINE()`
+macro. This is useful if the coroutine needs to have external dependencies
+injected into the constructor because the `COROUTINE()` macro does not allow the
+constructor to be customized.
+
+```
+class ManualCoroutine : public Coroutine {
+  public:
+    // Inject external dependencies into the constructor.
+    ManualCoroutine(...) {
+      ...
+    }
+
+  private:
+    virtual int runRoutine() override {
+      COROUTINE_BEGIN();
+      // insert coroutine code here
+      COROUTINE_END();
+    }
+};
+
+ManualCoroutine manualRoutine;
+```
+
+A manual coroutine (created without the `COROUTINE()` macro) is *not*
+automatically added to the linked list used by the `CoroutineScheduler`. If you
+wish to insert it into the scheduler, use the `resume()` method just before
+calling `CoroutineScheduler::setup()`:
+```
+void setup() {
+  ...
+  manualRoutine.resume();
+  CoroutineScheduler::setup();
+  ...
+}
+
+void loop() {
+  ...
+  CoroutineSchedule::loop();
+  ...
+}
+```
+
+The `Coroutine::resume()` method can be called at anytime to insert into the
+scheduler, but calling it in the global `setup()` makes things simple.
+
+The name of a manually created coroutine is set to be `nullptr` because the
+`COROUTINE()` macro was not used. When printed (e.g. using the
+`CoroutineScheduler::list()` method, the name is represented by the integer
+representation of the `this` pointer of the coroutine object.
+
+A good example of a manual coroutine is
+[src/ace_routine/cli/CommandDispatcher.h](src/ace_routine/cli/CommandDispatcher.h).
 
 ### External Coroutines
 

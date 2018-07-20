@@ -1,5 +1,13 @@
 # Changelog
 
+* (2018-07-19)
+    * Add examples/CommandLineInterface sketch which provides a non-blocking
+      command line interface using coroutines.
+    * Add non-blocking SerialReader and CommandDispatcher.
+    * Use runRoutine() method for the body of the coroutines instead of run().
+    * Limit maximum value of COROUTINE_DELAY() to 32767 millis to give more
+      breathing room to other coroutines.
+    * Add support for AUniter and Jenkins continuous integration.
 * (2018-06-23)
     * After allowing Coroutine::run() to be called directly,
       bypassing CoroutineScheduler, these things do actually look like

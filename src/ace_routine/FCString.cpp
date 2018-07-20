@@ -33,7 +33,10 @@ SOFTWARE.
 namespace ace_routine {
 
 void FCString::print(Print* printer) const {
-  if (mString.cstring == nullptr) return;
+  if (mString.cstring == nullptr) {
+    printer->print((unsigned long) this);
+    return;
+  }
 
   if (mStringType == kCStringType) {
     printer->print(getCString());
@@ -44,7 +47,7 @@ void FCString::print(Print* printer) const {
 
 void FCString::println(Print* printer) const {
   if (mString.cstring == nullptr) {
-    printer->println();
+    printer->println((unsigned long) this);
     return;
   }
 

@@ -43,12 +43,16 @@ COROUTINE(blinkLed) {
 #ifdef __arm__
 // should use uinstd.h to define sbrk but Due causes a conflict
 extern "C" char* sbrk(int incr);
+#elif defined(ESP8266)
+extern "C" {
+#include "user_interface.h"
+}
 #else
 extern char *__brkval;
 #endif
  
 /**
- * Return the amount of free memory. Taken from:
+ * Return the amount of free memory. For AVR and Teensy, see:
  *
  * - https://learn.adafruit.com/memories-of-an-arduino/measuring-free-memory
  * - https://arduino.stackexchange.com/questions/30497
@@ -58,12 +62,23 @@ extern char *__brkval;
  * has only 2048 of static RAM. Changed to always test for non-zero value of
  * __brkval, which gives 1553 which seems more accurate because the Arduino
  * IDE says that the sketch leaves 1605 bytes for RAM.
+ *
+ * For ESP8266, see:
+ * - https://github.com/esp8266/Arduino/issues/81
+ *
+ * For ESP32, see:
+ * - https://techtutorialsx.com/2017/12/17/esp32-arduino-getting-the-free-heap/
  */
-int freeMemory() {
-  char top;
+unsigned long freeMemory() {
 #ifdef __arm__
+  char top;
   return &top - reinterpret_cast<char*>(sbrk(0));
+#elif defined(ESP8266)
+  return system_get_free_heap_size();
+#elif defined(ESP32)
+  return ESP.getFreeHeap();
 #else
+  char top;
   return &top - (__brkval ? __brkval : __malloc_heap_start);
 #endif
 }

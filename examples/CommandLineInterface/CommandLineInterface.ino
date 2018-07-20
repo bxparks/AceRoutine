@@ -57,7 +57,7 @@ extern "C" {
 #else
 extern char *__brkval;
 #endif
- 
+
 /**
  * Return the amount of free memory. For AVR and Teensy, see:
  *
@@ -93,79 +93,50 @@ unsigned long freeMemory() {
 //---------------------------------------------------------------------------
 
 /** List the coroutines known by the CoroutineScheduler. */
-class ListCommandHandler: public CommandHandler {
-  public:
-    ListCommandHandler(const char* name, const char* helpString):
-        CommandHandler(name, helpString) {}
-
-    virtual void run(int /* argc */, const char** /* argv */) const override {
-      CoroutineScheduler::list(&Serial);
-    }
-};
+void listCommand(int /* argc */, const char** /* argv */) {
+  CoroutineScheduler::list(&Serial);
+}
 
 /** Echo the command line arguments. */
-class EchoCommandHandler: public CommandHandler {
-  public:
-    EchoCommandHandler(const char* name, const char* helpString):
-        CommandHandler(name, helpString) {}
-
-    virtual void run(int argc, const char** argv) const override {
-     for (int i = 1; i < argc; i++) {
-        Serial.print(argv[i]);
-        Serial.print(' ');
-      }
-      Serial.println();
-    }
-};
+void echoCommand(int argc, const char** argv) {
+ for (int i = 1; i < argc; i++) {
+    Serial.print(argv[i]);
+    Serial.print(' ');
+  }
+  Serial.println();
+}
 
 /** Print amount of free memory between stack and heap. */
-class FreeCommandHandler: public CommandHandler {
-  public:
-    FreeCommandHandler(const char* name, const char* helpString):
-        CommandHandler(name, helpString) {}
-
-    virtual void run(int /* argc */, const char** /* argv */) const override {
-      Serial.print(F("Free memory: "));
-      Serial.println(freeMemory());
-    }
-};
+void freeCommand(int /* argc */, const char** /* argv */) {
+  Serial.print(F("Free memory: "));
+  Serial.println(freeMemory());
+}
 
 /** Change the blinking LED on and off delay parameters. */
-class DelayCommandHandler: public CommandHandler {
-  public:
-    DelayCommandHandler(const char* name, const char* helpString):
-        CommandHandler(name, helpString) {}
+void delayCommand(int argc, const char** argv) {
+  if (argc != 3) {
+    Serial.println(F("Invalid number of arguments"));
+    return;
+  }
+  const char* param = argv[1];
+  const char* value = argv[2];
+  if (strcmp(param, "on") == 0) {
+    ledOnDelay = atoi(value);
+  } else if (strcmp(param, "off") == 0) {
+    ledOffDelay = atoi(value);
+  } else {
+    Serial.print(F("Unknown argument: "));
+    Serial.println(param);
+  }
+}
 
-    virtual void run(int argc, const char** argv) const override {
-      if (argc != 3) {
-        Serial.println(F("Invalid number of arguments"));
-        return;
-      }
-      const char* param = argv[1];
-      const char* value = argv[2];
-      if (strcmp(param, "on") == 0) {
-        ledOnDelay = atoi(value);
-      } else if (strcmp(param, "off") == 0) {
-        ledOffDelay = atoi(value);
-      } else {
-        Serial.print(F("Unknown argument: "));
-        Serial.println(param);
-      }
-    }
+const DispatchRecord dispatchTable[] = {
+  {delayCommand, "delay", "(on | off) millis"},
+  {listCommand, "list", nullptr},
+  {freeCommand, "free", nullptr},
+  {echoCommand, "echo", "args ..."},
 };
-
-DelayCommandHandler delayCommandHandler("list", nullptr);
-ListCommandHandler listCommandHandler("echo", "args ...");
-FreeCommandHandler freeCommandHandler("free", nullptr);
-EchoCommandHandler echoCommandHandler("delay", "(on | off) millis");
-
-const CommandHandler* commands[] = {
-  &delayCommandHandler,
-  &listCommandHandler,
-  &freeCommandHandler,
-  &echoCommandHandler,
-};
-const uint8_t NUM_COMMANDS = sizeof(commands) / sizeof(CommandHandler*);
+const uint8_t NUM_COMMANDS = sizeof(dispatchTable) / sizeof(DispatchRecord);
 
 const int BUF_SIZE = 64;
 char lineBuffer[BUF_SIZE];
@@ -174,7 +145,7 @@ SerialReader serialReader(Serial, lineBuffer, BUF_SIZE);
 const int8_t ARGV_SIZE = 10;
 const char* argv[ARGV_SIZE];
 CommandDispatcher dispatcher(
-    serialReader, commands, NUM_COMMANDS, argv, ARGV_SIZE);
+    serialReader, dispatchTable, NUM_COMMANDS, argv, ARGV_SIZE);
 
 //---------------------------------------------------------------------------
 

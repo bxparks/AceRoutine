@@ -54,12 +54,12 @@ void CommandDispatcher::helpCommandHandler(int argc, const char** argv) {
     }
 
     for (uint8_t i = 0; i < mNumCommands; i++) {
-      const CommandHandler* handler = mComandHandlers[i];
-      if (strcmp(handler->getName(), cmd) == 0) {
+      const DispatchRecord* record = &mDispatchTable[i];
+      if (strcmp(record->name, cmd) == 0) {
         Serial.print("Usage: ");
         Serial.print(cmd);
         Serial.print(' ');
-        Serial.println(handler->getHelpString());
+        Serial.println(record->helpString);
         return;
       }
     }
@@ -69,8 +69,8 @@ void CommandDispatcher::helpCommandHandler(int argc, const char** argv) {
     Serial.println(F("Usage: help [command]"));
     Serial.print(F("Commands: help "));
     for (uint8_t i = 0; i < mNumCommands; i++) {
-      const CommandHandler* handler = mComandHandlers[i];
-      Serial.print(handler->getName());
+      const DispatchRecord* record = &mDispatchTable[i];
+      Serial.print(record->name);
       Serial.print(' ');
     }
     Serial.println();
@@ -90,10 +90,9 @@ void CommandDispatcher::runCommand(char* line) {
     return;
   }
 
-  const CommandHandler* handler = findHandler(
-      mComandHandlers, mNumCommands, cmd);
-  if (handler != nullptr) {
-    handler->run(argc, mArgv);
+  const DispatchRecord* record = findCommand(mDispatchTable, mNumCommands, cmd);
+  if (record != nullptr) {
+    record->command(argc, mArgv);
     return;
   }
 
@@ -101,19 +100,18 @@ void CommandDispatcher::runCommand(char* line) {
   Serial.println(cmd);
 }
 
-const CommandHandler* CommandDispatcher::findHandler(
-    const CommandHandler* const* comandHandlers,
+const DispatchRecord* CommandDispatcher::findCommand(
+    const DispatchRecord* dispatchTable,
     uint8_t numCommands, const char* cmd) {
   for (uint8_t i = 0; i < numCommands; i++) {
-    const CommandHandler* handler = comandHandlers[i];
-    if (strcmp(handler->getName(), cmd) == 0) {
-      return handler;
+    const DispatchRecord* record = &dispatchTable[i];
+    if (strcmp(record->name, cmd) == 0) {
+      return record;
     }
   }
   return nullptr;
 }
 
-/** Tokenize the line, returning the number of tokens. */
 uint8_t CommandDispatcher::tokenize(char* line, const char** argv,
     uint8_t argvSize) {
   char* token = strtok(line, DELIMS);

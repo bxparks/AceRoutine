@@ -32,31 +32,19 @@ SOFTWARE.
 namespace ace_routine {
 namespace cli {
 
+/** Signature for a command handler. */
+typedef void (*CommandHandler)(int argc, const char** argv);
+
 /**
- * Abstract class for command handlers.
+ * A record of the command name and its handler. The helpString is the
+ * "usage" string, excluding the name of the command itself to save space.
+ * The name of the command will be automatically added by the 'help
+ * command' handler.
  */
-class CommandHandler {
-  public:
-    /**
-     * Constructor.
-     *
-     * @param name Name of the command will be automatically added by the
-     * 'help' handler to the help string.
-     * @param helpString The "usage" string, excluding the name of the command
-     * itself (to save space).
-     */
-    CommandHandler(const char* name, const char* helpString):
-        mName(name), mHelpString(helpString) {}
-
-    virtual void run(int argc, const char** argv) const = 0;
-
-    const char* getName() const { return mName; }
-
-    const char* getHelpString() const { return mHelpString; }
-
-  private:
-    const char* const mName;
-    const char* const mHelpString;
+struct DispatchRecord {
+  CommandHandler command;
+  const char* name;
+  const char* helpString;
 };
 
 /**
@@ -76,37 +64,40 @@ class CommandDispatcher: public Coroutine {
      * Constructor.
      *
      * @param serialReader Instance of SerialReader.
-     * @param handlers An array of CommandHandler pointers.
-     * @param numCommands Number of entries in handlers.
+     * @param dispatchTable An array of DispatchRecords.
+     * @param numCommands Number of entries in the dispatchTable.
      * @param argv Array of (const char*) that will be used to hold the word
-     * tokens of a command line.
+     * tokens of a command line string.
      * @param argvSize The size of the argv array. Tokens which are beyond this
-     * limit will be silently dropped from the call to CommandHandler::run().
+     * limit will be silently dropped.
      */
     CommandDispatcher(
             SerialReader& serialReader,
-            const CommandHandler* const* handlers,
+            const DispatchRecord* dispatchTable,
             uint8_t numCommands,
             const char** argv,
             uint8_t argvSize):
         mSerialReader(serialReader),
+        mDispatchTable(dispatchTable),
         mNumCommands(numCommands),
-        mComandHandlers(handlers),
         mArgv(argv),
         mArgvSize(argvSize) {}
 
-    /** Tokenize the line, returning the number of tokens. VisibleForTesting. */
+    /**
+     * Tokenize the line, and fill argv with each token until argvSize is
+     * reached. Return the number of tokens. VisibleForTesting.
+     */
     static uint8_t tokenize(char* line, const char** argv, uint8_t argvSize);
 
     /**
-     * Find the command handler using name. VisibleForTesting.
+     * Find the dispatch record of the given command name. VisibleForTesting.
      *
      * NOTE: this is currently a linear O(N) scan which is good enough for
      * small number of commands. If we sorted the handlers, we could do a
      * binary search for O(log(N)) and handle larger number of commands.
      */
-    static const CommandHandler* findHandler(
-        const CommandHandler* const* comandHandlers,
+    static const DispatchRecord* findCommand(
+        const DispatchRecord* dispatchTable,
         uint8_t numCommands, const char* cmd);
 
   private:
@@ -127,8 +118,8 @@ class CommandDispatcher: public Coroutine {
     virtual int runRoutine() override;
 
     SerialReader& mSerialReader;
+    const DispatchRecord* const mDispatchTable;
     const uint8_t mNumCommands;
-    const CommandHandler* const* const mComandHandlers;
     const char** const mArgv;
     const uint8_t mArgvSize;
 };

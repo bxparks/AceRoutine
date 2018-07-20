@@ -48,33 +48,24 @@ testF(CommandDispatcherTest, tokenize) {
 
 // ---------------------------------------------------------------------------
 
-class DummyHandler: public CommandHandler {
-  public:
-    DummyHandler(const char* name, const char* helpString):
-        CommandHandler(name, helpString) {}
+void dummyCommand(int /* argc */, const char** /* argv */) {}
 
-    virtual void run(int /* argc */, const char** /* argv */) const override {}
+static const DispatchRecord dispatchTable[] = {
+  {dummyCommand, "echo", "args ..."},
+  {dummyCommand, "ls", "[flags] args ..."},
 };
-
-DummyHandler handler1("echo", "args ...");
-DummyHandler handler2("ls", "[flags] args ...");
-
-static const CommandHandler* commands[] = {
-  &handler1,
-  &handler2,
-};
-const uint8_t NUM_COMMANDS = sizeof(commands) / sizeof(CommandHandler*);
+const uint8_t NUM_COMMANDS = sizeof(dispatchTable) / sizeof(DispatchRecord);
 
 test(findHandler) {
-  const CommandHandler* handler = CommandDispatcher::findHandler(
-      commands, NUM_COMMANDS, "echo");
-  assertEqual((uintptr_t) &handler1, (uintptr_t) handler);
-  assertEqual(handler->getName(), "echo");
-  assertEqual(handler->getHelpString(), "args ...");
+  const DispatchRecord* record = CommandDispatcher::findCommand(
+      dispatchTable, NUM_COMMANDS, "echo");
+  assertEqual((uintptr_t) record->command, (uintptr_t) dummyCommand);
+  assertEqual(record->name, "echo");
+  assertEqual(record->helpString, "args ...");
 
-  handler = CommandDispatcher::findHandler(
-      commands, NUM_COMMANDS, "NOTFOUND");
-  assertEqual((uintptr_t) handler, (uintptr_t) nullptr);
+  record = CommandDispatcher::findCommand(
+      dispatchTable, NUM_COMMANDS, "NOTFOUND");
+  assertEqual((uintptr_t) record, (uintptr_t) nullptr);
 }
 
 // ---------------------------------------------------------------------------

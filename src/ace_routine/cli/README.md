@@ -8,9 +8,9 @@ Serial port.
   lines (terminated by newline), words (separated by whitespace), and
   integers.
 * `CommandDispatcher` - a class that uses the `SerialReader` and
-  the `AceRoutine` library to read command lines from the `Serial` port,
-  parse the command line, then dispatch to the appropriate `CommandHandler`
-  object to perform the associated command.
+  the `AceRoutine` library to read command lines from the `Serial` port, parse
+  the command line string, then dispatch to the appropriate `CommandHandler` to
+  perform the associated command.
 
 These classes were initially created to experiment on and validate the
 `AceRoutine` API but they seem to be useful as an independent library. They may
@@ -43,34 +43,27 @@ char lineBuffer[BUF_SIZE];
 SerialReader serialReader(Serial, lineBuffer, BUF_SIZE);
 
 // Define the command handlers.
-class NewCommandHandler: public CommandHandler {
-  public:
-    NewCommandHandler(const char* name, const char* helpString):
-        CommandHandler(name, helpString) {}
-    
-    virtual void run(int argc, const char** argv) const override {
-      // insert body of command
-      ...
-    }
-};
+void newCommand(int argc, const char** argv) {
+  ...
+}
 
-// Create the command handler instance, giving its name and helpString.
-NewCommandHandler newCommandHandler("name-of-command", "help-string");
+void anotherCommand(int argc, const char** argv) {
+  ...
+}
 
-// Create a table of commands.
-const CommandHandler* commands[] = {
-  &newCommandHandler,
+// Create the dispatch table of commands.
+const DispatchRecord dispatchTable[] = {
+  {&newCommand, "name-of-command", "help-string"},
+  {&anotherCommand, "name-of-other-command", "help-string"},
   ...
 };
-
-const uint8_t NUM_COMMANDS = sizeof(commands) / sizeof(CommandHandler*);
+const uint8_t NUM_COMMANDS = sizeof(dispatchTable) / sizeof(DispatchRecord);
 
 // Create CommandDispatcher with buffers.
 const int8_t ARGV_SIZE = 10;
 const char* argv[ARGV_SIZE];
 CommandDispatcher dispatcher(
-    serialReader, commands, NUM_COMMANDS argv, ARGV_SIZE);
-
+    serialReader, dispatchTable, NUM_COMMANDS argv, ARGV_SIZE);
 
 void setup() {
   Serial.begin(115200);

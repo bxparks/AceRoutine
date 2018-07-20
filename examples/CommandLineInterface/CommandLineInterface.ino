@@ -1,7 +1,8 @@
 /*
- * A sketch that reads the serial port for a line and calls the event handler.
+ * A sketch that reads the serial port for a command, parses the command line,
+ * then calls the appropriate command handler.
  *
- * WORK IN PROGRESS
+ * Run the sketch, then type 'help' on the serial port.
  */
 
 #include <Arduino.h>
@@ -55,8 +56,8 @@ extern char *__brkval;
  *
  * For a Nano, the original code returns 2252, which seems too high since it
  * has only 2048 of static RAM. Changed to always test for non-zero value of
- * __brkval, which gives 1553 which is far closer because the Arduino IDE says
- * that the sketch leaves 1605 bytes for RAM.
+ * __brkval, which gives 1553 which seems more accurate because the Arduino
+ * IDE says that the sketch leaves 1605 bytes for RAM.
  */
 int freeMemory() {
   char top;
@@ -69,7 +70,7 @@ int freeMemory() {
 
 //---------------------------------------------------------------------------
 
-/** List the coroutines. */
+/** List the coroutines known by the CoroutineScheduler. */
 class ListCommandHandler: public CommandHandler {
   public:
     ListCommandHandler(): CommandHandler("list", nullptr) {}

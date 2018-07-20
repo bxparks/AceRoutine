@@ -75,14 +75,15 @@ const int LED = LED_BUILTIN;
 const int LED_ON = HIGH;
 const int LED_OFF = LOW;
 
-const int LED_DELAY = 200;
+const int LED_ON_DELAY = 100;
+const int LED_OFF_DELAY = 500;
 
 COROUTINE(blinkLed) {
   COROUTINE_LOOP() {
     digitalWrite(LED, LED_ON);
-    COROUTINE_DELAY(LED_DELAY);
+    COROUTINE_DELAY(LED_ON_DELAY);
     digitalWrite(LED, LED_OFF);
-    COROUTINE_DELAY(LED_DELAY);
+    COROUTINE_DELAY(LED_OFF_DELAY);
   }
 }
 
@@ -184,6 +185,11 @@ The following example sketches are provided:
 * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same time
 * [AutoBenchmark.ino](examples/AutoBenchmark):
   a program that performs CPU benchmarking
+* [CommandLineInterface](examples/CommandLineInterface): uses the
+  `ace_routine/cli` classes to implement a command line interface
+  that accepts a number of commands on the serial port. The CLI is
+  non-blocking and uses coroutines so that other coroutines continue to
+  run while the board waits for commands to be typed on the serial port.
 
 ## Usage
 

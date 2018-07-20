@@ -1,8 +1,8 @@
 /*
  * This sketch is the same as BlinkCoroutine except that it uses the 2-argument
- * version of COROUTINE() to create coroutines which using custom Coroutine
- * classes. The custom classes are able to support additional variables and
- * methods that can be used by the coroutines to communicate with each other.
+ * version of COROUTINE() to use custom Coroutine classes. The custom classes
+ * are able to support additional variables and methods which are used by the
+ * coroutines to communicate with each other.
  */
 
 #include <AceRoutine.h>

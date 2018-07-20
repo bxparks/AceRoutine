@@ -151,7 +151,7 @@ CommandDispatcher dispatcher(
 
 void setup() {
   Serial.begin(115200);
-  if (!Serial) {} // micro/leonardo
+  while (!Serial); // micro/leonardo
 
   dispatcher.resume(); // insert into the scheduler
   CoroutineScheduler::setup();

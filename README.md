@@ -20,8 +20,8 @@ There are only 2 classes in this library:
 
 The library provides a number of macros to help create coroutines and manage
 their life cycle:
-* `COROUTINE()`: defines an instance of `Coroutine` class or a user-provided
-  subclass of `Coroutine`
+* `COROUTINE()`: defines an instance of the `Coroutine` class or an
+  instance of a user-defined subclass of `Coroutine`
 * `COROUTINE_BEGIN()`: must occur at the start of a coroutine body
 * `COROUTINE_END()`: must occur at the end of the coroutine body
 * `COROUTINE_YIELD()`: yields execution back to the caller, often
@@ -185,11 +185,12 @@ The following example sketches are provided:
 * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same time
 * [AutoBenchmark.ino](examples/AutoBenchmark):
   a program that performs CPU benchmarking
-* [CommandLineInterface](examples/CommandLineInterface): uses the
-  `ace_routine/cli` classes to implement a command line interface
-  that accepts a number of commands on the serial port. The CLI is
-  non-blocking and uses coroutines so that other coroutines continue to
-  run while the board waits for commands to be typed on the serial port.
+* [CommandLineInterface.ino](examples/CommandLineInterface): uses the
+  `ace_routine/cli` classes to implement a command line interface that accepts a
+  number of commands on the serial port. In other words, it is a primitive
+  "shell". The shell is non-blocking and uses coroutines so that other
+  coroutines continue to run while the board waits for commands to be typed on
+  the serial port.
 
 ## Usage
 
@@ -707,7 +708,7 @@ instance of an internally generated class named `CustomCoroutine_blinkSlow`
 which is a subclass of `CustomCoroutine`.
 
 Custom coroutines are useful if you need to create multiple coroutines which
-have shared methods or data structures.
+share methods or data structures.
 
 ### Manual Coroutines
 

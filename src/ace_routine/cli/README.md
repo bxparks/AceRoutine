@@ -20,9 +20,9 @@ Version: (2018-07-20)
 
 ## Usage
 
-See 
-[examples/CommandLineInterface/CommandLineInterface.ino](../../../examples/CommandLineInterface/CommandLineInterface.ino)
-for an example program that implements 5 commands:
+See [examples/CommandLineInterface/](../../../examples/CommandLineInterface/)
+for an demo program that implements 5 commands:
+
 * `help [command]`
 * `list`
 * `free`

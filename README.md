@@ -381,7 +381,7 @@ while (!condition) COROUTINE_YIELD();
 milliseconds have elapsed. The `millis` argument is a `uint16_t`, a 16-bit
 unsigned integer, which saves 4 bytes on each instance of `Coroutine`. However,
 the actual maximum delay is limited to 32767 milliseconds to avoid overflow
-situations if the other coroutines in the system take to much time for their
+situations if the other coroutines in the system take too much time for their
 work before returning control to the waiting coroutine. With this limit, the
 other coroutines have as much as 32767 milliseconds to complete their work,
 which should be more than enough time for any conceivable situation. In

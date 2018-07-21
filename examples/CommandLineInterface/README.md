@@ -4,10 +4,10 @@ A demo of a primitive command line "shell" for Arduino using the classes in
 `src/ace_routine/cli`. It currently supports 5 commands:
 
 * `help [command]` - list the available commands
+* `delay (on | off) millis` - change the LED on or off duration
 * `list` - list the coroutines managed by the `CoroutineScheduler`
 * `free` - print the amount of free memory
 * `echo [args ...]` - echo the arguments on the command line
-* `delay (on | off) millis` - change the LED on or off duration
 
 The shell is non-blocking. In other words, the Arduino board is able to do other
 things using AceRoutine coroutines while waiting for the user to type in the

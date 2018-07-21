@@ -20,16 +20,8 @@ Version: (2018-07-20)
 
 ## Usage
 
-See [examples/CommandLineInterface/](../../../examples/CommandLineInterface/)
-for an demo program that implements 5 commands:
-
-* `help [command]`
-* `list`
-* `free`
-* `echo [args ...]`
-* `delay (on | off) millis`
-
-The basic process is:
+The basic steps for adding a command line interface to an Arduino sketch
+using the `cli/` library is the following:
 
 1. Create a `StreamReader`, giving it the buffers that it needs.
 1. Create a `DispatchTable` containing the list of commands whose signature
@@ -89,3 +81,14 @@ void loop() {
   CoroutineScheduler::loop();
 }
 ```
+
+## Example
+
+See [examples/CommandLineInterface/](../../../examples/CommandLineInterface/)
+for an demo program that implements 5 commands:
+
+* `help [command]`
+* `list`
+* `free`
+* `echo [args ...]`
+* `delay (on | off) millis`

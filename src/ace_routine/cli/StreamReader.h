@@ -31,11 +31,12 @@ namespace ace_routine {
 namespace cli {
 
 /**
- * Reads tokens (lines, words, integers, characters, etc) from the Serial
- * device. These are non-blocking helper functions designed to be used inside
- * COROUTINE() macros from the AceRoutine library.
+ * Reads tokens (lines, words, integers, characters, etc) from the Stream
+ * device. The Stream will normally be the global Serial object. These are
+ * non-blocking helper functions designed to be used inside COROUTINE() macros
+ * from the AceRoutine library.
  */
-class SerialReader {
+class StreamReader {
   public:
     /**
      * Constructor.
@@ -45,8 +46,8 @@ class SerialReader {
      * @param bufferSize The size of the buffer, should be set large enough to
      * hold the longest line without triggering buffer overflow.
      */
-    SerialReader(Stream& serial, char* buf, int bufSize):
-      mSerial(serial),
+    StreamReader(Stream& serial, char* buf, int bufSize):
+      mStream(serial),
       mBuf(buf),
       mBufSize(bufSize)
     {}
@@ -127,7 +128,7 @@ class SerialReader {
     /** Add char c to buffer. Return true if error. */
     bool addToBuffer(char c);
 
-    Stream& mSerial;
+    Stream& mStream;
     char* const mBuf;
     int mBufSize;
     int mIndex = 0;

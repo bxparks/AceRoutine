@@ -3,11 +3,11 @@
 These classes implement a non-blocking command line interface on the Serial
 port. In ther words, you can implement a primitive "shell" for the Arduino.
 
-* `SerialReader` - a class that provided non-blocking methods for
+* `StreamReader` - a class that provided non-blocking methods for
   reading various types of input tokens from the `Serial` port. Supported tokens
   include whole lines (terminated by newline), words (separated by whitespace),
   and integers.
-* `CommandDispatcher` - a class that uses the `SerialReader` and
+* `CommandDispatcher` - a class that uses the `StreamReader` and
   the `AceRoutine` library to read command lines from the `Serial` port, parse
   the command line string, then dispatch to the appropriate `CommandHandler` to
   perform the associated command.
@@ -31,7 +31,7 @@ for an demo program that implements 5 commands:
 
 The basic process is:
 
-1. Create a `SerialReader`, giving it the buffers that it needs.
+1. Create a `StreamReader`, giving it the buffers that it needs.
 1. Create a `DispatchTable` containing the list of commands whose signature
    matches `CommandHandler`.
 1. Create a `CommanDispatcher` which reads a whole line from the Serial port,
@@ -43,16 +43,16 @@ The main `*.ino` file will look like this:
 
 ```
 #include <AceRoutine.h>
-#include <ace_routine/cli/SerialReader.h>
+#include <ace_routine/cli/StreamReader.h>
 #include <ace_routine/cli/CommandDispatcher.h>
 
 using namespace ace_routine;
 using namespace ace_routine::cli;
 
-// Create the SerialReader with buffers.
+// Create the StreamReader with buffers.
 const int BUF_SIZE = 64;
 char lineBuffer[BUF_SIZE];
-SerialReader serialReader(Serial, lineBuffer, BUF_SIZE);
+StreamReader streamReader(Serial, lineBuffer, BUF_SIZE);
 
 // Define the command handlers.
 void newCommand(Print& printer, int argc, const char** argv) {
@@ -74,7 +74,7 @@ const uint8_t NUM_COMMANDS = sizeof(dispatchTable) / sizeof(DispatchRecord);
 // Create CommandDispatcher with buffers.
 const int8_t ARGV_SIZE = 10;
 const char* argv[ARGV_SIZE];
-CommandDispatcher dispatcher(serialReader, Serial,
+CommandDispatcher dispatcher(streamReader, Serial,
     dispatchTable, NUM_COMMANDS argv, ARGV_SIZE);
 
 void setup() {

@@ -23,24 +23,24 @@ SOFTWARE.
 */
 
 #include <ctype.h> // atoi()
-#include "SerialReader.h"
+#include "StreamReader.h"
 
 namespace ace_routine {
 namespace cli {
 
-bool SerialReader::getChar(char* c) {
+bool StreamReader::getChar(char* c) {
   if (mPushback != 0) {
     *c = mPushback;
     mPushback = 0;
     return true;
   }
-  if (mSerial.available() == 0) return false;
-  *c = mSerial.read();
+  if (mStream.available() == 0) return false;
+  *c = mStream.read();
   mPushback = 0;
   return true;
 }
 
-bool SerialReader::getWordString(bool* isError, char** word) {
+bool StreamReader::getWordString(bool* isError, char** word) {
   char c;
   while (getChar(&c)) {
     if (isspace(c)) {
@@ -63,7 +63,7 @@ bool SerialReader::getWordString(bool* isError, char** word) {
   return false;
 }
 
-bool SerialReader::getInteger(bool* isError, int* value) {
+bool StreamReader::getInteger(bool* isError, int* value) {
   char c;
   while (getChar(&c)) {
     if (!isdigit(c)) {
@@ -88,14 +88,14 @@ bool SerialReader::getInteger(bool* isError, int* value) {
   return false;
 }
 
-bool SerialReader::getComma(bool* isError) {
+bool StreamReader::getComma(bool* isError) {
   char c;
   if (!getChar(&c)) return false;
   *isError = (c != ',');
   return true;
 }
 
-bool SerialReader::skipWhiteSpace() {
+bool StreamReader::skipWhiteSpace() {
   char c;
   while (getChar(&c)) {
     if (!isspace(c)) {
@@ -106,9 +106,9 @@ bool SerialReader::skipWhiteSpace() {
   return false;
 }
 
-bool SerialReader::getLine(bool* isError, char** line) {
-  while (mSerial.available() > 0) {
-    char c = mSerial.read();
+bool StreamReader::getLine(bool* isError, char** line) {
+  while (mStream.available() > 0) {
+    char c = mStream.read();
     mBuf[mIndex] = c;
     mIndex++;
     if (mIndex >= mBufSize - 1) {
@@ -127,7 +127,7 @@ bool SerialReader::getLine(bool* isError, char** line) {
   return false;
 }
 
-bool SerialReader::addToBuffer(char c) {
+bool StreamReader::addToBuffer(char c) {
   mBuf[mIndex] = c;
   mIndex++;
   if (mIndex >= mBufSize - 1) {

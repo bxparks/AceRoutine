@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include <Arduino.h> // Print
 #include <AceRoutine.h>
-#include "SerialReader.h"
+#include "StreamReader.h"
 
 namespace ace_routine {
 namespace cli {
@@ -63,7 +63,7 @@ class CommandDispatcher: public Coroutine {
     /**
      * Constructor.
      *
-     * @param serialReader An instance of SerialReader.
+     * @param streamReader An instance of StreamReader.
      * @param printer The output object, normally the global Serial object.
      * @param dispatchTable An array of DispatchRecords.
      * @param numCommands Number of entries in the dispatchTable.
@@ -73,13 +73,13 @@ class CommandDispatcher: public Coroutine {
      * limit will be silently dropped.
      */
     CommandDispatcher(
-            SerialReader& serialReader,
+            StreamReader& streamReader,
             Print& printer,
             const DispatchRecord* dispatchTable,
             uint8_t numCommands,
             const char** argv,
             uint8_t argvSize):
-        mSerialReader(serialReader),
+        mStreamReader(streamReader),
         mPrinter(printer),
         mDispatchTable(dispatchTable),
         mNumCommands(numCommands),
@@ -120,7 +120,7 @@ class CommandDispatcher: public Coroutine {
 
     virtual int runRoutine() override;
 
-    SerialReader& mSerialReader;
+    StreamReader& mStreamReader;
     Print& mPrinter;
     const DispatchRecord* const mDispatchTable;
     const uint8_t mNumCommands;

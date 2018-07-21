@@ -14,7 +14,7 @@
 
 #include <Arduino.h>
 #include <AceRoutine.h>
-#include "ace_routine/cli/SerialReader.h"
+#include "ace_routine/cli/StreamReader.h"
 #include "ace_routine/cli/CommandDispatcher.h"
 using namespace ace_routine;
 using namespace ace_routine::cli;
@@ -140,11 +140,11 @@ const uint8_t NUM_COMMANDS = sizeof(dispatchTable) / sizeof(DispatchRecord);
 
 const int BUF_SIZE = 64;
 char lineBuffer[BUF_SIZE];
-SerialReader serialReader(Serial, lineBuffer, BUF_SIZE);
+StreamReader streamReader(Serial, lineBuffer, BUF_SIZE);
 
 const int8_t ARGV_SIZE = 10;
 const char* argv[ARGV_SIZE];
-CommandDispatcher dispatcher(serialReader, Serial,
+CommandDispatcher dispatcher(streamReader, Serial,
     dispatchTable, NUM_COMMANDS, argv, ARGV_SIZE);
 
 //---------------------------------------------------------------------------

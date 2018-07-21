@@ -130,12 +130,12 @@ int CommandDispatcher::runRoutine() {
   bool isError;
   char* line;
   COROUTINE_LOOP() {
-    COROUTINE_AWAIT(mSerialReader.getLine(&isError, &line));
+    COROUTINE_AWAIT(mStreamReader.getLine(&isError, &line));
 
     if (isError) {
       printLineError(line, STATUS_BUFFER_OVERFLOW);
       while (isError) {
-        COROUTINE_AWAIT(mSerialReader.getLine(&isError, &line));
+        COROUTINE_AWAIT(mStreamReader.getLine(&isError, &line));
         printLineError(line, STATUS_FLUSH_TO_EOL);
       }
       continue;

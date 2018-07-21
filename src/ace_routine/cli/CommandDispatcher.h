@@ -118,7 +118,7 @@ class CommandDispatcher: public Coroutine {
     /** Tokenize the given line and run the command handler. */
     void runCommand(char* line);
 
-    virtual int runRoutine() override;
+    virtual int run() override;
 
     StreamReader& mStreamReader;
     Print& mPrinter;

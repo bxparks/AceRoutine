@@ -59,7 +59,7 @@ SOFTWARE.
  * a subclass of Coroutine.
  *
  * The code in {} following this macro becomes the body of the
- * Coroutine::runRoutine() method.
+ * Coroutine::run() method.
  */
 #define COROUTINE(...) \
     GET_COROUTINE(__VA_ARGS__, COROUTINE2, COROUTINE1)(__VA_ARGS__)
@@ -69,24 +69,24 @@ SOFTWARE.
 #define COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
-  virtual int runRoutine() override \
+  virtual int run() override \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 Coroutine_##name :: Coroutine_##name() { \
   init(ACE_ROUTINE_F(#name)); \
 } \
-int Coroutine_##name :: runRoutine()
+int Coroutine_##name :: run()
 
 #define COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
-  virtual int runRoutine() override \
+  virtual int run() override \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 className##_##name :: className##_##name() { \
   init(ACE_ROUTINE_F(#name)); \
 } \
-int className##_##name :: runRoutine()
+int className##_##name :: run()
 
 /**
  * Create an extern reference to a coroutine that is defined in another .cpp
@@ -105,7 +105,7 @@ int className##_##name :: runRoutine()
 #define EXTERN_COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
-  virtual int runRoutine() override \
+  virtual int run() override \
     __attribute__((__noinline__,__noclone__)); \
 }; \
 extern Coroutine_##name name
@@ -113,7 +113,7 @@ extern Coroutine_##name name
 #define EXTERN_COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
-  virtual int runRoutine() override \
+  virtual int run() override \
     __attribute__((__noinline__,__noclone__)); \
 }; \
 extern className##_##name name
@@ -196,7 +196,7 @@ extern className##_##name name
     } while (false)
 
 /**
- * Mark the end of a coroutine. Subsequent calls to Coroutine::runRoutine()
+ * Mark the end of a coroutine. Subsequent calls to Coroutine::run()
  * will do nothing.
  */
 #define COROUTINE_END() \
@@ -212,7 +212,7 @@ namespace ace_routine {
 
 /**
  * Base class of all coroutines. The actual coroutine code is an implementation
- * of the virtual runRoutine() method.
+ * of the virtual run() method.
  */
 class Coroutine {
   public:
@@ -267,19 +267,16 @@ class Coroutine {
     const FCString& getName() const { return mName; }
 
     /**
-     * Execute the coroutine. The actual body of the coroutine is defined in
-     * the runRoutine() method. This method provides a layer of indirection to
-     * allow subclasses to intercept the dispatch to the body of the coroutine.
-     * Such subclasses can be used with the 2-argument version of the
-     * COROUTINE() macro.
+     * The body of the coroutine. The COROUTINE macro creates a subclass of
+     * this class and puts the body of the coroutine into this method.
      *
-     * According to the AutoBenchmark sketch, this additional layer of
-     * indirection costs 0.56 micros on an Arduino Nano, and 0.07 micros on an
-     * ESP32.
+     * @return The return value is always ignored. This method is declared to
+     * return an int to prevent the user from accidentally returning from this
+     * method using an explicit 'return' statement instead of through one of
+     * the macros (e.g. COROUTINE_YIELD(), COROUTINE_DELAY(), COROUTINE_AWAIT()
+     * or COROUTINE_END()).
      */
-    virtual void run() {
-      runRoutine();
-    }
+    virtual int run() = 0;
 
     /**
      * Returns the current millisecond clock. By default it returns the global
@@ -377,28 +374,10 @@ class Coroutine {
       insertSorted();
     }
 
-    /**
-     * The body of the coroutine. Subclasses must override. Also defined by the
-     * COROUTINE() macro.
-     *
-     * @return The return value is always ignored. This method is declared to
-     * return an int to prevent the user from accidentally returning from this
-     * method using an explicit 'return' statement instead of through one of
-     * the macros (e.g. COROUTINE_YIELD(), COROUTINE_DELAY(), COROUTINE_AWAIT()
-     * or COROUTINE_END()).
-     */
-    virtual int runRoutine() = 0;
-
-    /**
-     * Pointer to label where execute will start on the next call to
-     * runRoutine().
-     */
+    /** Pointer to label where execute will start on the next call to run(). */
     void setJump(void* jumpPoint) { mJumpPoint = jumpPoint; }
 
-    /**
-     * Pointer to label where execute will start on the next call to
-     * runRoutine().
-     */
+    /** Pointer to label where execute will start on the next call to run(). */
     void* getJump() const { return mJumpPoint; }
 
     /** Set the kStatusRunning state. */
@@ -422,7 +401,7 @@ class Coroutine {
      * use-cases. (The '- 1' comes from an edge case where isDelayExpired()
      * evaluates to be true in the CoroutineScheduler::runCoroutine() but
      * becomes to be false in the COROUTINE_DELAY() macro inside
-     * Coroutine::runRoutine()) because the clock increments by 1 millisecond.)
+     * Coroutine::run()) because the clock increments by 1 millisecond.)
      */
     void setDelay(uint16_t delayMillisDuration) {
       mDelayStartMillis = millis();

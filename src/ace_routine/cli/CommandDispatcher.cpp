@@ -126,7 +126,7 @@ uint8_t CommandDispatcher::tokenize(char* line, const char** argv,
   return argc;
 }
 
-int CommandDispatcher::runRoutine() {
+int CommandDispatcher::run() {
   bool isError;
   char* line;
   COROUTINE_LOOP() {

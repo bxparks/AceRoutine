@@ -39,8 +39,9 @@ others (in my opinion of course):
     * the `CoroutineScheduler` consumes only 2 bytes (8-bit) or 4 bytes (32-bit)
       no matter how many coroutines are active
 * extremely fast context switching
-    * ~7 microseconds on a 16 MHz ATmega328P
-    * ~0.8 microseconds on Teensy 3.2 (depending on compiler settings)
+    * ~6 microseconds on a 16 MHz ATmega328P
+    * 1.1-2.0 microseconds on Teensy 3.2 (depending on compiler settings)
+    * ~1.7 microseconds on a ESP8266
     * ~0.5 microseconds on a ESP32
 * uses "computed goto" feature of GCC to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
@@ -695,7 +696,7 @@ class CustomCoroutine : public Coroutine {
   public:
     void enable(bool isEnabled) { enabled = isEnabled; }
 
-    // runRoutine() abstract method defined by COROUTINE() macro
+    // the run() method will be defined by the COROUTINE() macro
 
   protected:
     bool enabled = 0;
@@ -718,7 +719,7 @@ share methods or data structures.
 ### Manual Coroutines
 
 A manual coroutine is a custom coroutine whose body of the coroutine (i.e
-the`runRoutine()` method) is defined manually instead of using the `COROUTINE()`
+the`run()` method) is defined manually instead of using the `COROUTINE()`
 macro. This is useful if the coroutine needs to have external dependencies
 injected into the constructor because the `COROUTINE()` macro does not allow the
 constructor to be customized.
@@ -732,7 +733,7 @@ class ManualCoroutine : public Coroutine {
     }
 
   private:
-    virtual int runRoutine() override {
+    virtual int run() override {
       COROUTINE_BEGIN();
       // insert coroutine code here
       COROUTINE_END();

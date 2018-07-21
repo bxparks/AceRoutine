@@ -1,10 +1,9 @@
 #line 2 "CliTest.ino"
 
 #include <stdint.h> // uintptr_t
-#include <Arduino.h>
+#include <Arduino.h> // Print
 #include <AceRoutine.h>
 #include <AUnitVerbose.h>
-#include "ace_routine/cli/SerialReader.h"
 #include "ace_routine/cli/CommandDispatcher.h"
 
 using namespace ace_routine;
@@ -48,7 +47,8 @@ testF(CommandDispatcherTest, tokenize) {
 
 // ---------------------------------------------------------------------------
 
-void dummyCommand(int /* argc */, const char** /* argv */) {}
+void dummyCommand(Print& /* printer */, int /* argc */,
+    const char** /* argv */) {}
 
 static const DispatchRecord dispatchTable[] = {
   {dummyCommand, "echo", "args ..."},

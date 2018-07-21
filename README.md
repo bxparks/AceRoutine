@@ -52,16 +52,16 @@ others (in my opinion of course):
 
 Some limitations are:
 * coroutines cannot return any values
-* coroutines are stackless, so they cannot presever local stack varaibles
-  across multiple calls. However, coroutines are instances of a class that can
-  be extended by the end-user, so member variables can be used as substitutes
-  for local stack variables.
+* coroutines are stackless, so they cannot preserve local stack varaibles
+  across multiple calls. Often the class member variables or function static
+  variables are reasonable substitutes.
 
 After I had completed most of this library, I discovered that I had essentially
 reimplemented the `<ProtoThread.h>` library in the
 [Cosa framework](https://github.com/mikaelpatel/Cosa). The difference is that
 AceRoutine is a self-contained library that works on any platform supporting the
-Arduino API (AVR, Teensy, ESP8266, ESP32, etc).
+Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
+additional macros that can reduce boilerplate code.
 
 ### HelloCoroutine
 
@@ -121,10 +121,14 @@ void loop() {
 This prints "Hello, ", then waits one second, and then prints "World!".
 At the same time, the LED blinks on and off.
 
-`HelloScheduler` implements the same thing using the `CoroutineScheduler`:
+The [HelloScheduler.ino](examples/HelloScheduler) sketch implements the same
+thing using the `CoroutineScheduler`:
 
 ```
-// same as above
+#include <AceRoutine.h>
+using namespace ace_routine;
+
+... // same as above
 
 void setup() {
   delay(1000);
@@ -146,8 +150,8 @@ the `loop()` method manually.
 ## Installation
 
 The latest stable release will eventually be available in the Arduino IDE
-Library Manager. Search for "AceRoutine". Click install. It is not there
-yet.
+Library Manager. Search for "AceRoutine". Click Install.
+(Unfortunately, it is not there yet.)
 
 The development version can be installed by cloning the
 [GitHub repository](https://github.com/bxparks/AceRoutine), checking out the
@@ -160,6 +164,7 @@ directory used by the Arduino IDE. (The result is a directory named
 The source files are organized as follows:
 * `src/AceRoutine.h` - main header file
 * `src/ace_routine/` - implementation files
+* `src/ace_routine/cli` - command line interface library
 * `src/ace_routine/testing/` - internal testing files
 * `tests/` - unit tests which depend on
   [AUnit](https://github.com/bxparks/AUnit)
@@ -186,9 +191,9 @@ The following example sketches are provided:
 * [AutoBenchmark.ino](examples/AutoBenchmark):
   a program that performs CPU benchmarking
 * [CommandLineInterface.ino](examples/CommandLineInterface): uses the
-  `ace_routine/cli` classes to implement a command line interface that accepts a
-  number of commands on the serial port. In other words, it is a primitive
-  "shell". The shell is non-blocking and uses coroutines so that other
+  `src/ace_routine/cli` classes to implement a command line interface that
+  accepts a number of commands on the serial port. In other words, it is a
+  primitive "shell". The shell is non-blocking and uses coroutines so that other
   coroutines continue to run while the board waits for commands to be typed on
   the serial port.
 

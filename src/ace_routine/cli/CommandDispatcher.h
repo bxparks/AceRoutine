@@ -25,7 +25,7 @@ SOFTWARE.
 #ifndef ACE_ROUTINE_COMMAND_DISPATCHER_H
 #define ACE_ROUTINE_COMMAND_DISPATCHER_H
 
-#include <Arduino.h> // Serial
+#include <Arduino.h> // Print
 #include <AceRoutine.h>
 #include "SerialReader.h"
 
@@ -33,7 +33,7 @@ namespace ace_routine {
 namespace cli {
 
 /** Signature for a command handler. */
-typedef void (*CommandHandler)(int argc, const char** argv);
+typedef void (*CommandHandler)(Print& printer, int argc, const char** argv);
 
 /**
  * A record of the command name and its handler. The helpString is the
@@ -63,7 +63,8 @@ class CommandDispatcher: public Coroutine {
     /**
      * Constructor.
      *
-     * @param serialReader Instance of SerialReader.
+     * @param serialReader An instance of SerialReader.
+     * @param printer The output object, normally the global Serial object.
      * @param dispatchTable An array of DispatchRecords.
      * @param numCommands Number of entries in the dispatchTable.
      * @param argv Array of (const char*) that will be used to hold the word
@@ -73,11 +74,13 @@ class CommandDispatcher: public Coroutine {
      */
     CommandDispatcher(
             SerialReader& serialReader,
+            Print& printer,
             const DispatchRecord* dispatchTable,
             uint8_t numCommands,
             const char** argv,
             uint8_t argvSize):
         mSerialReader(serialReader),
+        mPrinter(printer),
         mDispatchTable(dispatchTable),
         mNumCommands(numCommands),
         mArgv(argv),
@@ -110,7 +113,7 @@ class CommandDispatcher: public Coroutine {
     void printLineError(const char* line, uint8_t statusCode);
 
     /** Handle the 'help' command. */
-    void helpCommandHandler(int argc, const char** argv);
+    void helpCommandHandler(Print& printer, int argc, const char** argv);
 
     /** Tokenize the given line and run the command handler. */
     void runCommand(char* line);
@@ -118,6 +121,7 @@ class CommandDispatcher: public Coroutine {
     virtual int runRoutine() override;
 
     SerialReader& mSerialReader;
+    Print& mPrinter;
     const DispatchRecord* const mDispatchTable;
     const uint8_t mNumCommands;
     const char** const mArgv;

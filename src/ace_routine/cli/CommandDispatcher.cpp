@@ -31,49 +31,50 @@ const char CommandDispatcher::DELIMS[] = " \t\n";
 
 void CommandDispatcher::printLineError(const char* line, uint8_t statusCode) {
   if (statusCode == STATUS_BUFFER_OVERFLOW) {
-    Serial.print(F("BufferOverflow: "));
-    Serial.println(line);
+    mPrinter.print(F("BufferOverflow: "));
+    mPrinter.println(line);
   } else if (statusCode == STATUS_FLUSH_TO_EOL) {
-    Serial.print(F("FlushToEOL: "));
-    Serial.println(line);
+    mPrinter.print(F("FlushToEOL: "));
+    mPrinter.println(line);
   } else {
-    Serial.print(F("UnknownError: "));
-    Serial.print(statusCode);
-    Serial.print(": ");
-    Serial.println(line);
+    mPrinter.print(F("UnknownError: "));
+    mPrinter.print(statusCode);
+    mPrinter.print(F(": "));
+    mPrinter.println(line);
   }
 }
 
 /** Handle the 'help' command. */
-void CommandDispatcher::helpCommandHandler(int argc, const char** argv) {
+void CommandDispatcher::helpCommandHandler(
+    Print& printer, int argc, const char** argv) {
   if (argc == 2) {
     const char* cmd = argv[1];
     if (strcmp(cmd, "help") == 0) {
-      Serial.println(F("Usage: help [command]"));
+      printer.println(F("Usage: help [command]"));
       return;
     }
 
     for (uint8_t i = 0; i < mNumCommands; i++) {
       const DispatchRecord* record = &mDispatchTable[i];
       if (strcmp(record->name, cmd) == 0) {
-        Serial.print("Usage: ");
-        Serial.print(cmd);
-        Serial.print(' ');
-        Serial.println(record->helpString);
+        printer.print(F("Usage: "));
+        printer.print(cmd);
+        printer.print(' ');
+        printer.println(record->helpString);
         return;
       }
     }
-    Serial.print(F("Unknown command: "));
-    Serial.println(cmd);
+    printer.print(F("Unknown command: "));
+    printer.println(cmd);
   } else {
-    Serial.println(F("Usage: help [command]"));
-    Serial.print(F("Commands: help "));
+    printer.println(F("Usage: help [command]"));
+    printer.print(F("Commands: help "));
     for (uint8_t i = 0; i < mNumCommands; i++) {
       const DispatchRecord* record = &mDispatchTable[i];
-      Serial.print(record->name);
-      Serial.print(' ');
+      printer.print(record->name);
+      printer.print(' ');
     }
-    Serial.println();
+    printer.println();
   }
 }
 
@@ -84,20 +85,21 @@ void CommandDispatcher::runCommand(char* line) {
   if (argc == 0) return;
   const char* cmd = mArgv[0];
 
-  // The 'help' command is built-in.
+  // Handle the built-in 'help' command.
   if (strcmp(cmd, "help") == 0) {
-    helpCommandHandler(argc, mArgv);
+    helpCommandHandler(mPrinter, argc, mArgv);
     return;
   }
 
+  // Dispatch to the matching command handler if found.
   const DispatchRecord* record = findCommand(mDispatchTable, mNumCommands, cmd);
   if (record != nullptr) {
-    record->command(argc, mArgv);
+    record->command(mPrinter, argc, mArgv);
     return;
   }
 
-  Serial.print(F("Unknown command: "));
-  Serial.println(cmd);
+  mPrinter.print(F("Unknown command: "));
+  mPrinter.println(cmd);
 }
 
 const DispatchRecord* CommandDispatcher::findCommand(

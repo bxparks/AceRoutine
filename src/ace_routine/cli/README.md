@@ -55,11 +55,11 @@ char lineBuffer[BUF_SIZE];
 SerialReader serialReader(Serial, lineBuffer, BUF_SIZE);
 
 // Define the command handlers.
-void newCommand(int argc, const char** argv) {
+void newCommand(Print& printer, int argc, const char** argv) {
   ...
 }
 
-void anotherCommand(int argc, const char** argv) {
+void anotherCommand(Print& printer, int argc, const char** argv) {
   ...
 }
 
@@ -74,8 +74,8 @@ const uint8_t NUM_COMMANDS = sizeof(dispatchTable) / sizeof(DispatchRecord);
 // Create CommandDispatcher with buffers.
 const int8_t ARGV_SIZE = 10;
 const char* argv[ARGV_SIZE];
-CommandDispatcher dispatcher(
-    serialReader, dispatchTable, NUM_COMMANDS argv, ARGV_SIZE);
+CommandDispatcher dispatcher(serialReader, Serial,
+    dispatchTable, NUM_COMMANDS argv, ARGV_SIZE);
 
 void setup() {
   Serial.begin(115200);

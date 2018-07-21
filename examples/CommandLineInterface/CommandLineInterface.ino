@@ -93,29 +93,29 @@ unsigned long freeMemory() {
 //---------------------------------------------------------------------------
 
 /** List the coroutines known by the CoroutineScheduler. */
-void listCommand(int /* argc */, const char** /* argv */) {
-  CoroutineScheduler::list(&Serial);
+void listCommand(Print& printer, int /* argc */, const char** /* argv */) {
+  CoroutineScheduler::list(&printer);
 }
 
 /** Echo the command line arguments. */
-void echoCommand(int argc, const char** argv) {
+void echoCommand(Print& printer, int argc, const char** argv) {
  for (int i = 1; i < argc; i++) {
-    Serial.print(argv[i]);
-    Serial.print(' ');
+    printer.print(argv[i]);
+    printer.print(' ');
   }
-  Serial.println();
+  printer.println();
 }
 
 /** Print amount of free memory between stack and heap. */
-void freeCommand(int /* argc */, const char** /* argv */) {
-  Serial.print(F("Free memory: "));
-  Serial.println(freeMemory());
+void freeCommand(Print& printer, int /* argc */, const char** /* argv */) {
+  printer.print(F("Free memory: "));
+  printer.println(freeMemory());
 }
 
 /** Change the blinking LED on and off delay parameters. */
-void delayCommand(int argc, const char** argv) {
+void delayCommand(Print& printer, int argc, const char** argv) {
   if (argc != 3) {
-    Serial.println(F("Invalid number of arguments"));
+    printer.println(F("Invalid number of arguments"));
     return;
   }
   const char* param = argv[1];
@@ -125,8 +125,8 @@ void delayCommand(int argc, const char** argv) {
   } else if (strcmp(param, "off") == 0) {
     ledOffDelay = atoi(value);
   } else {
-    Serial.print(F("Unknown argument: "));
-    Serial.println(param);
+    printer.print(F("Unknown argument: "));
+    printer.println(param);
   }
 }
 
@@ -144,8 +144,8 @@ SerialReader serialReader(Serial, lineBuffer, BUF_SIZE);
 
 const int8_t ARGV_SIZE = 10;
 const char* argv[ARGV_SIZE];
-CommandDispatcher dispatcher(
-    serialReader, dispatchTable, NUM_COMMANDS, argv, ARGV_SIZE);
+CommandDispatcher dispatcher(serialReader, Serial,
+    dispatchTable, NUM_COMMANDS, argv, ARGV_SIZE);
 
 //---------------------------------------------------------------------------
 

@@ -634,29 +634,53 @@ unlikely that you will need know the exact name of this generated class.
 
 A coroutine has several internal states:
 * `kStatusSuspended`: coroutine was suspended using `Coroutine::suspend()`
-* `kStatusRunning`: coroutine is currently running
 * `kStatusYielding`: coroutine returned using `COROUTINE_YIELD()`
 * `kStatusAwaiting`: coroutine returned using `COROUTINE_AWAIT()`
 * `kStatusDelaying`: coroutine returned using `COROUTINE_DELAY()`
+* `kStatusRunning`: coroutine is currently running
 * `kStatusEnding`: coroutine returned using `COROUTINE_END()`
 * `kStatusTerminated`: coroutine has been removed from the scheduler queue and
   is permanently terminated. Set only by the `CoroutineScheduler`.
 
+The finite state diagram looks like this:
+```
+         Suspended
+         ^   ^   ^
+        /    |    \
+       /     |     \
+      v      |      \
+Yielding Awaiting Delaying
+     ^       ^       ^
+      \      |      /
+       \     |     /
+        \    |    /
+         v   v   v
+          Running
+             |
+             |
+             v
+          Ending
+             |
+             |
+             v
+        Terminated
+```
+
 You can query these internal states using the following methods on the
 `Coroutine` class:
 * `Coroutine::isSuspended()`
-* `Coroutine::isRunning()`
 * `Coroutine::isYielding()`
 * `Coroutine::isAwaiting()`
 * `Coroutine::isDelaying()`
+* `Coroutine::isRunning()`
 * `Coroutine::isEnding()`
 * `Coroutine::isTerminated()`
-* `Coroutine::isDone()`: same as `(isEnding() || isTerminated())`. This method
+* `Coroutine::isDone()`: same as `isEnding() || isTerminated()`. This method
   is preferred because it works when the `Coroutine` is executed manually or
-  executed through the `CoroutineScheduler`.
+  through the `CoroutineScheduler`.
 
-To call one of these functions, use the `Coroutine` instance variable that
-was created using the `COROUTINE()` macro:
+To call these functions on a specific coroutine, use the `Coroutine` instance
+variable that was created using the `COROUTINE()` macro:
 
 ```
 COROUTINE(doSomething) {
@@ -720,11 +744,12 @@ share methods or data structures.
 
 ### Manual Coroutines
 
-A manual coroutine is a custom coroutine whose body of the coroutine (i.e
-the`run()` method) is defined manually instead of using the `COROUTINE()`
-macro. This is useful if the coroutine needs to have external dependencies
-injected into the constructor because the `COROUTINE()` macro does not allow the
-constructor to be customized.
+An manual coroutine is a custom coroutine whose body of the coroutine (i.e
+the`run()` method) is defined manually and the coroutine object is also
+instantiated manually, instead of using the `COROUTINE()` macro. This is useful
+if the coroutine has external dependencies which need to be injected into the
+constructor. The `COROUTINE()` macro does not allow the constructor to be
+customized.
 
 ```
 class ManualCoroutine : public Coroutine {
@@ -769,7 +794,7 @@ scheduler, but calling it in the global `setup()` makes things simple.
 
 The name of a manually created coroutine is set to be `nullptr` because the
 `COROUTINE()` macro was not used. When printed (e.g. using the
-`CoroutineScheduler::list()` method, the name is represented by the integer
+`CoroutineScheduler::list()` method), the name is represented by the integer
 representation of the `this` pointer of the coroutine object.
 
 A good example of a manual coroutine is

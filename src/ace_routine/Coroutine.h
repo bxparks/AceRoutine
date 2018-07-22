@@ -220,6 +220,31 @@ class Coroutine {
      * The execution recovery status of the coroutine, corresponding to the
      * COROUTINE_YIELD(), COROUTINE_DELAY(), COROUTINE_AWAIT() and
      * COROUTINE_END() macros.
+		 *
+     * The finite state diagram looks like this:
+     *
+     * @verbatim
+     *          Suspended
+     *          ^   ^   ^
+     *         /    |    \
+     *        /     |     \
+     *       v      |      \
+     * Yielding Awaiting Delaying
+     *      ^       ^       ^
+     *       \      |      /
+     *        \     |     /
+     *         \    |    /
+     *          v   v   v
+     *           Running
+     *              |
+     *              |
+     *              v
+     *           Ending
+     *              |
+     *              |
+     *              v
+     *         Terminated
+     * @endverbatim
      */
     typedef uint8_t Status;
 
@@ -231,17 +256,17 @@ class Coroutine {
      */
     static const Status kStatusSuspended = 0;
 
-    /** Coroutine is currenly running. True only within the coroutine itself. */
-    static const Status kStatusRunning = 1;
-
     /** Coroutine returned using the COROUTINE_YIELD() statement. */
-    static const Status kStatusYielding = 2;
+    static const Status kStatusYielding = 1;
 
     /** Coroutine returned using the COROUTINE_AWAIT() statement. */
-    static const Status kStatusAwaiting = 3;
+    static const Status kStatusAwaiting = 2;
 
     /** Coroutine returned using the COROUTINE_DELAY() statement. */
-    static const Status kStatusDelaying = 4;
+    static const Status kStatusDelaying = 3;
+
+    /** Coroutine is currenly running. True only within the coroutine itself. */
+    static const Status kStatusRunning = 4;
 
     /** Coroutine executed the COROUTINE_END() statement. */
     static const Status kStatusEnding = 5;
@@ -312,8 +337,8 @@ class Coroutine {
       return elapsedMillis >= mDelayDurationMillis;
     }
 
-    /** The coroutine is currently running. True only within the coroutine. */
-    bool isRunning() const { return mStatus == kStatusRunning; }
+    /** The coroutine was suspended with a call to suspend(). */
+    bool isSuspended() const { return mStatus == kStatusSuspended; }
 
     /** The coroutine returned using COROUTINE_YIELD(). */
     bool isYielding() const { return mStatus == kStatusYielding; }
@@ -324,11 +349,11 @@ class Coroutine {
     /** The coroutine returned using COROUTINE_DELAY(). */
     bool isDelaying() const { return mStatus == kStatusDelaying; }
 
+    /** The coroutine is currently running. True only within the coroutine. */
+    bool isRunning() const { return mStatus == kStatusRunning; }
+
     /** The coroutine returned using COROUTINE_END(). */
     bool isEnding() const { return mStatus == kStatusEnding; }
-
-    /** The coroutine was suspended with a call to suspend(). */
-    bool isSuspended() const { return mStatus == kStatusSuspended; }
 
     /**
      * The coroutine was terminated by the scheduler with a call to

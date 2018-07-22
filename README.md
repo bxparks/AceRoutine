@@ -5,6 +5,8 @@ stackless coroutines on Arduino platforms.
 
 Version: (2018-07-19)
 
+[![AUniter Jenkins Badge](https://us-central1-xparks2015.cloudfunctions.net/badge?project=AceRoutine)](https://github.com/bxparks/AUniter)
+
 ## Summary
 
 This library is an implementation of the

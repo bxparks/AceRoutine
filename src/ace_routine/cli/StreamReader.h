@@ -107,6 +107,10 @@ class StreamReader {
     bool getLine(bool* isError, char** line);
 
   private:
+    // Disable copy-constructor and assignment operator
+    StreamReader(const StreamReader&) = delete;
+    StreamReader& operator=(const StreamReader&) = delete;
+
     /**
      * Push the given character back into the getChar() buffer. This allows us
      * to get a one-character look-ahead.

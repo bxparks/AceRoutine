@@ -104,6 +104,10 @@ class CommandDispatcher: public Coroutine {
         uint8_t numCommands, const char* cmd);
 
   private:
+    // Disable copy-constructor and assignment operator
+    CommandDispatcher(const CommandDispatcher&) = delete;
+    CommandDispatcher& operator=(const CommandDispatcher&) = delete;
+
     static const uint8_t STATUS_SUCCESS = 0;
     static const uint8_t STATUS_BUFFER_OVERFLOW = 1;
     static const uint8_t STATUS_FLUSH_TO_EOL = 2;

@@ -32,10 +32,10 @@ getStatus	KEYWORD2
 getDelayStart	KEYWORD2
 getDelay	KEYWORD2
 isSuspended	KEYWORD2
-isRunning	KEYWORD2
 isYielding	KEYWORD2
 isAwaiting	KEYWORD2
 isDelaying	KEYWORD2
+isRunning	KEYWORD2
 isEnding	KEYWORD2
 isTerminated	KEYWORD2
 isDone	KEYWORD2
@@ -67,5 +67,6 @@ kStatusSuspended	LITERAL1
 kStatusYielding	LITERAL1
 kStatusAwaiting	LITERAL1
 kStatusDelaying	LITERAL1
+kStatusRunning	LITERAL1
 kStatusEnding	LITERAL1
 kStatusTerminated	LITERAL1

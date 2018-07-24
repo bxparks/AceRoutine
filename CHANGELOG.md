@@ -1,5 +1,10 @@
 # Changelog
 
+* (2018-07-24)
+    * Remove `runRoutine()` indirection. Decided that it did not provide
+      enough benefits and felt like over-engineering.
+    * Use `Stream` and `Print` abstractg classes instead of using `Serial`
+      object directly.
 * (2018-07-19)
     * Add examples/CommandLineInterface sketch which provides a non-blocking
       command line interface using coroutines.

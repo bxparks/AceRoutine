@@ -964,7 +964,7 @@ In other words, you can create 100 `Coroutine` instances and they would use only
 1400 bytes of static RAM on an 8-bit AVR processor.
 
 The `CoroutineScheduler` consumes only 2 bytes of memory no matter how many
-coroutines are created. That's because it depends on a singly-link list whose
+coroutines are created. That's because it depends on a singly-linked list whose
 pointers live on the `Coroutine` object, not in the `CoroutineScheduler`.
 
 ### CPU

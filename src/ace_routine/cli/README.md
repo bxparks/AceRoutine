@@ -31,7 +31,42 @@ using the `cli/` library is the following:
 1. Run the `CommandDispatcher` as an `AceRoutine` coroutine in the global
    `loop()`.
 
-The main `*.ino` file will look like this:
+### Memory Allocation
+
+Both the `StreamReader` and `CommandDispatcher` perform no memory allocations
+internally (no `malloc()`, no `new` operator) to avoid memory problems. All
+data structures used by these classes must be pre-allocated by the calling code.
+Normally they will be created at static initialization time (before the global
+`setup()` method is called), but the calling code is allowed to create them on
+the heap if it wants or needs to.
+
+### Command Handler and Arguments
+
+The `CommandHandler` typedef is a pointer to a user-defined function that has
+the following signature:
+```
+typedef void (*CommandHandler)(Print& printer, int argc, const char** argv);
+```
+
+* `printer` is the output device, which will normally be the global `Serial`
+  object
+* `argc` is the number of `argv` arguments
+* `argv` is the array of `cont char*` pointers, each pointing to the words
+  of the command line delimited by whitespaces. These are identical to
+  the `argc` and `argv` parameters passed to the C-language `main(argc, argv)`
+  function. For example, `argv[0]` is the name of the command, and `argv[1]`
+  is the first argument after the command (if it exists).
+
+### Command Dispatcher
+
+The `CommandDispatcher` is a subclass of the `Coroutine` class and implements a
+coroutine in the `run()` method. Because this is a manually created coroutine,
+the `resume()` method must be called to add it to the `CoroutineScheduler`.
+
+### Structure of Client Calling Code
+
+An Arduino `.ino` file that uses the CLI classes to implement a commmand line
+shell will look something like this:
 
 ```
 #include <AceRoutine.h>

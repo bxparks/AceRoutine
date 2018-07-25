@@ -53,7 +53,7 @@ class CoroutineScheduler {
      * Serial is never configured in setup(), then this method causes no
      * additional flash memory consumption.
      */
-    static void list(Print* printer) {
+    static void list(Print& printer) {
       getScheduler()->listCoroutines(printer);
     }
 
@@ -75,7 +75,7 @@ class CoroutineScheduler {
     void runCoroutine();
 
     /** List all the routines in the linked list to the printer. */
-    void listCoroutines(Print* printer);
+    void listCoroutines(Print& printer);
 
     // The current coroutine is represented by a pointer to a pointer. This
     // allows the root node to be treated the same as all the other nodes, and

@@ -83,10 +83,10 @@ class FCString {
     const __FlashStringHelper* getFString() const { return mString.fstring; }
 
     /** Convenience method for printing an FCString. */
-    void print(Print* printer) const;
+    void print(Print& printer) const;
 
     /** Convenience method for printing an FCString. */
-    void println(Print* printer) const;
+    void println(Print& printer) const;
 
     /** Compare to another FCString. */
     int compareTo(const FCString& that) const;

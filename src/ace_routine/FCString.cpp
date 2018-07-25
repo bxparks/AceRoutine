@@ -32,29 +32,29 @@ SOFTWARE.
 
 namespace ace_routine {
 
-void FCString::print(Print* printer) const {
+void FCString::print(Print& printer) const {
   if (mString.cstring == nullptr) {
-    printer->print((unsigned long) this);
+    printer.print((unsigned long) this);
     return;
   }
 
   if (mStringType == kCStringType) {
-    printer->print(getCString());
+    printer.print(getCString());
   } else {
-    printer->print(getFString());
+    printer.print(getFString());
   }
 }
 
-void FCString::println(Print* printer) const {
+void FCString::println(Print& printer) const {
   if (mString.cstring == nullptr) {
-    printer->println((unsigned long) this);
+    printer.println((unsigned long) this);
     return;
   }
 
   if (mStringType == kCStringType) {
-    printer->println(getCString());
+    printer.println(getCString());
   } else {
-    printer->println(getFString());
+    printer.println(getFString());
   }
 }
 

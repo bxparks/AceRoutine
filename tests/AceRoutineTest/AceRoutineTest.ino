@@ -283,7 +283,7 @@ void setup() {
   extra.suspend();
   simpleCoroutine.suspend();
   CoroutineScheduler::setup();
-  CoroutineScheduler::list(&Serial);
+  CoroutineScheduler::list(Serial);
 }
 
 void loop() {

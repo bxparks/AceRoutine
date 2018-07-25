@@ -71,7 +71,7 @@ void CoroutineScheduler::runCoroutine() {
 
 #if ACE_ROUTINE_DEBUG == 1
   Serial.print(F("Processing "));
-  (*mCurrent)->printeName(&Serial);
+  (*mCurrent)->printeName(Serial);
   Serial.println();
 #endif
 
@@ -110,13 +110,13 @@ void CoroutineScheduler::runCoroutine() {
   }
 }
 
-void CoroutineScheduler::listCoroutines(Print* printer) {
+void CoroutineScheduler::listCoroutines(Print& printer) {
   for (Coroutine** p = Coroutine::getRoot(); (*p) != nullptr;
       p = (*p)->getNext()) {
-    printer->print(F("Coroutine "));
+    printer.print(F("Coroutine "));
     (*p)->getName().print(printer);
-    printer->print(F("; status: "));
-    printer->println((*p)->getStatus());
+    printer.print(F("; status: "));
+    printer.println((*p)->getStatus());
   }
 }
 

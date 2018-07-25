@@ -33,7 +33,7 @@ void setup() {
   while (!Serial); // Leonardo/Micro
 
   CoroutineScheduler::setup();
-  CoroutineScheduler::list(&Serial);
+  CoroutineScheduler::list(Serial);
 
   Serial.print(F("sizeof(Coroutine): "));
   Serial.println(sizeof(Coroutine));

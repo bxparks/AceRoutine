@@ -43,7 +43,7 @@ COROUTINE(reader) {
     if (c == '\n' || c == '\r') {
       const char* line = lineBuffer.getLine();
       if (strcmp(line, "list") == 0) {
-        CoroutineScheduler::list(&Serial);
+        CoroutineScheduler::list(Serial);
       } else if (strcmp(line, "millis") == 0) {
         Serial.println(millis());
       } else if (strcmp(line, "micros") == 0) {

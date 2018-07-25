@@ -94,7 +94,7 @@ unsigned long freeMemory() {
 
 /** List the coroutines known by the CoroutineScheduler. */
 void listCommand(Print& printer, int /* argc */, const char** /* argv */) {
-  CoroutineScheduler::list(&printer);
+  CoroutineScheduler::list(printer);
 }
 
 /** Echo the command line arguments. */

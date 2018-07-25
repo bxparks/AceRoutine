@@ -3,8 +3,10 @@
 * (2018-07-24)
     * Remove `runRoutine()` indirection. Decided that it did not provide
       enough benefits and felt like over-engineering.
-    * Use `Stream` and `Print` abstractg classes instead of using `Serial`
+    * Use `Stream` and `Print` abstract classes instead of using `Serial`
       object directly.
+    * Create 2 subclasses of CommandDispatcher to support c-strings or
+      flash strings.
 * (2018-07-19)
     * Add examples/CommandLineInterface sketch which provides a non-blocking
       command line interface using coroutines.

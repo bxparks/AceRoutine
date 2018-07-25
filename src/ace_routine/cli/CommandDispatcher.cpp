@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "../Flash.h"
 #include "CommandDispatcher.h"
 
 namespace ace_routine {
@@ -54,27 +55,14 @@ void CommandDispatcher::helpCommandHandler(
       return;
     }
 
-    for (uint8_t i = 0; i < mNumCommands; i++) {
-      const DispatchRecord* record = &mDispatchTable[i];
-      if (strcmp(record->name, cmd) == 0) {
-        printer.print(F("Usage: "));
-        printer.print(cmd);
-        printer.print(' ');
-        printer.println(record->helpString);
-        return;
-      }
-    }
+    bool found = helpSpecific(printer, cmd);
+    if (found) return;
     printer.print(F("Unknown command: "));
     printer.println(cmd);
   } else {
     printer.println(F("Usage: help [command]"));
     printer.print(F("Commands: help "));
-    for (uint8_t i = 0; i < mNumCommands; i++) {
-      const DispatchRecord* record = &mDispatchTable[i];
-      printer.print(record->name);
-      printer.print(' ');
-    }
-    printer.println();
+    helpGeneric(printer);
   }
 }
 
@@ -91,27 +79,7 @@ void CommandDispatcher::runCommand(char* line) {
     return;
   }
 
-  // Dispatch to the matching command handler if found.
-  const DispatchRecord* record = findCommand(mDispatchTable, mNumCommands, cmd);
-  if (record != nullptr) {
-    record->command(mPrinter, argc, mArgv);
-    return;
-  }
-
-  mPrinter.print(F("Unknown command: "));
-  mPrinter.println(cmd);
-}
-
-const DispatchRecord* CommandDispatcher::findCommand(
-    const DispatchRecord* dispatchTable,
-    uint8_t numCommands, const char* cmd) {
-  for (uint8_t i = 0; i < numCommands; i++) {
-    const DispatchRecord* record = &dispatchTable[i];
-    if (strcmp(record->name, cmd) == 0) {
-      return record;
-    }
-  }
-  return nullptr;
+  findAndRunCommand(cmd, argc, mArgv);
 }
 
 uint8_t CommandDispatcher::tokenize(char* line, const char** argv,
@@ -143,6 +111,104 @@ int CommandDispatcher::run() {
 
     runCommand(line);
   }
+}
+
+//---------------------------------------------------------------------------
+
+void CommandDispatcherC::helpGeneric(Print& printer) {
+  for (uint8_t i = 0; i < mNumCommands; i++) {
+    const DispatchRecordC* record = &mDispatchTable[i];
+    printer.print(record->name);
+    printer.print(' ');
+  }
+  printer.println();
+}
+
+bool CommandDispatcherC::helpSpecific(Print& printer, const char* cmd) {
+  const DispatchRecordC* record =
+      findCommand(mDispatchTable, mNumCommands, cmd);
+  if (record != nullptr) {
+    printer.print(F("Usage: "));
+    printer.print(cmd);
+    printer.print(' ');
+    printer.println(record->helpString);
+    return true;
+  }
+  return false;
+}
+
+void CommandDispatcherC::findAndRunCommand(
+      const char* cmd, int argc, const char** argv) {
+  const DispatchRecordC* record =
+      findCommand(mDispatchTable, mNumCommands, cmd);
+  if (record != nullptr) {
+    record->command(mPrinter, argc, argv);
+    return;
+  }
+
+  mPrinter.print(F("Unknown command: "));
+  mPrinter.println(cmd);
+}
+
+const DispatchRecordC* CommandDispatcherC::findCommand(
+    const DispatchRecordC* dispatchTable,
+    uint8_t numCommands, const char* cmd) {
+  for (uint8_t i = 0; i < numCommands; i++) {
+    const DispatchRecordC* record = &dispatchTable[i];
+    if (strcmp(cmd, record->name) == 0) {
+      return record;
+    }
+  }
+  return nullptr;
+}
+
+//---------------------------------------------------------------------------
+
+void CommandDispatcherF::helpGeneric(Print& printer) {
+  for (uint8_t i = 0; i < mNumCommands; i++) {
+    const DispatchRecordF* record = &mDispatchTable[i];
+    printer.print(record->name);
+    printer.print(' ');
+  }
+  printer.println();
+}
+
+bool CommandDispatcherF::helpSpecific(Print& printer, const char* cmd) {
+  const DispatchRecordF* record =
+      findCommand(mDispatchTable, mNumCommands, cmd);
+  if (record != nullptr) {
+    printer.print(F("Usage: "));
+    printer.print(cmd);
+    printer.print(' ');
+    printer.println(record->helpString);
+    return true;
+  }
+  return false;
+}
+
+void CommandDispatcherF::findAndRunCommand(
+    const char* cmd, int argc, const char** argv) {
+  const DispatchRecordF* record =
+      findCommand(mDispatchTable, mNumCommands, cmd);
+  if (record != nullptr) {
+    record->command(mPrinter, argc, argv);
+    return;
+  }
+
+  mPrinter.print(F("Unknown command: "));
+  mPrinter.println(cmd);
+}
+
+const DispatchRecordF* CommandDispatcherF::findCommand(
+    const DispatchRecordF* dispatchTableF,
+    uint8_t numCommands, const char* cmd) {
+  for (uint8_t i = 0; i < numCommands; i++) {
+    const DispatchRecordF* record = &dispatchTableF[i];
+    if (strcmp_P(cmd, (const char*) record->name) == 0) {
+      return record;
+    }
+  }
+  return nullptr;
 }
 
 }

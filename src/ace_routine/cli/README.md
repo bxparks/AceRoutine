@@ -31,14 +31,24 @@ using the `cli/` library is the following:
 1. Run the `CommandDispatcher` as an `AceRoutine` coroutine in the global
    `loop()`.
 
-### Memory Allocation
+### Command Dispatcher
 
-Both the `StreamReader` and `CommandDispatcher` perform no memory allocations
-internally (no `malloc()`, no `new` operator) to avoid memory problems. All
-data structures used by these classes must be pre-allocated by the calling code.
-Normally they will be created at static initialization time (before the global
-`setup()` method is called), but the calling code is allowed to create them on
-the heap if it wants or needs to.
+The `CommandDispatcher` is a subclass of the `Coroutine` class and implements a
+coroutine in the `run()` method. This is a manually created coroutine,
+not managed by the `COROUTINE()` macro, so the
+the `resume()` method must be called to add it to the `CoroutineScheduler`.
+
+The calling client is expected to create one of 2 subclasses of
+`CommandDispatcher`:
+* `CommandDispatcherC`: accepts an array of `DispatchRecordC` objects which
+  hold normal C-strings (i.e. `const char*`)
+* `CommandDispatcherF`: accepts an array of `DispatchRecordF` objects which
+  hold
+  [PROGMEM](https://arduino.cc/reference/en/language/variables/utilities/progmem/)
+  strings stored in flash memory (i.e. `const __FlashStringHelper*`)
+
+On devices with limited static RAM like AVR boards, using flash strings can be
+critical to allowing the program to run.
 
 ### Command Handler and Arguments
 
@@ -57,11 +67,14 @@ typedef void (*CommandHandler)(Print& printer, int argc, const char** argv);
   function. For example, `argv[0]` is the name of the command, and `argv[1]`
   is the first argument after the command (if it exists).
 
-### Command Dispatcher
+### Memory Allocation
 
-The `CommandDispatcher` is a subclass of the `Coroutine` class and implements a
-coroutine in the `run()` method. Because this is a manually created coroutine,
-the `resume()` method must be called to add it to the `CoroutineScheduler`.
+Both the `StreamReader` and `CommandDispatcher` perform no memory allocations
+internally (no `malloc()`, no `new` operator) to avoid memory problems. All
+data structures used by these classes must be pre-allocated by the calling code.
+Normally they will be created at static initialization time (before the global
+`setup()` method is called), but the calling code is allowed to create them on
+the heap if it wants or needs to.
 
 ### Structure of Client Calling Code
 
@@ -90,13 +103,13 @@ void anotherCommand(Print& printer, int argc, const char** argv) {
   ...
 }
 
-// Create the dispatch table of commands.
-const DispatchRecord dispatchTable[] = {
+// Create the dispatch table of commands (using C-strings)
+const DispatchRecordC dispatchTable[] = {
   {&newCommand, "name-of-command", "help-string"},
   {&anotherCommand, "name-of-other-command", "help-string"},
   ...
 };
-const uint8_t NUM_COMMANDS = sizeof(dispatchTable) / sizeof(DispatchRecord);
+const uint8_t NUM_COMMANDS = sizeof(dispatchTable) / sizeof(DispatchRecordC);
 
 // Create CommandDispatcher with buffers.
 const int8_t ARGV_SIZE = 10;

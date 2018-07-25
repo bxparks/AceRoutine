@@ -50,21 +50,49 @@ testF(CommandDispatcherTest, tokenize) {
 void dummyCommand(Print& /* printer */, int /* argc */,
     const char** /* argv */) {}
 
-static const DispatchRecord dispatchTable[] = {
+static const DispatchRecordC DISPATCH_TABLE[] = {
   {dummyCommand, "echo", "args ..."},
   {dummyCommand, "ls", "[flags] args ..."},
 };
-const uint8_t NUM_COMMANDS = sizeof(dispatchTable) / sizeof(DispatchRecord);
+const uint8_t NUM_COMMANDS = sizeof(DISPATCH_TABLE) / sizeof(DispatchRecordC);
 
-test(findHandler) {
-  const DispatchRecord* record = CommandDispatcher::findCommand(
-      dispatchTable, NUM_COMMANDS, "echo");
+test(CommandDispatcherC_findCommand) {
+  const DispatchRecordC* record = CommandDispatcherC::findCommand(
+      DISPATCH_TABLE, NUM_COMMANDS, "echo");
   assertEqual((uintptr_t) record->command, (uintptr_t) dummyCommand);
-  assertEqual(record->name, "echo");
-  assertEqual(record->helpString, "args ...");
+  assertEqual((uintptr_t) record->name, (uintptr_t) "echo");
+  assertEqual((uintptr_t) record->helpString, (uintptr_t) "args ...");
 
-  record = CommandDispatcher::findCommand(
-      dispatchTable, NUM_COMMANDS, "NOTFOUND");
+  record = CommandDispatcherC::findCommand(
+      DISPATCH_TABLE, NUM_COMMANDS, "NOTFOUND");
+  assertEqual((uintptr_t) record, (uintptr_t) nullptr);
+}
+
+const char ECHO_COMMAND[] PROGMEM = "echo";
+const char ECHO_HELP_STRING[] PROGMEM = "args ...";
+const char LS_COMMAND[] PROGMEM = "ls";
+const char LS_HELP_STRING[] PROGMEM = "[flags] args ...";
+
+static const DispatchRecordF DISPATCH_TABLE_F[] = {
+  {dummyCommand,
+      ACE_ROUTINE_FPSTR(ECHO_COMMAND),
+      ACE_ROUTINE_FPSTR(ECHO_HELP_STRING)},
+  {dummyCommand,
+      ACE_ROUTINE_FPSTR(LS_COMMAND),
+      ACE_ROUTINE_FPSTR(LS_HELP_STRING)},
+};
+const uint8_t NUM_COMMANDS_F =
+    sizeof(DISPATCH_TABLE_F) / sizeof(DispatchRecordF);
+
+test(CommandDispatcherF_findCommand) {
+  const DispatchRecordF* record = CommandDispatcherF::findCommand(
+      DISPATCH_TABLE_F, NUM_COMMANDS, "echo");
+  assertEqual((uintptr_t) record->command, (uintptr_t) dummyCommand);
+  assertEqual((uintptr_t) record->name, (uintptr_t) ECHO_COMMAND);
+  assertEqual((uintptr_t) record->helpString, (uintptr_t) ECHO_HELP_STRING);
+
+  record = CommandDispatcherF::findCommand(
+      DISPATCH_TABLE_F, NUM_COMMANDS, "NOTFOUND");
   assertEqual((uintptr_t) record, (uintptr_t) nullptr);
 }
 

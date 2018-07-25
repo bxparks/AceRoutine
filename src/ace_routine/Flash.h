@@ -44,7 +44,7 @@ class __FlashStringHelper;
 
 /**
  * The FPSTR() macro is defined on ESP8266, not defined on Teensy and AVR, and
- * broken on ESP32. We define our onw version to make this work on all 4
+ * broken on ESP32. We define our own version to make this work on all 4
  * platforms. We might be able to use just FPSTR() if
  * https://github.com/espressif/arduino-esp32/issues/1371 is fixed.
  */

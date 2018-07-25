@@ -130,13 +130,49 @@ void delayCommand(Print& printer, int argc, const char** argv) {
   }
 }
 
-const DispatchRecord dispatchTable[] = {
+/*
+ * Select C_STRING to use C-strings (const char*)
+ *
+ * Select F_STRING to use FlashStrings (const __FlashString*) which
+ * stores the strings in flash memory, saving 48 bytes out of
+ * 457 bytes of statis RAM in this example.
+ */
+#define C_STRING 1
+#define F_STRING 2
+#define STRING_MODE F_STRING
+
+#if STRING_MODE == C_STRING
+
+const DispatchRecordC dispatchTable[] = {
   {delayCommand, "delay", "(on | off) millis"},
   {listCommand, "list", nullptr},
   {freeCommand, "free", nullptr},
   {echoCommand, "echo", "args ..."},
 };
-const uint8_t NUM_COMMANDS = sizeof(dispatchTable) / sizeof(DispatchRecord);
+
+#else
+
+const char DELAY_COMMAND[] PROGMEM = "delay";
+const char DELAY_HELP_STRING[] PROGMEM = "(on | off) millis";
+const char LIST_COMMAND[] PROGMEM = "list";
+const char FREE_COMMAND[] PROGMEM = "free";
+const char ECHO_COMMAND[] PROGMEM = "echo";
+const char ECHO_HELP_STRING[] PROGMEM = "args ...";
+
+const DispatchRecordF dispatchTable[] = {
+  {delayCommand,
+      ACE_ROUTINE_FPSTR(DELAY_COMMAND),
+      ACE_ROUTINE_FPSTR(DELAY_HELP_STRING)},
+  {listCommand, ACE_ROUTINE_FPSTR(LIST_COMMAND), nullptr},
+  {freeCommand, ACE_ROUTINE_FPSTR(FREE_COMMAND), nullptr},
+  {echoCommand,
+      ACE_ROUTINE_FPSTR(ECHO_COMMAND),
+      ACE_ROUTINE_FPSTR(ECHO_HELP_STRING)},
+};
+
+#endif
+
+const uint8_t NUM_COMMANDS = sizeof(dispatchTable) / sizeof(DispatchRecordC);
 
 const int BUF_SIZE = 64;
 char lineBuffer[BUF_SIZE];
@@ -144,9 +180,18 @@ StreamReader streamReader(Serial, lineBuffer, BUF_SIZE);
 
 const int8_t ARGV_SIZE = 10;
 const char* argv[ARGV_SIZE];
-CommandDispatcher dispatcher(streamReader, Serial,
+
+#if STRING_MODE == C_STRING
+
+CommandDispatcherC dispatcher(streamReader, Serial,
     dispatchTable, NUM_COMMANDS, argv, ARGV_SIZE);
 
+#else
+
+CommandDispatcherF dispatcher(streamReader, Serial,
+    dispatchTable, NUM_COMMANDS, argv, ARGV_SIZE);
+
+#endif
 //---------------------------------------------------------------------------
 
 void setup() {

@@ -215,9 +215,115 @@ namespace ace_routine {
  * of the virtual run() method.
  */
 class Coroutine {
+  friend class CoroutineScheduler;
+
   public:
     /**
-     * The execution recovery status of the coroutine, corresponding to the
+     * Get the pointer to the root pointer. Implemented as a function static to
+     * fix the C++ static initialization problem, making it safe to use this in
+     * other static contexts.
+     */
+    static Coroutine** getRoot();
+
+    /**
+     * Return the next pointer as a pointer to the pointer, similar to
+     * getRoot(). This makes it much easier to manipulate a singly-linked list.
+     * Also makes setNext() method unnecessary.
+     */
+    Coroutine** getNext() { return &mNext; }
+
+    /** Human-readable name of the coroutine. */
+    const FCString& getName() const { return mName; }
+
+    /**
+     * The body of the coroutine. The COROUTINE macro creates a subclass of
+     * this class and puts the body of the coroutine into this method.
+     *
+     * @return The return value is always ignored. This method is declared to
+     * return an int to prevent the user from accidentally returning from this
+     * method using an explicit 'return' statement instead of through one of
+     * the macros (e.g. COROUTINE_YIELD(), COROUTINE_DELAY(), COROUTINE_AWAIT()
+     * or COROUTINE_END()).
+     */
+    virtual int run() = 0;
+
+    /**
+     * Returns the current millisecond clock. By default it returns the global
+     * millis() function from Arduino but can be overridden for testing.
+     */
+    virtual unsigned long millis() const;
+
+    /**
+     * Suspend the coroutine at the next scheduler iteration. If the coroutine
+     * is already in the process of ending or is already terminated, then this
+     * method does nothing. A coroutine cannot use this method to suspend
+     * itself, it can only suspend some other coroutine. Currently, there is no
+     * ability for a coroutine to suspend itself, that would require the
+     * addition of a COROUTINE_SUSPEND() macro. Also, this method works only if
+     * the CoroutineScheduler::loop() is used because the suspend functionality
+     * is implemented by the CoroutineScheduler.
+     */
+    void suspend() {
+      if (isDone()) return;
+      mStatus = kStatusSuspended;
+    }
+
+    /**
+     * Add a Suspended coroutine into the head of the scheduler linked list,
+     * and change the state to Yielding. If the coroutine is in any other
+     * state, this method does nothing. This method works only if the
+     * CoroutineScheduler::loop() is used.
+     */
+    void resume();
+
+    /** Check if delay time is over. */
+    bool isDelayExpired() {
+      uint16_t elapsedMillis = millis() - mDelayStartMillis;
+      return elapsedMillis >= mDelayDurationMillis;
+    }
+
+    /** The coroutine was suspended with a call to suspend(). */
+    bool isSuspended() const { return mStatus == kStatusSuspended; }
+
+    /** The coroutine returned using COROUTINE_YIELD(). */
+    bool isYielding() const { return mStatus == kStatusYielding; }
+
+    /** The coroutine returned using COROUTINE_AWAIT(). */
+    bool isAwaiting() const { return mStatus == kStatusAwaiting; }
+
+    /** The coroutine returned using COROUTINE_DELAY(). */
+    bool isDelaying() const { return mStatus == kStatusDelaying; }
+
+    /** The coroutine is currently running. True only within the coroutine. */
+    bool isRunning() const { return mStatus == kStatusRunning; }
+
+    /**
+     * The coroutine returned using COROUTINE_END(). In most cases, isDone() is
+     * recommended instead because it works when coroutines are executed
+     * manually or through the CoroutineScheduler.
+     */
+    bool isEnding() const { return mStatus == kStatusEnding; }
+
+    /**
+     * The coroutine was terminated by the scheduler with a call to
+     * setTerminated(). In most cases, isDone() should be used instead
+     * because it works when coroutines are executed manually or through the
+     * CoroutineScheudler.
+     */
+    bool isTerminated() const { return mStatus == kStatusTerminated; }
+
+    /**
+     * The coroutine is either Ending or Terminated. This method is recommended
+     * over isEnding() or isTerminated() because it works when the coroutine is
+     * executed either manually or through the CoroutineScheduler.
+     */
+    bool isDone() const {
+      return mStatus == kStatusEnding || mStatus == kStatusTerminated;
+    }
+
+  protected:
+    /**
+     * The execution status of the coroutine, corresponding to the
      * COROUTINE_YIELD(), COROUTINE_DELAY(), COROUTINE_AWAIT() and
      * COROUTINE_END() macros.
 		 *
@@ -274,109 +380,6 @@ class Coroutine {
     /** Coroutine has ended and no longer in the scheduler queue. */
     static const Status kStatusTerminated = 6;
 
-    /**
-     * Get the pointer to the root pointer. Implemented as a function static to
-     * fix the C++ static initialization problem, making it safe to use this in
-     * other static contexts.
-     */
-    static Coroutine** getRoot();
-
-    /**
-     * Return the next pointer as a pointer to the pointer, similar to
-     * getRoot(). This makes it much easier to manipulate a singly-linked list.
-     * Also makes setNext() method unnecessary.
-     */
-    Coroutine** getNext() { return &mNext; }
-
-    /** Human-readable name of the coroutine. */
-    const FCString& getName() const { return mName; }
-
-    /**
-     * The body of the coroutine. The COROUTINE macro creates a subclass of
-     * this class and puts the body of the coroutine into this method.
-     *
-     * @return The return value is always ignored. This method is declared to
-     * return an int to prevent the user from accidentally returning from this
-     * method using an explicit 'return' statement instead of through one of
-     * the macros (e.g. COROUTINE_YIELD(), COROUTINE_DELAY(), COROUTINE_AWAIT()
-     * or COROUTINE_END()).
-     */
-    virtual int run() = 0;
-
-    /**
-     * Returns the current millisecond clock. By default it returns the global
-     * millis() function from Arduino but can be overridden for testing.
-     */
-    virtual unsigned long millis() const;
-
-    /**
-     * Suspend the coroutine at the next scheduler iteration. If the coroutine
-     * is already in the process of ending or is already terminated, then this
-     * method does nothing. This method works only if the
-     * CoroutineScheduler::loop() is used.
-     */
-    void suspend() {
-      if (isDone()) return;
-      mStatus = kStatusSuspended;
-    }
-
-    /**
-     * Add a Suspended coroutine into the head of the scheduler linked list,
-     * and change the state to Yielding. If the coroutine is in any other
-     * state, this method does nothing. This method works only if the
-     * CoroutineScheduler::loop() is used.
-     */
-    void resume();
-
-    /** Return the status of the coroutine. Used by the CoroutineScheduler. */
-    Status getStatus() const { return mStatus; }
-
-    /** Check if delay time is over. */
-    bool isDelayExpired() {
-      uint16_t elapsedMillis = millis() - mDelayStartMillis;
-      return elapsedMillis >= mDelayDurationMillis;
-    }
-
-    /** The coroutine was suspended with a call to suspend(). */
-    bool isSuspended() const { return mStatus == kStatusSuspended; }
-
-    /** The coroutine returned using COROUTINE_YIELD(). */
-    bool isYielding() const { return mStatus == kStatusYielding; }
-
-    /** The coroutine returned using COROUTINE_AWAIT(). */
-    bool isAwaiting() const { return mStatus == kStatusAwaiting; }
-
-    /** The coroutine returned using COROUTINE_DELAY(). */
-    bool isDelaying() const { return mStatus == kStatusDelaying; }
-
-    /** The coroutine is currently running. True only within the coroutine. */
-    bool isRunning() const { return mStatus == kStatusRunning; }
-
-    /** The coroutine returned using COROUTINE_END(). */
-    bool isEnding() const { return mStatus == kStatusEnding; }
-
-    /**
-     * The coroutine was terminated by the scheduler with a call to
-     * setTerminated(). Normally, isDone() should be used instead.
-     */
-    bool isTerminated() const { return mStatus == kStatusTerminated; }
-
-    /**
-     * The coroutine is either Ending or Terminated. This method is recommended
-     * over isEnding() or isTerminated() because it works when the coroutine is
-     * executed either manually or through the CoroutineScheduler.
-     */
-    bool isDone() const {
-      return mStatus == kStatusEnding || mStatus == kStatusTerminated;
-    }
-
-    /**
-     * Indicate that the Coroutine has been removed from the Scheduler queue.
-     * Should be used only by the CoroutineScheduler.
-     */
-    void setTerminated() { mStatus = kStatusTerminated; }
-
-  protected:
     /** Constructor. */
     Coroutine() {}
 
@@ -398,6 +401,9 @@ class Coroutine {
       mStatus = kStatusYielding;
       insertSorted();
     }
+
+    /** Return the status of the coroutine. Used by the CoroutineScheduler. */
+    Status getStatus() const { return mStatus; }
 
     /** Pointer to label where execute will start on the next call to run(). */
     void setJump(void* jumpPoint) { mJumpPoint = jumpPoint; }
@@ -437,6 +443,12 @@ class Coroutine {
 
     /** Set the kStatusEnding state. */
     void setEnding() { mStatus = kStatusEnding; }
+
+    /**
+     * Set status to indicate that the Coroutine has been removed from the
+     * Scheduler queue. Should be used only by the CoroutineScheduler.
+     */
+    void setTerminated() { mStatus = kStatusTerminated; }
 
   private:
     // Disable copy-constructor and assignment operator

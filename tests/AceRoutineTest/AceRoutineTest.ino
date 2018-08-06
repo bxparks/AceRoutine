@@ -43,30 +43,30 @@ COROUTINE(TestableCoroutine, simpleCoroutine) {
 // Verify that multiple calls to Coroutine::run() after it ends is ok.
 test(simpleCoroutine) {
   simpleCoroutine.millis(0);
-  assertEqual(Coroutine::kStatusSuspended, simpleCoroutine.getStatus());
+  assertTrue(simpleCoroutine.isSuspended());
 
   simpleCoroutine.run();
-  assertEqual(Coroutine::kStatusYielding, simpleCoroutine.getStatus());
+  assertTrue(simpleCoroutine.isYielding());
 
   simpleCoroutine.run();
-  assertEqual(Coroutine::kStatusDelaying, simpleCoroutine.getStatus());
+  assertTrue(simpleCoroutine.isDelaying());
 
   simpleCoroutine.run();
-  assertEqual(Coroutine::kStatusDelaying, simpleCoroutine.getStatus());
+  assertTrue(simpleCoroutine.isDelaying());
 
   simpleCoroutine.millis(1);
   simpleCoroutine.run();
-  assertEqual(Coroutine::kStatusAwaiting, simpleCoroutine.getStatus());
+  assertTrue(simpleCoroutine.isAwaiting());
 
   simpleCoroutine.run();
-  assertEqual(Coroutine::kStatusAwaiting, simpleCoroutine.getStatus());
+  assertTrue(simpleCoroutine.isAwaiting());
 
   simpleCoroutineFlag = true;
   simpleCoroutine.run();
-  assertEqual(Coroutine::kStatusEnding, simpleCoroutine.getStatus());
+  assertTrue(simpleCoroutine.isEnding());
 
   simpleCoroutine.run();
-  assertEqual(Coroutine::kStatusEnding, simpleCoroutine.getStatus());
+  assertTrue(simpleCoroutine.isEnding());
 }
 
 // c is defined in another .cpp file
@@ -101,27 +101,27 @@ COROUTINE(TestableCoroutine, extra) {
 // Only 3 coroutines are initially active: a, b, c
 test(scheduler) {
   // initially everything is enabled
-  assertEqual(Coroutine::kStatusYielding, a.getStatus());
-  assertEqual(Coroutine::kStatusYielding, b.getStatus());
-  assertEqual(Coroutine::kStatusYielding, c.getStatus());
+  assertTrue(a.isYielding());
+  assertTrue(b.isYielding());
+  assertTrue(c.isYielding());
 
   // run a
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusDelaying, a.getStatus());
-  assertEqual(Coroutine::kStatusYielding, b.getStatus());
-  assertEqual(Coroutine::kStatusYielding, c.getStatus());
+  assertTrue(a.isDelaying());
+  assertTrue(b.isYielding());
+  assertTrue(c.isYielding());
 
   // run b
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusDelaying, a.getStatus());
-  assertEqual(Coroutine::kStatusYielding, b.getStatus());
-  assertEqual(Coroutine::kStatusYielding, c.getStatus());
+  assertTrue(a.isDelaying());
+  assertTrue(b.isYielding());
+  assertTrue(c.isYielding());
 
   // run c
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusDelaying, a.getStatus());
-  assertEqual(Coroutine::kStatusYielding, b.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, c.getStatus());
+  assertTrue(a.isDelaying());
+  assertTrue(b.isYielding());
+  assertTrue(c.isDelaying());
 
   a.millis(10);
   b.millis(10);
@@ -129,21 +129,21 @@ test(scheduler) {
 
   // run a
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusDelaying, a.getStatus());
-  assertEqual(Coroutine::kStatusYielding, b.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, c.getStatus());
+  assertTrue(a.isDelaying());
+  assertTrue(b.isYielding());
+  assertTrue(c.isDelaying());
 
   // run b
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusDelaying, a.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, b.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, c.getStatus());
+  assertTrue(a.isDelaying());
+  assertTrue(b.isDelaying());
+  assertTrue(c.isDelaying());
 
   // run c
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusDelaying, a.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, b.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, c.getStatus());
+  assertTrue(a.isDelaying());
+  assertTrue(b.isDelaying());
+  assertTrue(c.isDelaying());
 
   a.millis(36);
   b.millis(36);
@@ -151,21 +151,21 @@ test(scheduler) {
 
   // run a
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusYielding, a.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, b.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, c.getStatus());
+  assertTrue(a.isYielding());
+  assertTrue(b.isDelaying());
+  assertTrue(c.isDelaying());
 
   // run b
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusYielding, a.getStatus());
-  assertEqual(Coroutine::kStatusAwaiting, b.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, c.getStatus());
+  assertTrue(a.isYielding());
+  assertTrue(b.isAwaiting());
+  assertTrue(c.isDelaying());
 
   // run c
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusYielding, a.getStatus());
-  assertEqual(Coroutine::kStatusAwaiting, b.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, c.getStatus());
+  assertTrue(a.isYielding());
+  assertTrue(b.isAwaiting());
+  assertTrue(c.isDelaying());
 
   a.millis(101);
   b.millis(101);
@@ -173,21 +173,21 @@ test(scheduler) {
 
   // run a
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusAwaiting, a.getStatus());
-  assertEqual(Coroutine::kStatusAwaiting, b.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, c.getStatus());
+  assertTrue(a.isAwaiting());
+  assertTrue(b.isAwaiting());
+  assertTrue(c.isDelaying());
 
   // run b
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusAwaiting, a.getStatus());
-  assertEqual(Coroutine::kStatusAwaiting, b.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, c.getStatus());
+  assertTrue(a.isAwaiting());
+  assertTrue(b.isAwaiting());
+  assertTrue(c.isDelaying());
 
   // run c
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusAwaiting, a.getStatus());
-  assertEqual(Coroutine::kStatusAwaiting, b.getStatus());
-  assertEqual(Coroutine::kStatusEnding, c.getStatus());
+  assertTrue(a.isAwaiting());
+  assertTrue(b.isAwaiting());
+  assertTrue(c.isEnding());
 
   a.millis(102);
   b.millis(102);
@@ -195,21 +195,21 @@ test(scheduler) {
 
   // run a
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusAwaiting, a.getStatus());
-  assertEqual(Coroutine::kStatusAwaiting, b.getStatus());
-  assertEqual(Coroutine::kStatusEnding, c.getStatus());
+  assertTrue(a.isAwaiting());
+  assertTrue(b.isAwaiting());
+  assertTrue(c.isEnding());
 
   // run b
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusAwaiting, a.getStatus());
-  assertEqual(Coroutine::kStatusEnding, b.getStatus());
-  assertEqual(Coroutine::kStatusEnding, c.getStatus());
+  assertTrue(a.isAwaiting());
+  assertTrue(b.isEnding());
+  assertTrue(c.isEnding());
 
   // run c - removed from list
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusAwaiting, a.getStatus());
-  assertEqual(Coroutine::kStatusEnding, b.getStatus());
-  assertEqual(Coroutine::kStatusTerminated, c.getStatus());
+  assertTrue(a.isAwaiting());
+  assertTrue(b.isEnding());
+  assertTrue(c.isTerminated());
 
   a.millis(103);
   b.millis(103);
@@ -217,13 +217,13 @@ test(scheduler) {
 
   // run a, waiting for b over, loops around to delay(25)
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusDelaying, a.getStatus());
-  assertEqual(Coroutine::kStatusEnding, b.getStatus());
+  assertTrue(a.isDelaying());
+  assertTrue(b.isEnding());
 
   // run b - removed from list
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusDelaying, a.getStatus());
-  assertEqual(Coroutine::kStatusTerminated, b.getStatus());
+  assertTrue(a.isDelaying());
+  assertTrue(b.isTerminated());
 
   a.millis(104);
   b.millis(104);
@@ -231,7 +231,7 @@ test(scheduler) {
 
   // run a - continues to run the COROUTINE_LOOP()
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusDelaying, a.getStatus());
+  assertTrue(a.isDelaying());
 
   a.millis(130);
   b.millis(130);
@@ -239,7 +239,7 @@ test(scheduler) {
 
   // run a - continues to run the COROUTINE_LOOP()
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusYielding, a.getStatus());
+  assertTrue(a.isYielding());
 
   a.millis(131);
   b.millis(131);
@@ -247,18 +247,18 @@ test(scheduler) {
   extra.millis(131);
 
   // resume 'extra'
-  assertEqual(Coroutine::kStatusSuspended, extra.getStatus());
+  assertTrue(extra.isSuspended());
   extra.resume();
 
   // run 'extra'
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusEnding, extra.getStatus());
-  assertEqual(Coroutine::kStatusYielding, a.getStatus());
+  assertTrue(extra.isEnding());
+  assertTrue(a.isYielding());
 
   // run 'a'
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusEnding, extra.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, a.getStatus());
+  assertTrue(extra.isEnding());
+  assertTrue(a.isDelaying());
 
   a.millis(132);
   b.millis(132);
@@ -267,12 +267,12 @@ test(scheduler) {
 
   // run 'extra'
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusTerminated, extra.getStatus());
-  assertEqual(Coroutine::kStatusDelaying, a.getStatus());
+  assertTrue(extra.isTerminated());
+  assertTrue(a.isDelaying());
 
   // run 'a'
   CoroutineScheduler::loop();
-  assertEqual(Coroutine::kStatusDelaying, a.getStatus());
+  assertTrue(a.isDelaying());
 }
 
 void setup() {

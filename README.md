@@ -5,9 +5,9 @@ stackless coroutines on Arduino platforms.
 
 Version: 0.1 (2018-08-07)
 
-This library is currently in a "beta" status. I decided to release it as an
-Arduino library to get feedback from users. The API may change based upon the
-feedback.
+This library is currently in "beta" status. I'm releasing it through the Arduino
+Library Manager to solicit feedback from interested users. Send me an email or
+create a GitHub ticket.
 
 [![AUniter Jenkins Badge](https://us-central1-xparks2018.cloudfunctions.net/badge?project=AceRoutine)](https://github.com/bxparks/AUniter)
 
@@ -21,8 +21,8 @@ execute. When the scheduler makes it way back to the original coroutine, the
 execution continues right after the `yield()` or `delay()`.
 
 There are only 2 classes in this library:
-* each coroutine is an instance of a subclass of the `Coroutine` class,
-* the optional `CoroutineScheduler` class handles the scheduling
+* each coroutine is an instance of the `Coroutine` class (or a subclass),
+* the `CoroutineScheduler` class handles the scheduling.
 
 The library provides a number of macros to help create coroutines and manage
 their life cycle:
@@ -151,7 +151,7 @@ void loop() {
 ```
 
 The `CoroutineScheduler` can automatically manage all coroutines defined by the
-`COROUTINE()` macro, which eliminates the need to itemize all your coroutines in
+`COROUTINE()` macro, which eliminates the need to itemize your coroutines in
 the `loop()` method manually.
 
 ## Installation

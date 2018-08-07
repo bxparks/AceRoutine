@@ -1,5 +1,7 @@
 # Changelog
 
+* 0.1 (2018-08-07)
+    * Beta release.
 * (2018-07-24)
     * Remove `runRoutine()` indirection. Decided that it did not provide
       enough benefits and felt like over-engineering.

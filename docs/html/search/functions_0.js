@@ -1,10 +1,8 @@
 var searchData=
 [
-  ['getdelay',['getDelay',['../classace__routine_1_1Routine.html#afae6ca591f4be093ce8ca50967c255ef',1,'ace_routine::Routine']]],
-  ['getdelaystart',['getDelayStart',['../classace__routine_1_1Routine.html#a3aabbbad9f832727919e3f6825ce3ee7',1,'ace_routine::Routine']]],
-  ['getjump',['getJump',['../classace__routine_1_1Routine.html#a8220f6a777f555f9a81cb323899d964a',1,'ace_routine::Routine']]],
-  ['getname',['getName',['../classace__routine_1_1Routine.html#a5131207c74d905cfb9b168bed9934d5e',1,'ace_routine::Routine']]],
-  ['getnext',['getNext',['../classace__routine_1_1Routine.html#aab34971c9c60504859f8f060a1af4de2',1,'ace_routine::Routine']]],
-  ['getroot',['getRoot',['../classace__routine_1_1Routine.html#a3a66831f0c7647726aa7fa25043b253f',1,'ace_routine::Routine']]],
-  ['getstatus',['getStatus',['../classace__routine_1_1Routine.html#a1f22434fe36ef2b53a3fbb9d53057c4f',1,'ace_routine::Routine']]]
+  ['commanddispatcher',['CommandDispatcher',['../classace__routine_1_1cli_1_1CommandDispatcher.html#a1216db2c304cdc328e8b75f9b0aaf926',1,'ace_routine::cli::CommandDispatcher']]],
+  ['commanddispatcherc',['CommandDispatcherC',['../classace__routine_1_1cli_1_1CommandDispatcherC.html#ac872c8fbd95b3da1daa992abdfa5f65d',1,'ace_routine::cli::CommandDispatcherC']]],
+  ['commanddispatcherf',['CommandDispatcherF',['../classace__routine_1_1cli_1_1CommandDispatcherF.html#abc168e3adebdef2356b4d38a6ddee45f',1,'ace_routine::cli::CommandDispatcherF']]],
+  ['compareto',['compareTo',['../classace__routine_1_1FCString.html#ac5f05cb2b33afc7fc9a14b77534a72cb',1,'ace_routine::FCString']]],
+  ['coroutine',['Coroutine',['../classace__routine_1_1Coroutine.html#a77f4a6850863fd2f0f161b8cccdfab18',1,'ace_routine::Coroutine']]]
 ];

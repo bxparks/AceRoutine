@@ -1,0 +1,5 @@
+<map id="ace_routine::cli::CommandDispatcher" name="ace_routine::cli::CommandDispatcher">
+<area shape="rect" id="node3" href="$classace__routine_1_1cli_1_1CommandDispatcherC.html" title="A CommandDispatcher that takes DispatchRecordC records using C&#45;strings. " alt="" coords="5,169,184,211"/>
+<area shape="rect" id="node4" href="$classace__routine_1_1cli_1_1CommandDispatcherF.html" title="A CommandDispatcher that takes DispatchRecordF records using FlashStrings. " alt="" coords="208,169,387,211"/>
+<area shape="rect" id="node2" href="$classace__routine_1_1Coroutine.html" title="Base class of all coroutines. " alt="" coords="119,5,273,32"/>
+</map>

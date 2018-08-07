@@ -1,11 +1,10 @@
 var searchData=
 [
-  ['routine',['ROUTINE',['../Routine_8h.html#a35145676458aad0171ce25284124f647',1,'Routine.h']]],
-  ['routine_5fawait',['ROUTINE_AWAIT',['../Routine_8h.html#a39903f863d8d6a1655a5b2ca089bc359',1,'Routine.h']]],
-  ['routine_5fbegin',['ROUTINE_BEGIN',['../Routine_8h.html#a69837d2ddee6b8738ad574c5c94fd40f',1,'Routine.h']]],
-  ['routine_5fdelay',['ROUTINE_DELAY',['../Routine_8h.html#ae38e682068fb702e24871fff67102918',1,'Routine.h']]],
-  ['routine_5fend',['ROUTINE_END',['../Routine_8h.html#a7b119075e933cdf7f2dcab85aaba4ffb',1,'Routine.h']]],
-  ['routine_5floop',['ROUTINE_LOOP',['../Routine_8h.html#a62ef48c1b324fd7d713cfc0d52258517',1,'Routine.h']]],
-  ['routine_5fnamed',['ROUTINE_NAMED',['../Routine_8h.html#a3b0061bf24eb7ff6b453de831a8c4927',1,'Routine.h']]],
-  ['routine_5fyield',['ROUTINE_YIELD',['../Routine_8h.html#a4c7b5eadedacedd2da12c55608958761',1,'Routine.h']]]
+  ['coroutine',['COROUTINE',['../Coroutine_8h.html#ab22e58ab24b1908a7280f13603248ce3',1,'Coroutine.h']]],
+  ['coroutine_5fawait',['COROUTINE_AWAIT',['../Coroutine_8h.html#a9f6714d9752740b6173b6afc4d108fa8',1,'Coroutine.h']]],
+  ['coroutine_5fbegin',['COROUTINE_BEGIN',['../Coroutine_8h.html#a7b7dc05639a37cb3f51bf348c68db283',1,'Coroutine.h']]],
+  ['coroutine_5fdelay',['COROUTINE_DELAY',['../Coroutine_8h.html#a1391503960a4b0c48f8200f1ffa0e305',1,'Coroutine.h']]],
+  ['coroutine_5fend',['COROUTINE_END',['../Coroutine_8h.html#a7e326a8df652c46c42a8d713ddc67bd7',1,'Coroutine.h']]],
+  ['coroutine_5floop',['COROUTINE_LOOP',['../Coroutine_8h.html#adad73df0853c1d3040b88b3cd0a04c0e',1,'Coroutine.h']]],
+  ['coroutine_5fyield',['COROUTINE_YIELD',['../Coroutine_8h.html#a682abe1669f9fe28af63d11da5421cbf',1,'Coroutine.h']]]
 ];

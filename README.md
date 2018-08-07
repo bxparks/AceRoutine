@@ -328,7 +328,7 @@ for 1000 seconds, we can do this:
 ```
 COROUTINE(waitThousandSeconds) {
   COROUTINE_BEGIN();
-  static i = 0;
+  static int i = 0;
   for (i = 0; i < 100; i++) {
     COROUTINE_DELAY(10000);
   }
@@ -407,7 +407,7 @@ However, a reasonable solution is to use `static` variables. For example:
 ```
 COROUTINE(countToTen) {
   COROUTINE_BEGIN();
-  static i = 0;
+  static int i = 0;
   for (i = 0; i < 10; i++) {
     ...
     COROUTINE_DELAY(100);

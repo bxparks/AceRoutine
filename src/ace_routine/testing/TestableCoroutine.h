@@ -1,3 +1,4 @@
+/*
 MIT License
 
 Copyright (c) 2018 Brian T. Park
@@ -19,3 +20,28 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+*/
+
+#ifndef ACE_ROUTINE_TESTABLE_COROUTINE_H
+#define ACE_ROUTINE_TESTABLE_COROUTINE_H
+
+#include "../Coroutine.h"
+
+namespace ace_routine {
+namespace testing {
+
+/** A Coroutine that overrides the millis() clock for unit testing purposes. */
+class TestableCoroutine: public Coroutine {
+  public:
+    virtual unsigned long millis() const override { return mMillis; }
+
+    void millis(unsigned long millis) { mMillis = millis; }
+
+  private:
+    unsigned long mMillis = 0;
+};
+
+}
+}
+
+#endif

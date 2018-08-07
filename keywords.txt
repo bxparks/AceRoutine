@@ -1,0 +1,72 @@
+#######################################
+# Syntax Coloring Map for AceRoutine library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Coroutine	KEYWORD1
+CoroutineScheduler	KEYWORD1
+FCString	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+# Macros from Coroutine.h
+COROUTINE	KEYWORD2
+COROUTINE_BEGIN	KEYWORD2
+COROUTINE_LOOP	KEYWORD2
+COROUTINE_YIELD	KEYWORD2
+COROUTINE_AWAIT	KEYWORD2
+COROUTINE_DELAY	KEYWORD2
+COROUTINE_END	KEYWORD2
+EXTERN_COROUTINE	KEYWORD2
+# public methods
+getRoot	KEYWORD2
+getNext	KEYWORD2
+getName	KEYWORD2
+run	KEYWORD2
+getStatus	KEYWORD2
+getDelayStart	KEYWORD2
+getDelay	KEYWORD2
+isSuspended	KEYWORD2
+isYielding	KEYWORD2
+isAwaiting	KEYWORD2
+isDelaying	KEYWORD2
+isRunning	KEYWORD2
+isEnding	KEYWORD2
+isTerminated	KEYWORD2
+isDone	KEYWORD2
+setTerminated	KEYWORD2
+# protected methods
+init	KEYWORD2
+setJump	KEYWORD2
+getJump	KEYWORD2
+setYielding	KEYWORD2
+setAwaiting	KEYWORD2
+setDelaying	KEYWORD2
+setEnding	KEYWORD2
+
+# public methods from CoroutineScheduler.h
+setup	KEYWORD2
+loop	KEYWORD2
+list	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+# Coroutine.h
+kStatusSuspended	LITERAL1
+kStatusYielding	LITERAL1
+kStatusAwaiting	LITERAL1
+kStatusDelaying	LITERAL1
+kStatusRunning	LITERAL1
+kStatusEnding	LITERAL1
+kStatusTerminated	LITERAL1

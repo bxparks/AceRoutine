@@ -5,11 +5,11 @@
  *
  * Run the sketch, then type 'help' on the serial port. The following
  * commands are supported:
- *  - `help [command]`
- *  - `list`
- *  - `free`
- *  - `echo [args ...]`
- *  - `delay (on | off) millis`
+ *  - `help [command]` - list the known commands
+ *  - `list` - list the coroutines managed by the CoroutineScheduler
+ *  - `free` - print free memory
+ *  - `echo [args ...]` - echo the arguments
+ *  - `delay (on | off) millis` - set LED blink on or off delay
  */
 
 #include <Arduino.h>
@@ -130,20 +130,20 @@ void delayCommand(Print& printer, int argc, const char** argv) {
   }
 }
 
-// Select C_STRING to use C-strings (const char*)
+// Select USE_C_STRING to use C-strings (const char*)
 //
-// Select F_STRING to use FlashStrings (const __FlashString*) which
+// Select USE_F_STRING to use FlashStrings (const __FlashString*) which
 // stores the strings in flash memory, saving 48 bytes out of
 // 457 bytes of statis RAM in this example.
-#define C_STRING 1
-#define F_STRING 2
-#define STRING_MODE F_STRING
+#define USE_C_STRING 1
+#define USE_F_STRING 2
+#define STRING_MODE USE_F_STRING
 
-#if STRING_MODE == C_STRING
+#if STRING_MODE == USE_C_STRING
 
 const DispatchRecordC dispatchTable[] = {
   {delayCommand, "delay", "(on | off) millis"},
-  {listCommand, "ps", nullptr},
+  {listCommand, "list", nullptr},
   {freeCommand, "free", nullptr},
   {echoCommand, "echo", "args ..."},
 };
@@ -152,11 +152,15 @@ const uint8_t numCommands = sizeof(dispatchTable) / sizeof(DispatchRecordC);
 
 #else
 
-// F() works only inside methods.
+/**
+ * The F() macro works only inside methods, so we use this static function
+ * to create and hold the dispatch table. Returns the pointer to the table
+ * and sets the *numCommands to the number of entries.
+ */
 static const DispatchRecordF* getDispatchTable(uint8_t* numCommands) {
   static const DispatchRecordF dispatchTable[] = {
     {delayCommand, F("delay"), F("(on | off) millis")},
-    {listCommand, F("ps"), nullptr},
+    {listCommand, F("list"), nullptr},
     {freeCommand, F("free"), nullptr},
     {echoCommand, F("echo"), F("args ...")},
   };
@@ -171,24 +175,24 @@ const DispatchRecordF* dispatchTable = getDispatchTable(&numCommands);
 
 #endif
 
+// Create an instance of the StreamReader.
 const int BUF_SIZE = 64;
 char lineBuffer[BUF_SIZE];
 StreamReader streamReader(Serial, lineBuffer, BUF_SIZE);
 
+
+// Create an instance of the CommandDispatcher using either CStrings or
+// FStrings.
 const int8_t ARGV_SIZE = 10;
 const char* argv[ARGV_SIZE];
-
-#if STRING_MODE == C_STRING
-
-CommandDispatcherC dispatcher(streamReader, Serial,
-    dispatchTable, numCommands, argv, ARGV_SIZE);
-
+#if STRING_MODE == USE_C_STRING
+  CommandDispatcherC dispatcher(streamReader, Serial,
+      dispatchTable, numCommands, argv, ARGV_SIZE);
 #else
-
-CommandDispatcherF dispatcher(streamReader, Serial,
-    dispatchTable, numCommands, argv, ARGV_SIZE);
-
+  CommandDispatcherF dispatcher(streamReader, Serial,
+      dispatchTable, numCommands, argv, ARGV_SIZE);
 #endif
+
 //---------------------------------------------------------------------------
 
 void setup() {

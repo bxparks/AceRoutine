@@ -1014,6 +1014,16 @@ See [CHANGELOG.md](CHANGELOG.md).
 
 [MIT License](https://opensource.org/licenses/MIT)
 
+## Feedback and Support
+
+If you have any questions, comments, bug reports, or feature requests, please
+file a GitHub ticket or send me an email. I'd love to hear about how this
+software and its documentation can be improved. Instead of forking the
+repository to modify or add a feature for your own projects, let me have a
+chance to incorporate the change into the main repository so that your external
+dependencies are simpler and so that others can benefit. I can't promise that I
+will incorporate everything, but I will give your ideas serious consideration.
+
 ## Authors
 
 Created by Brian T. Park (brian@xparks.net).

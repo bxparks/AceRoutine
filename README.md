@@ -156,9 +156,8 @@ the `loop()` method manually.
 
 ## Installation
 
-The latest stable release will eventually be available in the Arduino IDE
-Library Manager. Search for "AceRoutine". Click Install.
-(Unfortunately, it is not there yet.)
+The latest stable release is available in the Arduino IDE Library Manager.
+Search for "AceRoutine". Click Install.
 
 The development version can be installed by cloning the
 [GitHub repository](https://github.com/bxparks/AceRoutine), checking out the

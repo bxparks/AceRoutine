@@ -20,25 +20,13 @@ using namespace ace_routine;
 using namespace ace_routine::cli;
 
 //---------------------------------------------------------------------------
+// Compensate for buggy F() implementation in ESP8266.
+//---------------------------------------------------------------------------
 
-// Select USE_F_STRING to use FlashStrings (const __FlashString*) which
-// stores the strings in flash memory. Useful for AVR boards with
-// small static RAM.
-//
-// Select USE_C_STRING to use C-strings (const char*) for all others because
-// they have more memory. ESP8266 has some support for Flash strings but it's
-// buggy, conflicts with Flash strings in templates. Easier to avoid.
-#define USE_C_STRING 1
-#define USE_F_STRING 2
-
-#if defined(AVR) || defined(__arm__) || defined(ESP32)
-  #define STRING_MODE USE_F_STRING
+#if defined(AVR)
   #define FF(x) F(x)
-#elif defined(ESP8266)
-  #define STRING_MODE USE_C_STRING
-  #define FF(x) (x)
 #else
-  #error Unsupported board
+  #define FF(x) (x)
 #endif
 
 //---------------------------------------------------------------------------
@@ -157,11 +145,11 @@ const uint8_t BUF_SIZE = 64;
 const uint8_t ARGV_SIZE = 10;
 const char PROMPT[] = "$ ";
 
-#if STRING_MODE == USE_C_STRING
-CommandManager<char, BUF_SIZE, ARGV_SIZE>
+#if defined(AVR)
+CommandManager<__FlashStringHelper, BUF_SIZE, ARGV_SIZE>
     commandManager(Serial, TABLE_SIZE, PROMPT);
 #else
-CommandManager<__FlashStringHelper, BUF_SIZE, ARGV_SIZE>
+CommandManager<char, BUF_SIZE, ARGV_SIZE>
     commandManager(Serial, TABLE_SIZE, PROMPT);
 #endif
 
@@ -172,17 +160,10 @@ void setup() {
   while (!Serial); // micro/leonardo
 
   // add commands to CommandManager
-#if STRING_MODE == USE_C_STRING
-  commandManager.add(delayCommand, "delay", "(on | off) millis");
-  commandManager.add(listCommand, "list", nullptr);
-  commandManager.add(freeCommand, "free", nullptr);
-  commandManager.add(echoCommand, "echo", "args ...");
-#else
-  commandManager.add(delayCommand, F("delay"), F("(on | off) millis"));
-  commandManager.add(listCommand, F("list"), nullptr);
-  commandManager.add(freeCommand, F("free"), nullptr);
-  commandManager.add(echoCommand, F("echo"), F("args ..."));
-#endif
+  commandManager.add(delayCommand, FF("delay"), FF("(on | off) millis"));
+  commandManager.add(listCommand, FF("list"), nullptr);
+  commandManager.add(freeCommand, FF("free"), nullptr);
+  commandManager.add(echoCommand, FF("echo"), FF("args ..."));
 
   commandManager.resume(); // insert into the scheduler
   CoroutineScheduler::setup();

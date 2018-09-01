@@ -21,6 +21,28 @@ using namespace ace_routine::cli;
 
 //---------------------------------------------------------------------------
 
+// Select USE_F_STRING to use FlashStrings (const __FlashString*) which
+// stores the strings in flash memory. Useful for AVR boards with
+// small static RAM.
+//
+// Select USE_C_STRING to use C-strings (const char*) for all others because
+// they have more memory. ESP8266 has some support for Flash strings but it's
+// buggy, conflicts with Flash strings in templates. Easier to avoid.
+#define USE_C_STRING 1
+#define USE_F_STRING 2
+
+#if defined(AVR) || defined(__arm__) || defined(ESP32)
+  #define STRING_MODE USE_F_STRING
+  #define FF(x) F(x)
+#elif defined(ESP8266)
+  #define STRING_MODE USE_C_STRING
+  #define FF(x) (x)
+#else
+  #error Unsupported board
+#endif
+
+//---------------------------------------------------------------------------
+
 #ifdef LED_BUILTIN
   const int LED = LED_BUILTIN;
 #else
@@ -108,14 +130,14 @@ void echoCommand(Print& printer, int argc, const char** argv) {
 
 /** Print amount of free memory between stack and heap. */
 void freeCommand(Print& printer, int /* argc */, const char** /* argv */) {
-  printer.print(F("Free memory: "));
+  printer.print(FF("Free memory: "));
   printer.println(freeMemory());
 }
 
 /** Change the blinking LED on and off delay parameters. */
 void delayCommand(Print& printer, int argc, const char** argv) {
   if (argc != 3) {
-    printer.println(F("Invalid number of arguments"));
+    printer.println(FF("Invalid number of arguments"));
     return;
   }
   const char* param = argv[1];
@@ -125,19 +147,10 @@ void delayCommand(Print& printer, int argc, const char** argv) {
   } else if (strcmp(param, "off") == 0) {
     ledOffDelay = atoi(value);
   } else {
-    printer.print(F("Unknown argument: "));
+    printer.print(FF("Unknown argument: "));
     printer.println(param);
   }
 }
-
-// Select USE_C_STRING to use C-strings (const char*)
-//
-// Select USE_F_STRING to use FlashStrings (const __FlashString*) which
-// stores the strings in flash memory, saving 48 bytes out of
-// 457 bytes of statis RAM in this example.
-#define USE_C_STRING 1
-#define USE_F_STRING 2
-#define STRING_MODE USE_F_STRING
 
 const uint8_t TABLE_SIZE = 4;
 const uint8_t BUF_SIZE = 64;

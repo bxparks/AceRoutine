@@ -54,7 +54,8 @@ class CommandManager: public Coroutine {
      * will normally be 'Serial', but can be set to something else.
      * @param tableSize Maximum number of commands in the dispatch table.
      * @param prompt If not null, print a prompt and echo the command entered
-     * by the user. If null, don't print prompt and don't echo.
+     * by the user. If null, don't print the prompt and don't echo the input
+     * from the user.
      */
     CommandManager(Stream& serial, uint8_t tableSize,
             const char* prompt = nullptr):

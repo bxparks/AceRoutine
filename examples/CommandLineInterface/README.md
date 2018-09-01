@@ -17,11 +17,16 @@ using the `delay` command described below.
 
 ## Help
 
-The `help` command prints the avaiable commands:
+The `help` command prints help string of all available commands:
 ```
 > help
 Usage: help [command]
-Commands: help delay list free echo 
+Commands:
+  help [command]
+  delay (on | off) millis
+  list
+  free
+  echo args ...
 ```
 
 Details about a specific command can be retrieved by specifying the command:

@@ -16,6 +16,7 @@
 #include <AceRoutine.h>
 #include "ace_routine/cli/StreamReader.h"
 #include "ace_routine/cli/CommandDispatcher.h"
+
 using namespace ace_routine;
 using namespace ace_routine::cli;
 
@@ -141,14 +142,15 @@ void delayCommand(Print& printer, int argc, const char** argv) {
 
 #if STRING_MODE == USE_C_STRING
 
-const DispatchRecordC dispatchTable[] = {
+const DispatchRecord<char> dispatchTable[] = {
   {delayCommand, "delay", "(on | off) millis"},
   {listCommand, "list", nullptr},
   {freeCommand, "free", nullptr},
   {echoCommand, "echo", "args ..."},
 };
 
-const uint8_t numCommands = sizeof(dispatchTable) / sizeof(DispatchRecordC);
+const uint8_t numCommands = sizeof(dispatchTable)
+    / sizeof(DispatchRecord<char>);
 
 #else
 
@@ -157,21 +159,24 @@ const uint8_t numCommands = sizeof(dispatchTable) / sizeof(DispatchRecordC);
  * to create and hold the dispatch table. Returns the pointer to the table
  * and sets the *numCommands to the number of entries.
  */
-static const DispatchRecordF* getDispatchTable(uint8_t* numCommands) {
-  static const DispatchRecordF dispatchTable[] = {
+static const DispatchRecord<__FlashStringHelper>*
+getDispatchTable(uint8_t* numCommands) {
+  static const DispatchRecord<__FlashStringHelper> dispatchTable[] = {
     {delayCommand, F("delay"), F("(on | off) millis")},
     {listCommand, F("list"), nullptr},
     {freeCommand, F("free"), nullptr},
     {echoCommand, F("echo"), F("args ...")},
   };
 
-  *numCommands = sizeof(dispatchTable) / sizeof(DispatchRecordF);
+  *numCommands = sizeof(dispatchTable)
+      / sizeof(DispatchRecord<__FlashStringHelper>);
 
   return dispatchTable;
 }
 
 uint8_t numCommands;
-const DispatchRecordF* dispatchTable = getDispatchTable(&numCommands);
+const DispatchRecord<__FlashStringHelper>* dispatchTable =
+    getDispatchTable(&numCommands);
 
 #endif
 
@@ -186,10 +191,10 @@ StreamReader streamReader(Serial, lineBuffer, BUF_SIZE);
 const int8_t ARGV_SIZE = 10;
 const char* argv[ARGV_SIZE];
 #if STRING_MODE == USE_C_STRING
-  CommandDispatcherC dispatcher(streamReader, Serial,
+  CommandDispatcher<char> dispatcher(streamReader, Serial,
       dispatchTable, numCommands, argv, ARGV_SIZE);
 #else
-  CommandDispatcherF dispatcher(streamReader, Serial,
+  CommandDispatcher<__FlashStringHelper> dispatcher(streamReader, Serial,
       dispatchTable, numCommands, argv, ARGV_SIZE);
 #endif
 

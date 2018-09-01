@@ -29,18 +29,18 @@ testF(CommandDispatcherTest, tokenize) {
   const char* expected[] = { "a", "b", "c", "d" };
 
   char BLANK[] = "\n";
-  uint8_t count = CommandDispatcher::tokenize(BLANK, argv, ARGV_SIZE);
+  uint8_t count = CommandDispatcher<char>::tokenize(BLANK, argv, ARGV_SIZE);
   assertEqual(count, 0);
 
   // 4 tokens
   char LINE[] = "a b c d";
-  count = CommandDispatcher::tokenize(LINE, argv, ARGV_SIZE);
+  count = CommandDispatcher<char>::tokenize(LINE, argv, ARGV_SIZE);
   assertEqual(count, 4);
   assertArgvEquals(argv, expected, count);
 
   // 5 tokens get truncated to 4
   char LINE5[] = "a b c d e";
-  count = CommandDispatcher::tokenize(LINE5, argv, ARGV_SIZE);
+  count = CommandDispatcher<char>::tokenize(LINE5, argv, ARGV_SIZE);
   assertEqual(count, 4);
   assertArgvEquals(argv, expected, count);
 }
@@ -50,20 +50,21 @@ testF(CommandDispatcherTest, tokenize) {
 void dummyCommand(Print& /* printer */, int /* argc */,
     const char** /* argv */) {}
 
-static const DispatchRecordC DISPATCH_TABLE[] = {
+static const DispatchRecord<char> DISPATCH_TABLE[] = {
   {dummyCommand, "echo", "args ..."},
   {dummyCommand, "ls", "[flags] args ..."},
 };
-const uint8_t NUM_COMMANDS = sizeof(DISPATCH_TABLE) / sizeof(DispatchRecordC);
+const uint8_t NUM_COMMANDS = sizeof(DISPATCH_TABLE)
+    / sizeof(DispatchRecord<char>);
 
 test(CommandDispatcherC_findCommand) {
-  const DispatchRecordC* record = CommandDispatcherC::findCommand(
+  const DispatchRecord<char>* record = CommandDispatcher<char>::findCommand(
       DISPATCH_TABLE, NUM_COMMANDS, "echo");
   assertEqual((uintptr_t) record->command, (uintptr_t) dummyCommand);
   assertEqual((uintptr_t) record->name, (uintptr_t) "echo");
   assertEqual((uintptr_t) record->helpString, (uintptr_t) "args ...");
 
-  record = CommandDispatcherC::findCommand(
+  record = CommandDispatcher<char>::findCommand(
       DISPATCH_TABLE, NUM_COMMANDS, "NOTFOUND");
   assertEqual((uintptr_t) record, (uintptr_t) nullptr);
 }
@@ -73,7 +74,7 @@ const char ECHO_HELP_STRING[] PROGMEM = "args ...";
 const char LS_COMMAND[] PROGMEM = "ls";
 const char LS_HELP_STRING[] PROGMEM = "[flags] args ...";
 
-static const DispatchRecordF DISPATCH_TABLE_F[] = {
+static const DispatchRecord<__FlashStringHelper> DISPATCH_TABLE_F[] = {
   {dummyCommand,
       ACE_ROUTINE_FPSTR(ECHO_COMMAND),
       ACE_ROUTINE_FPSTR(ECHO_HELP_STRING)},
@@ -82,16 +83,17 @@ static const DispatchRecordF DISPATCH_TABLE_F[] = {
       ACE_ROUTINE_FPSTR(LS_HELP_STRING)},
 };
 const uint8_t NUM_COMMANDS_F =
-    sizeof(DISPATCH_TABLE_F) / sizeof(DispatchRecordF);
+    sizeof(DISPATCH_TABLE_F) / sizeof(DispatchRecord<__FlashStringHelper>);
 
 test(CommandDispatcherF_findCommand) {
-  const DispatchRecordF* record = CommandDispatcherF::findCommand(
-      DISPATCH_TABLE_F, NUM_COMMANDS, "echo");
+  const DispatchRecord<__FlashStringHelper>* record =
+      CommandDispatcher<__FlashStringHelper>::findCommand(
+          DISPATCH_TABLE_F, NUM_COMMANDS, "echo");
   assertEqual((uintptr_t) record->command, (uintptr_t) dummyCommand);
   assertEqual((uintptr_t) record->name, (uintptr_t) ECHO_COMMAND);
   assertEqual((uintptr_t) record->helpString, (uintptr_t) ECHO_HELP_STRING);
 
-  record = CommandDispatcherF::findCommand(
+  record = CommandDispatcher<__FlashStringHelper>::findCommand(
       DISPATCH_TABLE_F, NUM_COMMANDS, "NOTFOUND");
   assertEqual((uintptr_t) record, (uintptr_t) nullptr);
 }

@@ -134,7 +134,7 @@ class StreamReader {
 
     Stream& mStream;
     char* const mBuf;
-    int mBufSize;
+    const int mBufSize;
     int mIndex = 0;
     char mPushback = 0;
 };

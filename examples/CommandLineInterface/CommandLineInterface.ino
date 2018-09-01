@@ -140,44 +140,12 @@ void delayCommand(Print& printer, int argc, const char** argv) {
 #define USE_F_STRING 2
 #define STRING_MODE USE_F_STRING
 
+const uint8_t TABLE_SIZE = 4;
+
 #if STRING_MODE == USE_C_STRING
-
-const DispatchRecord<char> dispatchTable[] = {
-  {delayCommand, "delay", "(on | off) millis"},
-  {listCommand, "list", nullptr},
-  {freeCommand, "free", nullptr},
-  {echoCommand, "echo", "args ..."},
-};
-
-const uint8_t numCommands = sizeof(dispatchTable)
-    / sizeof(DispatchRecord<char>);
-
+DispatchTable<char> dispatchTable(TABLE_SIZE);
 #else
-
-/**
- * The F() macro works only inside methods, so we use this static function
- * to create and hold the dispatch table. Returns the pointer to the table
- * and sets the *numCommands to the number of entries.
- */
-static const DispatchRecord<__FlashStringHelper>*
-getDispatchTable(uint8_t* numCommands) {
-  static const DispatchRecord<__FlashStringHelper> dispatchTable[] = {
-    {delayCommand, F("delay"), F("(on | off) millis")},
-    {listCommand, F("list"), nullptr},
-    {freeCommand, F("free"), nullptr},
-    {echoCommand, F("echo"), F("args ...")},
-  };
-
-  *numCommands = sizeof(dispatchTable)
-      / sizeof(DispatchRecord<__FlashStringHelper>);
-
-  return dispatchTable;
-}
-
-uint8_t numCommands;
-const DispatchRecord<__FlashStringHelper>* dispatchTable =
-    getDispatchTable(&numCommands);
-
+DispatchTable<__FlashStringHelper> dispatchTable(TABLE_SIZE);
 #endif
 
 // Create an instance of the StreamReader.
@@ -185,17 +153,16 @@ const int BUF_SIZE = 64;
 char lineBuffer[BUF_SIZE];
 StreamReader streamReader(Serial, lineBuffer, BUF_SIZE);
 
-
 // Create an instance of the CommandDispatcher using either CStrings or
 // FStrings.
 const int8_t ARGV_SIZE = 10;
 const char* argv[ARGV_SIZE];
 #if STRING_MODE == USE_C_STRING
   CommandDispatcher<char> dispatcher(streamReader, Serial,
-      dispatchTable, numCommands, argv, ARGV_SIZE);
+      dispatchTable, argv, ARGV_SIZE);
 #else
   CommandDispatcher<__FlashStringHelper> dispatcher(streamReader, Serial,
-      dispatchTable, numCommands, argv, ARGV_SIZE);
+      dispatchTable, argv, ARGV_SIZE);
 #endif
 
 //---------------------------------------------------------------------------
@@ -203,6 +170,19 @@ const char* argv[ARGV_SIZE];
 void setup() {
   Serial.begin(115200);
   while (!Serial); // micro/leonardo
+
+  // add commands to dispatchTable
+#if STRING_MODE == USE_C_STRING
+  dispatchTable.add(delayCommand, "delay", "(on | off) millis");
+  dispatchTable.add(listCommand, "list", nullptr);
+  dispatchTable.add(freeCommand, "free", nullptr);
+  dispatchTable.add(echoCommand, "echo", "args ...");
+#else
+  dispatchTable.add(delayCommand, F("delay"), F("(on | off) millis"));
+  dispatchTable.add(listCommand, F("list"), nullptr);
+  dispatchTable.add(freeCommand, F("free"), nullptr);
+  dispatchTable.add(echoCommand, F("echo"), F("args ..."));
+#endif
 
   dispatcher.resume(); // insert into the scheduler
   CoroutineScheduler::setup();

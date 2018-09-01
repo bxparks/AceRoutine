@@ -50,51 +50,34 @@ testF(CommandDispatcherTest, tokenize) {
 void dummyCommand(Print& /* printer */, int /* argc */,
     const char** /* argv */) {}
 
-static const DispatchRecord<char> DISPATCH_TABLE[] = {
-  {dummyCommand, "echo", "args ..."},
-  {dummyCommand, "ls", "[flags] args ..."},
-};
-const uint8_t NUM_COMMANDS = sizeof(DISPATCH_TABLE)
-    / sizeof(DispatchRecord<char>);
+static const uint8_t TABLE_SIZE = 10;
 
-test(CommandDispatcherC_findCommand) {
-  const DispatchRecord<char>* record = CommandDispatcher<char>::findCommand(
-      DISPATCH_TABLE, NUM_COMMANDS, "echo");
+test(CommandDispatcher_char_findCommand) {
+  DispatchTable<char> dispatchTable(TABLE_SIZE);
+  dispatchTable.add(dummyCommand, "echo", "args ...");
+  dispatchTable.add(dummyCommand, "ls", "[flags] args ...");
+
+  const DispatchRecord<char>* record = dispatchTable.findCommand("echo");
   assertEqual((uintptr_t) record->command, (uintptr_t) dummyCommand);
   assertEqual((uintptr_t) record->name, (uintptr_t) "echo");
   assertEqual((uintptr_t) record->helpString, (uintptr_t) "args ...");
 
-  record = CommandDispatcher<char>::findCommand(
-      DISPATCH_TABLE, NUM_COMMANDS, "NOTFOUND");
+  record = dispatchTable.findCommand("NOTFOUND");
   assertEqual((uintptr_t) record, (uintptr_t) nullptr);
 }
 
-const char ECHO_COMMAND[] PROGMEM = "echo";
-const char ECHO_HELP_STRING[] PROGMEM = "args ...";
-const char LS_COMMAND[] PROGMEM = "ls";
-const char LS_HELP_STRING[] PROGMEM = "[flags] args ...";
+test(CommandDispatcher_flash_findCommand) {
+  DispatchTable<__FlashStringHelper> dispatchTable(TABLE_SIZE);
+  dispatchTable.add(dummyCommand, F("echo"), F("args ..."));
+  dispatchTable.add(dummyCommand, F("ls"), F("[flags] args ..."));
 
-static const DispatchRecord<__FlashStringHelper> DISPATCH_TABLE_F[] = {
-  {dummyCommand,
-      ACE_ROUTINE_FPSTR(ECHO_COMMAND),
-      ACE_ROUTINE_FPSTR(ECHO_HELP_STRING)},
-  {dummyCommand,
-      ACE_ROUTINE_FPSTR(LS_COMMAND),
-      ACE_ROUTINE_FPSTR(LS_HELP_STRING)},
-};
-const uint8_t NUM_COMMANDS_F =
-    sizeof(DISPATCH_TABLE_F) / sizeof(DispatchRecord<__FlashStringHelper>);
-
-test(CommandDispatcherF_findCommand) {
   const DispatchRecord<__FlashStringHelper>* record =
-      CommandDispatcher<__FlashStringHelper>::findCommand(
-          DISPATCH_TABLE_F, NUM_COMMANDS, "echo");
+      dispatchTable.findCommand("echo");
   assertEqual((uintptr_t) record->command, (uintptr_t) dummyCommand);
-  assertEqual((uintptr_t) record->name, (uintptr_t) ECHO_COMMAND);
-  assertEqual((uintptr_t) record->helpString, (uintptr_t) ECHO_HELP_STRING);
+  assertEqual(record->name, "echo");
+  assertEqual(record->helpString, "args ...");
 
-  record = CommandDispatcher<__FlashStringHelper>::findCommand(
-      DISPATCH_TABLE_F, NUM_COMMANDS, "NOTFOUND");
+  record = dispatchTable.findCommand("NOTFOUND");
   assertEqual((uintptr_t) record, (uintptr_t) nullptr);
 }
 

@@ -25,7 +25,7 @@ SOFTWARE.
 #ifndef ACE_ROUTINE_COMMAND_DISPATCHER_H
 #define ACE_ROUTINE_COMMAND_DISPATCHER_H
 
-#include <Arduino.h> // Print
+#include <Print.h> // Print
 #include <AceRoutine.h>
 #include "StreamReader.h"
 
@@ -45,10 +45,74 @@ typedef void (*CommandHandler)(Print& printer, int argc, const char** argv);
  */
 template<typename T>
 struct DispatchRecord {
-  const CommandHandler command;
+  CommandHandler command;
   const T* name;
   const T* helpString;
 };
+
+/** A command dispatch table. */
+template<typename T>
+class DispatchTable {
+  public:
+    DispatchTable(uint8_t tableSize):
+        mTableSize(tableSize) {
+      mDispatchTable = new DispatchRecord<T>[tableSize];
+    }
+
+    ~DispatchTable() {
+      delete[] mDispatchTable;
+    }
+
+    const DispatchRecord<T>* get(uint8_t i) const {
+      return &mDispatchTable[i];
+    }
+
+    uint8_t size() const { return mNumCommands; }
+
+    void add(CommandHandler command, const T* name, const T* helpString) {
+      if (mNumCommands < mTableSize) {
+        mDispatchTable[mNumCommands] = {command, name, helpString};
+        mNumCommands++;
+      }
+    }
+
+    /**
+     * Find the CommandHandler of the given command name. VisibleForTesting.
+     *
+     * NOTE: this is currently a linear O(N) scan which is good enough for
+     * small number of commands. If we sorted the handlers, we could do a
+     * binary search for O(log(N)) and handle larger number of commands.
+     */
+    const DispatchRecord<T>* findCommand(const char* cmd) const {
+      for (uint8_t i = 0; i < mNumCommands; i++) {
+        const DispatchRecord<T>* record = &mDispatchTable[i];
+        if (compare(cmd, record->name) == 0) {
+          return record;
+        }
+      }
+      return nullptr;
+    }
+
+    /** Return 0 if 'cmd' matches 'name'. */
+    static int compare(const char* cmd, const T* name);
+
+  private:
+    const uint8_t mTableSize;
+    DispatchRecord<T>* mDispatchTable;
+    uint8_t mNumCommands = 0;
+};
+
+template<>
+int DispatchTable<char>::compare(
+    const char* cmd, const char* name) {
+  return strcmp(cmd, name);
+}
+
+template<>
+int DispatchTable<__FlashStringHelper>::compare(
+    const char* cmd, const __FlashStringHelper* name) {
+  return strcmp_P(cmd, (const char*) name);
+}
 
 /**
  * A coroutine that reads lines from the Serial port, tokenizes the line on
@@ -81,14 +145,12 @@ class CommandDispatcher: public Coroutine {
     CommandDispatcher(
             StreamReader& streamReader,
             Print& printer,
-            const DispatchRecord<T>* dispatchTable,
-            uint8_t numCommands,
+            const DispatchTable<T>& dispatchTable,
             const char** argv,
             uint8_t argvSize):
         mStreamReader(streamReader),
         mPrinter(printer),
         mDispatchTable(dispatchTable),
-        mNumCommands(numCommands),
         mArgv(argv),
         mArgvSize(argvSize) {}
 
@@ -106,26 +168,6 @@ class CommandDispatcher: public Coroutine {
       }
       return argc;
     }
-
-    /**
-     * Find the CommandHandler of the given command name. VisibleForTesting.
-     *
-     * NOTE: this is currently a linear O(N) scan which is good enough for
-     * small number of commands. If we sorted the handlers, we could do a
-     * binary search for O(log(N)) and handle larger number of commands.
-     */
-    static const DispatchRecord<T>* findCommand(
-        const DispatchRecord<T>* dispatchTable,
-        uint8_t numCommands, const char* cmd) {
-      for (uint8_t i = 0; i < numCommands; i++) {
-        const DispatchRecord<T>* record = &dispatchTable[i];
-        if (compare(cmd, record->name) == 0) {
-          return record;
-        }
-      }
-      return nullptr;
-    }
-
 
   protected:
     // Disable copy-constructor and assignment operator
@@ -175,8 +217,8 @@ class CommandDispatcher: public Coroutine {
 
     /** Print generic help. */
     void helpGeneric(Print& printer) const {
-      for (uint8_t i = 0; i < mNumCommands; i++) {
-        const DispatchRecord<T>* record = &mDispatchTable[i];
+      for (uint8_t i = 0; i < mDispatchTable.size(); i++) {
+        const DispatchRecord<T>* record = mDispatchTable.get(i);
         printer.print(record->name);
         printer.print(' ');
       }
@@ -185,8 +227,7 @@ class CommandDispatcher: public Coroutine {
 
     /** Print helpString of specific cmd. Returns true if cmd was found. */
     bool helpSpecific(Print& printer, const char* cmd) const {
-      const DispatchRecord<T>* record =
-          findCommand(mDispatchTable, mNumCommands, cmd);
+      const DispatchRecord<T>* record = mDispatchTable.findCommand(cmd);
       if (record != nullptr) {
         printer.print(F("Usage: "));
         printer.print(cmd);
@@ -216,8 +257,7 @@ class CommandDispatcher: public Coroutine {
     /** Find and run the given command. */
     void findAndRunCommand(
         const char* cmd, int argc, const char** argv) const {
-      const DispatchRecord<T>* record =
-          findCommand(mDispatchTable, mNumCommands, cmd);
+      const DispatchRecord<T>* record = mDispatchTable.findCommand(cmd);
       if (record != nullptr) {
         record->command(mPrinter, argc, argv);
         return;
@@ -246,28 +286,12 @@ class CommandDispatcher: public Coroutine {
       }
     }
 
-    /** Return 0 if 'cmd' matches 'name'. */
-    static int compare(const char* cmd, const T* name);
-
     StreamReader& mStreamReader;
     Print& mPrinter;
-    const DispatchRecord<T>* const mDispatchTable;
-    const uint8_t mNumCommands;
+    const DispatchTable<T>& mDispatchTable;
     const char** const mArgv;
     const uint8_t mArgvSize;
 };
-
-template<>
-int CommandDispatcher<char>::compare(
-    const char* cmd, const char* name) {
-  return strcmp(cmd, name);
-}
-
-template<>
-int CommandDispatcher<__FlashStringHelper>::compare(
-    const char* cmd, const __FlashStringHelper* name) {
-  return strcmp_P(cmd, (const char*) name);
-}
 
 template<typename T>
 const char CommandDispatcher<T>::DELIMS[] = " \t\n";

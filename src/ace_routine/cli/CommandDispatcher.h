@@ -228,6 +228,8 @@ class CommandDispatcher: public Coroutine {
     void helpCommandHandler(Print& printer, int argc, const char** argv) const {
       if (argc == 2) {
         const char* cmd = argv[1];
+
+        // check for "help help"
         if (strcmp(cmd, "help") == 0) {
           printer.println(F("Usage: help [command]"));
           return;
@@ -238,20 +240,19 @@ class CommandDispatcher: public Coroutine {
         printer.print(F("Unknown command: "));
         printer.println(cmd);
       } else {
-        printer.println(F("Usage: help [command]"));
-        printer.print(F("Commands: help "));
-        helpGeneric(printer);
+        printer.println(F("Commands:"));
+        printer.println(F("  help [command]"));
+        helpAll(printer);
       }
     }
 
-    /** Print generic help. */
-    void helpGeneric(Print& printer) const {
+    /** Print help on all commands */
+    void helpAll(Print& printer) const {
       for (uint8_t i = 0; i < mDispatchTable.size(); i++) {
         const DispatchRecord<T>* record = mDispatchTable.get(i);
-        printer.print(record->name);
-        printer.print(' ');
+        printer.print("  ");
+        printHelp(printer, record);
       }
-      printer.println();
     }
 
     /** Print helpString of specific cmd. Returns true if cmd was found. */
@@ -259,12 +260,20 @@ class CommandDispatcher: public Coroutine {
       const DispatchRecord<T>* record = mDispatchTable.findCommand(cmd);
       if (record != nullptr) {
         printer.print(F("Usage: "));
-        printer.print(cmd);
-        printer.print(' ');
-        printer.println(record->helpString);
+        printHelp(printer, record);
         return true;
       }
       return false;
+    }
+
+    static void printHelp(Print& printer, const DispatchRecord<T>* record) {
+      printer.print(record->name);
+      if (record->helpString != nullptr) {
+        printer.print(' ');
+        printer.println(record->helpString);
+      } else {
+        printer.println();
+      }
     }
 
     /** Tokenize the given line and run the command handler. */

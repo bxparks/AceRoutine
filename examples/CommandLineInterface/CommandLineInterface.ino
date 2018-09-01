@@ -142,12 +142,14 @@ void delayCommand(Print& printer, int argc, const char** argv) {
 const uint8_t TABLE_SIZE = 4;
 const uint8_t BUF_SIZE = 64;
 const uint8_t ARGV_SIZE = 10;
+const char PROMPT[] = "$ ";
 
 #if STRING_MODE == USE_C_STRING
-CommandManager<char, BUF_SIZE, ARGV_SIZE> commandManager(Serial, TABLE_SIZE);
+CommandManager<char, BUF_SIZE, ARGV_SIZE>
+    commandManager(Serial, TABLE_SIZE, PROMPT);
 #else
 CommandManager<__FlashStringHelper, BUF_SIZE, ARGV_SIZE>
-    commandManager(Serial, TABLE_SIZE);
+    commandManager(Serial, TABLE_SIZE, PROMPT);
 #endif
 
 //---------------------------------------------------------------------------

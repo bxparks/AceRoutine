@@ -169,6 +169,25 @@ class CommandDispatcher: public Coroutine {
       return argc;
     }
 
+    virtual int run() override {
+      bool isError;
+      char* line;
+      COROUTINE_LOOP() {
+        COROUTINE_AWAIT(mStreamReader.getLine(&isError, &line));
+
+        if (isError) {
+          printLineError(line, STATUS_BUFFER_OVERFLOW);
+          while (isError) {
+            COROUTINE_AWAIT(mStreamReader.getLine(&isError, &line));
+            printLineError(line, STATUS_FLUSH_TO_EOL);
+          }
+          continue;
+        }
+
+        runCommand(line);
+      }
+    }
+
   protected:
     // Disable copy-constructor and assignment operator
     CommandDispatcher(const CommandDispatcher&) = delete;
@@ -265,25 +284,6 @@ class CommandDispatcher: public Coroutine {
 
       mPrinter.print(F("Unknown command: "));
       mPrinter.println(cmd);
-    }
-
-    virtual int run() override {
-      bool isError;
-      char* line;
-      COROUTINE_LOOP() {
-        COROUTINE_AWAIT(mStreamReader.getLine(&isError, &line));
-
-        if (isError) {
-          printLineError(line, STATUS_BUFFER_OVERFLOW);
-          while (isError) {
-            COROUTINE_AWAIT(mStreamReader.getLine(&isError, &line));
-            printLineError(line, STATUS_FLUSH_TO_EOL);
-          }
-          continue;
-        }
-
-        runCommand(line);
-      }
     }
 
     StreamReader& mStreamReader;

@@ -14,8 +14,7 @@
 
 #include <Arduino.h>
 #include <AceRoutine.h>
-#include "ace_routine/cli/StreamReader.h"
-#include "ace_routine/cli/CommandDispatcher.h"
+#include "ace_routine/cli/CommandManager.h"
 
 using namespace ace_routine;
 using namespace ace_routine::cli;
@@ -141,28 +140,14 @@ void delayCommand(Print& printer, int argc, const char** argv) {
 #define STRING_MODE USE_F_STRING
 
 const uint8_t TABLE_SIZE = 4;
+const uint8_t BUF_SIZE = 64;
+const uint8_t ARGV_SIZE = 10;
 
 #if STRING_MODE == USE_C_STRING
-DispatchTable<char> dispatchTable(TABLE_SIZE);
+CommandManager<char, BUF_SIZE, ARGV_SIZE> commandManager(Serial, TABLE_SIZE);
 #else
-DispatchTable<__FlashStringHelper> dispatchTable(TABLE_SIZE);
-#endif
-
-// Create an instance of the StreamReader.
-const int BUF_SIZE = 64;
-char lineBuffer[BUF_SIZE];
-StreamReader streamReader(Serial, lineBuffer, BUF_SIZE);
-
-// Create an instance of the CommandDispatcher using either CStrings or
-// FStrings.
-const int8_t ARGV_SIZE = 10;
-const char* argv[ARGV_SIZE];
-#if STRING_MODE == USE_C_STRING
-  CommandDispatcher<char> dispatcher(streamReader, Serial,
-      dispatchTable, argv, ARGV_SIZE);
-#else
-  CommandDispatcher<__FlashStringHelper> dispatcher(streamReader, Serial,
-      dispatchTable, argv, ARGV_SIZE);
+CommandManager<__FlashStringHelper, BUF_SIZE, ARGV_SIZE>
+    commandManager(Serial, TABLE_SIZE);
 #endif
 
 //---------------------------------------------------------------------------
@@ -171,20 +156,20 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // micro/leonardo
 
-  // add commands to dispatchTable
+  // add commands to CommandManager
 #if STRING_MODE == USE_C_STRING
-  dispatchTable.add(delayCommand, "delay", "(on | off) millis");
-  dispatchTable.add(listCommand, "list", nullptr);
-  dispatchTable.add(freeCommand, "free", nullptr);
-  dispatchTable.add(echoCommand, "echo", "args ...");
+  commandManager.add(delayCommand, "delay", "(on | off) millis");
+  commandManager.add(listCommand, "list", nullptr);
+  commandManager.add(freeCommand, "free", nullptr);
+  commandManager.add(echoCommand, "echo", "args ...");
 #else
-  dispatchTable.add(delayCommand, F("delay"), F("(on | off) millis"));
-  dispatchTable.add(listCommand, F("list"), nullptr);
-  dispatchTable.add(freeCommand, F("free"), nullptr);
-  dispatchTable.add(echoCommand, F("echo"), F("args ..."));
+  commandManager.add(delayCommand, F("delay"), F("(on | off) millis"));
+  commandManager.add(listCommand, F("list"), nullptr);
+  commandManager.add(freeCommand, F("free"), nullptr);
+  commandManager.add(echoCommand, F("echo"), F("args ..."));
 #endif
 
-  dispatcher.resume(); // insert into the scheduler
+  commandManager.resume(); // insert into the scheduler
   CoroutineScheduler::setup();
 }
 

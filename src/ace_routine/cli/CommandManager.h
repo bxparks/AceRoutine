@@ -50,14 +50,18 @@ class CommandManager: public Coroutine {
   public:
     
     /**
-     * @param serial the serial port used to read commands and send output,
+     * @param serial The serial port used to read commands and send output,
      * will normally be 'Serial', but can be set to something else.
-     * @param tableSize maximum number of commands in the dispatch table
+     * @param tableSize Maximum number of commands in the dispatch table.
+     * @param prompt If not null, print a prompt and echo the command entered
+     * by the user. If null, don't print prompt and don't echo.
      */
-    CommandManager(Stream& serial, uint8_t tableSize):
+    CommandManager(Stream& serial, uint8_t tableSize,
+            const char* prompt = nullptr):
         mStreamReader(serial, mLineBuffer, BUF_SIZE),
         mDispatchTable(tableSize),
-        mDispatcher(mStreamReader, serial, mDispatchTable, mArgv, ARGV_SIZE) {}
+        mDispatcher(mStreamReader, serial, mDispatchTable, mArgv, ARGV_SIZE,
+            prompt) {}
 
     /**
      * Add the given command handler, name and help string to the internal

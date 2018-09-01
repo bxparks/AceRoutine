@@ -136,23 +136,27 @@ class CommandDispatcher: public Coroutine {
      *
      * @param streamReader An instance of StreamReader.
      * @param printer The output object, normally the global Serial object.
-     * @param numCommands Number of entries in the dispatchTable.
+     * @param dispatchTable List of command handlers and their command names.
      * @param argv Array of (const char*) that will be used to hold the word
      * tokens of a command line string.
      * @param argvSize The size of the argv array. Tokens which are beyond this
      * limit will be silently dropped.
+     * @param prompt If not null, print a prompt and echo the command entered
+     * by the user. If null, don't print prompt and don't echo.
      */
     CommandDispatcher(
             StreamReader& streamReader,
             Print& printer,
             const DispatchTable<T>& dispatchTable,
             const char** argv,
-            uint8_t argvSize):
+            uint8_t argvSize,
+            const char* prompt):
         mStreamReader(streamReader),
         mPrinter(printer),
         mDispatchTable(dispatchTable),
         mArgv(argv),
-        mArgvSize(argvSize) {}
+        mArgvSize(argvSize),
+        mPrompt(prompt) {}
 
     /**
      * Tokenize the line, and fill argv with each token until argvSize is
@@ -173,6 +177,9 @@ class CommandDispatcher: public Coroutine {
       bool isError;
       char* line;
       COROUTINE_LOOP() {
+        if (mPrompt != nullptr) {
+          mPrinter.print(mPrompt);
+        }
         COROUTINE_AWAIT(mStreamReader.getLine(&isError, &line));
 
         if (isError) {
@@ -184,6 +191,9 @@ class CommandDispatcher: public Coroutine {
           continue;
         }
 
+        if (mPrompt != nullptr) {
+          mPrinter.print(line); // line includes the \n
+        }
         runCommand(line);
       }
     }
@@ -291,6 +301,7 @@ class CommandDispatcher: public Coroutine {
     const DispatchTable<T>& mDispatchTable;
     const char** const mArgv;
     const uint8_t mArgvSize;
+    const char* const mPrompt;
 };
 
 template<typename T>

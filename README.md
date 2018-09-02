@@ -799,9 +799,9 @@ void loop() {
 ```
 
 There are 3 versions of the `init()` method:
-    * `init()` - insert an anonymous coroutine
-    * `init(const char* name)` - insert a named coroutine
-    * `init(const __FlashStringHelper* name)` - insert a named coroutine
+* `init()` - insert an anonymous coroutine
+* `init(const char* name)` - insert a named coroutine
+* `init(const __FlashStringHelper* name)` - insert a named coroutine
 
 All 3 have been designed so that they are safe to be called from the constructor
 of a `Coroutine` class, even during static initialization time. This is exactly

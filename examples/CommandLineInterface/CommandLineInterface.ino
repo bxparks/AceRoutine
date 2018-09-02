@@ -165,7 +165,7 @@ void setup() {
   commandManager.add(freeCommand, FF("free"), nullptr);
   commandManager.add(echoCommand, FF("echo"), FF("args ..."));
 
-  commandManager.resume(); // insert into the scheduler
+  commandManager.init("CommandManager"); // insert into the scheduler
   CoroutineScheduler::setup();
 }
 

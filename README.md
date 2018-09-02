@@ -781,12 +781,12 @@ ManualCoroutine manualRoutine;
 
 A manual coroutine (created without the `COROUTINE()` macro) is *not*
 automatically added to the linked list used by the `CoroutineScheduler`. If you
-wish to insert it into the scheduler, use the `resume()` method just before
+wish to insert it into the scheduler, use the `init()` method just before
 calling `CoroutineScheduler::setup()`:
 ```
 void setup() {
   ...
-  manualRoutine.resume();
+  manualRoutine.init("manualRoutine");
   CoroutineScheduler::setup();
   ...
 }
@@ -798,16 +798,36 @@ void loop() {
 }
 ```
 
-The `Coroutine::resume()` method can be called at anytime to insert into the
-scheduler, but calling it in the global `setup()` makes things simple.
+There are 3 versions of the `init()` method:
+    * `init()` - insert an anonymous coroutine
+    * `init(const char* name)` - insert a named coroutine
+    * `init(const __FlashStringHelper* name)` - insert a named coroutine
 
-The name of a manually created coroutine is set to be `nullptr` because the
-`COROUTINE()` macro was not used. When printed (e.g. using the
-`CoroutineScheduler::list()` method), the name is represented by the integer
-representation of the `this` pointer of the coroutine object.
+All 3 have been designed so that they are safe to be called from the constructor
+of a `Coroutine` class, even during static initialization time. This is exactly
+what the `COROUTINE()` macro does, call the `init()` method from the generated
+constructor. However, a manual coroutine is often written as a library that is
+supposed to be used by an end-user, and it would be convenient for the name of
+the coroutine to be defined by the end-user. The problem is that the `F()` macro
+cannot be used outside of the function context, so it is cannot be passed into
+the constructor when the coroutine is statically created. The workaround is to
+call the `init()` method in the global `setup()` function, where the `F()` macro
+is allowed to be used. (The other more obscure reason is that the constructor of
+the manual coroutine class will often have a large number of dependency
+injection parameters which are required to implement its functionality, and it
+is cleaner to avoid mixing in the name of the `Coroutine` which is an incidental
+dependency. Anyway, that's my rationale right now, but this may change in the
+future if a simpler alternative is discovered.)
+
+If the coroutine is not given a name, the name is stored as a `nullptr`. When
+printed (e.g. using the `CoroutineScheduler::list()` method), the name of an
+anonymous coroutine is represented by the integer representation of the `this`
+pointer of the coroutine object.
 
 A good example of a manual coroutine is
-[src/ace_routine/cli/CommandDispatcher.h](src/ace_routine/cli/CommandDispatcher.h).
+[src/ace_routine/cli/CommandManager.h](src/ace_routine/cli/CommandManager.h)
+and you can see how it is configured in
+[examples/CommandLineInterface](examples/CommandLineInterface).
 
 ### External Coroutines
 

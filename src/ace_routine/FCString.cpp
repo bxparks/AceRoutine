@@ -25,6 +25,7 @@ SOFTWARE.
 // Much of this copied from AUnit/src/aunit/FCString.h and
 // AUnit/src/aunit/Compare.h.
 
+#include <stdint.h> // uintptr_t
 #include <string.h> // strcmp()
 #include <Print.h> // Print
 #include "Flash.h"
@@ -34,7 +35,7 @@ namespace ace_routine {
 
 size_t FCString::printTo(Print& printer) const {
   if (mString.cstring == nullptr) {
-    return printer.print((unsigned long) this);
+    return printer.print((uintptr_t) this);
   }
 
   if (mStringType == kCStringType) {

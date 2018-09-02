@@ -321,6 +321,48 @@ class Coroutine {
       return mStatus == kStatusEnding || mStatus == kStatusTerminated;
     }
 
+    /**
+     * Initialize the coroutine for the CoroutineScheduler, set it to Yielding
+     * state, and add it to the linked list of coroutines.
+     *
+     * This is publicly exposed because of a bug in ESP8266 where the F()
+     * string given in the constructor parameter breaks, but can be given
+     * inside the constructor (see
+     * https://github.com/esp8266/Arduino/issues/3369). The COROUTINE macro
+     * tries to get around that bug using the init() method directly, instead
+     * of passing the name of the coroutine through the constructor.
+     *
+     * It turns out that exposing this has the benefit that it allows Custom or
+     * Manual coroutines to be given a name and added to the
+     * CoroutineScheduler. TODO: Maybe change the init() methods to something
+     * like initForScheduler() or setupForScheduler() to be more descriptive?
+     *
+     * @param name The name of the coroutine as a human-readable string.
+     */
+    void init(const char* name) {
+      mName = FCString(name);
+      mStatus = kStatusYielding;
+      insertSorted();
+    }
+
+    /** Same as init(const char*) except using flash string type. */
+    void init(const __FlashStringHelper* name) {
+      mName = FCString(name);
+      mStatus = kStatusYielding;
+      insertSorted();
+    }
+
+    /**
+     * Initialize for the anonymous CoroutineScheduler by inserting into the
+     * linked list. All anonymous coroutines are inserted at the start of the
+     * list. The order will be in reverse order to the calls to init(). In
+     * other words, the last init() wil be the first item in the list.
+     */
+    void init() {
+      mStatus = kStatusYielding;
+      insertSorted();
+    }
+
   protected:
     /**
      * The execution status of the coroutine, corresponding to the
@@ -382,25 +424,6 @@ class Coroutine {
 
     /** Constructor. */
     Coroutine() {}
-
-    /**
-     * Initialize the coroutine, set it to Yielding state, and add it to the
-     * linked list of coroutines.
-     *
-     * @param name The name of the coroutine as a human-readable string.
-     */
-    void init(const char* name) {
-      mName = FCString(name);
-      mStatus = kStatusYielding;
-      insertSorted();
-    }
-
-    /** Same as init(const char*) except using flash string type. */
-    void init(const __FlashStringHelper* name) {
-      mName = FCString(name);
-      mStatus = kStatusYielding;
-      insertSorted();
-    }
 
     /** Return the status of the coroutine. Used by the CoroutineScheduler. */
     Status getStatus() const { return mStatus; }

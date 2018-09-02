@@ -114,7 +114,7 @@ void CoroutineScheduler::listCoroutines(Print& printer) {
   for (Coroutine** p = Coroutine::getRoot(); (*p) != nullptr;
       p = (*p)->getNext()) {
     printer.print(F("Coroutine "));
-    (*p)->getName().print(printer);
+    (*p)->getName().printTo(printer);
     printer.print(F("; status: "));
     printer.println((*p)->getStatus());
   }

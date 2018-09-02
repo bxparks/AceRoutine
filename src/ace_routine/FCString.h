@@ -49,9 +49,6 @@ namespace ace_routine {
  * (Teensy-ARM or ESP8266) bytes big, so the cost of 50-100 bytes of static
  * memory for a large suite of 25 unit tests does not seem worth the minor
  * convenience.
- *
- * Instead, the print() and println() methods invert the dependency and
- * accept a pointer to 'Print'.
  */
 class FCString {
   public:
@@ -82,11 +79,13 @@ class FCString {
     /** Get the flash string pointer. */
     const __FlashStringHelper* getFString() const { return mString.fstring; }
 
-    /** Convenience method for printing an FCString. */
-    void print(Print& printer) const;
-
-    /** Convenience method for printing an FCString. */
-    void println(Print& printer) const;
+    /**
+     * Convenience method for printing an FCString to printer. This is
+     * identical to the method in Printable but we don't derive from Printable
+     * because we don't want to want to pay the memory cost of the vtable
+     * pointer for such a small class.
+     */
+    size_t printTo(Print& printer) const;
 
     /** Compare to another FCString. */
     int compareTo(const FCString& that) const;

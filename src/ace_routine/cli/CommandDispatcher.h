@@ -159,8 +159,10 @@ class CommandDispatcher: public Coroutine {
         mPrompt(prompt) {}
 
     /**
-     * Tokenize the line, and fill argv with each token until argvSize is
-     * reached. Return the number of tokens. VisibleForTesting.
+     * Tokenize the line, separating tokens delimited by whitespace (space,
+     * formfeed, carriage return, newline, tab, and vertical tab) and fill argv
+     * with each token until argvSize is reached. Return the number of tokens
+     * filled in. VisibleForTesting.
      */
     static uint8_t tokenize(char* line, const char** argv, uint8_t argvSize) {
       char* token = strtok(line, DELIMS);
@@ -313,8 +315,9 @@ class CommandDispatcher: public Coroutine {
     const char* const mPrompt;
 };
 
+// Same whitespace characters used by isspace() in the standard C99 library.
 template<typename T>
-const char CommandDispatcher<T>::DELIMS[] = " \t\n";
+const char CommandDispatcher<T>::DELIMS[] = " \f\r\n\t\v";
 
 }
 }

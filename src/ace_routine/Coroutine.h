@@ -59,7 +59,7 @@ SOFTWARE.
  * a subclass of Coroutine.
  *
  * The code in {} following this macro becomes the body of the
- * Coroutine::run() method.
+ * Coroutine::runCoroutine() method.
  */
 #define COROUTINE(...) \
     GET_COROUTINE(__VA_ARGS__, COROUTINE2, COROUTINE1)(__VA_ARGS__)
@@ -69,24 +69,24 @@ SOFTWARE.
 #define COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
-  virtual int run() override \
+  virtual int runCoroutine() override \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 Coroutine_##name :: Coroutine_##name() { \
   setupCoroutine(ACE_ROUTINE_F(#name)); \
 } \
-int Coroutine_##name :: run()
+int Coroutine_##name :: runCoroutine()
 
 #define COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
-  virtual int run() override \
+  virtual int runCoroutine() override \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 className##_##name :: className##_##name() { \
   setupCoroutine(ACE_ROUTINE_F(#name)); \
 } \
-int className##_##name :: run()
+int className##_##name :: runCoroutine()
 
 /**
  * Create an extern reference to a coroutine that is defined in another .cpp
@@ -105,7 +105,7 @@ int className##_##name :: run()
 #define EXTERN_COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
-  virtual int run() override \
+  virtual int runCoroutine() override \
     __attribute__((__noinline__,__noclone__)); \
 }; \
 extern Coroutine_##name name
@@ -113,7 +113,7 @@ extern Coroutine_##name name
 #define EXTERN_COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
-  virtual int run() override \
+  virtual int runCoroutine() override \
     __attribute__((__noinline__,__noclone__)); \
 }; \
 extern className##_##name name
@@ -183,7 +183,7 @@ extern className##_##name name
 * matches the global delay(millis) function already provided by the Arduino
 * API. Also having a separate kStatusDelaying state allows the
 * CoroutineScheduler to be slightly more efficient by avoiding the call to
-* Coroutine::run() if the delay has not expired.
+* Coroutine::runCoroutine() if the delay has not expired.
 */
 #define COROUTINE_DELAY(delayMillis) \
     do { \
@@ -196,7 +196,7 @@ extern className##_##name name
     } while (false)
 
 /**
- * Mark the end of a coroutine. Subsequent calls to Coroutine::run()
+ * Mark the end of a coroutine. Subsequent calls to Coroutine::runCoroutine()
  * will do nothing.
  */
 #define COROUTINE_END() \
@@ -212,7 +212,7 @@ namespace ace_routine {
 
 /**
  * Base class of all coroutines. The actual coroutine code is an implementation
- * of the virtual run() method.
+ * of the virtual runCoroutine() method.
  */
 class Coroutine {
   friend class CoroutineScheduler;
@@ -245,7 +245,7 @@ class Coroutine {
      * the macros (e.g. COROUTINE_YIELD(), COROUTINE_DELAY(), COROUTINE_AWAIT()
      * or COROUTINE_END()).
      */
-    virtual int run() = 0;
+    virtual int runCoroutine() = 0;
 
     /**
      * Returns the current millisecond clock. By default it returns the global
@@ -434,10 +434,16 @@ class Coroutine {
     /** Return the status of the coroutine. Used by the CoroutineScheduler. */
     Status getStatus() const { return mStatus; }
 
-    /** Pointer to label where execute will start on the next call to run(). */
+    /**
+     * Pointer to label where execute will start on the next call to
+     * runCoroutine().
+     */
     void setJump(void* jumpPoint) { mJumpPoint = jumpPoint; }
 
-    /** Pointer to label where execute will start on the next call to run(). */
+    /**
+     * Pointer to label where execute will start on the next call to
+     * runCoroutine().
+     */
     void* getJump() const { return mJumpPoint; }
 
     /** Set the kStatusRunning state. */
@@ -461,7 +467,8 @@ class Coroutine {
      * use-cases. (The '- 1' comes from an edge case where isDelayExpired()
      * evaluates to be true in the CoroutineScheduler::runCoroutine() but
      * becomes to be false in the COROUTINE_DELAY() macro inside
-     * Coroutine::run()) because the clock increments by 1 millisecond.)
+     * Coroutine::runCoroutine()) because the clock increments by 1
+     * millisecond.)
      */
     void setDelay(uint16_t delayMillisDuration) {
       mDelayStartMillis = millis();

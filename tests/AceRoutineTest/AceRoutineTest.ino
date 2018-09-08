@@ -40,32 +40,32 @@ COROUTINE(TestableCoroutine, simpleCoroutine) {
   COROUTINE_END();
 }
 
-// Verify that multiple calls to Coroutine::run() after it ends is ok.
+// Verify that multiple calls to Coroutine::runCoroutine() after it ends is ok.
 test(simpleCoroutine) {
   simpleCoroutine.millis(0);
   assertTrue(simpleCoroutine.isSuspended());
 
-  simpleCoroutine.run();
+  simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isYielding());
 
-  simpleCoroutine.run();
+  simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isDelaying());
 
-  simpleCoroutine.run();
+  simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isDelaying());
 
   simpleCoroutine.millis(1);
-  simpleCoroutine.run();
+  simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isAwaiting());
 
-  simpleCoroutine.run();
+  simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isAwaiting());
 
   simpleCoroutineFlag = true;
-  simpleCoroutine.run();
+  simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isEnding());
 
-  simpleCoroutine.run();
+  simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isEnding());
 }
 

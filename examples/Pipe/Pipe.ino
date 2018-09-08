@@ -68,6 +68,6 @@ void setup() {
 }
 
 void loop() {
-  reader.run();
-  writer.run();
+  reader.runCoroutine();
+  writer.runCoroutine();
 }

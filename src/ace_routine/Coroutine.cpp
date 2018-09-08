@@ -53,8 +53,9 @@ void Coroutine::resume() {
 
   // We lost the original state of the coroutine when suspend() was called but
   // the coroutine will automatically go back into the original state when
-  // Coroutine::run() is called because COROUTINE_YIELD(), COROUTINE_DELAY()
-  // and COROUTINE_AWAIT() are written to restore their status.
+  // Coroutine::runCoroutine() is called because COROUTINE_YIELD(),
+  // COROUTINE_DELAY() and COROUTINE_AWAIT() are written to restore their
+  // status.
   mStatus = kStatusYielding;
 
   // insert at the head of the linked list

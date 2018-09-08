@@ -36,11 +36,11 @@ namespace cli {
  * CommandDispatcher. It is not strictly necessary to use this, but the setup
  * is much easier using this class.
  *
- * This is a subclass of Coroutine, just like CommandDispatcher. The run()
- * method simply delegates to the underlying CommandDispatcher, so this class
- * can be used as a substitute for CommandDispatcher. The setupCoroutine()
- * method should be called to initialize the name of the coroutine and
- * insert it into the CoroutineScheduler.
+ * This is a subclass of Coroutine, just like CommandDispatcher. The
+ * runCoroutine() method simply delegates to the underlying CommandDispatcher,
+ * so this class can be used as a substitute for CommandDispatcher. The
+ * setupCoroutine() method should be called to initialize the name of the
+ * coroutine and insert it into the CoroutineScheduler.
  *
  * Example usage:
  *
@@ -96,8 +96,8 @@ class CommandManager: public Coroutine {
       mDispatchTable.add(command, name, help);
     }
 
-    virtual int run() override {
-      return mDispatcher.run();
+    virtual int runCoroutine() override {
+      return mDispatcher.runCoroutine();
     }
 
   private:

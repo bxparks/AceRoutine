@@ -119,9 +119,9 @@ void setup() {
 }
 
 void loop() {
-  blinkLed.run();
-  printHello.run();
-  printWorld.run();
+  blinkLed.runCoroutine();
+  printHello.runCoroutine();
+  printWorld.runCoroutine();
 }
 ```
 
@@ -293,9 +293,9 @@ name of this generated class.
 ### Coroutine Body
 
 The code immediately following the `COROUTINE()` macro becomes the body of the
-`Coroutine::run()` virtual method. Within this `run()` method, various helper
-macros (e.g. `COROUTINE_BEGIN()`, `COROUTINE_YIELD()`, `COROUTINE_DELAY()`, etc)
-can be used. These helper macros are described below.
+`Coroutine::runCoroutine()` virtual method. Within this `runCoroutine()` method,
+various helper macros (e.g. `COROUTINE_BEGIN()`, `COROUTINE_YIELD()`,
+`COROUTINE_DELAY()`, etc) can be used. These helper macros are described below.
 
 ### Begin and End Markers
 
@@ -544,7 +544,7 @@ COROUTINE(inner) {
 COROUTINE(outer) {
   COROUTINE_LOOP() {
     ...
-    inner.run();
+    inner.runCoroutine();
     ...
     COROUTINE_YIELD();
   }
@@ -564,13 +564,13 @@ There are 2 ways to run the coroutines:
 #### Manual Scheduling
 
 If you have only a small number of coroutines, the manual method may be the
-easiest. This requires you to explicitly call the `run()` method of all the
-coroutines that you wish to run in the `loop()` method, like this:
+easiest. This requires you to explicitly call the `runCoroutine()` method of all
+the coroutines that you wish to run in the `loop()` method, like this:
 ```
 void loop() {
-  blinkLed.run();
-  printHello.run();
-  printWorld.run();
+  blinkLed.runCoroutine();
+  printHello.runCoroutine();
+  printWorld.runCoroutine();
 }
 ```
 
@@ -731,7 +731,7 @@ class CustomCoroutine : public Coroutine {
   public:
     void enable(bool isEnabled) { enabled = isEnabled; }
 
-    // the run() method will be defined by the COROUTINE() macro
+    // the runCoroutine() method will be defined by the COROUTINE() macro
 
   protected:
     bool enabled = 0;
@@ -754,7 +754,7 @@ share methods or data structures.
 ### Manual Coroutines
 
 An manual coroutine is a custom coroutine whose body of the coroutine (i.e
-the`run()` method) is defined manually and the coroutine object is also
+the`runCoroutine()` method) is defined manually and the coroutine object is also
 instantiated manually, instead of using the `COROUTINE()` macro. This is useful
 if the coroutine has external dependencies which need to be injected into the
 constructor. The `COROUTINE()` macro does not allow the constructor to be
@@ -769,7 +769,7 @@ class ManualCoroutine : public Coroutine {
     }
 
   private:
-    virtual int run() override {
+    virtual int runCoroutine() override {
       COROUTINE_BEGIN();
       // insert coroutine code here
       COROUTINE_END();

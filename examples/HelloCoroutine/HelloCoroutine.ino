@@ -56,7 +56,7 @@ void setup() {
 
 // Manually execute the coroutines.
 void loop() {
-  blinkLed.run();
-  printHello.run();
-  printWorld.run();
+  blinkLed.runCoroutine();
+  printHello.runCoroutine();
+  printWorld.runCoroutine();
 }

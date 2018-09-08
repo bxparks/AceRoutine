@@ -182,7 +182,7 @@ class CommandDispatcher: public Coroutine {
       return argc;
     }
 
-    virtual int run() override {
+    virtual int runCoroutine() override {
       bool isError;
       char* line;
       COROUTINE_LOOP() {

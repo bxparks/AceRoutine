@@ -45,8 +45,8 @@ void CoroutineScheduler::setupScheduler() {
   // Pre-scan to remove any coroutines whose suspend() was called before the
   // CoroutineScheduler::setup(). This makes unit tests easier to write because
   // they can just concentrate on only the active coroutines. And this is also
-  // more intuitive because we don't need to wait a complete run() cycle to
-  // remove these from the queue.
+  // more intuitive because we don't need to wait a complete runCoroutine()
+  // cycle to remove these from the queue.
   Coroutine** current = Coroutine::getRoot();
   while (*current != nullptr) {
     if ((*current)->isSuspended()) {
@@ -79,16 +79,16 @@ void CoroutineScheduler::runCoroutine() {
   switch ((*mCurrent)->getStatus()) {
     case Coroutine::kStatusYielding:
     case Coroutine::kStatusAwaiting:
-      (*mCurrent)->run();
+      (*mCurrent)->runCoroutine();
       mCurrent = (*mCurrent)->getNext();
       break;
     case Coroutine::kStatusDelaying: {
       // Check isDelayExpired() here to optimize away an extra call into the
-      // Coroutine::run(). Everything would still work if we just dispatched
-      // into the Coroutine::run() because that method checks isDelayExpired()
-      // as well.
+      // Coroutine::runCoroutine(). Everything would still work if we just
+      // dispatched into the Coroutine::runCoroutine() because that method
+      // checks isDelayExpired() as well.
       if ((*mCurrent)->isDelayExpired()) {
-        (*mCurrent)->run();
+        (*mCurrent)->runCoroutine();
       }
       mCurrent = (*mCurrent)->getNext();
       break;

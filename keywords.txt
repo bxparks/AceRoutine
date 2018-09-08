@@ -41,7 +41,7 @@ isTerminated	KEYWORD2
 isDone	KEYWORD2
 setTerminated	KEYWORD2
 # protected methods
-init	KEYWORD2
+setupCoroutine	KEYWORD2
 setJump	KEYWORD2
 getJump	KEYWORD2
 setYielding	KEYWORD2

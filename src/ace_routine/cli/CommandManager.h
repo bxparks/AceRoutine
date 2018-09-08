@@ -38,18 +38,42 @@ namespace cli {
  *
  * This is a subclass of Coroutine, just like CommandDispatcher. The run()
  * method simply delegates to the underlying CommandDispatcher, so this class
- * can be used as a substitute for CommandDispatcher.
- * 
- * @param T string type of the command names, either 'char' or
- *    '__FlashStringHelper'
- * @param BUF_SIZE size of the input line buffer
- * @param ARGV_SIZE size of the command line argv token table
+ * can be used as a substitute for CommandDispatcher. The setupCoroutine()
+ * method should be called to initialize the name of the coroutine and
+ * insert it into the CoroutineScheduler.
+ *
+ * Example usage:
+ *
+ * @code
+ * const uint8_t TABLE_SIZE = 4;
+ * const uint8_t BUF_SIZE = 64;
+ * const uint8_t ARGV_SIZE = 5;
+ * const char PROMPT[] = "$ ";
+ *
+ * CommandManager<char, BUF_SIZE, ARGV_SIZE>
+ *     commandManager(Serial, TABLE_SIZE, PROMPT);
+ *
+ * void setup() {
+ *   commandManager.add(commandHandler, "{name of command}"), "{help string}"));
+ *   ...
+ *
+ *   commandManger.setupCoroutine("commandManager");
+ *   CoroutineScheduler::setup();
+ * }
+ * @endcode
+ *
+ * @param T String type of the command names used by the CommandDispatcher,
+ *    either 'char' or '__FlashStringHelper'.
+ * @param BUF_SIZE Size of the input line buffer.
+ * @param ARGV_SIZE Size of the command line argv token list.
  */
 template<typename T, uint8_t BUF_SIZE, uint8_t ARGV_SIZE>
 class CommandManager: public Coroutine {
   public:
-    
+
     /**
+     * Constructor.
+     *
      * @param serial The serial port used to read commands and send output,
      * will normally be 'Serial', but can be set to something else.
      * @param tableSize Maximum number of commands in the dispatch table.

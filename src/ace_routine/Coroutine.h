@@ -73,7 +73,7 @@ struct Coroutine_##name : ace_routine::Coroutine { \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 Coroutine_##name :: Coroutine_##name() { \
-  init(ACE_ROUTINE_F(#name)); \
+  setupCoroutine(ACE_ROUTINE_F(#name)); \
 } \
 int Coroutine_##name :: run()
 
@@ -84,7 +84,7 @@ struct className##_##name : className { \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 className##_##name :: className##_##name() { \
-  init(ACE_ROUTINE_F(#name)); \
+  setupCoroutine(ACE_ROUTINE_F(#name)); \
 } \
 int className##_##name :: run()
 
@@ -323,42 +323,39 @@ class Coroutine {
 
     /**
      * Initialize the coroutine for the CoroutineScheduler, set it to Yielding
-     * state, and add it to the linked list of coroutines.
+     * state, and add it to the linked list of coroutines. This method is
+     * called automatically by the COROUTINE() macro. It needs to be called
+     * manually when using coroutines which were manually created without using
+     * that COROUTINE() macro.
      *
-     * This is publicly exposed because of a bug in ESP8266 where the F()
-     * string given in the constructor parameter breaks, but can be given
-     * inside the constructor (see
-     * https://github.com/esp8266/Arduino/issues/3369). The COROUTINE macro
-     * tries to get around that bug using the init() method directly, instead
-     * of passing the name of the coroutine through the constructor.
-     *
-     * It turns out that exposing this has the benefit that it allows Custom or
-     * Manual coroutines to be given a name and added to the
-     * CoroutineScheduler. TODO: Maybe change the init() methods to something
-     * like initForScheduler() or setupForScheduler() to be more descriptive?
+     * This method could have been named init() or setup() but since this class
+     * expected to be used as a mix-in class to create more complex classes
+     * which could have its own setup() methods, the longer name seemed more
+     * clear.
      *
      * @param name The name of the coroutine as a human-readable string.
      */
-    void init(const char* name) {
-      mName = FCString(name);
-      mStatus = kStatusYielding;
-      insertSorted();
-    }
-
-    /** Same as init(const char*) except using flash string type. */
-    void init(const __FlashStringHelper* name) {
+    void setupCoroutine(const char* name) {
       mName = FCString(name);
       mStatus = kStatusYielding;
       insertSorted();
     }
 
     /**
-     * Initialize for the anonymous CoroutineScheduler by inserting into the
-     * linked list. All anonymous coroutines are inserted at the start of the
-     * list. The order will be in reverse order to the calls to init(). In
-     * other words, the last init() wil be the first item in the list.
+     * Same as setupCoroutine(const char*) except using flash string type.
+     *
+     * Normally, the name would be passed from the subclass into this parent
+     * class through constructor chaining. But if we try to do that with the
+     * F() string, the compiler complains because F() macros work only inside a
+     * function. Therefore, the COROUTINE() macro uses the setupCoroutine()
+     * method to pass the name of the coroutine.
+     *
+     * The problem doesn't exist for a (const char*) but for consistency, I
+     * made both types of strings pass through the setupCoroutine() method
+     * instead of chaining the constructor.
      */
-    void init() {
+    void setupCoroutine(const __FlashStringHelper* name) {
+      mName = FCString(name);
       mStatus = kStatusYielding;
       insertSorted();
     }
@@ -422,7 +419,16 @@ class Coroutine {
     /** Coroutine has ended and no longer in the scheduler queue. */
     static const Status kStatusTerminated = 6;
 
-    /** Constructor. */
+    /**
+     * Constructor. All subclasses are expected to call either
+     * setupCoroutine(const char*) or setupCoroutine(const
+     * __FlashStringHelper*) before the CoroutineScheduler is used. The
+     * COROUTINE() macro will automatically call setupCoroutine().
+     *
+     * See comment in setupCoroutine(const __FlashStringHelper*) for reason why
+     * an setupCoroutine() function is used instead of chaining the name
+     * through the constructor.
+     */
     Coroutine() {}
 
     /** Return the status of the coroutine. Used by the CoroutineScheduler. */

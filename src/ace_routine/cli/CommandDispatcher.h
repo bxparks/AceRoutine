@@ -34,7 +34,14 @@ class __FlashStringHelper;
 namespace ace_routine {
 namespace cli {
 
-/** Signature for a command handler. */
+/**
+ * Signature for a command handler.
+ *
+ * @param printer The output printer, normally Serial.
+ * @param argc Number of tokens in the input command, including the name of
+ *        the command itself.
+ * @param argv An array of strings for each token.
+ */
 typedef void (*CommandHandler)(Print& printer, int argc, const char** argv);
 
 /**

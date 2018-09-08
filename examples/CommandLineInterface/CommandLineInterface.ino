@@ -142,7 +142,7 @@ void delayCommand(Print& printer, int argc, const char** argv) {
 
 const uint8_t TABLE_SIZE = 4;
 const uint8_t BUF_SIZE = 64;
-const uint8_t ARGV_SIZE = 10;
+const uint8_t ARGV_SIZE = 5;
 const char PROMPT[] = "$ ";
 
 #if defined(AVR)
@@ -165,7 +165,7 @@ void setup() {
   commandManager.add(freeCommand, FF("free"), nullptr);
   commandManager.add(echoCommand, FF("echo"), FF("args ..."));
 
-  commandManager.init("CommandManager"); // insert into the scheduler
+  commandManager.setupCoroutine("commandManager");
   CoroutineScheduler::setup();
 }
 

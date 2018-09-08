@@ -781,12 +781,12 @@ ManualCoroutine manualRoutine;
 
 A manual coroutine (created without the `COROUTINE()` macro) is *not*
 automatically added to the linked list used by the `CoroutineScheduler`. If you
-wish to insert it into the scheduler, use the `init()` method just before
-calling `CoroutineScheduler::setup()`:
+wish to insert it into the scheduler, use the `setupCoroutine()` method just
+before calling `CoroutineScheduler::setup()`:
 ```
 void setup() {
   ...
-  manualRoutine.init("manualRoutine");
+  manualRoutine.setupCoroutine("manualRoutine");
   CoroutineScheduler::setup();
   ...
 }
@@ -798,26 +798,25 @@ void loop() {
 }
 ```
 
-There are 3 versions of the `init()` method:
-* `init()` - insert an anonymous coroutine
-* `init(const char* name)` - insert a named coroutine
-* `init(const __FlashStringHelper* name)` - insert a named coroutine
+There are 2 versions of the `setupCoroutine()` method:
+* `setupCoroutine(const char* name)` - insert a named coroutine
+* `setupCoroutine(const __FlashStringHelper* name)` - insert a named coroutine
 
-All 3 have been designed so that they are safe to be called from the constructor
+Both have been designed so that they are safe to be called from the constructor
 of a `Coroutine` class, even during static initialization time. This is exactly
-what the `COROUTINE()` macro does, call the `init()` method from the generated
-constructor. However, a manual coroutine is often written as a library that is
-supposed to be used by an end-user, and it would be convenient for the name of
-the coroutine to be defined by the end-user. The problem is that the `F()` macro
-cannot be used outside of the function context, so it is cannot be passed into
-the constructor when the coroutine is statically created. The workaround is to
-call the `init()` method in the global `setup()` function, where the `F()` macro
-is allowed to be used. (The other more obscure reason is that the constructor of
-the manual coroutine class will often have a large number of dependency
-injection parameters which are required to implement its functionality, and it
-is cleaner to avoid mixing in the name of the `Coroutine` which is an incidental
-dependency. Anyway, that's my rationale right now, but this may change in the
-future if a simpler alternative is discovered.)
+what the `COROUTINE()` macro does, call the `setupCoroutine()` method from the
+generated constructor. However, a manual coroutine is often written as a library
+that is supposed to be used by an end-user, and it would be convenient for the
+name of the coroutine to be defined by the end-user. The problem is that the
+`F()` macro cannot be used outside of the function context, so it is cannot be
+passed into the constructor when the coroutine is statically created. The
+workaround is to call the `setupCoroutine()` method in the global `setup()`
+function, where the `F()` macro is allowed to be used. (The other more obscure
+reason is that the constructor of the manual coroutine class will often have a
+large number of dependency injection parameters which are required to implement
+its functionality, and it is cleaner to avoid mixing in the name of the
+`Coroutine` which is an incidental dependency. Anyway, that's my rationale right
+now, but this may change in the future if a simpler alternative is discovered.)
 
 If the coroutine is not given a name, the name is stored as a `nullptr`. When
 printed (e.g. using the `CoroutineScheduler::list()` method), the name of an

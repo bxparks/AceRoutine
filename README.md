@@ -196,7 +196,7 @@ The following example sketches are provided:
 * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same time
 * [AutoBenchmark.ino](examples/AutoBenchmark):
   a program that performs CPU benchmarking
-* [CommandLineInterface.ino](examples/CommandLineInterface): uses the
+* [CommandLineShell.ino](examples/CommandLineShell): uses the
   `src/ace_routine/cli` classes to implement a command line interface that
   accepts a number of commands on the serial port. In other words, it is a
   primitive "shell". The shell is non-blocking and uses coroutines so that other
@@ -826,7 +826,7 @@ pointer of the coroutine object.
 A good example of a manual coroutine is
 [src/ace_routine/cli/CommandManager.h](src/ace_routine/cli/CommandManager.h)
 and you can see how it is configured in
-[examples/CommandLineInterface](examples/CommandLineInterface).
+[examples/CommandLineShell](examples/CommandLineShell).
 
 ### External Coroutines
 

@@ -102,7 +102,7 @@ void loop() {
 
 ## Example
 
-See [examples/CommandLineInterface/](../../../examples/CommandLineInterface/)
+See [examples/CommandLineShell/](../../../examples/CommandLineShell/)
 for an demo program that implements 5 commands:
 
 * `help [command]`

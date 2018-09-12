@@ -1,4 +1,4 @@
-# Command Line Interface (Shell)
+# Command Line Shell
 
 A demo of a primitive command line "shell" for Arduino using the classes in
 `src/ace_routine/cli`. It currently supports 5 commands:

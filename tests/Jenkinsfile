@@ -16,7 +16,7 @@ pipeline {
             steps {
                 dir('AUniter') {
                     git url: 'https://github.com/bxparks/AUniter',
-                        branch: 'master'
+                        branch: 'develop'
                 }
                 dir('libraries/AUnit') {
                     git url: 'https://github.com/bxparks/AUnit',
@@ -27,31 +27,31 @@ pipeline {
         stage('Verify Examples') {
             steps {
                 sh "AUniter/tools/auniter.sh \
-                    --config libraries/AceRoutine/tests/auniter.conf \
+                    --config libraries/AceRoutine/tests/auniter.ini \
                     verify \
-                    --pref sketchbook.path=$WORKSPACE \
-                    --boards $BOARDS \
+                    --sketchbook=$WORKSPACE \
+                    $BOARDS \
                     libraries/AceRoutine/examples/*"
             }
         }
         stage('Verify Tests') {
             steps {
                 sh "AUniter/tools/auniter.sh \
-                    --config libraries/AceRoutine/tests/auniter.conf \
+                    --config libraries/AceRoutine/tests/auniter.ini \
                     verify \
-                    --pref sketchbook.path=$WORKSPACE \
-                    --boards $BOARDS \
+                    --sketchbook=$WORKSPACE \
+                    $BOARDS \
                     libraries/AceRoutine/tests/*Test"
             }
         }
         stage('Test') {
             steps {
                 sh "AUniter/tools/auniter.sh \
-                    --config libraries/AceRoutine/tests/auniter.conf \
+                    --config libraries/AceRoutine/tests/auniter.ini \
                     test \
-                    --skip_if_no_port \
-                    --pref sketchbook.path=$WORKSPACE \
-                    --boards $BOARDS \
+                    --skip_missing_port \
+                    --sketchbook=$WORKSPACE \
+                    $BOARDS \
                     libraries/AceRoutine/tests/*Test"
             }
         }

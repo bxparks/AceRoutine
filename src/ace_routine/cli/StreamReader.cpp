@@ -117,7 +117,17 @@ bool StreamReader::getLine(bool* isError, char** line) {
       *line = mBuf;
       return true;
     }
-    if (c == '\n') {
+
+    // End of line: Unix uses '\n'; DOS uses '\r\n'; classic MAC uses '\r'. On
+    // terminals,
+    //
+    // Terminals: "Enter" usually sends '\r' (CR, Control-M), and one must type
+    // "Control-J" to send a '\n' (LF).
+    //
+    // Not all terminal programs can do mapping of \r to \n, or vise versa. So
+    // We will support either \n or \r, but not "\r\n" (which will count as two
+    // lines).
+    if (c == '\n' || c == '\r') {
       resetBuffer();
       *isError = false;
       *line = mBuf;

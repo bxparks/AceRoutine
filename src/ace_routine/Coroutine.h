@@ -365,7 +365,7 @@ class Coroutine {
      * The execution status of the coroutine, corresponding to the
      * COROUTINE_YIELD(), COROUTINE_DELAY(), COROUTINE_AWAIT() and
      * COROUTINE_END() macros.
-		 *
+     *
      * The finite state diagram looks like this:
      *
      * @verbatim

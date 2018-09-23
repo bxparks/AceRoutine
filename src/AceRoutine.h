@@ -33,6 +33,7 @@ SOFTWARE.
 
 #include "ace_routine/Coroutine.h"
 #include "ace_routine/CoroutineScheduler.h"
+#include "ace_routine/Channel.h"
 
 // Version format: xxyyzz == "xx.yy.zz"
 #define ACE_ROUTINE_VERSION 000100

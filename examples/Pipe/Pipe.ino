@@ -10,20 +10,11 @@
 
 #define CHANNEL_TYPE_SIMPLE 0
 #define CHANNEL_TYPE_SYNCHRONIZED 1
-#define CHANNEL_TYPE CHANNEL_TYPE_SIMPLE
+#define CHANNEL_TYPE CHANNEL_TYPE_SYNCHRONIZED
 
 #define TEST_TYPE_LOOP 0
 #define TEST_TYPE_SEQ 1
 #define TEST_TYPE TEST_TYPE_LOOP
-
-#define COROUTINE_CHANNEL_WRITE(channel, x) \
-do { \
-  channel.setValue(x); \
-  COROUTINE_AWAIT(channel.write()); \
-} while (false)
-
-#define COROUTINE_CHANNEL_READ(channel, x) \
-  COROUTINE_AWAIT(channel.read(x))
 
 using namespace ace_routine;
 
@@ -90,104 +81,10 @@ class SimpleChannel {
     bool mDataReady = false;
 };
 
-/**
- * An unbuffered synchronizing channel. Readers and writers block until the
- * writer is ready to send and the receiver is ready to receive. Then the
- * writer writes, the reader reads, then continues processing. Then the writer
- * is allowed to continue processing. This sequencing is implemented as a
- * finite state machine.
- *
- * The result of sending 20 integers from the writer to the reader looks
- * like this:
- *
- * @code
- * Writer: sending 0
- * Reader: received 0
- * Writer: sending 1
- * Reader: received 1
- * Writer: sending 2
- * Reader: received 2
- * ...
- * @endcode
- *
- * This sequence of events matches the user's expectations.
- */
-template<typename T>
-class SynchronizedChannel {
-  public:
-    void setValue(const T& value) {
-      mValueToWrite = value;
-    }
-
-    /** Same as write(constT& value) except use the value of setValue(). */
-    bool write() {
-      switch (mChannelState) {
-        case kWriterReady:
-          return false;
-        case kReaderReady:
-          mValue = mValueToWrite;
-          mChannelState = kDataProduced;
-          return false;
-        case kDataProduced:
-          return false;
-        case kDataConsumed:
-          mChannelState = kWriterReady;
-          return true;
-        default:
-          return false;
-      }
-    }
-
-    bool write(const T& value) {
-      switch (mChannelState) {
-        case kWriterReady:
-          return false;
-        case kReaderReady:
-          mValue = value;
-          mChannelState = kDataProduced;
-          return false;
-        case kDataProduced:
-          return false;
-        case kDataConsumed:
-          mChannelState = kWriterReady;
-          return true;
-        default:
-          return false;
-      }
-    }
-
-    bool read(T& value) {
-      switch (mChannelState) {
-        case kWriterReady:
-          mChannelState = kReaderReady;
-          return false;
-        case kReaderReady:
-          return false;
-        case kDataProduced:
-          value = mValue;
-          mChannelState = kDataConsumed;
-          return true;
-        case kDataConsumed:
-          return false;
-        default:
-          return false;
-      }
-    }
-
-  private:
-    static const uint8_t kWriterReady = 0;
-    static const uint8_t kReaderReady = 1;
-    static const uint8_t kDataProduced = 2;
-    static const uint8_t kDataConsumed = 3;
-    uint8_t mChannelState = kWriterReady;
-    T mValue;
-    T mValueToWrite;
-};
-
 #if CHANNEL_TYPE == CHANNEL_TYPE_SIMPLE
   SimpleChannel<int> channel;
-#else
-  SynchronizedChannel<int> channel;
+#elif CHANNEL_TYPE == CHANNEL_TYPE_SYNCHRONIZED
+  Channel<int> channel;
 #endif
 
 #if TEST_TYPE == TEST_TYPE_LOOP

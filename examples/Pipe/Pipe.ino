@@ -10,11 +10,20 @@
 
 #define CHANNEL_TYPE_SIMPLE 0
 #define CHANNEL_TYPE_SYNCHRONIZED 1
-#define CHANNEL_TYPE CHANNEL_TYPE_SYNCHRONIZED
+#define CHANNEL_TYPE CHANNEL_TYPE_SIMPLE
 
 #define TEST_TYPE_LOOP 0
 #define TEST_TYPE_SEQ 1
 #define TEST_TYPE TEST_TYPE_LOOP
+
+#define COROUTINE_CHANNEL_WRITE(channel, x) \
+do { \
+  channel.setValue(x); \
+  COROUTINE_AWAIT(channel.write()); \
+} while (false)
+
+#define COROUTINE_CHANNEL_READ(channel, x) \
+  COROUTINE_AWAIT(channel.read(x))
 
 using namespace ace_routine;
 
@@ -41,6 +50,20 @@ using namespace ace_routine;
 template<typename T>
 class SimpleChannel {
   public:
+    void setValue(const T& value) {
+      mValueToWrite = value;
+    }
+
+    bool write() {
+      if (mDataReady) {
+        return false;
+      } else {
+        mValue = mValueToWrite;
+        mDataReady = true;
+        return true;
+      }
+    }
+
     bool write(const T& value) {
       if (mDataReady) {
         return false;
@@ -63,6 +86,7 @@ class SimpleChannel {
 
   private:
     T mValue;
+    T mValueToWrite;
     bool mDataReady = false;
 };
 
@@ -91,6 +115,29 @@ class SimpleChannel {
 template<typename T>
 class SynchronizedChannel {
   public:
+    void setValue(const T& value) {
+      mValueToWrite = value;
+    }
+
+    /** Same as write(constT& value) except use the value of setValue(). */
+    bool write() {
+      switch (mChannelState) {
+        case kWriterReady:
+          return false;
+        case kReaderReady:
+          mValue = mValueToWrite;
+          mChannelState = kDataProduced;
+          return false;
+        case kDataProduced:
+          return false;
+        case kDataConsumed:
+          mChannelState = kWriterReady;
+          return true;
+        default:
+          return false;
+      }
+    }
+
     bool write(const T& value) {
       switch (mChannelState) {
         case kWriterReady:
@@ -134,6 +181,7 @@ class SynchronizedChannel {
     static const uint8_t kDataConsumed = 3;
     uint8_t mChannelState = kWriterReady;
     T mValue;
+    T mValueToWrite;
 };
 
 #if CHANNEL_TYPE == CHANNEL_TYPE_SIMPLE
@@ -145,12 +193,12 @@ class SynchronizedChannel {
 #if TEST_TYPE == TEST_TYPE_LOOP
 // Test the ordering of sending 20 integers and receiving 20 integers.
 COROUTINE(writer) {
-  COROUTINE_BEGIN();
   static int i;
+  COROUTINE_BEGIN();
   for (i = 0; i < 20; i++) {
     Serial.print("Writer: sending ");
     Serial.println(i);
-    COROUTINE_AWAIT(channel.write(i));
+    COROUTINE_CHANNEL_WRITE(channel, i);
   }
   Serial.println("Writer: done");
   COROUTINE_END();
@@ -159,7 +207,7 @@ COROUTINE(writer) {
 COROUTINE(reader) {
   COROUTINE_LOOP() {
     int i;
-    COROUTINE_AWAIT(channel.read(i));
+    COROUTINE_CHANNEL_READ(channel, i);
     Serial.print("Reader: received ");
     Serial.println(i);
   }
@@ -171,18 +219,18 @@ COROUTINE(reader) {
 COROUTINE(writer) {
   COROUTINE_BEGIN();
   Serial.println("Writer: sending data");
-  COROUTINE_AWAIT(channel.write(42));
+  COROUTINE_CHANNEL_WRITE(channel, 42);
   Serial.println("Writer: sent data");
   COROUTINE_END();
 }
 
 COROUTINE(reader) {
-  static int data;
   COROUTINE_BEGIN();
   Serial.println("Reader: sleeping for 1 second");
   COROUTINE_DELAY(1000);
   Serial.println("Reader: receiving data");
-  COROUTINE_AWAIT(channel.read(data));
+  int data;
+  COROUTINE_CHANNEL_READ(channel, data);
   Serial.println("Reader: received data");
   COROUTINE_END();
 }

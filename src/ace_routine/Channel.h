@@ -7,13 +7,13 @@
 /** Write the given value x to the given channel within a Coroutine. */
 #define COROUTINE_CHANNEL_WRITE(channel, x) \
 do { \
-  channel.setValue(x); \
-  COROUTINE_AWAIT(channel.write()); \
+  (channel).setValue(x); \
+  COROUTINE_AWAIT((channel).write()); \
 } while (false)
 
 /** Read the value in the channel to variable x within a Coroutine. */
 #define COROUTINE_CHANNEL_READ(channel, x) \
-  COROUTINE_AWAIT(channel.read(x))
+  COROUTINE_AWAIT((channel).read(x))
 
 namespace ace_routine {
 

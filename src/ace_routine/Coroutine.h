@@ -171,20 +171,20 @@ extern className##_##name name
     } while (false)
 
 /**
-* Yield for delayMillis. A delayMillis of 0 is functionally equivalent to
-* COROUTINE_YIELD(). To save memory, the delayMillis is stored as a uint16_t
-* but the actual maximum is limited to 32767 millliseconds. See setDelay()
-* for the reason for this limitation.
-*
-* If you need to wait for longer than that, use a for-loop to call
-* COROUTINE_DELAY() as many times as necessary.
-*
-* This could have been implemented using COROUTINE_AWAIT() but this macro
-* matches the global delay(millis) function already provided by the Arduino
-* API. Also having a separate kStatusDelaying state allows the
-* CoroutineScheduler to be slightly more efficient by avoiding the call to
-* Coroutine::runCoroutine() if the delay has not expired.
-*/
+ * Yield for delayMillis. A delayMillis of 0 is functionally equivalent to
+ * COROUTINE_YIELD(). To save memory, the delayMillis is stored as a uint16_t
+ * but the actual maximum is limited to 32767 millliseconds. See setDelay()
+ * for the reason for this limitation.
+ *
+ * If you need to wait for longer than that, use a for-loop to call
+ * COROUTINE_DELAY() as many times as necessary.
+ *
+ * This could have been implemented using COROUTINE_AWAIT() but this macro
+ * matches the global delay(millis) function already provided by the Arduino
+ * API. Also having a separate kStatusDelaying state allows the
+ * CoroutineScheduler to be slightly more efficient by avoiding the call to
+ * Coroutine::runCoroutine() if the delay has not expired.
+ */
 #define COROUTINE_DELAY(delayMillis) \
     do { \
       setDelay(delayMillis); \
@@ -193,6 +193,60 @@ extern className##_##name name
         COROUTINE_YIELD_INTERNAL(); \
       } \
       setRunning(); \
+    } while (false)
+
+/**
+ * Delay for delaySeconds. Maximum value is the maximum value of the
+ * loopCounter. For example, if the loopCounter is a uint16_t, then the maximum
+ * delay is 65535 seconds, or 18h12m15s. This macro calls COROUTINE_DELAY()
+ * every 1000 milliseconds, so over the course of the entire delay, there may
+ * be some drift. (Some of this drift could be avoided by looping in 16000ms
+ * chunks, then looping the remainder in 1000ms chunks. Division of
+ * delaySeconds by 16 would be fast. But minimizing drift doesn't seem to be
+ * important for the use cases that I have in mind, so I haven't implemented
+ * this.)
+ *
+ * The loopCounter needs to be supplied to the macro because AceRoutine
+ * coroutines are stackless so the loop cannot use the stack to keep count of
+ * the number of seconds. Instead it needs to be given a loop counter that
+ * retains information across multiple calls. That loop counter can be a member
+ * variable of the Coroutine object, or it can be a function-static variable.
+ *
+ * The usage would be something like:
+ * @code
+ * class MyCoroutine: public Coroutine {
+ *   public:
+ *     virtual int runCoroutine() override {
+ *       ...
+ *       COROUTINE_DELAY_SECONDS(mDelayCounter, 120);
+ *       ...
+ *     }
+ *
+ *   private:
+ *     uint16_t mDelayCounter;
+ * };
+ * ...
+ * @endcode
+ *
+ * or
+ *
+ * @code
+ * COROUTINE(myRoutine) {
+ *   COROUTINE_LOOP() {
+ *     ...
+ *     static uint16_t delayCounter;
+ *     COROUTINE_DELAY_SECONDS(delayCounter, 120);
+ *     ...
+ *   }
+ * }
+ * @endcode
+ */
+#define COROUTINE_DELAY_SECONDS(delaySeconds, loopCounter) \
+    do { \
+      loopCounter = delaySeconds; \
+      while (loopCounter-- > 0) { \
+        COROUTINE_DELAY(1000); \
+      } \
     } while (false)
 
 /**

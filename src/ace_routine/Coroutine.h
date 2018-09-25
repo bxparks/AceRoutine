@@ -241,7 +241,7 @@ extern className##_##name name
  * }
  * @endcode
  */
-#define COROUTINE_DELAY_SECONDS(delaySeconds, loopCounter) \
+#define COROUTINE_DELAY_SECONDS(loopCounter, delaySeconds) \
     do { \
       loopCounter = delaySeconds; \
       while (loopCounter-- > 0) { \

@@ -152,109 +152,32 @@ class CommandDispatcher: public Coroutine {
     CommandDispatcher(const CommandDispatcher&) = delete;
     CommandDispatcher& operator=(const CommandDispatcher&) = delete;
 
+    void printLineError(const char* line, uint8_t statusCode) const;
+
+    /** Handle the 'help' command. */
+    void helpCommandHandler(Print& printer, int argc, const char** argv) const;
+
+    /** Print help on all commands */
+    void helpAll(Print& printer) const;
+
+    /** Print helpString of specific cmd. Returns true if cmd was found. */
+    bool helpSpecific(Print& printer, const char* cmd) const;
+
+    /** Print help string for the given command. */
+    static void printHelp(Print& printer, const CommandHandler* command);
+
+    /** Tokenize the given line and run the command handler. */
+    void runCommand(char* line) const;
+
+    /** Find and run the given command. */
+    void findAndRunCommand(const char* cmd, int argc, const char** argv) const;
+
     static const uint8_t STATUS_SUCCESS = 0;
     static const uint8_t STATUS_BUFFER_OVERFLOW = 1;
     static const uint8_t STATUS_FLUSH_TO_EOL = 2;
     static const char DELIMS[];
 
     /** Print the error caused by the given line. */
-    void printLineError(const char* line, uint8_t statusCode) const {
-      if (statusCode == STATUS_BUFFER_OVERFLOW) {
-        mPrinter.print(F("BufferOverflow: "));
-        mPrinter.println(line);
-      } else if (statusCode == STATUS_FLUSH_TO_EOL) {
-        mPrinter.print(F("FlushToEOL: "));
-        mPrinter.println(line);
-      } else {
-        mPrinter.print(F("UnknownError: "));
-        mPrinter.print(statusCode);
-        mPrinter.print(F(": "));
-        mPrinter.println(line);
-      }
-    }
-
-    /** Handle the 'help' command. */
-    void helpCommandHandler(Print& printer, int argc, const char** argv) const {
-      if (argc == 2) {
-        const char* cmd = argv[1];
-
-        // check for "help help"
-        if (strcmp(cmd, "help") == 0) {
-          printer.println(F("Usage: help [command]"));
-          return;
-        }
-
-        bool found = helpSpecific(printer, cmd);
-        if (found) return;
-        printer.print(F("Unknown command: "));
-        printer.println(cmd);
-      } else {
-        printer.println(F("Commands:"));
-        printer.println(F("  help [command]"));
-        helpAll(printer);
-      }
-    }
-
-    /** Print help on all commands */
-    void helpAll(Print& printer) const {
-      for (uint8_t i = 0; i < mNumCommands; i++) {
-        const CommandHandler* command = mCommands[i];
-        printer.print("  ");
-        printHelp(printer, command);
-      }
-    }
-
-    /** Print helpString of specific cmd. Returns true if cmd was found. */
-    bool helpSpecific(Print& printer, const char* cmd) const {
-      const CommandHandler* command = findCommand(cmd);
-      if (command != nullptr) {
-        printer.print(F("Usage: "));
-        printHelp(printer, command);
-        return true;
-      }
-      return false;
-    }
-
-    static void printHelp(Print& printer, const CommandHandler* command) {
-      command->getName().printTo(printer);
-      if (!command->getHelpString().isNull()) {
-        printer.print(' ');
-        command->getHelpString().printTo(printer);
-        printer.println();
-      } else {
-        printer.println();
-      }
-    }
-
-    /** Tokenize the given line and run the command handler. */
-    void runCommand(char* line) const {
-      // Tokenize the line.
-      int argc = tokenize(line, mArgv, mArgvSize);
-      if (argc == 0) return;
-      const char* cmd = mArgv[0];
-
-      // Handle the built-in 'help' command.
-      if (strcmp(cmd, "help") == 0) {
-        helpCommandHandler(mPrinter, argc, mArgv);
-        return;
-      }
-
-      findAndRunCommand(cmd, argc, mArgv);
-    }
-
-    /** Find and run the given command. */
-    void findAndRunCommand(
-        const char* cmd, int argc, const char** argv) const {
-      const CommandHandler* command = findCommand(cmd);
-      if (command != nullptr) {
-        command->run(mPrinter, argc, argv);
-        return;
-      }
-
-      mPrinter.print(F("Unknown command: "));
-      mPrinter.println(cmd);
-    }
-
     StreamReader& mStreamReader;
     Print& mPrinter;
     const CommandHandler** const mCommands;

@@ -22,21 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-/**
- * @mainpage AceRoutine Library
- *
- * This is the Doxygen documentation for the
- * <a href="https://github.com/bxparks/AceRoutine">AceRoutine Library</a>.
- */
+#include "CommandDispatcher.h"
 
-#ifndef ACE_ROUTINE_ACE_ROUTINE_H
-#define ACE_ROUTINE_ACE_ROUTINE_H
+namespace ace_routine {
+namespace cli {
 
-#include "ace_routine/Coroutine.h"
-#include "ace_routine/CoroutineScheduler.h"
-#include "ace_routine/Channel.h"
+// Same whitespace characters used by isspace() in the standard C99 library.
+const char CommandDispatcher::DELIMS[] = " \f\r\n\t\v";
 
-// Version format: xxyyzz == "xx.yy.zz"
-#define ACE_ROUTINE_VERSION 000100
-
-#endif
+}
+}

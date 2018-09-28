@@ -28,98 +28,12 @@ SOFTWARE.
 #include <Print.h> // Print
 #include <AceRoutine.h>
 #include "StreamReader.h"
+#include "CommandHandler.h"
 
 class __FlashStringHelper;
 
 namespace ace_routine {
 namespace cli {
-
-/**
- * Signature for a command handler.
- *
- * @param printer The output printer, normally Serial.
- * @param argc Number of tokens in the input command, including the name of
- *        the command itself.
- * @param argv An array of strings for each token.
- */
-typedef void (*CommandHandler)(Print& printer, int argc, const char** argv);
-
-/**
- * A record of the command name and its handler. The helpString is the
- * "usage" string, excluding the name of the command itself to save space.
- * The name of the command will be automatically added by the 'help
- * command' handler.
- */
-template<typename T>
-struct DispatchRecord {
-  CommandHandler command;
-  const T* name;
-  const T* helpString;
-};
-
-/** A command dispatch table. */
-template<typename T>
-class DispatchTable {
-  public:
-    DispatchTable(uint8_t tableSize):
-        mTableSize(tableSize) {
-      mDispatchTable = new DispatchRecord<T>[tableSize];
-    }
-
-    ~DispatchTable() {
-      delete[] mDispatchTable;
-    }
-
-    const DispatchRecord<T>* get(uint8_t i) const {
-      return &mDispatchTable[i];
-    }
-
-    uint8_t size() const { return mNumCommands; }
-
-    void add(CommandHandler command, const T* name, const T* helpString) {
-      if (mNumCommands < mTableSize) {
-        mDispatchTable[mNumCommands] = {command, name, helpString};
-        mNumCommands++;
-      }
-    }
-
-    /**
-     * Find the CommandHandler of the given command name. VisibleForTesting.
-     *
-     * NOTE: this is currently a linear O(N) scan which is good enough for
-     * small number of commands. If we sorted the handlers, we could do a
-     * binary search for O(log(N)) and handle larger number of commands.
-     */
-    const DispatchRecord<T>* findCommand(const char* cmd) const {
-      for (uint8_t i = 0; i < mNumCommands; i++) {
-        const DispatchRecord<T>* record = &mDispatchTable[i];
-        if (compare(cmd, record->name) == 0) {
-          return record;
-        }
-      }
-      return nullptr;
-    }
-
-    /** Return 0 if 'cmd' matches 'name'. */
-    static int compare(const char* cmd, const T* name);
-
-  private:
-    const uint8_t mTableSize;
-    DispatchRecord<T>* mDispatchTable;
-    uint8_t mNumCommands = 0;
-};
-
-template<>
-int DispatchTable<char>::compare(
-    const char* cmd, const char* name) {
-  return strcmp(cmd, name);
-}
-
-template<>
-int DispatchTable<__FlashStringHelper>::compare(
-    const char* cmd, const __FlashStringHelper* name) {
-  return strcmp_P(cmd, (const char*) name);
-}
 
 /**
  * A coroutine that reads lines from the Serial port, tokenizes the line on
@@ -135,7 +49,6 @@ int DispatchTable<__FlashStringHelper>::compare(
  * The template parameters can be either a 'char' for C-strings or
  * '__FlashStringHelper' for F() flash strings.
  */
-template<typename T>
 class CommandDispatcher: public Coroutine {
   public:
     /**
@@ -143,33 +56,41 @@ class CommandDispatcher: public Coroutine {
      *
      * @param streamReader An instance of StreamReader.
      * @param printer The output object, normally the global Serial object.
-     * @param dispatchTable List of command handlers and their command names.
+     * @param commands Array of CommandHandler pointers.
+     * @param numCommands number of commands.
      * @param argv Array of (const char*) that will be used to hold the word
-     * tokens of a command line string.
+     *        tokens of a command line string.
      * @param argvSize The size of the argv array. Tokens which are beyond this
-     * limit will be silently dropped.
+     *        limit will be silently dropped.
      * @param prompt If not null, print a prompt and echo the command entered
-     * by the user. If null, don't print prompt and don't echo.
+     *        by the user. If null, don't print prompt and don't echo.
      */
     CommandDispatcher(
             StreamReader& streamReader,
             Print& printer,
-            const DispatchTable<T>& dispatchTable,
+            const CommandHandler** commands,
+            uint8_t numCommands,
             const char** argv,
             uint8_t argvSize,
             const char* prompt):
         mStreamReader(streamReader),
         mPrinter(printer),
-        mDispatchTable(dispatchTable),
+        mCommands(commands),
+        mNumCommands(numCommands),
         mArgv(argv),
         mArgvSize(argvSize),
         mPrompt(prompt) {}
+
+    /** Destructor. Used only in unit tests. */
+    virtual ~CommandDispatcher() {}
 
     /**
      * Tokenize the line, separating tokens delimited by whitespace (space,
      * formfeed, carriage return, newline, tab, and vertical tab) and fill argv
      * with each token until argvSize is reached. Return the number of tokens
-     * filled in. VisibleForTesting.
+     * filled in.
+     *
+     * VisibleForTesting.
      */
     static uint8_t tokenize(char* line, const char** argv, uint8_t argvSize) {
       char* token = strtok(line, DELIMS);
@@ -205,6 +126,25 @@ class CommandDispatcher: public Coroutine {
         }
         runCommand(line);
       }
+    }
+
+    /**
+     * Find the CommandHandler of the given command name.
+     *
+     * VisibleForTesting.
+     *
+     * NOTE: this is currently a linear O(N) scan which is good enough for
+     * small number of commands. If we sorted the handlers, we could do a
+     * binary search for O(log(N)) and handle larger number of commands.
+     */
+    const CommandHandler* findCommand(const char* cmd) const {
+      for (uint8_t i = 0; i < mNumCommands; i++) {
+        const CommandHandler* command = mCommands[i];
+        if (command->getName().compareTo(FCString(cmd)) == 0) {
+          return command;
+        }
+      }
+      return nullptr;
     }
 
   protected:
@@ -257,29 +197,30 @@ class CommandDispatcher: public Coroutine {
 
     /** Print help on all commands */
     void helpAll(Print& printer) const {
-      for (uint8_t i = 0; i < mDispatchTable.size(); i++) {
-        const DispatchRecord<T>* record = mDispatchTable.get(i);
+      for (uint8_t i = 0; i < mNumCommands; i++) {
+        const CommandHandler* command = mCommands[i];
         printer.print("  ");
-        printHelp(printer, record);
+        printHelp(printer, command);
       }
     }
 
     /** Print helpString of specific cmd. Returns true if cmd was found. */
     bool helpSpecific(Print& printer, const char* cmd) const {
-      const DispatchRecord<T>* record = mDispatchTable.findCommand(cmd);
-      if (record != nullptr) {
+      const CommandHandler* command = findCommand(cmd);
+      if (command != nullptr) {
         printer.print(F("Usage: "));
-        printHelp(printer, record);
+        printHelp(printer, command);
         return true;
       }
       return false;
     }
 
-    static void printHelp(Print& printer, const DispatchRecord<T>* record) {
-      printer.print(record->name);
-      if (record->helpString != nullptr) {
+    static void printHelp(Print& printer, const CommandHandler* command) {
+      command->getName().printTo(printer);
+      if (!command->getHelpString().isNull()) {
         printer.print(' ');
-        printer.println(record->helpString);
+        command->getHelpString().printTo(printer);
+        printer.println();
       } else {
         printer.println();
       }
@@ -304,9 +245,9 @@ class CommandDispatcher: public Coroutine {
     /** Find and run the given command. */
     void findAndRunCommand(
         const char* cmd, int argc, const char** argv) const {
-      const DispatchRecord<T>* record = mDispatchTable.findCommand(cmd);
-      if (record != nullptr) {
-        record->command(mPrinter, argc, argv);
+      const CommandHandler* command = findCommand(cmd);
+      if (command != nullptr) {
+        command->run(mPrinter, argc, argv);
         return;
       }
 
@@ -316,15 +257,12 @@ class CommandDispatcher: public Coroutine {
 
     StreamReader& mStreamReader;
     Print& mPrinter;
-    const DispatchTable<T>& mDispatchTable;
+    const CommandHandler** const mCommands;
+    uint8_t const mNumCommands;
     const char** const mArgv;
-    const uint8_t mArgvSize;
+    uint8_t const mArgvSize;
     const char* const mPrompt;
 };
-
-// Same whitespace characters used by isspace() in the standard C99 library.
-template<typename T>
-const char CommandDispatcher<T>::DELIMS[] = " \f\r\n\t\v";
 
 }
 }

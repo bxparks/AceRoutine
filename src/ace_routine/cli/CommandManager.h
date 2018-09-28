@@ -50,24 +50,25 @@ namespace cli {
  * const uint8_t ARGV_SIZE = 5;
  * const char PROMPT[] = "$ ";
  *
- * CommandManager<char, BUF_SIZE, ARGV_SIZE>
- *     commandManager(Serial, TABLE_SIZE, PROMPT);
+ * CommandManager<TABLE_SIZE, BUF_SIZE, ARGV_SIZE> commandManager(
+ *     Serial, PROMPT);
  *
  * void setup() {
- *   commandManager.add(commandHandler, "{name of command}"), "{help string}"));
+ *   commandManager.add(commandHandler1);
+ *   commandManager.add(commandHandler2);
  *   ...
+ *   commandManager.setupCommands();
  *
- *   commandManger.setupCoroutine("commandManager");
+ *   commandManager.setupCoroutine("commandManager");
  *   CoroutineScheduler::setup();
  * }
  * @endcode
  *
- * @param T String type of the command names used by the CommandDispatcher,
- *    either 'char' or '__FlashStringHelper'.
+ * @param MAX_COMMANDS Maximum number of commands.
  * @param BUF_SIZE Size of the input line buffer.
  * @param ARGV_SIZE Size of the command line argv token list.
  */
-template<typename T, uint8_t BUF_SIZE, uint8_t ARGV_SIZE>
+template<uint8_t MAX_COMMANDS, uint8_t BUF_SIZE, uint8_t ARGV_SIZE>
 class CommandManager: public Coroutine {
   public:
 
@@ -75,37 +76,51 @@ class CommandManager: public Coroutine {
      * Constructor.
      *
      * @param serial The serial port used to read commands and send output,
-     * will normally be 'Serial', but can be set to something else.
-     * @param tableSize Maximum number of commands in the dispatch table.
+     *        will normally be 'Serial', but can be set to something else.
      * @param prompt If not null, print a prompt and echo the command entered
-     * by the user. If null, don't print the prompt and don't echo the input
-     * from the user.
+     *        by the user. If null, don't print the prompt and don't echo the
+     *        input from the user.
      */
-    CommandManager(Stream& serial, uint8_t tableSize,
-            const char* prompt = nullptr):
-        mStreamReader(serial, mLineBuffer, BUF_SIZE),
-        mDispatchTable(tableSize),
-        mDispatcher(mStreamReader, serial, mDispatchTable, mArgv, ARGV_SIZE,
-            prompt) {}
+    CommandManager(Stream& serial, const char* prompt = nullptr):
+        mSerial(serial),
+        mPrompt(prompt),
+        mStreamReader(serial, mLineBuffer, BUF_SIZE) {}
 
-    /**
-     * Add the given command handler, name and help string to the internal
-     * dispatch table.
-     */
-    void add(CommandHandler command, const T* name, const T* help) {
-      mDispatchTable.add(command, name, help);
+    virtual ~CommandManager() {
+      if (mDispatcher) {
+        delete mDispatcher;
+      }
+    }
+
+    /** Add the given command handler to the list of commands. */
+    void add(const CommandHandler* command) {
+      if (mNumCommands < MAX_COMMANDS) {
+        mCommands[mNumCommands++] = command;
+      }
+    }
+
+    void setupCommands() {
+      mDispatcher = new CommandDispatcher(mStreamReader, mSerial, mCommands,
+          mNumCommands, mArgv, ARGV_SIZE, mPrompt);
     }
 
     virtual int runCoroutine() override {
-      return mDispatcher.runCoroutine();
+      return mDispatcher->runCoroutine();
     }
 
+    /** Return the CommandDispatcher. VisibleForTesting. */
+    const CommandDispatcher* getDispatcher() const { return mDispatcher; }
+
   private:
-    char mLineBuffer[BUF_SIZE];
+    Stream& mSerial;
+    const char* const mPrompt;
     StreamReader mStreamReader;
-    DispatchTable<T> mDispatchTable;
+    const CommandHandler* mCommands[MAX_COMMANDS];
+    char mLineBuffer[BUF_SIZE];
     const char* mArgv[ARGV_SIZE];
-    CommandDispatcher<T> mDispatcher;
+
+    CommandDispatcher* mDispatcher = nullptr;
+    uint8_t mNumCommands = 0;
 };
 
 }

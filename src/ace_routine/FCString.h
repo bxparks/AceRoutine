@@ -70,6 +70,9 @@ class FCString {
       mString.fstring = s;
     }
 
+    /** Return if this is a null string. */
+    bool isNull() const { return mString.cstring == nullptr; }
+
     /** Get the internal type of string. */
     uint8_t getType() const { return mStringType; }
 

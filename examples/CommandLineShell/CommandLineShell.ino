@@ -103,55 +103,83 @@ unsigned long freeMemory() {
 //---------------------------------------------------------------------------
 
 /** List the coroutines known by the CoroutineScheduler. */
-void listCommand(Print& printer, int /* argc */, const char** /* argv */) {
-  CoroutineScheduler::list(printer);
-}
+class ListCommand: public CommandHandler {
+  public:
+    ListCommand():
+      CommandHandler("list", nullptr) {}
+
+    virtual void run(Print& printer, int /* argc */, const char** /* argv */)
+        const override {
+      CoroutineScheduler::list(printer);
+    }
+};
 
 /** Echo the command line arguments. */
-void echoCommand(Print& printer, int argc, const char** argv) {
- for (int i = 1; i < argc; i++) {
-    printer.print(argv[i]);
-    printer.print(' ');
-  }
-  printer.println();
-}
+class EchoCommand: public CommandHandler {
+  public:
+    EchoCommand():
+      CommandHandler("echo", "args ...") {}
+
+    virtual void run(Print& printer, int argc, const char** argv)
+        const override {
+     for (int i = 1; i < argc; i++) {
+        printer.print(argv[i]);
+        printer.print(' ');
+      }
+      printer.println();
+    }
+};
 
 /** Print amount of free memory between stack and heap. */
-void freeCommand(Print& printer, int /* argc */, const char** /* argv */) {
-  printer.print(FF("Free memory: "));
-  printer.println(freeMemory());
-}
+class FreeCommand: public CommandHandler {
+  public:
+    FreeCommand():
+        CommandHandler("free", nullptr) {}
+
+    virtual void run(Print& printer, int /* argc */, const char** /* argv */)
+        const override {
+      printer.print(FF("Free memory: "));
+      printer.println(freeMemory());
+    }
+};
 
 /** Change the blinking LED on and off delay parameters. */
-void delayCommand(Print& printer, int argc, const char** argv) {
-  if (argc != 3) {
-    printer.println(FF("Invalid number of arguments"));
-    return;
-  }
-  const char* param = argv[1];
-  const char* value = argv[2];
-  if (strcmp(param, "on") == 0) {
-    ledOnDelay = atoi(value);
-  } else if (strcmp(param, "off") == 0) {
-    ledOffDelay = atoi(value);
-  } else {
-    printer.print(FF("Unknown argument: "));
-    printer.println(param);
-  }
-}
+class DelayCommand: public CommandHandler {
+  public:
+    DelayCommand():
+        CommandHandler("delay", "(on | off) millis") {}
 
-const uint8_t TABLE_SIZE = 4;
-const uint8_t BUF_SIZE = 64;
-const uint8_t ARGV_SIZE = 5;
-const char PROMPT[] = "$ ";
+    virtual void run(Print& printer, int argc, const char** argv)
+        const override {
+      if (argc != 3) {
+        printer.println(FF("Invalid number of arguments"));
+        return;
+      }
+      const char* param = argv[1];
+      const char* value = argv[2];
+      if (strcmp(param, "on") == 0) {
+        ledOnDelay = atoi(value);
+      } else if (strcmp(param, "off") == 0) {
+        ledOffDelay = atoi(value);
+      } else {
+        printer.print(FF("Unknown argument: "));
+        printer.println(param);
+      }
+    }
+};
 
-#if defined(AVR)
-CommandManager<__FlashStringHelper, BUF_SIZE, ARGV_SIZE>
-    commandManager(Serial, TABLE_SIZE, PROMPT);
-#else
-CommandManager<char, BUF_SIZE, ARGV_SIZE>
-    commandManager(Serial, TABLE_SIZE, PROMPT);
-#endif
+static const uint8_t MAX_COMMANDS = 4;
+static const uint8_t BUF_SIZE = 64;
+static const uint8_t ARGV_SIZE = 5;
+static const char PROMPT[] = "$ ";
+
+CommandManager<MAX_COMMANDS, BUF_SIZE, ARGV_SIZE>
+    commandManager(Serial, PROMPT);
+
+DelayCommand delayCommand;
+ListCommand listCommand;
+FreeCommand freeCommand;
+EchoCommand echoCommand;
 
 //---------------------------------------------------------------------------
 
@@ -160,10 +188,11 @@ void setup() {
   while (!Serial); // micro/leonardo
 
   // add commands to CommandManager
-  commandManager.add(delayCommand, FF("delay"), FF("(on | off) millis"));
-  commandManager.add(listCommand, FF("list"), nullptr);
-  commandManager.add(freeCommand, FF("free"), nullptr);
-  commandManager.add(echoCommand, FF("echo"), FF("args ..."));
+  commandManager.add(&delayCommand);
+  commandManager.add(&listCommand);
+  commandManager.add(&freeCommand);
+  commandManager.add(&echoCommand);
+  commandManager.setupCommands();
 
   commandManager.setupCoroutine("commandManager");
   CoroutineScheduler::setup();

@@ -40,7 +40,14 @@ class CommandHandler {
    /**
     * Run the command.
     *
-    * @param printer The output printer, normally Serial.
+    * @param printer The output printer, normally Serial. This is not
+    *        expected to change during the lifetime of the CommandHandler
+    *        instance, so normally I would inject this parameter into the
+    *        object. However, that would cause each instance to consume 2 more
+    *        bytes, even though all instances are expected to have the same
+    *        'printer'. For an 8-bit AVR processor with only 2kB of RAM, every
+    *        byte is important , so I am keeping this as a parameter passed
+    *        into the run() method.
     * @param argc Number of tokens in the input command, including the name of
     *        the command itself.
     * @param argv An array of strings for each token.

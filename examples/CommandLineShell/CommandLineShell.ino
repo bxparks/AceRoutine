@@ -172,20 +172,20 @@ DelayCommand delayCommand;
 ListCommand listCommand;
 FreeCommand freeCommand;
 EchoCommand echoCommand;
-
-const CommandHandler* COMMANDS[] = {
+static const CommandHandler* const COMMANDS[] = {
   &delayCommand,
   &listCommand,
   &freeCommand,
   &echoCommand
 };
+static const uint8_t NUM_COMMANDS = sizeof(COMMANDS) / sizeof(CommandHandler*);
 
 static const uint8_t BUF_SIZE = 64;
 static const uint8_t ARGV_SIZE = 5;
 static const char PROMPT[] = "$ ";
 
 CommandManager<BUF_SIZE, ARGV_SIZE> commandManager(
-    COMMANDS, sizeof(COMMANDS) / sizeof(CommandHandler*), Serial, PROMPT);
+    COMMANDS, NUM_COMMANDS, Serial, PROMPT);
 
 //---------------------------------------------------------------------------
 

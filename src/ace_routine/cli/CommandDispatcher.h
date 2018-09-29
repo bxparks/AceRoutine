@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include <Print.h> // Print
 #include <AceRoutine.h>
-#include "StreamReader.h"
 #include "CommandHandler.h"
 #include "InputLine.h"
 
@@ -55,7 +54,7 @@ class CommandDispatcher: public Coroutine {
     /**
      * Constructor.
      *
-     * @param streamReader An instance of StreamReader.
+     * @param channel A channel from the StringLineReader to this coroutine.
      * @param printer The output object, normally the global Serial object.
      * @param commands Array of CommandHandler pointers.
      * @param numCommands number of commands.
@@ -114,10 +113,6 @@ class CommandDispatcher: public Coroutine {
 
         if (input.status == InputLine::kStatusOverflow) {
           printLineError(input.line, STATUS_BUFFER_OVERFLOW);
-          do {
-            COROUTINE_CHANNEL_READ(mChannel, input);
-            printLineError(input.line, STATUS_FLUSH_TO_EOL);
-          } while (input.status == InputLine::kStatusOverflow);
           continue;
         }
 

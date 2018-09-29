@@ -42,7 +42,8 @@ class StreamLineReader: public ace_routine::Coroutine {
     /**
      * Constructor.
      *
-     * @param channel output channel to send an InputLine back to the receiver
+     * @param channel The output Channel used to send an InputLine message
+     *        back to the receiver.
      * @param stream The input stream, usually the global Serial object.
      * @param buffer The input character buffer.
      * @param bufferSize The size of the buffer, should be set large enough to

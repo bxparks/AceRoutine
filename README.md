@@ -74,7 +74,7 @@ additional macros that can reduce boilerplate code.
 
 This is the [HelloCoroutine.ino](examples/HelloCoroutine) sample sketch.
 
-```C++C++
+```C++
 #include <AceRoutine.h>
 using namespace ace_routine;
 

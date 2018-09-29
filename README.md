@@ -551,9 +551,50 @@ COROUTINE(outer) {
 }
 
 ```
+I have yet to find it useful to call a `COROUTINE()` from another `COROUTINE()`.
 
-Although this is techically allowed, I have not yet discovered a practical
-use-case for this feature.
+However, I have found it useful to chain coroutines when using the **Manual
+Coroutines** described in one of the sections below. The ability to chain
+coroutines allows us to implement a [Decorator
+Pattern](https://en.wikipedia.org/wiki/Decorator_pattern) or a chain of
+responsibility. Using manual coroutines, we can wrap one coroutine with another
+and delegate to the inner coroutine like this:
+
+```C++
+class InnerCoroutine: public Coroutine {
+  public:
+    InnerCoroutine(..) { ...}
+
+    virtual int runCoroutine override {
+      COROUTINE_BEGIN();
+      ...
+      COROUTINE_END();
+      ...
+    }
+};
+
+class OuterCoroutine: public Coroutine {
+  public:
+    OuterCoroutine(InnerCoroutine& inner): mInner(inner) {
+      ...
+    }
+
+    virtual int runCoroutine override {
+      ...
+      mInner.runCoroutine();
+      ...
+    }
+
+  private:
+    Coroutine& mInner;
+};
+
+```
+Most likely, only the `OuterCoroutine` would be registered in the
+`CoroutineScheduler`. And in the cases that I've come across, the
+`OuterCoroutine` doesn't actually use much of the Coroutine functionality
+(i.e. doesn't actuall use the `COROUTINE_BEGIN()` and `COROUTINE_END()` macros.
+It simply delegates the `runCoroutine()` call to the inner one.
 
 ### Running and Scheduling
 
@@ -764,7 +805,7 @@ customized.
 class ManualCoroutine : public Coroutine {
   public:
     // Inject external dependencies into the constructor.
-    ManualCoroutine(...) {
+    ManualCoroutine(Params, ..., Objects, ...) {
       ...
     }
 
@@ -776,7 +817,7 @@ class ManualCoroutine : public Coroutine {
     }
 };
 
-ManualCoroutine manualRoutine;
+ManualCoroutine manualRoutine(params, ..., objects, ...);
 ```
 
 A manual coroutine (created without the `COROUTINE()` macro) is *not*

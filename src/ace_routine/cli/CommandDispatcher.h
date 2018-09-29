@@ -29,6 +29,7 @@ SOFTWARE.
 #include <AceRoutine.h>
 #include "StreamReader.h"
 #include "CommandHandler.h"
+#include "InputLine.h"
 
 class __FlashStringHelper;
 
@@ -66,14 +67,14 @@ class CommandDispatcher: public Coroutine {
      *        by the user. If null, don't print prompt and don't echo.
      */
     CommandDispatcher(
-            StreamReader& streamReader,
+            Channel<InputLine>& channel,
             Print& printer,
-            const CommandHandler** commands,
+            const CommandHandler* const* commands,
             uint8_t numCommands,
             const char** argv,
             uint8_t argvSize,
             const char* prompt):
-        mStreamReader(streamReader),
+        mChannel(channel),
         mPrinter(printer),
         mCommands(commands),
         mNumCommands(numCommands),
@@ -104,27 +105,26 @@ class CommandDispatcher: public Coroutine {
     }
 
     virtual int runCoroutine() override {
-      bool isError;
-      char* line;
+      InputLine input;
       COROUTINE_LOOP() {
         if (mPrompt != nullptr) {
           mPrinter.print(mPrompt);
         }
-        COROUTINE_AWAIT(mStreamReader.getLine(&isError, &line));
+        COROUTINE_CHANNEL_READ(mChannel, input);
 
-        if (isError) {
-          printLineError(line, STATUS_BUFFER_OVERFLOW);
-          while (isError) {
-            COROUTINE_AWAIT(mStreamReader.getLine(&isError, &line));
-            printLineError(line, STATUS_FLUSH_TO_EOL);
-          }
+        if (input.status == InputLine::kStatusOverflow) {
+          printLineError(input.line, STATUS_BUFFER_OVERFLOW);
+          do {
+            COROUTINE_CHANNEL_READ(mChannel, input);
+            printLineError(input.line, STATUS_FLUSH_TO_EOL);
+          } while (input.status == InputLine::kStatusOverflow);
           continue;
         }
 
         if (mPrompt != nullptr) {
-          mPrinter.print(line); // line includes the \n
+          mPrinter.print(input.line); // line includes the \n
         }
-        runCommand(line);
+        runCommand(input.line);
       }
     }
 
@@ -177,10 +177,9 @@ class CommandDispatcher: public Coroutine {
     static const uint8_t STATUS_FLUSH_TO_EOL = 2;
     static const char DELIMS[];
 
-    /** Print the error caused by the given line. */
-    StreamReader& mStreamReader;
+    Channel<InputLine>& mChannel;
     Print& mPrinter;
-    const CommandHandler** const mCommands;
+    const CommandHandler* const* const mCommands;
     uint8_t const mNumCommands;
     const char** const mArgv;
     uint8_t const mArgvSize;

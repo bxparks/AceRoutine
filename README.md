@@ -74,7 +74,7 @@ additional macros that can reduce boilerplate code.
 
 This is the [HelloCoroutine.ino](examples/HelloCoroutine) sample sketch.
 
-```
+```C++C++
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -131,7 +131,7 @@ At the same time, the LED blinks on and off.
 The [HelloScheduler.ino](examples/HelloScheduler) sketch implements the same
 thing using the `CoroutineScheduler`:
 
-```
+```C++
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -212,7 +212,7 @@ To prevent name clashes with other libraries that the calling code may use, all
 classes are defined in the `ace_routine` namespace. To use the code without
 prepending the `ace_routine::` prefix, use the `using` directive:
 
-```
+```C++
 #include <AceRoutine.h>
 using namespace ace_routine;
 ```
@@ -234,7 +234,7 @@ The following macros are used:
 ### Overall Structure
 
 The overall structure looks like this:
-```
+```C++
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -278,7 +278,7 @@ void loop() {
 All coroutines are instances of the `Coroutine` class or one of its
 subclasses. The name of the coroutine instance is the name provided
 in the `COROUTINE()` macro. For example, in the following example:
-```
+```C++
 COROUTINE(doSomething) {
   COROUTINE_BEGIN();
   ...
@@ -321,7 +321,7 @@ gives the illusion that the execution continues further down the function.)
 
 `COROUTINE_AWAIT(condition)` yields until the `condition` evaluates to `true`.
 This is a convenience macro that is identical to:
-```
+```C++
 while (!condition) COROUTINE_YIELD();
 ```
 
@@ -340,7 +340,7 @@ yield control to the other coroutines as soon as possible.
 
 To delay for longer, an explicit loop can be used. For example, to delay
 for 1000 seconds, we can do this:
-```
+```C++
 COROUTINE(waitThousandSeconds) {
   COROUTINE_BEGIN();
   static int i = 0;
@@ -367,7 +367,7 @@ through multiple calls to the function, which is exactly what is needed.
 ### Conditional If-Else
 
 Conditional if-statements work as expected with the various macros:
-```
+```C++
 COROUTINE(doIfThenElse) {
   COROUTINE_BEGIN();
 
@@ -390,7 +390,7 @@ COROUTINE(doIfThenElse) {
 Unlike some implementations of stackless coroutines, AceRoutine coroutines are
 compatible with `switch` statements:
 
-```
+```C++
 COROUTINE(doThingsBasedOnSwitchConditions) {
   COROUTINE_BEGIN();
   ...
@@ -419,7 +419,7 @@ would be created on the stack, and the stack gets destroyed as soon as
 `COROUTINE_YIELD()`, `COROUTINE_DELAY()`, or `COROUTINE_AWAIT()` is executed.
 However, a reasonable solution is to use `static` variables. For example:
 
-```
+```C++
 COROUTINE(countToTen) {
   COROUTINE_BEGIN();
   static int i = 0;
@@ -438,7 +438,7 @@ You can write a coroutine that loops while certain condition is valid like this,
 just like you would normally, except that you call the `COROUTINE_YIELD()`
 macro to cooperatively allow other coroutines to execute.
 
-```
+```C++
 COROUTINE(loopWhileCondition) {
   COROUTINE_BEGIN();
   while (condition) {
@@ -459,7 +459,7 @@ AWAIT.
 In many cases, you just want to loop forever. You could use a `while (true)`
 statement, like this:
 
-```
+```C++
 COROUTINE(loopForever) {
   COROUTINE_BEGIN();
   while (true) {
@@ -473,7 +473,7 @@ COROUTINE(loopForever) {
 However, a forever-loop occurs so often that I created a convenience macro
 named `COROUTINE_LOOP()` to make this easier:
 
-```
+```C++
 COROUTINE(loopForever) {
   COROUTINE_LOOP() {
     ...
@@ -490,7 +490,7 @@ because the loop does not terminate. (Technically, it isn't required with the
 
 You could actually exit the loop using `COROUTINE_END()` in the middle of the
 loop:
-```
+```C++
 COROUTINE(loopForever) {
   COROUTINE_LOOP() {
     if (condition) {
@@ -510,7 +510,7 @@ Coroutines macros **cannot** be nested. In other words, if you call another
 function from within a coroutine, you cannot use the various `COROUTINE_XXX()`
 macros inside the nested function. The macros will trigger compiler errors if
 you try:
-```
+```C++
 void doSomething() {
   ...
   COROUTINE_YIELD(); // ***compiler error***
@@ -532,7 +532,7 @@ COROUTINE(cannotUseNestedMacros) {
 
 Coroutines can be chained, in other words, one coroutine *can* explicitly
 call another coroutine, like this:
-```
+```C++
 COROUTINE(inner) {
   COROUTINE_LOOP() {
     ...
@@ -566,7 +566,7 @@ There are 2 ways to run the coroutines:
 If you have only a small number of coroutines, the manual method may be the
 easiest. This requires you to explicitly call the `runCoroutine()` method of all
 the coroutines that you wish to run in the `loop()` method, like this:
-```
+```C++
 void loop() {
   blinkLed.runCoroutine();
   printHello.runCoroutine();
@@ -581,7 +581,7 @@ defined in multiple `.cpp` files, then the `CoroutineScheduler` will
 make things easy. You just need to call `CoroutineScheduler::setup()`
 in the global `setup()` method, and `CoroutineScheduler::loop()`
 in the global `loop()` method, like this:
-```
+```C++
 void setup() {
   ...
   CoroutineScheduler::setup();
@@ -691,7 +691,7 @@ You can query these internal states using the following methods on the
 To call these functions on a specific coroutine, use the `Coroutine` instance
 variable that was created using the `COROUTINE()` macro:
 
-```
+```C++
 COROUTINE(doSomething) {
   COROUTINE_BEGIN();
   ...
@@ -714,7 +714,7 @@ COROUTINE(doSomethingElse) {
 The `COROUTINE_YIELD()`, `COROUTINE_DELAY()`, `COROUTINE_AWAIT()` macros have
 been designed to allow them to be used almost everywhere a valid C/C++ statement
 is allowed. For example, the following is allowed:
-```
+```C++
   ...
   if (condition) COROUTINE_YIELD();
   ...
@@ -726,7 +726,7 @@ All coroutines are instances of the `Coroutine` class, or one of its subclasses.
 You can create custom subclasses of `Coroutine` and create coroutines which are
 instances of the custom class. Use the 2-argument version of the `COROUTINE()`
 macro like this:
-```
+```C++
 class CustomCoroutine : public Coroutine {
   public:
     void enable(bool isEnabled) { enabled = isEnabled; }
@@ -760,7 +760,7 @@ if the coroutine has external dependencies which need to be injected into the
 constructor. The `COROUTINE()` macro does not allow the constructor to be
 customized.
 
-```
+```C++
 class ManualCoroutine : public Coroutine {
   public:
     // Inject external dependencies into the constructor.
@@ -783,7 +783,7 @@ A manual coroutine (created without the `COROUTINE()` macro) is *not*
 automatically added to the linked list used by the `CoroutineScheduler`. If you
 wish to insert it into the scheduler, use the `setupCoroutine()` method just
 before calling `CoroutineScheduler::setup()`:
-```
+```C++
 void setup() {
   ...
   manualRoutine.setupCoroutine("manualRoutine");
@@ -837,7 +837,7 @@ declaration for that instance. The macro that makes this easy is
 
 For example, supposed we define a coroutine named `external` like
 this in a `External.cpp` file:
-```
+```C++
 COROUTINE(external) {
   ...
 }
@@ -845,7 +845,7 @@ COROUTINE(external) {
 
 To use this in `Main.ino` file, we must use the `EXTERN_COROUTINE()` macro like
 this:
-```
+```C++
 EXTERN_COROUTINE(external);
 
 COROUTINE(doSomething) {
@@ -858,14 +858,14 @@ COROUTINE(doSomething) {
 If the 2-argument version of `COROUTINE()` was used, then the corresponding
 2-argument version of `EXTERN_COROUTINE()` must be used, like this in
 `External.cpp`:
-```
+```C++
 COROUTINE(CustomCoroutine, external) {
   ...
 }
 ```
 
 then this in `Main.ino`:
-```
+```C++
 EXTERN_COROUTINE(CustomCoroutine, external);
 
 COROUTINE(doSomething) {

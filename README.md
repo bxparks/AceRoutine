@@ -694,26 +694,29 @@ A coroutine has several internal states:
 
 The finite state diagram looks like this:
 ```
-         Suspended
-         ^   ^   ^
-        /    |    \
-       /     |     \
-      v      |      \
-Yielding Awaiting Delaying
-     ^       ^       ^
-      \      |      /
-       \     |     /
-        \    |    /
-         v   v   v
-          Running
-             |
-             |
-             v
-          Ending
-             |
-             |
-             v
-        Terminated
+                     ----------------------------
+         Suspended                              ^
+         ^   ^   ^                              |
+        /    |    \                             |
+       /     |     \                            |
+      v      |      \       --------            |
+Yielding Awaiting Delaying         ^            |
+     ^       ^       ^             |            |
+      \      |      /              |        accessible
+       \     |     /               |        using
+        \    |    /                |        CoroutineScheduler
+         v   v   v          accessible          |
+          Running           by calling          |
+             |              runCoroutine()      |
+             |              directly            |
+             |                     |            |
+             v                     |            |
+          Ending                   v            |
+             |              --------            |
+             |                                  |
+             v                                  |
+        Terminated                              v
+                    -----------------------------
 ```
 
 You can query these internal states using the following methods on the

@@ -47,20 +47,29 @@ namespace cli {
  * Example usage:
  *
  * @code
- * const uint8_t TABLE_SIZE = 4;
+ * class CommandA: public CommandHandler {
+ *   ...
+ * };
+ * class CommandB: public CommandHandler {
+ *   ...
+ * };
+ *
+ * CommandA commandA;
+ * CommandB commandB;
+ *
+ * static const CommandHandler* COMMANDS[] = {
+ *
+ * };
+ *
  * const uint8_t BUF_SIZE = 64;
  * const uint8_t ARGV_SIZE = 5;
  * const char PROMPT[] = "$ ";
  *
- * CommandManager<TABLE_SIZE, BUF_SIZE, ARGV_SIZE> commandManager(
- *     Serial, PROMPT);
+ * CommandManager<BUF_SIZE, ARGV_SIZE> commandManager(
+ *     COMMANDS, NUM_COMMANDS, Serial, PROMPT);
  *
  * void setup() {
- *   commandManager.add(commandHandler1);
- *   commandManager.add(commandHandler2);
  *   ...
- *   commandManager.setupCommands();
- *
  *   commandManager.setupCoroutine("commandManager");
  *   CoroutineScheduler::setup();
  * }

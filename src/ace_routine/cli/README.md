@@ -44,10 +44,12 @@ parameters:
 ### CommandManager
 
 The `CommandManager` is a templatized convenience class that creates all the
-helper objects and buffers, including:
-* a `CommandDispatcher`
-* a `StreamLineReader`
-* a `Channel` between the two coroutines
+helper objects and buffers needed to read and parse the command line input.
+It includes:
+
+* a `StreamLineReader` coroutine that reads the input lines from `Serial`
+* a `CommandDispatcher` coroutine that parses the input lines
+* a `Channel<InputLine>` from `StreamLineReader` to `CommandDispatcher`
 * a line buffer for the input lines
 * a array of `(const char*)` to hold the command line arguments of the command
 

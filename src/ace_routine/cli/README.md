@@ -7,30 +7,30 @@ These classes were initially an experiment to validate the `AceRoutine` macros
 and classes but they seem to be useful as an independent library. They may be
 moved to a separate project/repository later.
 
-Version: (2018-07-20)
+Version: (2018-09-29)
 
 ## Usage
 
 The basic steps for adding a command line interface to an Arduino sketch
 using the `cli/` library is the following:
 
-1. Create a `CommandHandler` function for each command.
-1. Create a `CommandManager` object that defines size parameters of various
-   internal buffers.
-1. Register the command in the CommandManager in the global `setup()` method
-   using `CommandManager::add(handler, name, helpString)` for each command.
+1. Create a `CommandHandler` class for each command, defining its
+   `name` and `helpString`.
+1. Create a static array of `CommandHandler*` pointers with all the commands
+   that you would like to suport.
+1. Create a `CommandManager` object, giving it the `CommandHandler*` array,
+   and a number of size parameters for various internal buffers (maximum line
+   buffer length, and maximum number of `argv` parameters for a command).
 1. Insert the `CommandManager` into the `CoroutineScheduler` by calling
-   `commandManager.resume();` just before `CoroutineScheduler::setup()`.
+   `commandManager.setupCoroutine()` just before `CoroutineScheduler::setup()`.
 1. Run the `CoroutineScheduler::loop` in the global `loop()` method to
    run the `CommandManager` as a coroutine.
 
 ### Command Handler and Arguments
 
-The `CommandHandler` typedef is a pointer to a user-defined function that has
-the following signature:
-```
-typedef void (*CommandHandler)(Print& printer, int argc, const char** argv);
-```
+The `CommandHandler` class defines the command's `name`, `helpString` and
+the `run()` method that implements the command. It takes the following
+parameters:
 
 * `printer` is the output device, which will normally be the global `Serial`
   object
@@ -43,55 +43,57 @@ typedef void (*CommandHandler)(Print& printer, int argc, const char** argv);
 
 ### CommandManager
 
-The `CommandManager` is a templatized convenience class that wraps the
-`CommandDispatcher` along with all of the various buffers and resources that the
-dispatcher needs. It greatly simplies the creation of the `CommandDispatcher`.
+The `CommandManager` is a templatized convenience class that creates all the
+helper objects and buffers needed to read and parse the command line input.
+It includes:
 
-Using the template parameters, the `CommandManager` creates almost all of its
-resources statically (i.e. the sizes are known at compile-time). However, it
-creates a fixed array of command records in the `DispatchTable` on the heap. No
-further heap allocation is performed for the lifetime of this object.
+* a `StreamLineReader` coroutine that reads the input lines from `Serial`
+* a `CommandDispatcher` coroutine that parses the input lines
+* a `Channel<InputLine>` from `StreamLineReader` to `CommandDispatcher`
+* a line buffer for the input lines
+* a array of `(const char*)` to hold the command line arguments of the command
 
-### Structure of Client Calling Code
+You don't have to use the `CommandManager`, but it greatly simplies the creation
+and usage of the `CommandDispatcher`.
+
+### Setup Process from Sketch
 
 An Arduino `.ino` file that uses the CLI classes to implement a commmand line
 shell will look something like this:
 
-```
+```C++
 #include <AceRoutine.h>
 #include <ace_routine/cli/CommandManager.h>
 
 using namespace ace_routine;
 using namespace ace_routine::cli;
 
-// Define the command handlers.
-void newCommand(Print& printer, int argc, const char** argv) {
+class CommandA: public CommandHandler {
   ...
-}
-
-void anotherCommand(Print& printer, int argc, const char** argv) {
+};
+class CommandB: public CommandHandler {
   ...
-}
+};
 
-// Create the dispatch table of commands (using C-strings)
-const DispatchRecordC dispatchTable[] = {
+CommandA commandA;
+CommandB commandB;
 
-// Create the CommandManager
-const uint8_t BUF_SIZE = 64; // maximum size of an input line
-const uint8_t ARGV_SIZE = 10; // maximum number of tokens in command
-const uint8_t TABLE_SIZE = 4; // maximum number of commands
-const char PROMPT[] = "> ";
-CommandManager<__FlashStringHelper, BUF_SIZE, ARGV_SIZE>
-    commandManager(Serial, TABLE_SIZE, PROMPT);
+static const CommandHandler* const COMMANDS[] = {
+  &commandA,
+  &commandB,
+};
+static uint8_t const NUM_COMMANDS = sizeof(COMMANDS) / sizeof(CommandHandler*);
+
+uint8_t const BUF_SIZE = 64; // maximum size of an input line
+uint8_t const ARGV_SIZE = 10; // maximum number of tokens in command
+char const PROMPT[] = "$ ";
+
+CommandManager<BUF_SIZE, ARGV_SIZE> commandManager(
+    COMMANDS, NUM_COMMANDS, Serial, PROMPT);
 
 void setup() {
-  Serial.begin(115200);
-  while (!Serial); // micro/leonardo
-
-  commandManager.add(newCommand, "name-of-command", "help-string");
-  commandManager.add(anotherCommand, "name-of-other-command", "help-string");
   ...
-  commandManager.resume(); // insert into the scheduler
+  commandManager.setupCoroutine("commandManager");
   CoroutineScheduler::setup();
 }
 

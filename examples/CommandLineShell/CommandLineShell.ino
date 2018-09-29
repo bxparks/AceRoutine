@@ -168,31 +168,30 @@ class DelayCommand: public CommandHandler {
     }
 };
 
-static const uint8_t MAX_COMMANDS = 4;
-static const uint8_t BUF_SIZE = 64;
-static const uint8_t ARGV_SIZE = 5;
-static const char PROMPT[] = "$ ";
-
-CommandManager<MAX_COMMANDS, BUF_SIZE, ARGV_SIZE>
-    commandManager(Serial, PROMPT);
-
 DelayCommand delayCommand;
 ListCommand listCommand;
 FreeCommand freeCommand;
 EchoCommand echoCommand;
+static const CommandHandler* const COMMANDS[] = {
+  &delayCommand,
+  &listCommand,
+  &freeCommand,
+  &echoCommand
+};
+static const uint8_t NUM_COMMANDS = sizeof(COMMANDS) / sizeof(CommandHandler*);
+
+static const uint8_t BUF_SIZE = 64;
+static const uint8_t ARGV_SIZE = 5;
+static const char PROMPT[] = "$ ";
+
+CommandManager<BUF_SIZE, ARGV_SIZE> commandManager(
+    COMMANDS, NUM_COMMANDS, Serial, PROMPT);
 
 //---------------------------------------------------------------------------
 
 void setup() {
   Serial.begin(115200);
   while (!Serial); // micro/leonardo
-
-  // add commands to CommandManager
-  commandManager.add(&delayCommand);
-  commandManager.add(&listCommand);
-  commandManager.add(&freeCommand);
-  commandManager.add(&echoCommand);
-  commandManager.setupCommands();
 
   commandManager.setupCoroutine("commandManager");
   CoroutineScheduler::setup();

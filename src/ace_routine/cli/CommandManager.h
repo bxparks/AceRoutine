@@ -25,7 +25,9 @@ SOFTWARE.
 #ifndef ACE_ROUTINE_COMMAND_MANAGER_H
 #define ACE_ROUTINE_COMMAND_MANAGER_H
 
+#include <AceRoutine.h>
 #include "CommandDispatcher.h"
+#include "StreamLineReader.h"
 
 namespace ace_routine {
 namespace cli {
@@ -45,82 +47,81 @@ namespace cli {
  * Example usage:
  *
  * @code
- * const uint8_t TABLE_SIZE = 4;
+ * class CommandA: public CommandHandler {
+ *   ...
+ * };
+ * class CommandB: public CommandHandler {
+ *   ...
+ * };
+ *
+ * CommandA commandA;
+ * CommandB commandB;
+ *
+ * static const CommandHandler* COMMANDS[] = {
+ *
+ * };
+ *
  * const uint8_t BUF_SIZE = 64;
  * const uint8_t ARGV_SIZE = 5;
  * const char PROMPT[] = "$ ";
  *
- * CommandManager<TABLE_SIZE, BUF_SIZE, ARGV_SIZE> commandManager(
- *     Serial, PROMPT);
+ * CommandManager<BUF_SIZE, ARGV_SIZE> commandManager(
+ *     COMMANDS, NUM_COMMANDS, Serial, PROMPT);
  *
  * void setup() {
- *   commandManager.add(commandHandler1);
- *   commandManager.add(commandHandler2);
  *   ...
- *   commandManager.setupCommands();
- *
  *   commandManager.setupCoroutine("commandManager");
  *   CoroutineScheduler::setup();
  * }
  * @endcode
  *
- * @param MAX_COMMANDS Maximum number of commands.
  * @param BUF_SIZE Size of the input line buffer.
  * @param ARGV_SIZE Size of the command line argv token list.
  */
-template<uint8_t MAX_COMMANDS, uint8_t BUF_SIZE, uint8_t ARGV_SIZE>
+template<uint8_t BUF_SIZE, uint8_t ARGV_SIZE>
 class CommandManager: public Coroutine {
   public:
 
     /**
      * Constructor.
      *
+     * @param commands Array of (CommandHandler*).
+     * @param numCommands Number of commands in 'commands'.
      * @param serial The serial port used to read commands and send output,
      *        will normally be 'Serial', but can be set to something else.
      * @param prompt If not null, print a prompt and echo the command entered
      *        by the user. If null, don't print the prompt and don't echo the
      *        input from the user.
      */
-    CommandManager(Stream& serial, const char* prompt = nullptr):
+    CommandManager(const CommandHandler* const* commands, uint8_t numCommands,
+            Stream& serial, const char* prompt = nullptr):
+        mCommands(commands),
+        mNumCommands(numCommands),
         mSerial(serial),
         mPrompt(prompt),
-        mStreamReader(serial, mLineBuffer, BUF_SIZE) {}
-
-    virtual ~CommandManager() {
-      if (mDispatcher) {
-        delete mDispatcher;
-      }
-    }
-
-    /** Add the given command handler to the list of commands. */
-    void add(const CommandHandler* command) {
-      if (mNumCommands < MAX_COMMANDS) {
-        mCommands[mNumCommands++] = command;
-      }
-    }
-
-    void setupCommands() {
-      mDispatcher = new CommandDispatcher(mStreamReader, mSerial, mCommands,
-          mNumCommands, mArgv, ARGV_SIZE, mPrompt);
-    }
+        mStreamLineReader(mChannel, mSerial, mLineBuffer, BUF_SIZE),
+        mDispatcher(mChannel, mSerial, mCommands, mNumCommands,
+            mArgv, ARGV_SIZE, mPrompt) {}
 
     virtual int runCoroutine() override {
-      return mDispatcher->runCoroutine();
+      mStreamLineReader.runCoroutine();
+      mDispatcher.runCoroutine();
+      return 0;
     }
 
     /** Return the CommandDispatcher. VisibleForTesting. */
     const CommandDispatcher* getDispatcher() const { return mDispatcher; }
 
   private:
+    const CommandHandler* const* const mCommands;
+    uint8_t const mNumCommands;
     Stream& mSerial;
     const char* const mPrompt;
-    StreamReader mStreamReader;
-    const CommandHandler* mCommands[MAX_COMMANDS];
+    Channel<InputLine> mChannel;
+    StreamLineReader mStreamLineReader;
+    CommandDispatcher mDispatcher;
     char mLineBuffer[BUF_SIZE];
     const char* mArgv[ARGV_SIZE];
-
-    CommandDispatcher* mDispatcher = nullptr;
-    uint8_t mNumCommands = 0;
 };
 
 }

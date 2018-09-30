@@ -42,6 +42,9 @@ namespace ace_routine {
 template<typename T>
 class Channel {
   public:
+    /** Constructor. */
+    Channel() {}
+
     /**
      * Used by COROUTINE_CHANNEL_WRITE() to preserve the value of the write
      * across multiple COROUTINE_YIELD() calls. Not designed to be used
@@ -119,6 +122,10 @@ class Channel {
     }
 
   private:
+    // Disable copy-constructor and assignment operator
+    Channel(const Channel&) = delete;
+    Channel& operator=(const Channel&) = delete;
+
     static const uint8_t kWriterReady = 0;
     static const uint8_t kReaderReady = 1;
     static const uint8_t kDataProduced = 2;

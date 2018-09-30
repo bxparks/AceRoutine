@@ -63,10 +63,13 @@ others (in my opinion of course):
 * fully unit tested using [AUnit](https://github.com/bxparks/AUnit)
 
 Some limitations are:
-* coroutines cannot return any values
-* coroutines are stackless, so they cannot preserve local stack varaibles
+* A `Coroutine` cannot return any values.
+* A `Coroutine` is stackless cannot preserve local stack varaibles
   across multiple calls. Often the class member variables or function static
   variables are reasonable substitutes.
+* A `Channel` is an experimental feature and has limited features. It is
+  currently an unbuffered, synchrronized channel. It can be used by only one
+  reader and one writer.
 
 After I had completed most of this library, I discovered that I had essentially
 reimplemented the `<ProtoThread.h>` library in the
@@ -190,6 +193,8 @@ The [docs/](docs/) directory contains the
 
 The following example sketches are provided:
 
+* [AutoBenchmark.ino](examples/AutoBenchmark):
+  a program that performs CPU benchmarking
 * [HelloCoroutine.ino](examples/HelloCoroutine)
 * [HelloScheduler.ino](examples/HelloScheduler): same as `HelloCoroutine`
   except using the `CoroutineScheduler` instead of manually running the
@@ -199,14 +204,14 @@ The following example sketches are provided:
 * [BlinkSlowFastCustomRoutine.ino](examples/BlinkSlowFastCustomRoutine): same
   as BlinkSlowFastRoutine but using a custom `Coroutine` class
 * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same time
-* [AutoBenchmark.ino](examples/AutoBenchmark):
-  a program that performs CPU benchmarking
 * [CommandLineShell.ino](examples/CommandLineShell): uses the
   `src/ace_routine/cli` classes to implement a command line interface that
   accepts a number of commands on the serial port. In other words, it is a
   primitive "shell". The shell is non-blocking and uses coroutines so that other
   coroutines continue to run while the board waits for commands to be typed on
   the serial port.
+* [Pipe.ino](examples/Pipe): uses a `Channel` to allow a Writer to send
+  messages to a Reader
 
 ## Usage
 
@@ -589,9 +594,9 @@ class OuterCoroutine: public Coroutine {
     }
 
     virtual int runCoroutine override {
-      ...
+      // No COROUTINE_BEGIN() and COROUTINE_END() needed if this simply
+      // delegates to the InnerCoroutine.
       mInner.runCoroutine();
-      ...
     }
 
   private:

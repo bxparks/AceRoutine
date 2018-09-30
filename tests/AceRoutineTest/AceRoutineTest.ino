@@ -8,6 +8,8 @@ using namespace ace_routine;
 using namespace ace_routine::testing;
 using namespace aunit;
 
+// ---------------------------------------------------------------------------
+
 test(FCString_compareTo) {
   FCString n;
   FCString a("a");
@@ -27,6 +29,45 @@ test(FCString_compareTo) {
   assertMore(fb.compareTo(a), 0);
   assertMore(fb.compareTo(fa), 0);
 }
+
+// ---------------------------------------------------------------------------
+
+Channel<int> channel;
+
+test(channelReadAndWrite) {
+  int writeValue = 2;
+  int readValue = 0;
+
+  assertFalse(channel.read(readValue));
+  assertFalse(channel.read(readValue)); // second call should also return false
+  assertFalse(channel.write(writeValue));
+  assertFalse(channel.write(writeValue)); // second call should return false
+
+  assertTrue(channel.read(readValue));
+  assertTrue(channel.write(writeValue)); // write() can proceed after read()
+
+  assertEqual(readValue, writeValue);
+}
+
+test(channelWriteMacro) {
+  int writeValue = 2;
+  int readValue = 0;
+
+  assertFalse(channel.read(readValue));
+  assertFalse(channel.read(readValue)); // second call should also return false
+
+  // Test the methods used by COROUTINE_CHANNEL_WRITE()
+  channel.setValue(writeValue);
+  assertFalse(channel.write());
+  assertFalse(channel.write()); // second call should return false
+
+  assertTrue(channel.read(readValue));
+  assertTrue(channel.write()); // write() can proceed after read()
+
+  assertEqual(readValue, writeValue);
+}
+
+// ---------------------------------------------------------------------------
 
 // An external flag to await upon, for testing.
 bool simpleCoroutineFlag = false;
@@ -274,6 +315,8 @@ test(scheduler) {
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
 }
+
+// ---------------------------------------------------------------------------
 
 void setup() {
   delay(1000); // some boards reboot twice

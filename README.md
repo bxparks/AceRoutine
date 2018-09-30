@@ -3,7 +3,7 @@
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
 
-Version: 0.1 (2018-08-07)
+Version: 0.2 (2018-09-29)
 
 This library is currently in "beta" status. I'm releasing it through the Arduino
 Library Manager to solicit feedback from interested users. Send me an email or
@@ -20,9 +20,12 @@ using a `yield()` or `delay()` functionality to allow other coroutines to
 execute. When the scheduler makes it way back to the original coroutine, the
 execution continues right after the `yield()` or `delay()`.
 
-There are only 2 classes in this library:
-* each coroutine is an instance of the `Coroutine` class (or a subclass),
-* the `CoroutineScheduler` class handles the scheduling.
+There are only 3 classes in this library:
+* `Coroutine` class provides the context variables for all coroutines,
+* `CoroutineScheduler` class optionally handles the scheduling,
+* `Channel` class allows coroutines to send messages to each other. This is
+  an early experimental feature whose API and feature may change considerably
+  in the future.
 
 The library provides a number of macros to help create coroutines and manage
 their life cycle:
@@ -36,6 +39,8 @@ their life cycle:
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
+* `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`
+* `COROUTINE_CHANNEL_READ()`: reads a message from a `Channel`
 
 Here are some of the compelling features of this library compared to
 others (in my opinion of course):
@@ -219,7 +224,8 @@ using namespace ace_routine;
 
 ### Macros
 
-The following macros are used:
+The following macros are available to hide a lot of boilerplate code:
+
 * `COROUTINE()`: defines an instance of `Coroutine` class or a user-provided
   custom subclass of `Coroutine`
 * `COROUTINE_BEGIN()`: must occur at the start of a coroutine body
@@ -230,6 +236,8 @@ The following macros are used:
   allowable delay is 32767 milliseconds.
 * `COROUTINE_LOOP()`: convenience macro that loops forever, replaces
   `COROUTINE_BEGIN()` and `COROUTINE_END()`
+* `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`
+* `COROUTINE_CHANNEL_READ()`: reads a message from a `Channel`
 
 ### Overall Structure
 
@@ -551,7 +559,8 @@ COROUTINE(outer) {
 }
 
 ```
-I have yet to find it useful to call a `COROUTINE()` from another `COROUTINE()`.
+I have yet to find it useful to call a Coroutine defined with the `COROUTINE()`
+from another Coroutine defined by the same `COROUTINE()` macro.
 
 However, I have found it useful to chain coroutines when using the **Manual
 Coroutines** described in one of the sections below. The ability to chain
@@ -792,8 +801,10 @@ The 2-argument version created an object instance called `blinkSlow` which is an
 instance of an internally generated class named `CustomCoroutine_blinkSlow`
 which is a subclass of `CustomCoroutine`.
 
-Custom coroutines are useful if you need to create multiple coroutines which
-share methods or data structures.
+Custom coroutines were intended to be useful if you need to create multiple
+coroutines which share methods or data structures. In practice, however, I have
+yet to find a use for them. Instead, I have found that the *Manual Coroutines*
+described in the next section to be more useful.
 
 ### Manual Coroutines
 
@@ -843,8 +854,8 @@ void loop() {
 ```
 
 There are 2 versions of the `setupCoroutine()` method:
-* `setupCoroutine(const char* name)` - insert a named coroutine
-* `setupCoroutine(const __FlashStringHelper* name)` - insert a named coroutine
+* `setupCoroutine(const char* name)`
+* `setupCoroutine(const __FlashStringHelper* name)`
 
 Both have been designed so that they are safe to be called from the constructor
 of a `Coroutine` class, even during static initialization time. This is exactly
@@ -921,15 +932,167 @@ COROUTINE(doSomething) {
 
 ### Communication Between Coroutines
 
-The AceRoutine library does not provide any internal mechanism to
-pass data between coroutines. Here are some options:
+There are a handful ways that `Coroutine` instances can pass data between
+each other.
 
 * The easiest method is to use **global variables** which are modified by
   multiple coroutines.
-* You can subclass the `Coroutine` class and define a class static variables
-  which can be shared among coroutines which inherit this custom class
-* You can define methods on the custom Coroutine class, and pass messages back
-  and forth between coroutines using these methods.
+* To avoid polluting the global namespace, you can subclass the `Coroutine`
+  class and define **class static variables** which can be shared among
+  coroutines which inherit this custom class
+* You can define **methods on the custom Coroutine class**, and pass messages
+  back and forth between coroutines using these methods.
+* You can use **channels** as explained in the next section.
+
+### Channels
+
+I have provided an early experimental implementation of channels inspired by the
+[Go Lang Channels](https://www.golang-book.com/books/intro/10). The `Channel`
+class implements an unbuffered, bidirectional channel. The API and features
+of the `Channel` class may change significantly in the future.
+
+Just like Go Lang channels, the AceRoutine `Channel` provides a point of
+synchronization between coroutines. In other words, the following sequence of
+events is guaranteed when interacting with a channel:
+
+* the writer blocks until the reader is ready,
+* the reader blocks until the writer is ready,
+* when the writer writes, the reader picks up the the message and is allowed
+  to continue execution *before* the writer is allowed to continue,
+* the writer then continues execution after the reader yields.
+
+Channels will be most likely be used with Manual Coroutines, in other words,
+when you define your own subclasses of `Coroutine` and define your own
+`runCoroutine()` method, instead of using the `COROUTINE()` macro. The `Channel`
+class can be injected into the constructor of the `Coroutine` subclass.
+
+The `Channel` class is templatized on the channel message class written by the
+writer and read by the reader. It will often be useful for the message type to
+contain a status field which indicates whether the writer encountered an error.
+So a message of just an `int` may look like:
+```C++
+class Message {
+  static uint8_t const kStatusOk = 0;
+  static uint8_t const kStatusError = 1;
+
+  uint8_t status;
+  int value;
+};
+```
+
+A `Channel` of this type can be created like this:
+```C+++
+Channel<Message> channel;
+```
+
+This channel should be injected into the writer coroutine and reader coroutine:
+```C++
+class Writer: public Coroutine {
+  public:
+    Writer(Channel<Message>& channel, ...):
+      mChannel(channel),
+      ...
+    {...}
+
+  private:
+    Channel<Message>& mChannel;
+};
+
+class Reader: public Coroutine {
+  public:
+    Reader(Channel<Message>& channel, ...):
+      mChannel(channel),
+      ...
+    {...}
+
+  private:
+    Channel<Message>& mChannel;
+};
+```
+
+Next, implement the `runCoroutine()` methods of both the Writer and Reader
+to pass the `Messager` objects. There are 2 new macros to help with writing to
+and reading from channels:
+
+* `COROUTINE_CHANNEL_WRITE(channel, value)`: writes the `value` to the given
+  channel, blocking (i.e. yielding) until the reader is ready
+* `COROUTINE_CHANNEL_READ(channel, value)`: reads from the channel into the
+  given `value`, blocking (i.e. yielding) until the writer is ready to write
+
+Here is the sketch of a Writer that sends 10 integers to the Reader:
+
+```C++
+class Writer: public Coroutine {
+  public:
+    Writer(...) {...}
+
+    virtual int runCoroutine() override {
+      static int i;
+      COROUTINE_BEGIN();
+      for (i = 0; i < 9; i++) {
+        Message message = { Message::kStatusOk, i };
+        COROUTINE_CHANNEL_WRITER(mChannel, message);
+      }
+      COROUTINE_END();
+    }
+
+  private:
+    Channel<Message>& mChannel;
+};
+
+class Reader: public Coroutine {
+  public
+    Reader(...) {...}
+
+    virtual int runCoroutine() override {
+      COROUTINE_LOOP() {
+        Message message;
+        COROUTINE_CHANNEL_READ(mChannel, message);
+        if (message.status == Message::kStatusOk) {
+          Serial.print("Message received: value = ");
+          Serial.println(message.value);
+        }
+      }
+    }
+
+  private:
+    Channel<Message>& mChannel;
+};
+
+...
+
+Writer writer(channel);
+Reader reader(channel);
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial); // micro/leonardo
+
+  ...
+  writer.setupCoroutine("writer");
+  reader.setupCoroutine("reader");
+  CoroutineScheduler::setup();
+  ...
+}
+
+void loop() {
+  CoroutineScheduler::loop();
+}
+```
+
+**Limitations**
+
+* Only a single AceRoutine `Coroutine` can write to a `Channel`.
+* Only a single AceRoutine `Coroutine` can read from a `Channel`.
+* There is equivalent of a
+  [Go Lang select statement](https://gobyexample.com/select), so the coroutine
+  cannot wait for multiple channels at the same time.
+* There is no buffered channel type.
+* There is no provision to
+  [close a channel](https://gobyexample.com/closing-channels).
+
+Some of these features may be implemented in the future if I find compelling
+use-cases and if they are easy to implement.
 
 ### Functors
 

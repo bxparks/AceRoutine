@@ -1,16 +1,14 @@
 /*
  * A sketch that illustrates using two coroutines and a channel to create a
- * pipe between them. I'm borrowing concepts from the GoLang channels.
- *
- * WORK IN PROGRESS
+ * pipe between them.
  */
 
 #include <Arduino.h>
 #include <AceRoutine.h>
 
-#define CHANNEL_TYPE_SIMPLE 0
-#define CHANNEL_TYPE_SYNCHRONIZED 1
-#define CHANNEL_TYPE CHANNEL_TYPE_SYNCHRONIZED
+#define CHANNEL_TYPE_SYNC 0
+#define CHANNEL_TYPE_NO_SYNC 1
+#define CHANNEL_TYPE CHANNEL_TYPE_SYNC
 
 #define TEST_TYPE_LOOP 0
 #define TEST_TYPE_SEQ 1
@@ -22,7 +20,7 @@ using namespace ace_routine;
  * An unbuffered channel that provides no synchronization. Perhaps better
  * described as a buffered channel of size 1.
  *
- * Because of the buffering of size one, sending 20 integers from the writer to
+ * Because of the buffering of size one, sending 10 integers from the writer to
  * the reader has the following order:
  *
  * @code
@@ -37,9 +35,12 @@ using namespace ace_routine;
  * @endcode
  *
  * In other words, the receiver is one iteration behind the writer.
+ *
+ * TODO: Figure out if it's useful to move into the src/ace_time/ directory,
+ * perhaps as a BufferedChannel?
  */
 template<typename T>
-class SimpleChannel {
+class NoSyncChannel {
   public:
     void setValue(const T& value) {
       mValueToWrite = value;
@@ -81,21 +82,31 @@ class SimpleChannel {
     bool mDataReady = false;
 };
 
-#if CHANNEL_TYPE == CHANNEL_TYPE_SIMPLE
-  SimpleChannel<int> channel;
-#elif CHANNEL_TYPE == CHANNEL_TYPE_SYNCHRONIZED
-  Channel<int> channel;
+struct Message {
+  static uint8_t const kStatusOk = 0;
+  static uint8_t const kStatusError = 1;
+
+  uint8_t status;
+  int value;
+};
+
+#if CHANNEL_TYPE == CHANNEL_TYPE_NO_SYNC
+  NoSyncChannel<Message> channel;
+#elif CHANNEL_TYPE == CHANNEL_TYPE_SYNC
+  // This is a synchronized unbuffered Channel.
+  Channel<Message> channel;
 #endif
 
 #if TEST_TYPE == TEST_TYPE_LOOP
-// Test the ordering of sending 20 integers and receiving 20 integers.
+// Test the ordering of sending 10 integers and receiving 10 integers.
 COROUTINE(writer) {
   static int i;
   COROUTINE_BEGIN();
-  for (i = 0; i < 20; i++) {
+  for (i = 0; i < 10; i++) {
     Serial.print("Writer: sending ");
     Serial.println(i);
-    COROUTINE_CHANNEL_WRITE(channel, i);
+    Message message = {Message::kStatusOk, i};
+    COROUTINE_CHANNEL_WRITE(channel, message);
   }
   Serial.println("Writer: done");
   COROUTINE_END();
@@ -103,10 +114,10 @@ COROUTINE(writer) {
 
 COROUTINE(reader) {
   COROUTINE_LOOP() {
-    int i;
-    COROUTINE_CHANNEL_READ(channel, i);
+    Message message;
+    COROUTINE_CHANNEL_READ(channel, message);
     Serial.print("Reader: received ");
-    Serial.println(i);
+    Serial.println(message.value);
   }
 }
 

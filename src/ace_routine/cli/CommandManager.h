@@ -110,7 +110,7 @@ class CommandManager: public Coroutine {
     }
 
     /** Return the CommandDispatcher. VisibleForTesting. */
-    const CommandDispatcher* getDispatcher() const { return mDispatcher; }
+    const CommandDispatcher* getDispatcher() const { return &mDispatcher; }
 
   private:
     const CommandHandler* const* const mCommands;

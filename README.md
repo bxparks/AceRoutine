@@ -1085,6 +1085,17 @@ void loop() {
 }
 ```
 
+**Examples**
+
+A really good example of using a `Channel` can be found in the
+[ace_routine/cli](src/ace_routine/cli) package which uses 2 coroutines
+and a channel between them to communicate:
+
+* `StreamLineReader.h`: a coroutine that reads from `Serial` and writes to a
+  `Channel`
+* `CommandDispatcher.h`: a coroutine that reads from a `Channel` and dispatches
+  to a `CommandHandler`
+
 **Limitations**
 
 * Only a single AceRoutine `Coroutine` can write to a `Channel`.

@@ -53,24 +53,32 @@ Smallest code + LTO   |       1.81 | 0.68 | 1.12 |
 
 ## ESP8266
 
-Memory Size: (same as Teensy 3.2)
+Memory Size:
+```
+sizeof(Routine): 28
+sizeof(RoutineScheduler): 4
+```
 
 ```
 ------------+------+------+
 AceRoutine  | base | diff |
 ------------+------+------+
-      10.83 | 9.11 | 1.71 |
+       6.17 | 4.49 | 1.67 |
 ------------+------+------+
 ```
 
 ## ESP32
 
-Memory Size: (same as Teensy 3.2)
+Memory Size:
+```
+sizeof(Routine): 28
+sizeof(RoutineScheduler): 4
+```
 
 ```
 ------------+------+------+
  AceRoutine | base | diff |
 ------------+------+------+
-       6.59 | 6.13 | 0.46 |
+       1.69 | 1.23 | 0.45 |
 ------------+------+------+
 ```

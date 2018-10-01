@@ -212,6 +212,9 @@ The following example sketches are provided:
   the serial port.
 * [Pipe.ino](examples/Pipe): uses a `Channel` to allow a Writer to send
   messages to a Reader
+* [ChannelBenchmark.ino](examples/ChannelBenchmark): determines the amount of
+  CPU overhead of a `Channel` by using 2 coroutines to ping-pong an integer
+  across 2 channels
 
 ## Usage
 
@@ -1205,11 +1208,13 @@ advantages:
 All objects are statically allocated (i.e. not heap or stack).
 
 * 8-bit processors (AVR Nano, UNO, etc):
-    * sizeof(Coroutine): 14
-    * sizeof(CoroutineScheduler): 2
+    * `sizeof(Coroutine)`: 14
+    * `sizeof(CoroutineScheduler)`: 2
+    * `sizeof(Channel<int>)`: 5
 * 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32)
-    * sizeof(Coroutine): 28
-    * sizeof(CoroutineScheduler): 4
+    * `sizeof(Coroutine)`: 28
+    * `sizeof(CoroutineScheduler)`: 4
+    * `sizeof(Channel<int>)`: 12
 
 In other words, you can create 100 `Coroutine` instances and they would use only
 1400 bytes of static RAM on an 8-bit AVR processor.
@@ -1218,6 +1223,10 @@ The `CoroutineScheduler` consumes only 2 bytes of memory no matter how many
 coroutines are created. That's because it depends on a singly-linked list whose
 pointers live on the `Coroutine` object, not in the `CoroutineScheduler`.
 
+The `Channel` object requires 2 copies of the parameterized `<T>` type so its
+size is equal to `1 + 2 * sizeof(T)`, rounded to the nearest memory alignment
+boundary (i.e. 12 for a 32-bit processor).
+
 ### CPU
 
 See [examples/AutoBenchmark](examples/AutoBenchmark).
@@ -1225,9 +1234,9 @@ See [examples/AutoBenchmark](examples/AutoBenchmark).
 ## System Requirements
 
 This library was developed and tested using:
-* [Arduino IDE 1.8.5](https://www.arduino.cc/en/Main/Software)
+* [Arduino IDE 1.8.7](https://www.arduino.cc/en/Main/Software)
 * [Teensyduino 1.41](https://www.pjrc.com/teensy/td_download.html)
-* [ESP8266 Arduino Core 2.4.1](https://arduino-esp8266.readthedocs.io/en/2.4.1/)
+* [ESP8266 Arduino Core 2.4.2](https://arduino-esp8266.readthedocs.io/en/2.4.2/)
 * [arduino-esp32](https://github.com/espressif/arduino-esp32)
 
 I used MacOS 10.13.3 and Ubuntu 17.10 for most of my development.

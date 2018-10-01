@@ -36,13 +36,15 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 
-  CoroutineScheduler::setup();
-  CoroutineScheduler::list(Serial);
-
   Serial.print(F("sizeof(Coroutine): "));
   Serial.println(sizeof(Coroutine));
   Serial.print(F("sizeof(CoroutineScheduler): "));
   Serial.println(sizeof(CoroutineScheduler));
+  Serial.print(F("sizeof(Channel<int>): "));
+  Serial.println(sizeof(Channel<int>));
+
+  CoroutineScheduler::setup();
+  CoroutineScheduler::list(Serial);
 
   Serial.println(
       F("------------+------+------+"));

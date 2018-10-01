@@ -262,6 +262,8 @@ extern className##_##name name
       return 0; \
     } while (false)
 
+class StatusStringTest;
+
 namespace ace_routine {
 
 /**
@@ -270,6 +272,7 @@ namespace ace_routine {
  */
 class Coroutine {
   friend class CoroutineScheduler;
+  friend class ::StatusStringTest;
 
   public:
     /**
@@ -488,6 +491,11 @@ class Coroutine {
     /** Return the status of the coroutine. Used by the CoroutineScheduler. */
     Status getStatus() const { return mStatus; }
 
+    /** Print the human-readable string of the Status. */
+    void statusPrintTo(Print& printer) {
+      printer.print(sStatusStrings[mStatus]);
+    }
+
     /**
      * Pointer to label where execute will start on the next call to
      * runCoroutine().
@@ -544,6 +552,9 @@ class Coroutine {
     // Disable copy-constructor and assignment operator
     Coroutine(const Coroutine&) = delete;
     Coroutine& operator=(const Coroutine&) = delete;
+
+    /** A lookup table from Status integer to human-readable strings. */
+    static const __FlashStringHelper* const sStatusStrings[];
 
     /**
      * Insert the current coroutine into the singly linked list. The order of

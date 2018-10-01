@@ -32,6 +32,35 @@ test(FCString_compareTo) {
 
 // ---------------------------------------------------------------------------
 
+// Create a named subclass of TestOnce so that we can add it as a friend of the
+// Coroutine class, which allows it access to the protected Status constants
+// and sStatusStrings.
+class StatusStringTest: public TestOnce {
+  public:
+    void assertStatusStringsEqual() {
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusSuspended],
+          F("Suspended"));
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusYielding],
+          F("Yielding"));
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusAwaiting],
+          F("Awaiting"));
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusDelaying],
+          F("Delaying"));
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusRunning],
+          F("Running"));
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusEnding],
+          F("Ending"));
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusTerminated],
+          F("Terminated"));
+    }
+};
+
+testF(StatusStringTest, statusStrings) {
+  assertStatusStringsEqual();
+}
+
+// ---------------------------------------------------------------------------
+
 Channel<int> channel;
 
 test(channelReadAndWrite) {

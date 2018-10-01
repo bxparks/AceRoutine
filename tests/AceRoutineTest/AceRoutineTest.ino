@@ -39,19 +39,19 @@ class StatusStringTest: public TestOnce {
   public:
     void assertStatusStringsEqual() {
       assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusSuspended],
-          F("Suspended"));
+          "Suspended");
       assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusYielding],
-          F("Yielding"));
+          "Yielding");
       assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusAwaiting],
-          F("Awaiting"));
+          "Awaiting");
       assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusDelaying],
-          F("Delaying"));
+          "Delaying");
       assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusRunning],
-          F("Running"));
+          "Running");
       assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusEnding],
-          F("Ending"));
+          "Ending");
       assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusTerminated],
-          F("Terminated"));
+          "Terminated");
     }
 };
 

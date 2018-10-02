@@ -157,14 +157,12 @@ extern className##_##name name
  *    while (!condition) COROUTINE_YIELD();
  * @endcode
  *
- * but the getStatus() during the waiting is set to kStatusAwaiting instead of
- * kStatusYielding. The current scheduler treats the two states the same, but
- * it's possible that a different scheduler may want to treat them differently.
+ * but potentially slightly more efficient.
  */
 #define COROUTINE_AWAIT(condition) \
     do { \
       while (!(condition)) { \
-        setAwaiting(); \
+        setYielding(); \
         COROUTINE_YIELD_INTERNAL(); \
       } \
       setRunning(); \
@@ -345,9 +343,6 @@ class Coroutine {
     /** The coroutine returned using COROUTINE_YIELD(). */
     bool isYielding() const { return mStatus == kStatusYielding; }
 
-    /** The coroutine returned using COROUTINE_AWAIT(). */
-    bool isAwaiting() const { return mStatus == kStatusAwaiting; }
-
     /** The coroutine returned using COROUTINE_DELAY(). */
     bool isDelaying() const { return mStatus == kStatusDelaying; }
 
@@ -427,16 +422,16 @@ class Coroutine {
      *
      * @verbatim
      *          Suspended
-     *          ^   ^   ^
-     *         /    |    \
-     *        /     |     \
-     *       v      |      \
-     * Yielding Awaiting Delaying
-     *      ^       ^       ^
-     *       \      |      /
-     *        \     |     /
-     *         \    |    /
-     *          v   v   v
+     *          ^       ^
+     *         /         \
+     *        /           \
+     *       v             \
+     * Yielding          Delaying
+     *      ^               ^
+     *       \             /
+     *        \           /
+     *         \         /
+     *          v       v
      *           Running
      *              |
      *              |
@@ -461,20 +456,17 @@ class Coroutine {
     /** Coroutine returned using the COROUTINE_YIELD() statement. */
     static const Status kStatusYielding = 1;
 
-    /** Coroutine returned using the COROUTINE_AWAIT() statement. */
-    static const Status kStatusAwaiting = 2;
-
     /** Coroutine returned using the COROUTINE_DELAY() statement. */
-    static const Status kStatusDelaying = 3;
+    static const Status kStatusDelaying = 2;
 
     /** Coroutine is currenly running. True only within the coroutine itself. */
-    static const Status kStatusRunning = 4;
+    static const Status kStatusRunning = 3;
 
     /** Coroutine executed the COROUTINE_END() statement. */
-    static const Status kStatusEnding = 5;
+    static const Status kStatusEnding = 4;
 
     /** Coroutine has ended and no longer in the scheduler queue. */
-    static const Status kStatusTerminated = 6;
+    static const Status kStatusTerminated = 5;
 
     /**
      * Constructor. All subclasses are expected to call either
@@ -513,9 +505,6 @@ class Coroutine {
 
     /** Set the kStatusDelaying state. */
     void setYielding() { mStatus = kStatusYielding; }
-
-    /** Set the kStatusAwaiting state. */
-    void setAwaiting() { mStatus = kStatusAwaiting; }
 
     /** Set the kStatusDelaying state. */
     void setDelaying() { mStatus = kStatusDelaying; }

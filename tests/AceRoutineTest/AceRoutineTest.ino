@@ -42,8 +42,6 @@ class StatusStringTest: public TestOnce {
           "Suspended");
       assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusYielding],
           "Yielding");
-      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusAwaiting],
-          "Awaiting");
       assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusDelaying],
           "Delaying");
       assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusRunning],
@@ -126,10 +124,10 @@ test(simpleCoroutine) {
 
   simpleCoroutine.millis(1);
   simpleCoroutine.runCoroutine();
-  assertTrue(simpleCoroutine.isAwaiting());
+  assertTrue(simpleCoroutine.isYielding());
 
   simpleCoroutine.runCoroutine();
-  assertTrue(simpleCoroutine.isAwaiting());
+  assertTrue(simpleCoroutine.isYielding());
 
   simpleCoroutineFlag = true;
   simpleCoroutine.runCoroutine();
@@ -228,13 +226,13 @@ test(scheduler) {
   // run b
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
-  assertTrue(b.isAwaiting());
+  assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
 
   // run c
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
-  assertTrue(b.isAwaiting());
+  assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
 
   a.millis(101);
@@ -243,20 +241,20 @@ test(scheduler) {
 
   // run a
   CoroutineScheduler::loop();
-  assertTrue(a.isAwaiting());
-  assertTrue(b.isAwaiting());
+  assertTrue(a.isYielding());
+  assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
 
   // run b
   CoroutineScheduler::loop();
-  assertTrue(a.isAwaiting());
-  assertTrue(b.isAwaiting());
+  assertTrue(a.isYielding());
+  assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
 
   // run c
   CoroutineScheduler::loop();
-  assertTrue(a.isAwaiting());
-  assertTrue(b.isAwaiting());
+  assertTrue(a.isYielding());
+  assertTrue(b.isYielding());
   assertTrue(c.isEnding());
 
   a.millis(102);
@@ -265,19 +263,19 @@ test(scheduler) {
 
   // run a
   CoroutineScheduler::loop();
-  assertTrue(a.isAwaiting());
-  assertTrue(b.isAwaiting());
+  assertTrue(a.isYielding());
+  assertTrue(b.isYielding());
   assertTrue(c.isEnding());
 
   // run b
   CoroutineScheduler::loop();
-  assertTrue(a.isAwaiting());
+  assertTrue(a.isYielding());
   assertTrue(b.isEnding());
   assertTrue(c.isEnding());
 
   // run c - removed from list
   CoroutineScheduler::loop();
-  assertTrue(a.isAwaiting());
+  assertTrue(a.isYielding());
   assertTrue(b.isEnding());
   assertTrue(c.isTerminated());
 

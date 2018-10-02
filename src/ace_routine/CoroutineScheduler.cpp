@@ -78,7 +78,6 @@ void CoroutineScheduler::runCoroutine() {
   // Handle the coroutine's dispatch back to the last known internal status.
   switch ((*mCurrent)->getStatus()) {
     case Coroutine::kStatusYielding:
-    case Coroutine::kStatusAwaiting:
       (*mCurrent)->runCoroutine();
       mCurrent = (*mCurrent)->getNext();
       break;

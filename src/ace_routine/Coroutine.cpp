@@ -77,7 +77,6 @@ unsigned long Coroutine::millis() const {
 
 static const char kStatusSuspendedString[] PROGMEM = "Suspended";
 static const char kStatusYieldingString[] PROGMEM = "Yielding";
-static const char kStatusAwaitingString[] PROGMEM = "Awaiting";
 static const char kStatusDelayingString[] PROGMEM = "Delaying";
 static const char kStatusRunningString[] PROGMEM = "Running";
 static const char kStatusEndingString[] PROGMEM = "Ending";
@@ -86,7 +85,6 @@ static const char kStatusTerminatedString[] PROGMEM = "Terminated";
 const __FlashStringHelper* const Coroutine::sStatusStrings[] = {
   ACE_ROUTINE_FPSTR(kStatusSuspendedString),
   ACE_ROUTINE_FPSTR(kStatusYieldingString),
-  ACE_ROUTINE_FPSTR(kStatusAwaitingString),
   ACE_ROUTINE_FPSTR(kStatusDelayingString),
   ACE_ROUTINE_FPSTR(kStatusRunningString),
   ACE_ROUTINE_FPSTR(kStatusEndingString),

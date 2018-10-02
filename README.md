@@ -745,8 +745,8 @@ tests to prevent extraneous coroutines from interfering with test validation.
 
 A coroutine has several internal states:
 * `kStatusSuspended`: coroutine was suspended using `Coroutine::suspend()`
-* `kStatusYielding`: coroutine returned using `COROUTINE_YIELD()`
-* `kStatusAwaiting`: coroutine returned using `COROUTINE_AWAIT()`
+* `kStatusYielding`: coroutine returned using `COROUTINE_YIELD()` or
+  `COROUTINE_AWAIT()`
 * `kStatusDelaying`: coroutine returned using `COROUTINE_DELAY()`
 * `kStatusRunning`: coroutine is currently running
 * `kStatusEnding`: coroutine returned using `COROUTINE_END()`
@@ -757,16 +757,16 @@ The finite state diagram looks like this:
 ```
                      ----------------------------
          Suspended                              ^
-         ^   ^   ^                              |
-        /    |    \                             |
-       /     |     \                            |
-      v      |      \       --------            |
-Yielding Awaiting Delaying         ^            |
-     ^       ^       ^             |            |
-      \      |      /              |        accessible
-       \     |     /               |        using
-        \    |    /                |        CoroutineScheduler
-         v   v   v          accessible          |
+         ^       ^                              |
+        /         \                             |
+       /           \                            |
+      v             \       --------            |
+Yielding          Delaying         ^            |
+     ^               ^             |            |
+      \             /              |        accessible
+       \           /               |        using
+        \         /                |        CoroutineScheduler
+         v       v          accessible          |
           Running           by calling          |
              |              runCoroutine()      |
              |              directly            |
@@ -784,7 +784,6 @@ You can query these internal states using the following methods on the
 `Coroutine` class:
 * `Coroutine::isSuspended()`
 * `Coroutine::isYielding()`
-* `Coroutine::isAwaiting()`
 * `Coroutine::isDelaying()`
 * `Coroutine::isRunning()`
 * `Coroutine::isEnding()`

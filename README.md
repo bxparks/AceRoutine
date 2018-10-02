@@ -244,6 +244,9 @@ The following macros are available to hide a lot of boilerplate code:
 * `COROUTINE_AWAIT(condition)`: yield until `condition` become `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The maximum
   allowable delay is 32767 milliseconds.
+* `COROUTINE_DELAY_SECONDS(loopCounter, seconds)`: yields back execution for
+  `seconds`. The maximum allowable delay is the maximum value of the integer
+  type of `loopCounter` which can be of any integer type.
 * `COROUTINE_LOOP()`: convenience macro that loops forever, replaces
   `COROUTINE_BEGIN()` and `COROUTINE_END()`
 * `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`

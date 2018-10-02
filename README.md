@@ -38,9 +38,11 @@ their life cycle:
 * `COROUTINE_AWAIT(condition)`: yield until `condition` become `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
+* `COROUTINE_DELAY_SECONDS(loopCounter, seconds)`: yields back execution for
+  `seconds`. The `seconds` parameter is defined as a `uint16_t`.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
-* `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`
-* `COROUTINE_CHANNEL_READ()`: reads a message from a `Channel`
+* `COROUTINE_CHANNEL_WRITE(channel, value)`: writes a value to a `Channel`
+* `COROUTINE_CHANNEL_READ(channel, value)`: reads a value from a `Channel`
 
 Here are some of the compelling features of this library compared to
 others (in my opinion of course):
@@ -343,7 +345,7 @@ while (!condition) COROUTINE_YIELD();
 
 ### Delay
 
-`COROUTINE_DELAY(millis)` delays the return of control until `millis`
+The `COROUTINE_DELAY(millis)` macro delays the return of control until `millis`
 milliseconds have elapsed. The `millis` argument is a `uint16_t`, a 16-bit
 unsigned integer, which reduces the size of each coroutine instance by 4 bytes.
 However, the actual maximum delay is limited to 32767 milliseconds to avoid
@@ -359,15 +361,54 @@ for 1000 seconds, we can do this:
 ```C++
 COROUTINE(waitThousandSeconds) {
   COROUTINE_BEGIN();
-  static int i = 0;
-  for (i = 0; i < 100; i++) {
-    COROUTINE_DELAY(10000);
+  static uint16_t i;
+  for (i = 0; i < 1000; i++) {
+    COROUTINE_DELAY(1000);
   }
   ...
   COROUTINE_END();
 }
 ```
 See **For Loop** section below for a description of the for-loop construct.
+
+This for-loop construct happens often enough that it seemed worthwhile to
+provide the `COROUTINE_DELAY_SECONDS(loopCounter, seconds)` convenience macro.
+It replaces the above for-loop, like this:
+```C++
+COROUTINE(waitThousandSeconds) {
+  COROUTINE_BEGIN();
+  static uint16_t loopCounter;
+  COROUTINE_DELAY_SECONDS(loopCounter, 1000);
+  ...
+  COROUTINE_END();
+}
+```
+The `static uint16_t loopCounter` variable is still required for the
+`COROUTINE_DELAY_SECONDS()` macro because it needs a loop counter that must
+preserve its value across multiple invocation of the coroutine. The
+`loopCounter` may be any integer type, and the maximum number of seconds is the
+maximum value of that particular integer type. For example, if the `loopCounter`
+was a `uint8_t`, the maximum delay would be 255 seconds. If the `loopCounter`
+was a `uint32_t`, the maximum delay would be about 4 billion seconds.
+
+The `loopCounter` may also be a member variable of the `Coroutine` subclass,
+when you use custom or manual coroutines (see the sections on *Custom
+Coroutines* or *Manual Coroutines* below for details). In other words, you can
+define a coroutine with a `mDelayCounter` member variable, and use the
+`COROUTINE_DELAY_SECONDS()` macro like this:
+```C++
+class MyCoroutine: public Coroutine {
+  public:
+    virtual int runCoroutine() override {
+      ...
+      COROUTINE_DELAY_SECONDS(mDelayCounter, 1000);
+      ...
+    }
+
+  private:
+    uint16_t mDelayCounter;
+};
+```
 
 ### Stackless Coroutines
 

@@ -197,14 +197,14 @@ extern className##_##name name
 
 /**
  * Delay for delaySeconds. Maximum value is the maximum value of the
- * loopCounter. For example, if the loopCounter is a uint16_t, then the maximum
- * delay is 65535 seconds, or 18h12m15s. This macro calls COROUTINE_DELAY()
- * every 1000 milliseconds, so over the course of the entire delay, there may
- * be some drift. (Some of this drift could be avoided by looping in 16000ms
- * chunks, then looping the remainder in 1000ms chunks. Division of
- * delaySeconds by 16 would be fast. But minimizing drift doesn't seem to be
- * important for the use cases that I have in mind, so I haven't implemented
- * this.)
+ * loopCounter which can be any integer type. For example, if the loopCounter
+ * is a uint16_t, then the maximum delay is 65535 seconds, or 18h12m15s. This
+ * macro calls COROUTINE_DELAY() every 1000 milliseconds, so over the course of
+ * the entire delay, there may be some drift. (Some of this drift could be
+ * avoided by looping in 16000ms chunks, then looping the remainder in 1000ms
+ * chunks. Division of delaySeconds by 16 would be fast. But minimizing drift
+ * doesn't seem to be important for the use cases that I have in mind, so I
+ * haven't implemented this.)
  *
  * The loopCounter needs to be supplied to the macro because AceRoutine
  * coroutines are stackless so the loop cannot use the stack to keep count of
@@ -218,7 +218,7 @@ extern className##_##name name
  *   public:
  *     virtual int runCoroutine() override {
  *       ...
- *       COROUTINE_DELAY_SECONDS(mDelayCounter, 120);
+ *       COROUTINE_DELAY_SECONDS(mDelayCounter, 1000);
  *       ...
  *     }
  *
@@ -235,7 +235,7 @@ extern className##_##name name
  *   COROUTINE_LOOP() {
  *     ...
  *     static uint16_t delayCounter;
- *     COROUTINE_DELAY_SECONDS(delayCounter, 120);
+ *     COROUTINE_DELAY_SECONDS(delayCounter, 1000);
  *     ...
  *   }
  * }

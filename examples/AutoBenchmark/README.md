@@ -1,5 +1,17 @@
 # AutoBenchmark
 
+The `AutoBenchmark` tries to measure the amount of overhead caused by the
+context switching between coroutines. It uses 2 alternating coroutines to
+increment a global counter for X number of seconds. Each time the counter is
+incremented, there is a `Coroutine` context switch. The amount of microseconds
+it takes to increment the counter by 1 is given in the `AceRoutine` column.
+
+It then uses does the same thing using just a simple while-loop, which provides
+a baseline. This is represented by the `base` column.
+
+The difference between the 2 benchmarks (represented by the `diff` column below)
+is the overhead caused by the `Coroutine` context switch.
+
 All times in microseconds.
 
 ## Arduino Nano

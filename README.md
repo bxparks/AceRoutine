@@ -39,7 +39,8 @@ their life cycle:
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
 * `COROUTINE_DELAY_SECONDS(loopCounter, seconds)`: yields back execution for
-  `seconds`. The `seconds` parameter is defined as a `uint16_t`.
+  `seconds`. The maximum value of `seconds` is determined by `loopCounter`
+  which can be of any integer type.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
 * `COROUTINE_CHANNEL_WRITE(channel, value)`: writes a value to a `Channel`
 * `COROUTINE_CHANNEL_READ(channel, value)`: reads a value from a `Channel`

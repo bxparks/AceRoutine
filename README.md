@@ -3,7 +3,7 @@
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
 
-Version: 0.2 (2018-09-29)
+Version: 0.2 (2018-10-02)
 
 This library is currently in "beta" status. I'm releasing it through the Arduino
 Library Manager to solicit feedback from interested users. Send me an email or

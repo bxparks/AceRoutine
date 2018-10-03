@@ -1,5 +1,31 @@
 # Changelog
 
+* 0.2 (2018-10-02)
+    * Add `COROUTINE_DELAY_SECONDS()` to support delays longer than
+      32767 millis.
+    * Update `auniter.ini` and `Jenkinsfile` for compatibility with
+      AUniter v1.7.
+    * Coroutine Status
+        * Remove `kStatusAwaiting` state used by `COROUTINE_AWAIT()` which
+          wasn't being used for anything, collapse into existing
+          `kStatusYielding`.
+        * Print human-readable strings of the Coroutine status from
+          `CoroutineScheduler::list()`.
+    * Channels
+        * Add a synchronized unbuffered Channel, similar to Go Lang channels.
+        * Add `COROUTINE_CHANNEL_READ()` and `COROUTINE_CHANNEL_WRITE()`
+          convenience macros.
+        * Write `ChannelBenchmark` to determine the CPU overhead of using
+          channels.
+    * CLI library
+        * Update `cli` library to use channels to read from serial port
+          asynchronously.
+        * Convert `CommandHandler` from a pointer to function to a full
+          class to allow dependency injection and better code reuse.
+    * Manual and custom Coroutines
+        * Rename `Coroutine::run()` to `Coroutine::runCoroutine()` for clarity.
+        * Rename `Coroutine::init()` to `Coroutine::setupCoroutine()` to make
+          it easier to use mix-in classes.
 * 0.1 (2018-08-07)
     * Beta release.
 * (2018-07-24)

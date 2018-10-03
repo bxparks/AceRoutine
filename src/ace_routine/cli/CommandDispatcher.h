@@ -147,6 +147,7 @@ class CommandDispatcher: public Coroutine {
     CommandDispatcher(const CommandDispatcher&) = delete;
     CommandDispatcher& operator=(const CommandDispatcher&) = delete;
 
+    /** Print the input line that caused an error along with its status code. */
     void printLineError(const char* line, uint8_t statusCode) const;
 
     /** Handle the 'help' command. */

@@ -33,7 +33,7 @@ namespace ace_routine {
 namespace cli {
 
 /**
- * An AceRoutine coroutine that reads lines (terminated by '\n' or '\r' from
+ * An AceRoutine coroutine that reads lines (terminated by '\\n' or '\\r' from
  * the Stream device, and write the InputLine message into the provided
  * Channel. The Stream will normally be the global Serial object.
  */
@@ -50,11 +50,11 @@ class StreamLineReader: public ace_routine::Coroutine {
      *        hold the longest line without triggering buffer overflow.
      */
     StreamLineReader(ace_routine::Channel<InputLine>& channel, Stream& stream,
-        char* buf, int bufSize):
+        char* buffer, int bufferSize):
       mChannel(channel),
       mStream(stream),
-      mBuf(buf),
-      mBufSize(bufSize)
+      mBuf(buffer),
+      mBufSize(bufferSize)
     {}
 
     virtual int runCoroutine() override {

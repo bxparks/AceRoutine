@@ -35,7 +35,7 @@ their life cycle:
 * `COROUTINE_END()`: must occur at the end of the coroutine body
 * `COROUTINE_YIELD()`: yields execution back to the caller, often
   `CoroutineScheduler` but not necessarily
-* `COROUTINE_AWAIT(condition)`: yield until `condition` become `true`
+* `COROUTINE_AWAIT(condition)`: yield until `condition` becomes `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
 * `COROUTINE_DELAY_SECONDS(loopCounter, seconds)`: yields back execution for

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['helpcommandhandler',['helpCommandHandler',['../classace__routine_1_1cli_1_1CommandDispatcher.html#afc2ec90edb4f8e6deea759fc512f7369',1,'ace_routine::cli::CommandDispatcher']]],
-  ['helpgeneric',['helpGeneric',['../classace__routine_1_1cli_1_1CommandDispatcher.html#a51006bebb0903c700b80719300457d37',1,'ace_routine::cli::CommandDispatcher']]],
-  ['helpspecific',['helpSpecific',['../classace__routine_1_1cli_1_1CommandDispatcher.html#ae4e385cba0a6b4c57d2ef43fdd7bc99a',1,'ace_routine::cli::CommandDispatcher']]]
+  ['helpall',['helpAll',['../classace__routine_1_1cli_1_1CommandDispatcher.html#a54e0253192cedd6579f6dce982f356ca',1,'ace_routine::cli::CommandDispatcher']]],
+  ['helpcommandhandler',['helpCommandHandler',['../classace__routine_1_1cli_1_1CommandDispatcher.html#a3a4b68ea9d62ae1049da4e9bc64ead6c',1,'ace_routine::cli::CommandDispatcher']]],
+  ['helpspecific',['helpSpecific',['../classace__routine_1_1cli_1_1CommandDispatcher.html#af0795638742833c9d98c1530397ef505',1,'ace_routine::cli::CommandDispatcher']]]
 ];

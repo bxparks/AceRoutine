@@ -8,6 +8,7 @@
 
 Coroutine	KEYWORD1
 CoroutineScheduler	KEYWORD1
+Channel	KEYWORD1
 FCString	KEYWORD1
 
 #######################################
@@ -21,7 +22,10 @@ COROUTINE_LOOP	KEYWORD2
 COROUTINE_YIELD	KEYWORD2
 COROUTINE_AWAIT	KEYWORD2
 COROUTINE_DELAY	KEYWORD2
+COROUTINE_DELAY_SECONDS	KEYWORD2
 COROUTINE_END	KEYWORD2
+COROUTINE_CHANNEL_READ	KEYWORD2
+COROUTINE_CHANNEL_WRITE	KEYWORD2
 EXTERN_COROUTINE	KEYWORD2
 # public methods
 getRoot	KEYWORD2
@@ -33,7 +37,6 @@ getDelayStart	KEYWORD2
 getDelay	KEYWORD2
 isSuspended	KEYWORD2
 isYielding	KEYWORD2
-isAwaiting	KEYWORD2
 isDelaying	KEYWORD2
 isRunning	KEYWORD2
 isEnding	KEYWORD2
@@ -41,11 +44,10 @@ isTerminated	KEYWORD2
 isDone	KEYWORD2
 setTerminated	KEYWORD2
 # protected methods
-init	KEYWORD2
+setupCoroutine	KEYWORD2
 setJump	KEYWORD2
 getJump	KEYWORD2
 setYielding	KEYWORD2
-setAwaiting	KEYWORD2
 setDelaying	KEYWORD2
 setEnding	KEYWORD2
 
@@ -65,7 +67,6 @@ list	KEYWORD2
 # Coroutine.h
 kStatusSuspended	LITERAL1
 kStatusYielding	LITERAL1
-kStatusAwaiting	LITERAL1
 kStatusDelaying	LITERAL1
 kStatusRunning	LITERAL1
 kStatusEnding	LITERAL1

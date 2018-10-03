@@ -59,7 +59,7 @@ SOFTWARE.
  * a subclass of Coroutine.
  *
  * The code in {} following this macro becomes the body of the
- * Coroutine::run() method.
+ * Coroutine::runCoroutine() method.
  */
 #define COROUTINE(...) \
     GET_COROUTINE(__VA_ARGS__, COROUTINE2, COROUTINE1)(__VA_ARGS__)
@@ -69,24 +69,24 @@ SOFTWARE.
 #define COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
-  virtual int run() override \
+  virtual int runCoroutine() override \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 Coroutine_##name :: Coroutine_##name() { \
-  init(ACE_ROUTINE_F(#name)); \
+  setupCoroutine(ACE_ROUTINE_F(#name)); \
 } \
-int Coroutine_##name :: run()
+int Coroutine_##name :: runCoroutine()
 
 #define COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
-  virtual int run() override \
+  virtual int runCoroutine() override \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 className##_##name :: className##_##name() { \
-  init(ACE_ROUTINE_F(#name)); \
+  setupCoroutine(ACE_ROUTINE_F(#name)); \
 } \
-int className##_##name :: run()
+int className##_##name :: runCoroutine()
 
 /**
  * Create an extern reference to a coroutine that is defined in another .cpp
@@ -105,7 +105,7 @@ int className##_##name :: run()
 #define EXTERN_COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
-  virtual int run() override \
+  virtual int runCoroutine() override \
     __attribute__((__noinline__,__noclone__)); \
 }; \
 extern Coroutine_##name name
@@ -113,7 +113,7 @@ extern Coroutine_##name name
 #define EXTERN_COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
-  virtual int run() override \
+  virtual int runCoroutine() override \
     __attribute__((__noinline__,__noclone__)); \
 }; \
 extern className##_##name name
@@ -157,34 +157,32 @@ extern className##_##name name
  *    while (!condition) COROUTINE_YIELD();
  * @endcode
  *
- * but the getStatus() during the waiting is set to kStatusAwaiting instead of
- * kStatusYielding. The current scheduler treats the two states the same, but
- * it's possible that a different scheduler may want to treat them differently.
+ * but potentially slightly more efficient.
  */
 #define COROUTINE_AWAIT(condition) \
     do { \
       while (!(condition)) { \
-        setAwaiting(); \
+        setYielding(); \
         COROUTINE_YIELD_INTERNAL(); \
       } \
       setRunning(); \
     } while (false)
 
 /**
-* Yield for delayMillis. A delayMillis of 0 is functionally equivalent to
-* COROUTINE_YIELD(). To save memory, the delayMillis is stored as a uint16_t
-* but the actual maximum is limited to 32767 millliseconds. See setDelay()
-* for the reason for this limitation.
-*
-* If you need to wait for longer than that, use a for-loop to call
-* COROUTINE_DELAY() as many times as necessary.
-*
-* This could have been implemented using COROUTINE_AWAIT() but this macro
-* matches the global delay(millis) function already provided by the Arduino
-* API. Also having a separate kStatusDelaying state allows the
-* CoroutineScheduler to be slightly more efficient by avoiding the call to
-* Coroutine::run() if the delay has not expired.
-*/
+ * Yield for delayMillis. A delayMillis of 0 is functionally equivalent to
+ * COROUTINE_YIELD(). To save memory, the delayMillis is stored as a uint16_t
+ * but the actual maximum is limited to 32767 millliseconds. See setDelay()
+ * for the reason for this limitation.
+ *
+ * If you need to wait for longer than that, use a for-loop to call
+ * COROUTINE_DELAY() as many times as necessary.
+ *
+ * This could have been implemented using COROUTINE_AWAIT() but this macro
+ * matches the global delay(millis) function already provided by the Arduino
+ * API. Also having a separate kStatusDelaying state allows the
+ * CoroutineScheduler to be slightly more efficient by avoiding the call to
+ * Coroutine::runCoroutine() if the delay has not expired.
+ */
 #define COROUTINE_DELAY(delayMillis) \
     do { \
       setDelay(delayMillis); \
@@ -196,7 +194,61 @@ extern className##_##name name
     } while (false)
 
 /**
- * Mark the end of a coroutine. Subsequent calls to Coroutine::run()
+ * Delay for delaySeconds. Maximum value is the maximum value of the
+ * loopCounter which can be any integer type. For example, if the loopCounter
+ * is a uint16_t, then the maximum delay is 65535 seconds, or 18h12m15s. This
+ * macro calls COROUTINE_DELAY() every 1000 milliseconds, so over the course of
+ * the entire delay, there may be some drift. (Some of this drift could be
+ * avoided by looping in 16000ms chunks, then looping the remainder in 1000ms
+ * chunks. Division of delaySeconds by 16 would be fast. But minimizing drift
+ * doesn't seem to be important for the use cases that I have in mind, so I
+ * haven't implemented this.)
+ *
+ * The loopCounter needs to be supplied to the macro because AceRoutine
+ * coroutines are stackless so the loop cannot use the stack to keep count of
+ * the number of seconds. Instead it needs to be given a loop counter that
+ * retains information across multiple calls. That loop counter can be a member
+ * variable of the Coroutine object, or it can be a function-static variable.
+ *
+ * The usage would be something like:
+ * @code
+ * class MyCoroutine: public Coroutine {
+ *   public:
+ *     virtual int runCoroutine() override {
+ *       ...
+ *       COROUTINE_DELAY_SECONDS(mDelayCounter, 1000);
+ *       ...
+ *     }
+ *
+ *   private:
+ *     uint16_t mDelayCounter;
+ * };
+ * ...
+ * @endcode
+ *
+ * or
+ *
+ * @code
+ * COROUTINE(myRoutine) {
+ *   COROUTINE_LOOP() {
+ *     ...
+ *     static uint16_t delayCounter;
+ *     COROUTINE_DELAY_SECONDS(delayCounter, 1000);
+ *     ...
+ *   }
+ * }
+ * @endcode
+ */
+#define COROUTINE_DELAY_SECONDS(loopCounter, delaySeconds) \
+    do { \
+      loopCounter = delaySeconds; \
+      while (loopCounter-- > 0) { \
+        COROUTINE_DELAY(1000); \
+      } \
+    } while (false)
+
+/**
+ * Mark the end of a coroutine. Subsequent calls to Coroutine::runCoroutine()
  * will do nothing.
  */
 #define COROUTINE_END() \
@@ -208,14 +260,17 @@ extern className##_##name name
       return 0; \
     } while (false)
 
+class StatusStringTest;
+
 namespace ace_routine {
 
 /**
  * Base class of all coroutines. The actual coroutine code is an implementation
- * of the virtual run() method.
+ * of the virtual runCoroutine() method.
  */
 class Coroutine {
   friend class CoroutineScheduler;
+  friend class ::StatusStringTest;
 
   public:
     /**
@@ -245,7 +300,7 @@ class Coroutine {
      * the macros (e.g. COROUTINE_YIELD(), COROUTINE_DELAY(), COROUTINE_AWAIT()
      * or COROUTINE_END()).
      */
-    virtual int run() = 0;
+    virtual int runCoroutine() = 0;
 
     /**
      * Returns the current millisecond clock. By default it returns the global
@@ -288,9 +343,6 @@ class Coroutine {
     /** The coroutine returned using COROUTINE_YIELD(). */
     bool isYielding() const { return mStatus == kStatusYielding; }
 
-    /** The coroutine returned using COROUTINE_AWAIT(). */
-    bool isAwaiting() const { return mStatus == kStatusAwaiting; }
-
     /** The coroutine returned using COROUTINE_DELAY(). */
     bool isDelaying() const { return mStatus == kStatusDelaying; }
 
@@ -321,26 +373,65 @@ class Coroutine {
       return mStatus == kStatusEnding || mStatus == kStatusTerminated;
     }
 
+    /**
+     * Initialize the coroutine for the CoroutineScheduler, set it to Yielding
+     * state, and add it to the linked list of coroutines. This method is
+     * called automatically by the COROUTINE() macro. It needs to be called
+     * manually when using coroutines which were manually created without using
+     * that COROUTINE() macro.
+     *
+     * This method could have been named init() or setup() but since this class
+     * expected to be used as a mix-in class to create more complex classes
+     * which could have its own setup() methods, the longer name seemed more
+     * clear.
+     *
+     * @param name The name of the coroutine as a human-readable string.
+     */
+    void setupCoroutine(const char* name) {
+      mName = FCString(name);
+      mStatus = kStatusYielding;
+      insertSorted();
+    }
+
+    /**
+     * Same as setupCoroutine(const char*) except using flash string type.
+     *
+     * Normally, the name would be passed from the subclass into this parent
+     * class through constructor chaining. But if we try to do that with the
+     * F() string, the compiler complains because F() macros work only inside a
+     * function. Therefore, the COROUTINE() macro uses the setupCoroutine()
+     * method to pass the name of the coroutine.
+     *
+     * The problem doesn't exist for a (const char*) but for consistency, I
+     * made both types of strings pass through the setupCoroutine() method
+     * instead of chaining the constructor.
+     */
+    void setupCoroutine(const __FlashStringHelper* name) {
+      mName = FCString(name);
+      mStatus = kStatusYielding;
+      insertSorted();
+    }
+
   protected:
     /**
      * The execution status of the coroutine, corresponding to the
      * COROUTINE_YIELD(), COROUTINE_DELAY(), COROUTINE_AWAIT() and
      * COROUTINE_END() macros.
-		 *
+     *
      * The finite state diagram looks like this:
      *
      * @verbatim
      *          Suspended
-     *          ^   ^   ^
-     *         /    |    \
-     *        /     |     \
-     *       v      |      \
-     * Yielding Awaiting Delaying
-     *      ^       ^       ^
-     *       \      |      /
-     *        \     |     /
-     *         \    |    /
-     *          v   v   v
+     *          ^       ^
+     *         /         \
+     *        /           \
+     *       v             \
+     * Yielding          Delaying
+     *      ^               ^
+     *       \             /
+     *        \           /
+     *         \         /
+     *          v       v
      *           Running
      *              |
      *              |
@@ -365,50 +456,48 @@ class Coroutine {
     /** Coroutine returned using the COROUTINE_YIELD() statement. */
     static const Status kStatusYielding = 1;
 
-    /** Coroutine returned using the COROUTINE_AWAIT() statement. */
-    static const Status kStatusAwaiting = 2;
-
     /** Coroutine returned using the COROUTINE_DELAY() statement. */
-    static const Status kStatusDelaying = 3;
+    static const Status kStatusDelaying = 2;
 
     /** Coroutine is currenly running. True only within the coroutine itself. */
-    static const Status kStatusRunning = 4;
+    static const Status kStatusRunning = 3;
 
     /** Coroutine executed the COROUTINE_END() statement. */
-    static const Status kStatusEnding = 5;
+    static const Status kStatusEnding = 4;
 
     /** Coroutine has ended and no longer in the scheduler queue. */
-    static const Status kStatusTerminated = 6;
-
-    /** Constructor. */
-    Coroutine() {}
+    static const Status kStatusTerminated = 5;
 
     /**
-     * Initialize the coroutine, set it to Yielding state, and add it to the
-     * linked list of coroutines.
+     * Constructor. All subclasses are expected to call either
+     * setupCoroutine(const char*) or setupCoroutine(const
+     * __FlashStringHelper*) before the CoroutineScheduler is used. The
+     * COROUTINE() macro will automatically call setupCoroutine().
      *
-     * @param name The name of the coroutine as a human-readable string.
+     * See comment in setupCoroutine(const __FlashStringHelper*) for reason why
+     * an setupCoroutine() function is used instead of chaining the name
+     * through the constructor.
      */
-    void init(const char* name) {
-      mName = FCString(name);
-      mStatus = kStatusYielding;
-      insertSorted();
-    }
-
-    /** Same as init(const char*) except using flash string type. */
-    void init(const __FlashStringHelper* name) {
-      mName = FCString(name);
-      mStatus = kStatusYielding;
-      insertSorted();
-    }
+    Coroutine() {}
 
     /** Return the status of the coroutine. Used by the CoroutineScheduler. */
     Status getStatus() const { return mStatus; }
 
-    /** Pointer to label where execute will start on the next call to run(). */
+    /** Print the human-readable string of the Status. */
+    void statusPrintTo(Print& printer) {
+      printer.print(sStatusStrings[mStatus]);
+    }
+
+    /**
+     * Pointer to label where execute will start on the next call to
+     * runCoroutine().
+     */
     void setJump(void* jumpPoint) { mJumpPoint = jumpPoint; }
 
-    /** Pointer to label where execute will start on the next call to run(). */
+    /**
+     * Pointer to label where execute will start on the next call to
+     * runCoroutine().
+     */
     void* getJump() const { return mJumpPoint; }
 
     /** Set the kStatusRunning state. */
@@ -416,9 +505,6 @@ class Coroutine {
 
     /** Set the kStatusDelaying state. */
     void setYielding() { mStatus = kStatusYielding; }
-
-    /** Set the kStatusAwaiting state. */
-    void setAwaiting() { mStatus = kStatusAwaiting; }
 
     /** Set the kStatusDelaying state. */
     void setDelaying() { mStatus = kStatusDelaying; }
@@ -432,7 +518,8 @@ class Coroutine {
      * use-cases. (The '- 1' comes from an edge case where isDelayExpired()
      * evaluates to be true in the CoroutineScheduler::runCoroutine() but
      * becomes to be false in the COROUTINE_DELAY() macro inside
-     * Coroutine::run()) because the clock increments by 1 millisecond.)
+     * Coroutine::runCoroutine()) because the clock increments by 1
+     * millisecond.)
      */
     void setDelay(uint16_t delayMillisDuration) {
       mDelayStartMillis = millis();
@@ -454,6 +541,9 @@ class Coroutine {
     // Disable copy-constructor and assignment operator
     Coroutine(const Coroutine&) = delete;
     Coroutine& operator=(const Coroutine&) = delete;
+
+    /** A lookup table from Status integer to human-readable strings. */
+    static const __FlashStringHelper* const sStatusStrings[];
 
     /**
      * Insert the current coroutine into the singly linked list. The order of

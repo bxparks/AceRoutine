@@ -1,65 +1,149 @@
 /*
- * A sketch that illustrates using two coroutines and a circular buffer to
- * create a pipe between the two coroutines. Not sure if this is of any
- * practical use though.
- *
- * WORK IN PROGRESS
+ * A sketch that illustrates using two coroutines and a channel to create a
+ * pipe between them.
  */
 
 #include <Arduino.h>
 #include <AceRoutine.h>
+
+#define CHANNEL_TYPE_SYNC 0
+#define CHANNEL_TYPE_NO_SYNC 1
+#define CHANNEL_TYPE CHANNEL_TYPE_SYNC
+
+#define TEST_TYPE_LOOP 0
+#define TEST_TYPE_SEQ 1
+#define TEST_TYPE TEST_TYPE_LOOP
+
 using namespace ace_routine;
 
-/** A circular buffer of BUF_SIZE. */
-class Channel {
+/**
+ * An unbuffered channel that provides no synchronization. Perhaps better
+ * described as a buffered channel of size 1.
+ *
+ * Because of the buffering of size one, sending 10 integers from the writer to
+ * the reader has the following order:
+ *
+ * @code
+ * Writer: sending 0
+ * Writer: sending 1
+ * Reader: received 0
+ * Writer: sending 2
+ * Reader: received 1
+ * Writer: sending 3
+ * Reader: received 2
+ * ...
+ * @endcode
+ *
+ * In other words, the receiver is one iteration behind the writer.
+ *
+ * TODO: Figure out if it's useful to move into the src/ace_time/ directory,
+ * perhaps as a BufferedChannel?
+ */
+template<typename T>
+class NoSyncChannel {
   public:
-    static const uint8_t BUF_SIZE = 64;
-
-    void write(char c) {
-      if (mNumElements >= BUF_SIZE) return;
-      mBuffer[mEnd] = c;
-      if (++mEnd >= BUF_SIZE) mEnd = 0;
-      mNumElements++;
+    void setValue(const T& value) {
+      mValueToWrite = value;
     }
 
-    char read() {
-      if (mNumElements == 0) return 0;
-      char element = mBuffer[mStart];
-      if (++mStart >= BUF_SIZE) mStart = 0;
-      mNumElements--;
-      return element;
+    bool write() {
+      if (mDataReady) {
+        return false;
+      } else {
+        mValue = mValueToWrite;
+        mDataReady = true;
+        return true;
+      }
     }
 
-    bool isWritePossible() { return mNumElements < BUF_SIZE; }
+    bool write(const T& value) {
+      if (mDataReady) {
+        return false;
+      } else {
+        mValue = value;
+        mDataReady = true;
+        return true;
+      }
+    }
 
-    bool isReadPossible() { return mNumElements > 0; }
+    bool read(T& value) {
+      if (mDataReady) {
+        value = mValue;
+        mDataReady = false;
+        return true;
+      } else {
+        return false;
+      }
+    }
 
-    char mBuffer[BUF_SIZE];
-    uint8_t mStart = 0;
-    uint8_t mEnd = 0;
-    uint8_t mNumElements = 0;
+  private:
+    T mValue;
+    T mValueToWrite;
+    bool mDataReady = false;
 };
 
-Channel channel;
+struct Message {
+  static uint8_t const kStatusOk = 0;
+  static uint8_t const kStatusError = 1;
+
+  uint8_t status;
+  int value;
+};
+
+#if CHANNEL_TYPE == CHANNEL_TYPE_NO_SYNC
+  NoSyncChannel<Message> channel;
+#elif CHANNEL_TYPE == CHANNEL_TYPE_SYNC
+  // This is a synchronized unbuffered Channel.
+  Channel<Message> channel;
+#endif
+
+#if TEST_TYPE == TEST_TYPE_LOOP
+// Test the ordering of sending 10 integers and receiving 10 integers.
+COROUTINE(writer) {
+  static int i;
+  COROUTINE_BEGIN();
+  for (i = 0; i < 10; i++) {
+    Serial.print("Writer: sending ");
+    Serial.println(i);
+    Message message = {Message::kStatusOk, i};
+    COROUTINE_CHANNEL_WRITE(channel, message);
+  }
+  Serial.println("Writer: done");
+  COROUTINE_END();
+}
 
 COROUTINE(reader) {
   COROUTINE_LOOP() {
-    COROUTINE_AWAIT(Serial.available() > 0 && channel.isWritePossible());
-    // copy as many characters as possible without yielding
-    while (Serial.available() > 0 && channel.isWritePossible()) {
-      char c = Serial.read();
-      channel.write(c);
-    }
+    Message message;
+    COROUTINE_CHANNEL_READ(channel, message);
+    Serial.print("Reader: received ");
+    Serial.println(message.value);
   }
 }
 
+#else
+
+// Test the sequencing of the writer and reader.
 COROUTINE(writer) {
-  COROUTINE_LOOP() {
-    COROUTINE_AWAIT(channel.isReadPossible());
-    char c = channel.read();
-    Serial.print(c);
-  }
+  COROUTINE_BEGIN();
+  Serial.println("Writer: sending data");
+  COROUTINE_CHANNEL_WRITE(channel, 42);
+  Serial.println("Writer: sent data");
+  COROUTINE_END();
 }
+
+COROUTINE(reader) {
+  COROUTINE_BEGIN();
+  Serial.println("Reader: sleeping for 1 second");
+  COROUTINE_DELAY(1000);
+  Serial.println("Reader: receiving data");
+  int data;
+  COROUTINE_CHANNEL_READ(channel, data);
+  Serial.println("Reader: received data");
+  COROUTINE_END();
+}
+
+#endif
 
 void setup() {
   delay(1000);
@@ -68,6 +152,8 @@ void setup() {
 }
 
 void loop() {
-  reader.run();
-  writer.run();
+  // The order of these 2 shouldn't matter, but we should flip them
+  // occasionally to verify that.
+  reader.runCoroutine();
+  writer.runCoroutine();
 }

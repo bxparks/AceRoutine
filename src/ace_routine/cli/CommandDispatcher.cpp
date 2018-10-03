@@ -22,15 +22,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "../Flash.h"
+/*
+ * Most of these methods are in the .cpp file instead of remaining in the .h
+ * file because they use the F() macro, which causes problems for ESP8266 if
+ * they are used in an inline context.
+ */
+
 #include "CommandDispatcher.h"
 
 namespace ace_routine {
 namespace cli {
 
-const char CommandDispatcher::DELIMS[] = " \t\n";
+// Same whitespace characters used by isspace() in the standard C99 library.
+const char CommandDispatcher::DELIMS[] = " \f\r\n\t\v";
 
-void CommandDispatcher::printLineError(const char* line, uint8_t statusCode) {
+void CommandDispatcher::printLineError(const char* line, uint8_t statusCode)
+    const {
   if (statusCode == STATUS_BUFFER_OVERFLOW) {
     mPrinter.print(F("BufferOverflow: "));
     mPrinter.println(line);
@@ -45,11 +52,12 @@ void CommandDispatcher::printLineError(const char* line, uint8_t statusCode) {
   }
 }
 
-/** Handle the 'help' command. */
 void CommandDispatcher::helpCommandHandler(
-    Print& printer, int argc, const char** argv) {
+    Print& printer, int argc, const char** argv) const {
   if (argc == 2) {
     const char* cmd = argv[1];
+
+    // check for "help help"
     if (strcmp(cmd, "help") == 0) {
       printer.println(F("Usage: help [command]"));
       return;
@@ -60,14 +68,43 @@ void CommandDispatcher::helpCommandHandler(
     printer.print(F("Unknown command: "));
     printer.println(cmd);
   } else {
-    printer.println(F("Usage: help [command]"));
-    printer.print(F("Commands: help "));
-    helpGeneric(printer);
+    printer.println(F("Commands:"));
+    printer.println(F("  help [command]"));
+    helpAll(printer);
   }
 }
 
-/** Tokenize the given line and run the command handler. */
-void CommandDispatcher::runCommand(char* line) {
+void CommandDispatcher::helpAll(Print& printer) const {
+  for (uint8_t i = 0; i < mNumCommands; i++) {
+    const CommandHandler* command = mCommands[i];
+    printer.print("  ");
+    printHelp(printer, command);
+  }
+}
+
+bool CommandDispatcher::helpSpecific(Print& printer, const char* cmd) const {
+  const CommandHandler* command = findCommand(cmd);
+  if (command != nullptr) {
+    printer.print(F("Usage: "));
+    printHelp(printer, command);
+    return true;
+  }
+  return false;
+}
+
+void CommandDispatcher::printHelp(
+    Print& printer, const CommandHandler* command) {
+  command->getName().printTo(printer);
+  if (!command->getHelpString().isNull()) {
+    printer.print(' ');
+    command->getHelpString().printTo(printer);
+    printer.println();
+  } else {
+    printer.println();
+  }
+}
+
+void CommandDispatcher::runCommand(char* line) const {
   // Tokenize the line.
   int argc = tokenize(line, mArgv, mArgvSize);
   if (argc == 0) return;
@@ -82,133 +119,16 @@ void CommandDispatcher::runCommand(char* line) {
   findAndRunCommand(cmd, argc, mArgv);
 }
 
-uint8_t CommandDispatcher::tokenize(char* line, const char** argv,
-    uint8_t argvSize) {
-  char* token = strtok(line, DELIMS);
-  int argc = 0;
-  while (token != nullptr && argc < argvSize) {
-    argv[argc] = token;
-    argc++;
-    token = strtok(nullptr, DELIMS);
-  }
-  return argc;
-}
-
-int CommandDispatcher::run() {
-  bool isError;
-  char* line;
-  COROUTINE_LOOP() {
-    COROUTINE_AWAIT(mStreamReader.getLine(&isError, &line));
-
-    if (isError) {
-      printLineError(line, STATUS_BUFFER_OVERFLOW);
-      while (isError) {
-        COROUTINE_AWAIT(mStreamReader.getLine(&isError, &line));
-        printLineError(line, STATUS_FLUSH_TO_EOL);
-      }
-      continue;
-    }
-
-    runCommand(line);
-  }
-}
-
-//---------------------------------------------------------------------------
-
-void CommandDispatcherC::helpGeneric(Print& printer) {
-  for (uint8_t i = 0; i < mNumCommands; i++) {
-    const DispatchRecordC* record = &mDispatchTable[i];
-    printer.print(record->name);
-    printer.print(' ');
-  }
-  printer.println();
-}
-
-bool CommandDispatcherC::helpSpecific(Print& printer, const char* cmd) {
-  const DispatchRecordC* record =
-      findCommand(mDispatchTable, mNumCommands, cmd);
-  if (record != nullptr) {
-    printer.print(F("Usage: "));
-    printer.print(cmd);
-    printer.print(' ');
-    printer.println(record->helpString);
-    return true;
-  }
-  return false;
-}
-
-void CommandDispatcherC::findAndRunCommand(
-      const char* cmd, int argc, const char** argv) {
-  const DispatchRecordC* record =
-      findCommand(mDispatchTable, mNumCommands, cmd);
-  if (record != nullptr) {
-    record->command(mPrinter, argc, argv);
+void CommandDispatcher::findAndRunCommand(
+    const char* cmd, int argc, const char** argv) const {
+  const CommandHandler* command = findCommand(cmd);
+  if (command != nullptr) {
+    command->run(mPrinter, argc, argv);
     return;
   }
 
   mPrinter.print(F("Unknown command: "));
   mPrinter.println(cmd);
-}
-
-const DispatchRecordC* CommandDispatcherC::findCommand(
-    const DispatchRecordC* dispatchTable,
-    uint8_t numCommands, const char* cmd) {
-  for (uint8_t i = 0; i < numCommands; i++) {
-    const DispatchRecordC* record = &dispatchTable[i];
-    if (strcmp(cmd, record->name) == 0) {
-      return record;
-    }
-  }
-  return nullptr;
-}
-
-//---------------------------------------------------------------------------
-
-void CommandDispatcherF::helpGeneric(Print& printer) {
-  for (uint8_t i = 0; i < mNumCommands; i++) {
-    const DispatchRecordF* record = &mDispatchTable[i];
-    printer.print(record->name);
-    printer.print(' ');
-  }
-  printer.println();
-}
-
-bool CommandDispatcherF::helpSpecific(Print& printer, const char* cmd) {
-  const DispatchRecordF* record =
-      findCommand(mDispatchTable, mNumCommands, cmd);
-  if (record != nullptr) {
-    printer.print(F("Usage: "));
-    printer.print(cmd);
-    printer.print(' ');
-    printer.println(record->helpString);
-    return true;
-  }
-  return false;
-}
-
-void CommandDispatcherF::findAndRunCommand(
-    const char* cmd, int argc, const char** argv) {
-  const DispatchRecordF* record =
-      findCommand(mDispatchTable, mNumCommands, cmd);
-  if (record != nullptr) {
-    record->command(mPrinter, argc, argv);
-    return;
-  }
-
-  mPrinter.print(F("Unknown command: "));
-  mPrinter.println(cmd);
-}
-
-const DispatchRecordF* CommandDispatcherF::findCommand(
-    const DispatchRecordF* dispatchTableF,
-    uint8_t numCommands, const char* cmd) {
-  for (uint8_t i = 0; i < numCommands; i++) {
-    const DispatchRecordF* record = &dispatchTableF[i];
-    if (strcmp_P(cmd, (const char*) record->name) == 0) {
-      return record;
-    }
-  }
-  return nullptr;
 }
 
 }

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.2</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -67,35 +67,40 @@ $(function() {
 <div class="textblock">
 <p><a href="hierarchy.html">Go to the textual class hierarchy</a></p>
 </div><table border="0" cellspacing="10" cellpadding="0">
-<tr><td><img src="inherit_graph_0.png" border="0" alt="" usemap="#ace__routine_1_1cli_1_1DispatchRecordC"/>
-<map name="ace__routine_1_1cli_1_1DispatchRecordC" id="ace__routine_1_1cli_1_1DispatchRecordC">
-<area shape="rect" id="node1" href="structace__routine_1_1cli_1_1DispatchRecordC.html" title="A record of the command name and its handler. " alt="" coords="5,5,176,47"/>
+<tr><td><img src="inherit_graph_0.png" border="0" alt="" usemap="#ace__routine_1_1Channel_3_01ace__routine_1_1cli_1_1InputLine_01_4"/>
+<map name="ace__routine_1_1Channel_3_01ace__routine_1_1cli_1_1InputLine_01_4" id="ace__routine_1_1Channel_3_01ace__routine_1_1cli_1_1InputLine_01_4">
+<area shape="rect" id="node1" href="classace__routine_1_1Channel.html" title="ace_routine::Channel\l\&lt; ace_routine::cli::InputLine \&gt;" alt="" coords="5,5,200,47"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_1.png" border="0" alt="" usemap="#ace__routine_1_1cli_1_1DispatchRecordF"/>
-<map name="ace__routine_1_1cli_1_1DispatchRecordF" id="ace__routine_1_1cli_1_1DispatchRecordF">
-<area shape="rect" id="node1" href="structace__routine_1_1cli_1_1DispatchRecordF.html" title="Same as DispatchRecordC but uses FlashStrings instead of (const char*) to save static RAM on AVR boar..." alt="" coords="5,5,176,47"/>
+<tr><td><img src="inherit_graph_1.png" border="0" alt="" usemap="#ace__routine_1_1Channel_3_01T_01_4"/>
+<map name="ace__routine_1_1Channel_3_01T_01_4" id="ace__routine_1_1Channel_3_01T_01_4">
+<area shape="rect" id="node1" href="classace__routine_1_1Channel.html" title="An unbuffered synchronized channel. " alt="" coords="5,5,183,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_2.png" border="0" alt="" usemap="#ace__routine_1_1cli_1_1StreamReader"/>
-<map name="ace__routine_1_1cli_1_1StreamReader" id="ace__routine_1_1cli_1_1StreamReader">
-<area shape="rect" id="node1" href="classace__routine_1_1cli_1_1StreamReader.html" title="Reads tokens (lines, words, integers, characters, etc) from the Stream device. " alt="" coords="5,5,165,47"/>
+<tr><td><img src="inherit_graph_2.png" border="0" alt="" usemap="#ace__routine_1_1cli_1_1CommandHandler"/>
+<map name="ace__routine_1_1cli_1_1CommandHandler" id="ace__routine_1_1cli_1_1CommandHandler">
+<area shape="rect" id="node1" href="classace__routine_1_1cli_1_1CommandHandler.html" title="Signature for a command handler. " alt="" coords="5,5,184,47"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_3.png" border="0" alt="" usemap="#ace__routine_1_1Coroutine"/>
+<tr><td><img src="inherit_graph_3.png" border="0" alt="" usemap="#ace__routine_1_1cli_1_1InputLine"/>
+<map name="ace__routine_1_1cli_1_1InputLine" id="ace__routine_1_1cli_1_1InputLine">
+<area shape="rect" id="node1" href="structace__routine_1_1cli_1_1InputLine.html" title="Message sent from StreamLineReader to CommandDispatcher coroutines through Channel&lt;InputLine&gt; channel..." alt="" coords="5,5,176,32"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_4.png" border="0" alt="" usemap="#ace__routine_1_1Coroutine"/>
 <map name="ace__routine_1_1Coroutine" id="ace__routine_1_1Coroutine">
-<area shape="rect" id="node1" href="classace__routine_1_1Coroutine.html" title="Base class of all coroutines. " alt="" coords="5,46,159,73"/>
-<area shape="rect" id="node2" href="classace__routine_1_1cli_1_1CommandDispatcher.html" title="Base&#45;class of a coroutine that reads lines from the Serial port, tokenizes the line on whitespace bou..." alt="" coords="207,39,385,80"/>
-<area shape="rect" id="node3" href="classace__routine_1_1cli_1_1CommandDispatcherC.html" title="A CommandDispatcher that takes DispatchRecordC records using C&#45;strings. " alt="" coords="433,5,612,47"/>
-<area shape="rect" id="node4" href="classace__routine_1_1cli_1_1CommandDispatcherF.html" title="A CommandDispatcher that takes DispatchRecordF records using FlashStrings. " alt="" coords="433,71,612,112"/>
+<area shape="rect" id="node1" href="classace__routine_1_1Coroutine.html" title="Base class of all coroutines. " alt="" coords="5,78,159,105"/>
+<area shape="rect" id="node2" href="classace__routine_1_1cli_1_1CommandDispatcher.html" title="A coroutine that reads lines from the Serial port, tokenizes the line on whitespace boundaries..." alt="" coords="239,5,417,47"/>
+<area shape="rect" id="node3" href="classace__routine_1_1cli_1_1CommandManager.html" title="A convenience wrapper around a CommandDispatcher that hides complexity of creating, initializing and injecting the resources needed by the CommandDispatcher. " alt="" coords="207,71,449,112"/>
+<area shape="rect" id="node4" href="classace__routine_1_1cli_1_1StreamLineReader.html" title="An AceRoutine coroutine that reads lines (terminated by &#39;\n&#39; or &#39;\r&#39; from the Stream device..." alt="" coords="248,136,408,177"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_4.png" border="0" alt="" usemap="#ace__routine_1_1CoroutineScheduler"/>
+<tr><td><img src="inherit_graph_5.png" border="0" alt="" usemap="#ace__routine_1_1CoroutineScheduler"/>
 <map name="ace__routine_1_1CoroutineScheduler" id="ace__routine_1_1CoroutineScheduler">
 <area shape="rect" id="node1" href="classace__routine_1_1CoroutineScheduler.html" title="Class that manages instances of the Coroutine class, and executes them in a round&#45;robin fashion..." alt="" coords="5,5,216,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_5.png" border="0" alt="" usemap="#ace__routine_1_1FCString"/>
+<tr><td><img src="inherit_graph_6.png" border="0" alt="" usemap="#ace__routine_1_1FCString"/>
 <map name="ace__routine_1_1FCString" id="ace__routine_1_1FCString">
 <area shape="rect" id="node1" href="classace__routine_1_1FCString.html" title="A union of (const char*) and (const __FlashStringHelper*) with a discriminator. " alt="" coords="5,5,155,32"/>
 </map>

@@ -9,7 +9,11 @@
 #include <AceRoutine.h>
 using namespace ace_routine;
 
-const unsigned long DURATION = 5000;
+#if defined(ESP8266)
+const unsigned long DURATION = 1000;
+#else
+const unsigned long DURATION = 3000;
+#endif
 
 unsigned long counter = 0;
 
@@ -32,13 +36,15 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 
-  CoroutineScheduler::setup();
-  CoroutineScheduler::list(Serial);
-
   Serial.print(F("sizeof(Coroutine): "));
   Serial.println(sizeof(Coroutine));
   Serial.print(F("sizeof(CoroutineScheduler): "));
   Serial.println(sizeof(CoroutineScheduler));
+  Serial.print(F("sizeof(Channel<int>): "));
+  Serial.println(sizeof(Channel<int>));
+
+  CoroutineScheduler::setup();
+  CoroutineScheduler::list(Serial);
 
   Serial.println(
       F("------------+------+------+"));
@@ -71,19 +77,21 @@ void printStats(float baseline, float aceCoroutine) {
 void doAceRoutine() {
   counter = 0;
   unsigned long start = millis();
+  yield();
   while (millis() - start < DURATION) {
     CoroutineScheduler::loop();
-    yield();
   }
+  yield();
 }
 
 void doBaseline() {
   counter = 0;
   unsigned long start = millis();
+  yield();
   while (millis() - start < DURATION) {
     counter++;
-    yield();
   }
+  yield();
 }
 
 void loop() {

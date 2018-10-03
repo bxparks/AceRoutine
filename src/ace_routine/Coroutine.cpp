@@ -25,6 +25,7 @@ SOFTWARE.
 #include <stdint.h> // uintptr_t
 #include <Arduino.h> // millis()
 #include "Coroutine.h"
+#include "Flash.h"
 
 namespace ace_routine {
 
@@ -53,8 +54,9 @@ void Coroutine::resume() {
 
   // We lost the original state of the coroutine when suspend() was called but
   // the coroutine will automatically go back into the original state when
-  // Coroutine::run() is called because COROUTINE_YIELD(), COROUTINE_DELAY()
-  // and COROUTINE_AWAIT() are written to restore their status.
+  // Coroutine::runCoroutine() is called because COROUTINE_YIELD(),
+  // COROUTINE_DELAY() and COROUTINE_AWAIT() are written to restore their
+  // status.
   mStatus = kStatusYielding;
 
   // insert at the head of the linked list
@@ -66,5 +68,27 @@ void Coroutine::resume() {
 unsigned long Coroutine::millis() const {
   return ::millis();
 }
+
+// Create the sStatusStrings lookup table to translate Status integer to a
+// human-readable string. When it is used, it increases flash memory by 86
+// bytes, and static RAM by 14 bytes. It is currently only used by
+// CoroutineScheduler::list() but I think it's worth it to make debugging
+// easier.
+
+static const char kStatusSuspendedString[] PROGMEM = "Suspended";
+static const char kStatusYieldingString[] PROGMEM = "Yielding";
+static const char kStatusDelayingString[] PROGMEM = "Delaying";
+static const char kStatusRunningString[] PROGMEM = "Running";
+static const char kStatusEndingString[] PROGMEM = "Ending";
+static const char kStatusTerminatedString[] PROGMEM = "Terminated";
+
+const __FlashStringHelper* const Coroutine::sStatusStrings[] = {
+  ACE_ROUTINE_FPSTR(kStatusSuspendedString),
+  ACE_ROUTINE_FPSTR(kStatusYieldingString),
+  ACE_ROUTINE_FPSTR(kStatusDelayingString),
+  ACE_ROUTINE_FPSTR(kStatusRunningString),
+  ACE_ROUTINE_FPSTR(kStatusEndingString),
+  ACE_ROUTINE_FPSTR(kStatusTerminatedString),
+};
 
 }

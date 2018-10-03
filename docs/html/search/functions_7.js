@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['print',['print',['../classace__routine_1_1FCString.html#ac244d804d43afe5cd30ea7b9dc834799',1,'ace_routine::FCString']]],
-  ['printlineerror',['printLineError',['../classace__routine_1_1cli_1_1CommandDispatcher.html#a16cfa6a047bc334ef5e70872840f661c',1,'ace_routine::cli::CommandDispatcher']]],
-  ['println',['println',['../classace__routine_1_1FCString.html#a2ec18e25b8fb09e72ea24f07e2e7bf09',1,'ace_routine::FCString']]]
+  ['printhelp',['printHelp',['../classace__routine_1_1cli_1_1CommandDispatcher.html#ad4eddd78d17333dfaa58e6d426dce25e',1,'ace_routine::cli::CommandDispatcher']]],
+  ['printlineerror',['printLineError',['../classace__routine_1_1cli_1_1CommandDispatcher.html#ae0d64db2ed48fa0605f0df33715f40c6',1,'ace_routine::cli::CommandDispatcher']]],
+  ['printto',['printTo',['../classace__routine_1_1FCString.html#a834801808fbe4c5b7a8af27cca07732b',1,'ace_routine::FCString']]]
 ];

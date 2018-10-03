@@ -3,7 +3,7 @@
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
 
-Version: 0.1 (2018-08-07)
+Version: 0.2 (2018-10-02)
 
 This library is currently in "beta" status. I'm releasing it through the Arduino
 Library Manager to solicit feedback from interested users. Send me an email or
@@ -20,9 +20,12 @@ using a `yield()` or `delay()` functionality to allow other coroutines to
 execute. When the scheduler makes it way back to the original coroutine, the
 execution continues right after the `yield()` or `delay()`.
 
-There are only 2 classes in this library:
-* each coroutine is an instance of the `Coroutine` class (or a subclass),
-* the `CoroutineScheduler` class handles the scheduling.
+There are only 3 classes in this library:
+* `Coroutine` class provides the context variables for all coroutines,
+* `CoroutineScheduler` class optionally handles the scheduling,
+* `Channel` class allows coroutines to send messages to each other. This is
+  an early experimental feature whose API and feature may change considerably
+  in the future.
 
 The library provides a number of macros to help create coroutines and manage
 their life cycle:
@@ -35,7 +38,11 @@ their life cycle:
 * `COROUTINE_AWAIT(condition)`: yield until `condition` become `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
+* `COROUTINE_DELAY_SECONDS(loopCounter, seconds)`: yields back execution for
+  `seconds`. The `seconds` parameter is defined as a `uint16_t`.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
+* `COROUTINE_CHANNEL_WRITE(channel, value)`: writes a value to a `Channel`
+* `COROUTINE_CHANNEL_READ(channel, value)`: reads a value from a `Channel`
 
 Here are some of the compelling features of this library compared to
 others (in my opinion of course):
@@ -58,10 +65,13 @@ others (in my opinion of course):
 * fully unit tested using [AUnit](https://github.com/bxparks/AUnit)
 
 Some limitations are:
-* coroutines cannot return any values
-* coroutines are stackless, so they cannot preserve local stack varaibles
+* A `Coroutine` cannot return any values.
+* A `Coroutine` is stackless cannot preserve local stack varaibles
   across multiple calls. Often the class member variables or function static
   variables are reasonable substitutes.
+* A `Channel` is an experimental feature and has limited features. It is
+  currently an unbuffered, synchrronized channel. It can be used by only one
+  reader and one writer.
 
 After I had completed most of this library, I discovered that I had essentially
 reimplemented the `<ProtoThread.h>` library in the
@@ -74,7 +84,7 @@ additional macros that can reduce boilerplate code.
 
 This is the [HelloCoroutine.ino](examples/HelloCoroutine) sample sketch.
 
-```
+```C++
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -119,9 +129,9 @@ void setup() {
 }
 
 void loop() {
-  blinkLed.run();
-  printHello.run();
-  printWorld.run();
+  blinkLed.runCoroutine();
+  printHello.runCoroutine();
+  printWorld.runCoroutine();
 }
 ```
 
@@ -131,7 +141,7 @@ At the same time, the LED blinks on and off.
 The [HelloScheduler.ino](examples/HelloScheduler) sketch implements the same
 thing using the `CoroutineScheduler`:
 
-```
+```C++
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -156,9 +166,8 @@ the `loop()` method manually.
 
 ## Installation
 
-The latest stable release will eventually be available in the Arduino IDE
-Library Manager. Search for "AceRoutine". Click Install.
-(Unfortunately, it is not there yet.)
+The latest stable release is available in the Arduino IDE Library Manager.
+Search for "AceRoutine". Click Install.
 
 The development version can be installed by cloning the
 [GitHub repository](https://github.com/bxparks/AceRoutine), checking out the
@@ -186,6 +195,8 @@ The [docs/](docs/) directory contains the
 
 The following example sketches are provided:
 
+* [AutoBenchmark.ino](examples/AutoBenchmark):
+  a program that performs CPU benchmarking
 * [HelloCoroutine.ino](examples/HelloCoroutine)
 * [HelloScheduler.ino](examples/HelloScheduler): same as `HelloCoroutine`
   except using the `CoroutineScheduler` instead of manually running the
@@ -195,14 +206,17 @@ The following example sketches are provided:
 * [BlinkSlowFastCustomRoutine.ino](examples/BlinkSlowFastCustomRoutine): same
   as BlinkSlowFastRoutine but using a custom `Coroutine` class
 * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same time
-* [AutoBenchmark.ino](examples/AutoBenchmark):
-  a program that performs CPU benchmarking
-* [CommandLineInterface.ino](examples/CommandLineInterface): uses the
+* [CommandLineShell.ino](examples/CommandLineShell): uses the
   `src/ace_routine/cli` classes to implement a command line interface that
   accepts a number of commands on the serial port. In other words, it is a
   primitive "shell". The shell is non-blocking and uses coroutines so that other
   coroutines continue to run while the board waits for commands to be typed on
   the serial port.
+* [Pipe.ino](examples/Pipe): uses a `Channel` to allow a Writer to send
+  messages to a Reader
+* [ChannelBenchmark.ino](examples/ChannelBenchmark): determines the amount of
+  CPU overhead of a `Channel` by using 2 coroutines to ping-pong an integer
+  across 2 channels
 
 ## Usage
 
@@ -213,14 +227,15 @@ To prevent name clashes with other libraries that the calling code may use, all
 classes are defined in the `ace_routine` namespace. To use the code without
 prepending the `ace_routine::` prefix, use the `using` directive:
 
-```
+```C++
 #include <AceRoutine.h>
 using namespace ace_routine;
 ```
 
 ### Macros
 
-The following macros are used:
+The following macros are available to hide a lot of boilerplate code:
+
 * `COROUTINE()`: defines an instance of `Coroutine` class or a user-provided
   custom subclass of `Coroutine`
 * `COROUTINE_BEGIN()`: must occur at the start of a coroutine body
@@ -229,13 +244,18 @@ The following macros are used:
 * `COROUTINE_AWAIT(condition)`: yield until `condition` become `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The maximum
   allowable delay is 32767 milliseconds.
+* `COROUTINE_DELAY_SECONDS(loopCounter, seconds)`: yields back execution for
+  `seconds`. The maximum allowable delay is the maximum value of the integer
+  type of `loopCounter` which can be of any integer type.
 * `COROUTINE_LOOP()`: convenience macro that loops forever, replaces
   `COROUTINE_BEGIN()` and `COROUTINE_END()`
+* `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`
+* `COROUTINE_CHANNEL_READ()`: reads a message from a `Channel`
 
 ### Overall Structure
 
 The overall structure looks like this:
-```
+```C++
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -274,11 +294,27 @@ void loop() {
 }
 ```
 
+### Coroutine Instance
+
+All coroutines are instances of the `Coroutine` class or one of its
+subclasses. The name of the coroutine instance is the name provided
+in the `COROUTINE()` macro. For example, in the following example:
+```C++
+COROUTINE(doSomething) {
+  COROUTINE_BEGIN();
+  ...
+  COROUTINE_END();
+}
+```
+there is a globally-scoped object named `doSomething` which is an instance of a
+subclass of `Coroutine`. The name of this subclass is autogenerated to be
+`Coroutine_doSomething` but it is unlikely that you will need know the exact
+name of this generated class.
+
 ### Coroutine Body
 
-The `COROUTINE(name)` macro defines an instance of the `Coroutine` class named
-`name`. The code immediately following the macro, in the `{ ... }`, becomes the
-body of the `Coroutine::run()` virtual method. Within this `run()` method,
+The code immediately following the `COROUTINE()` macro becomes the body of the
+`Coroutine::runCoroutine()` virtual method. Within this `runCoroutine()` method,
 various helper macros (e.g. `COROUTINE_BEGIN()`, `COROUTINE_YIELD()`,
 `COROUTINE_DELAY()`, etc) can be used. These helper macros are described below.
 
@@ -306,13 +342,13 @@ gives the illusion that the execution continues further down the function.)
 
 `COROUTINE_AWAIT(condition)` yields until the `condition` evaluates to `true`.
 This is a convenience macro that is identical to:
-```
+```C++
 while (!condition) COROUTINE_YIELD();
 ```
 
 ### Delay
 
-`COROUTINE_DELAY(millis)` delays the return of control until `millis`
+The `COROUTINE_DELAY(millis)` macro delays the return of control until `millis`
 milliseconds have elapsed. The `millis` argument is a `uint16_t`, a 16-bit
 unsigned integer, which reduces the size of each coroutine instance by 4 bytes.
 However, the actual maximum delay is limited to 32767 milliseconds to avoid
@@ -325,18 +361,57 @@ yield control to the other coroutines as soon as possible.
 
 To delay for longer, an explicit loop can be used. For example, to delay
 for 1000 seconds, we can do this:
-```
+```C++
 COROUTINE(waitThousandSeconds) {
   COROUTINE_BEGIN();
-  static i = 0;
-  for (i = 0; i < 100; i++) {
-    COROUTINE_DELAY(10000);
+  static uint16_t i;
+  for (i = 0; i < 1000; i++) {
+    COROUTINE_DELAY(1000);
   }
   ...
   COROUTINE_END();
 }
 ```
 See **For Loop** section below for a description of the for-loop construct.
+
+This for-loop construct happens often enough that it seemed worthwhile to
+provide the `COROUTINE_DELAY_SECONDS(loopCounter, seconds)` convenience macro.
+It replaces the above for-loop, like this:
+```C++
+COROUTINE(waitThousandSeconds) {
+  COROUTINE_BEGIN();
+  static uint16_t loopCounter;
+  COROUTINE_DELAY_SECONDS(loopCounter, 1000);
+  ...
+  COROUTINE_END();
+}
+```
+The `static uint16_t loopCounter` variable is still required for the
+`COROUTINE_DELAY_SECONDS()` macro because it needs a loop counter that must
+preserve its value across multiple invocation of the coroutine. The
+`loopCounter` may be any integer type, and the maximum number of seconds is the
+maximum value of that particular integer type. For example, if the `loopCounter`
+was a `uint8_t`, the maximum delay would be 255 seconds. If the `loopCounter`
+was a `uint32_t`, the maximum delay would be about 4 billion seconds.
+
+The `loopCounter` may also be a member variable of the `Coroutine` subclass,
+when you use custom or manual coroutines (see the sections on *Custom
+Coroutines* or *Manual Coroutines* below for details). In other words, you can
+define a coroutine with a `mDelayCounter` member variable, and use the
+`COROUTINE_DELAY_SECONDS()` macro like this:
+```C++
+class MyCoroutine: public Coroutine {
+  public:
+    virtual int runCoroutine() override {
+      ...
+      COROUTINE_DELAY_SECONDS(mDelayCounter, 1000);
+      ...
+    }
+
+  private:
+    uint16_t mDelayCounter;
+};
+```
 
 ### Stackless Coroutines
 
@@ -352,7 +427,7 @@ through multiple calls to the function, which is exactly what is needed.
 ### Conditional If-Else
 
 Conditional if-statements work as expected with the various macros:
-```
+```C++
 COROUTINE(doIfThenElse) {
   COROUTINE_BEGIN();
 
@@ -375,7 +450,7 @@ COROUTINE(doIfThenElse) {
 Unlike some implementations of stackless coroutines, AceRoutine coroutines are
 compatible with `switch` statements:
 
-```
+```C++
 COROUTINE(doThingsBasedOnSwitchConditions) {
   COROUTINE_BEGIN();
   ...
@@ -404,10 +479,10 @@ would be created on the stack, and the stack gets destroyed as soon as
 `COROUTINE_YIELD()`, `COROUTINE_DELAY()`, or `COROUTINE_AWAIT()` is executed.
 However, a reasonable solution is to use `static` variables. For example:
 
-```
+```C++
 COROUTINE(countToTen) {
   COROUTINE_BEGIN();
-  static i = 0;
+  static int i = 0;
   for (i = 0; i < 10; i++) {
     ...
     COROUTINE_DELAY(100);
@@ -423,7 +498,7 @@ You can write a coroutine that loops while certain condition is valid like this,
 just like you would normally, except that you call the `COROUTINE_YIELD()`
 macro to cooperatively allow other coroutines to execute.
 
-```
+```C++
 COROUTINE(loopWhileCondition) {
   COROUTINE_BEGIN();
   while (condition) {
@@ -444,7 +519,7 @@ AWAIT.
 In many cases, you just want to loop forever. You could use a `while (true)`
 statement, like this:
 
-```
+```C++
 COROUTINE(loopForever) {
   COROUTINE_BEGIN();
   while (true) {
@@ -458,7 +533,7 @@ COROUTINE(loopForever) {
 However, a forever-loop occurs so often that I created a convenience macro
 named `COROUTINE_LOOP()` to make this easier:
 
-```
+```C++
 COROUTINE(loopForever) {
   COROUTINE_LOOP() {
     ...
@@ -475,7 +550,7 @@ because the loop does not terminate. (Technically, it isn't required with the
 
 You could actually exit the loop using `COROUTINE_END()` in the middle of the
 loop:
-```
+```C++
 COROUTINE(loopForever) {
   COROUTINE_LOOP() {
     if (condition) {
@@ -495,7 +570,7 @@ Coroutines macros **cannot** be nested. In other words, if you call another
 function from within a coroutine, you cannot use the various `COROUTINE_XXX()`
 macros inside the nested function. The macros will trigger compiler errors if
 you try:
-```
+```C++
 void doSomething() {
   ...
   COROUTINE_YIELD(); // ***compiler error***
@@ -517,7 +592,7 @@ COROUTINE(cannotUseNestedMacros) {
 
 Coroutines can be chained, in other words, one coroutine *can* explicitly
 call another coroutine, like this:
-```
+```C++
 COROUTINE(inner) {
   COROUTINE_LOOP() {
     ...
@@ -529,32 +604,58 @@ COROUTINE(inner) {
 COROUTINE(outer) {
   COROUTINE_LOOP() {
     ...
-    inner.run();
+    inner.runCoroutine();
     ...
     COROUTINE_YIELD();
   }
 }
 
 ```
+I have yet to find it useful to call a Coroutine defined with the `COROUTINE()`
+from another Coroutine defined by the same `COROUTINE()` macro.
 
-Although this is techically allowed, I have not yet discovered a practical
-use-case for this feature.
+However, I have found it useful to chain coroutines when using the **Manual
+Coroutines** described in one of the sections below. The ability to chain
+coroutines allows us to implement a [Decorator
+Pattern](https://en.wikipedia.org/wiki/Decorator_pattern) or a chain of
+responsibility. Using manual coroutines, we can wrap one coroutine with another
+and delegate to the inner coroutine like this:
 
-### Coroutine Instance
+```C++
+class InnerCoroutine: public Coroutine {
+  public:
+    InnerCoroutine(..) { ...}
 
-All coroutines are instances of the `Coroutine` class or one of its
-subclasses. The name of the coroutine instance is the name provided
-in the `COROUTINE()` macro. For example, in the following example:
+    virtual int runCoroutine override {
+      COROUTINE_BEGIN();
+      ...
+      COROUTINE_END();
+      ...
+    }
+};
+
+class OuterCoroutine: public Coroutine {
+  public:
+    OuterCoroutine(InnerCoroutine& inner): mInner(inner) {
+      ...
+    }
+
+    virtual int runCoroutine override {
+      // No COROUTINE_BEGIN() and COROUTINE_END() needed if this simply
+      // delegates to the InnerCoroutine.
+      mInner.runCoroutine();
+    }
+
+  private:
+    Coroutine& mInner;
+};
+
 ```
-COROUTINE(doSomething) {
-  COROUTINE_BEGIN();
-  ...
-  COROUTINE_END();
-}
-```
-there is a globally scoped instance of a subclass of `Coroutine` named
-`doSomething`. The name of this subclass is `Coroutine_doSomething` but it is
-unlikely that you will need know the exact name of this generated class.
+Most likely, only the `OuterCoroutine` would be registered in the
+`CoroutineScheduler`. And in the cases that I've come across, the
+`OuterCoroutine` doesn't actually use much of the Coroutine functionality
+(i.e. doesn't actuall use the `COROUTINE_BEGIN()` and `COROUTINE_END()` macros.
+It simply delegates the `runCoroutine()` call to the inner one.
 
 ### Running and Scheduling
 
@@ -565,13 +666,13 @@ There are 2 ways to run the coroutines:
 #### Manual Scheduling
 
 If you have only a small number of coroutines, the manual method may be the
-easiest. This requires you to explicitly call the `run()` method of all the
-coroutines that you wish to run in the `loop()` method, like this:
-```
+easiest. This requires you to explicitly call the `runCoroutine()` method of all
+the coroutines that you wish to run in the `loop()` method, like this:
+```C++
 void loop() {
-  blinkLed.run();
-  printHello.run();
-  printWorld.run();
+  blinkLed.runCoroutine();
+  printHello.runCoroutine();
+  printWorld.runCoroutine();
 }
 ```
 
@@ -582,7 +683,7 @@ defined in multiple `.cpp` files, then the `CoroutineScheduler` will
 make things easy. You just need to call `CoroutineScheduler::setup()`
 in the global `setup()` method, and `CoroutineScheduler::loop()`
 in the global `loop()` method, like this:
-```
+```C++
 void setup() {
   ...
   CoroutineScheduler::setup();
@@ -644,8 +745,8 @@ tests to prevent extraneous coroutines from interfering with test validation.
 
 A coroutine has several internal states:
 * `kStatusSuspended`: coroutine was suspended using `Coroutine::suspend()`
-* `kStatusYielding`: coroutine returned using `COROUTINE_YIELD()`
-* `kStatusAwaiting`: coroutine returned using `COROUTINE_AWAIT()`
+* `kStatusYielding`: coroutine returned using `COROUTINE_YIELD()` or
+  `COROUTINE_AWAIT()`
 * `kStatusDelaying`: coroutine returned using `COROUTINE_DELAY()`
 * `kStatusRunning`: coroutine is currently running
 * `kStatusEnding`: coroutine returned using `COROUTINE_END()`
@@ -654,33 +755,35 @@ A coroutine has several internal states:
 
 The finite state diagram looks like this:
 ```
-         Suspended
-         ^   ^   ^
-        /    |    \
-       /     |     \
-      v      |      \
-Yielding Awaiting Delaying
-     ^       ^       ^
-      \      |      /
-       \     |     /
-        \    |    /
-         v   v   v
-          Running
-             |
-             |
-             v
-          Ending
-             |
-             |
-             v
-        Terminated
+                     ----------------------------
+         Suspended                              ^
+         ^       ^                              |
+        /         \                             |
+       /           \                            |
+      v             \       --------            |
+Yielding          Delaying         ^            |
+     ^               ^             |            |
+      \             /              |        accessible
+       \           /               |        using
+        \         /                |        CoroutineScheduler
+         v       v          accessible          |
+          Running           by calling          |
+             |              runCoroutine()      |
+             |              directly            |
+             |                     |            |
+             v                     |            |
+          Ending                   v            |
+             |              --------            |
+             |                                  |
+             v                                  |
+        Terminated                              v
+                    -----------------------------
 ```
 
 You can query these internal states using the following methods on the
 `Coroutine` class:
 * `Coroutine::isSuspended()`
 * `Coroutine::isYielding()`
-* `Coroutine::isAwaiting()`
 * `Coroutine::isDelaying()`
 * `Coroutine::isRunning()`
 * `Coroutine::isEnding()`
@@ -692,7 +795,7 @@ You can query these internal states using the following methods on the
 To call these functions on a specific coroutine, use the `Coroutine` instance
 variable that was created using the `COROUTINE()` macro:
 
-```
+```C++
 COROUTINE(doSomething) {
   COROUTINE_BEGIN();
   ...
@@ -715,7 +818,7 @@ COROUTINE(doSomethingElse) {
 The `COROUTINE_YIELD()`, `COROUTINE_DELAY()`, `COROUTINE_AWAIT()` macros have
 been designed to allow them to be used almost everywhere a valid C/C++ statement
 is allowed. For example, the following is allowed:
-```
+```C++
   ...
   if (condition) COROUTINE_YIELD();
   ...
@@ -727,12 +830,12 @@ All coroutines are instances of the `Coroutine` class, or one of its subclasses.
 You can create custom subclasses of `Coroutine` and create coroutines which are
 instances of the custom class. Use the 2-argument version of the `COROUTINE()`
 macro like this:
-```
+```C++
 class CustomCoroutine : public Coroutine {
   public:
     void enable(bool isEnabled) { enabled = isEnabled; }
 
-    // the run() method will be defined by the COROUTINE() macro
+    // the runCoroutine() method will be defined by the COROUTINE() macro
 
   protected:
     bool enabled = 0;
@@ -749,45 +852,47 @@ The 2-argument version created an object instance called `blinkSlow` which is an
 instance of an internally generated class named `CustomCoroutine_blinkSlow`
 which is a subclass of `CustomCoroutine`.
 
-Custom coroutines are useful if you need to create multiple coroutines which
-share methods or data structures.
+Custom coroutines were intended to be useful if you need to create multiple
+coroutines which share methods or data structures. In practice, however, I have
+yet to find a use for them. Instead, I have found that the *Manual Coroutines*
+described in the next section to be more useful.
 
 ### Manual Coroutines
 
 An manual coroutine is a custom coroutine whose body of the coroutine (i.e
-the`run()` method) is defined manually and the coroutine object is also
+the`runCoroutine()` method) is defined manually and the coroutine object is also
 instantiated manually, instead of using the `COROUTINE()` macro. This is useful
 if the coroutine has external dependencies which need to be injected into the
 constructor. The `COROUTINE()` macro does not allow the constructor to be
 customized.
 
-```
+```C++
 class ManualCoroutine : public Coroutine {
   public:
     // Inject external dependencies into the constructor.
-    ManualCoroutine(...) {
+    ManualCoroutine(Params, ..., Objects, ...) {
       ...
     }
 
   private:
-    virtual int run() override {
+    virtual int runCoroutine() override {
       COROUTINE_BEGIN();
       // insert coroutine code here
       COROUTINE_END();
     }
 };
 
-ManualCoroutine manualRoutine;
+ManualCoroutine manualRoutine(params, ..., objects, ...);
 ```
 
 A manual coroutine (created without the `COROUTINE()` macro) is *not*
 automatically added to the linked list used by the `CoroutineScheduler`. If you
-wish to insert it into the scheduler, use the `resume()` method just before
-calling `CoroutineScheduler::setup()`:
-```
+wish to insert it into the scheduler, use the `setupCoroutine()` method just
+before calling `CoroutineScheduler::setup()`:
+```C++
 void setup() {
   ...
-  manualRoutine.resume();
+  manualRoutine.setupCoroutine("manualRoutine");
   CoroutineScheduler::setup();
   ...
 }
@@ -799,16 +904,35 @@ void loop() {
 }
 ```
 
-The `Coroutine::resume()` method can be called at anytime to insert into the
-scheduler, but calling it in the global `setup()` makes things simple.
+There are 2 versions of the `setupCoroutine()` method:
+* `setupCoroutine(const char* name)`
+* `setupCoroutine(const __FlashStringHelper* name)`
 
-The name of a manually created coroutine is set to be `nullptr` because the
-`COROUTINE()` macro was not used. When printed (e.g. using the
-`CoroutineScheduler::list()` method), the name is represented by the integer
-representation of the `this` pointer of the coroutine object.
+Both have been designed so that they are safe to be called from the constructor
+of a `Coroutine` class, even during static initialization time. This is exactly
+what the `COROUTINE()` macro does, call the `setupCoroutine()` method from the
+generated constructor. However, a manual coroutine is often written as a library
+that is supposed to be used by an end-user, and it would be convenient for the
+name of the coroutine to be defined by the end-user. The problem is that the
+`F()` macro cannot be used outside of the function context, so it is cannot be
+passed into the constructor when the coroutine is statically created. The
+workaround is to call the `setupCoroutine()` method in the global `setup()`
+function, where the `F()` macro is allowed to be used. (The other more obscure
+reason is that the constructor of the manual coroutine class will often have a
+large number of dependency injection parameters which are required to implement
+its functionality, and it is cleaner to avoid mixing in the name of the
+`Coroutine` which is an incidental dependency. Anyway, that's my rationale right
+now, but this may change in the future if a simpler alternative is discovered.)
+
+If the coroutine is not given a name, the name is stored as a `nullptr`. When
+printed (e.g. using the `CoroutineScheduler::list()` method), the name of an
+anonymous coroutine is represented by the integer representation of the `this`
+pointer of the coroutine object.
 
 A good example of a manual coroutine is
-[src/ace_routine/cli/CommandDispatcher.h](src/ace_routine/cli/CommandDispatcher.h).
+[src/ace_routine/cli/CommandManager.h](src/ace_routine/cli/CommandManager.h)
+and you can see how it is configured in
+[examples/CommandLineShell](examples/CommandLineShell).
 
 ### External Coroutines
 
@@ -819,7 +943,7 @@ declaration for that instance. The macro that makes this easy is
 
 For example, supposed we define a coroutine named `external` like
 this in a `External.cpp` file:
-```
+```C++
 COROUTINE(external) {
   ...
 }
@@ -827,7 +951,7 @@ COROUTINE(external) {
 
 To use this in `Main.ino` file, we must use the `EXTERN_COROUTINE()` macro like
 this:
-```
+```C++
 EXTERN_COROUTINE(external);
 
 COROUTINE(doSomething) {
@@ -840,14 +964,14 @@ COROUTINE(doSomething) {
 If the 2-argument version of `COROUTINE()` was used, then the corresponding
 2-argument version of `EXTERN_COROUTINE()` must be used, like this in
 `External.cpp`:
-```
+```C++
 COROUTINE(CustomCoroutine, external) {
   ...
 }
 ```
 
 then this in `Main.ino`:
-```
+```C++
 EXTERN_COROUTINE(CustomCoroutine, external);
 
 COROUTINE(doSomething) {
@@ -859,15 +983,178 @@ COROUTINE(doSomething) {
 
 ### Communication Between Coroutines
 
-The AceRoutine library does not provide any internal mechanism to
-pass data between coroutines. Here are some options:
+There are a handful ways that `Coroutine` instances can pass data between
+each other.
 
 * The easiest method is to use **global variables** which are modified by
   multiple coroutines.
-* You can subclass the `Coroutine` class and define a class static variables
-  which can be shared among coroutines which inherit this custom class
-* You can define methods on the custom Coroutine class, and pass messages back
-  and forth between coroutines using these methods.
+* To avoid polluting the global namespace, you can subclass the `Coroutine`
+  class and define **class static variables** which can be shared among
+  coroutines which inherit this custom class
+* You can define **methods on the custom Coroutine class**, and pass messages
+  back and forth between coroutines using these methods.
+* You can use **channels** as explained in the next section.
+
+### Channels
+
+I have provided an early experimental implementation of channels inspired by the
+[Go Lang Channels](https://www.golang-book.com/books/intro/10). The `Channel`
+class implements an unbuffered, bidirectional channel. The API and features
+of the `Channel` class may change significantly in the future.
+
+Just like Go Lang channels, the AceRoutine `Channel` provides a point of
+synchronization between coroutines. In other words, the following sequence of
+events is guaranteed when interacting with a channel:
+
+* the writer blocks until the reader is ready,
+* the reader blocks until the writer is ready,
+* when the writer writes, the reader picks up the the message and is allowed
+  to continue execution *before* the writer is allowed to continue,
+* the writer then continues execution after the reader yields.
+
+Channels will be most likely be used with Manual Coroutines, in other words,
+when you define your own subclasses of `Coroutine` and define your own
+`runCoroutine()` method, instead of using the `COROUTINE()` macro. The `Channel`
+class can be injected into the constructor of the `Coroutine` subclass.
+
+The `Channel` class is templatized on the channel message class written by the
+writer and read by the reader. It will often be useful for the message type to
+contain a status field which indicates whether the writer encountered an error.
+So a message of just an `int` may look like:
+```C++
+class Message {
+  static uint8_t const kStatusOk = 0;
+  static uint8_t const kStatusError = 1;
+
+  uint8_t status;
+  int value;
+};
+```
+
+A `Channel` of this type can be created like this:
+```C+++
+Channel<Message> channel;
+```
+
+This channel should be injected into the writer coroutine and reader coroutine:
+```C++
+class Writer: public Coroutine {
+  public:
+    Writer(Channel<Message>& channel, ...):
+      mChannel(channel),
+      ...
+    {...}
+
+  private:
+    Channel<Message>& mChannel;
+};
+
+class Reader: public Coroutine {
+  public:
+    Reader(Channel<Message>& channel, ...):
+      mChannel(channel),
+      ...
+    {...}
+
+  private:
+    Channel<Message>& mChannel;
+};
+```
+
+Next, implement the `runCoroutine()` methods of both the Writer and Reader
+to pass the `Messager` objects. There are 2 new macros to help with writing to
+and reading from channels:
+
+* `COROUTINE_CHANNEL_WRITE(channel, value)`: writes the `value` to the given
+  channel, blocking (i.e. yielding) until the reader is ready
+* `COROUTINE_CHANNEL_READ(channel, value)`: reads from the channel into the
+  given `value`, blocking (i.e. yielding) until the writer is ready to write
+
+Here is the sketch of a Writer that sends 10 integers to the Reader:
+
+```C++
+class Writer: public Coroutine {
+  public:
+    Writer(...) {...}
+
+    virtual int runCoroutine() override {
+      static int i;
+      COROUTINE_BEGIN();
+      for (i = 0; i < 9; i++) {
+        Message message = { Message::kStatusOk, i };
+        COROUTINE_CHANNEL_WRITER(mChannel, message);
+      }
+      COROUTINE_END();
+    }
+
+  private:
+    Channel<Message>& mChannel;
+};
+
+class Reader: public Coroutine {
+  public
+    Reader(...) {...}
+
+    virtual int runCoroutine() override {
+      COROUTINE_LOOP() {
+        Message message;
+        COROUTINE_CHANNEL_READ(mChannel, message);
+        if (message.status == Message::kStatusOk) {
+          Serial.print("Message received: value = ");
+          Serial.println(message.value);
+        }
+      }
+    }
+
+  private:
+    Channel<Message>& mChannel;
+};
+
+...
+
+Writer writer(channel);
+Reader reader(channel);
+
+void setup() {
+  Serial.begin(115200);
+  while (!Serial); // micro/leonardo
+
+  ...
+  writer.setupCoroutine("writer");
+  reader.setupCoroutine("reader");
+  CoroutineScheduler::setup();
+  ...
+}
+
+void loop() {
+  CoroutineScheduler::loop();
+}
+```
+
+**Examples**
+
+A really good example of using a `Channel` can be found in the
+[ace_routine/cli](src/ace_routine/cli) package which uses 2 coroutines
+and a channel between them to communicate:
+
+* `StreamLineReader.h`: a coroutine that reads from `Serial` and writes to a
+  `Channel`
+* `CommandDispatcher.h`: a coroutine that reads from a `Channel` and dispatches
+  to a `CommandHandler`
+
+**Limitations**
+
+* Only a single AceRoutine `Coroutine` can write to a `Channel`.
+* Only a single AceRoutine `Coroutine` can read from a `Channel`.
+* There is equivalent of a
+  [Go Lang select statement](https://gobyexample.com/select), so the coroutine
+  cannot wait for multiple channels at the same time.
+* There is no buffered channel type.
+* There is no provision to
+  [close a channel](https://gobyexample.com/closing-channels).
+
+Some of these features may be implemented in the future if I find compelling
+use-cases and if they are easy to implement.
 
 ### Functors
 
@@ -964,11 +1251,13 @@ advantages:
 All objects are statically allocated (i.e. not heap or stack).
 
 * 8-bit processors (AVR Nano, UNO, etc):
-    * sizeof(Coroutine): 14
-    * sizeof(CoroutineScheduler): 2
+    * `sizeof(Coroutine)`: 14
+    * `sizeof(CoroutineScheduler)`: 2
+    * `sizeof(Channel<int>)`: 5
 * 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32)
-    * sizeof(Coroutine): 28
-    * sizeof(CoroutineScheduler): 4
+    * `sizeof(Coroutine)`: 28
+    * `sizeof(CoroutineScheduler)`: 4
+    * `sizeof(Channel<int>)`: 12
 
 In other words, you can create 100 `Coroutine` instances and they would use only
 1400 bytes of static RAM on an 8-bit AVR processor.
@@ -977,6 +1266,10 @@ The `CoroutineScheduler` consumes only 2 bytes of memory no matter how many
 coroutines are created. That's because it depends on a singly-linked list whose
 pointers live on the `Coroutine` object, not in the `CoroutineScheduler`.
 
+The `Channel` object requires 2 copies of the parameterized `<T>` type so its
+size is equal to `1 + 2 * sizeof(T)`, rounded to the nearest memory alignment
+boundary (i.e. 12 for a 32-bit processor).
+
 ### CPU
 
 See [examples/AutoBenchmark](examples/AutoBenchmark).
@@ -984,9 +1277,9 @@ See [examples/AutoBenchmark](examples/AutoBenchmark).
 ## System Requirements
 
 This library was developed and tested using:
-* [Arduino IDE 1.8.5](https://www.arduino.cc/en/Main/Software)
+* [Arduino IDE 1.8.7](https://www.arduino.cc/en/Main/Software)
 * [Teensyduino 1.41](https://www.pjrc.com/teensy/td_download.html)
-* [ESP8266 Arduino Core 2.4.1](https://arduino-esp8266.readthedocs.io/en/2.4.1/)
+* [ESP8266 Arduino Core 2.4.2](https://arduino-esp8266.readthedocs.io/en/2.4.2/)
 * [arduino-esp32](https://github.com/espressif/arduino-esp32)
 
 I used MacOS 10.13.3 and Ubuntu 17.10 for most of my development.
@@ -1013,6 +1306,16 @@ See [CHANGELOG.md](CHANGELOG.md).
 ## License
 
 [MIT License](https://opensource.org/licenses/MIT)
+
+## Feedback and Support
+
+If you have any questions, comments, bug reports, or feature requests, please
+file a GitHub ticket or send me an email. I'd love to hear about how this
+software and its documentation can be improved. Instead of forking the
+repository to modify or add a feature for your own projects, let me have a
+chance to incorporate the change into the main repository so that your external
+dependencies are simpler and so that others can benefit. I can't promise that I
+will incorporate everything, but I will give your ideas serious consideration.
 
 ## Authors
 

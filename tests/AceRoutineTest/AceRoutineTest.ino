@@ -8,6 +8,8 @@ using namespace ace_routine;
 using namespace ace_routine::testing;
 using namespace aunit;
 
+// ---------------------------------------------------------------------------
+
 test(FCString_compareTo) {
   FCString n;
   FCString a("a");
@@ -28,6 +30,72 @@ test(FCString_compareTo) {
   assertMore(fb.compareTo(fa), 0);
 }
 
+// ---------------------------------------------------------------------------
+
+// Create a named subclass of TestOnce so that we can add it as a friend of the
+// Coroutine class, which allows it access to the protected Status constants
+// and sStatusStrings.
+class StatusStringTest: public TestOnce {
+  public:
+    void assertStatusStringsEqual() {
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusSuspended],
+          "Suspended");
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusYielding],
+          "Yielding");
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusDelaying],
+          "Delaying");
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusRunning],
+          "Running");
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusEnding],
+          "Ending");
+      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusTerminated],
+          "Terminated");
+    }
+};
+
+testF(StatusStringTest, statusStrings) {
+  assertStatusStringsEqual();
+}
+
+// ---------------------------------------------------------------------------
+
+Channel<int> channel;
+
+test(channelReadAndWrite) {
+  int writeValue = 2;
+  int readValue = 0;
+
+  assertFalse(channel.read(readValue));
+  assertFalse(channel.read(readValue)); // second call should also return false
+  assertFalse(channel.write(writeValue));
+  assertFalse(channel.write(writeValue)); // second call should return false
+
+  assertTrue(channel.read(readValue));
+  assertTrue(channel.write(writeValue)); // write() can proceed after read()
+
+  assertEqual(readValue, writeValue);
+}
+
+test(channelWriteMacro) {
+  int writeValue = 2;
+  int readValue = 0;
+
+  assertFalse(channel.read(readValue));
+  assertFalse(channel.read(readValue)); // second call should also return false
+
+  // Test the methods used by COROUTINE_CHANNEL_WRITE()
+  channel.setValue(writeValue);
+  assertFalse(channel.write());
+  assertFalse(channel.write()); // second call should return false
+
+  assertTrue(channel.read(readValue));
+  assertTrue(channel.write()); // write() can proceed after read()
+
+  assertEqual(readValue, writeValue);
+}
+
+// ---------------------------------------------------------------------------
+
 // An external flag to await upon, for testing.
 bool simpleCoroutineFlag = false;
 
@@ -40,32 +108,32 @@ COROUTINE(TestableCoroutine, simpleCoroutine) {
   COROUTINE_END();
 }
 
-// Verify that multiple calls to Coroutine::run() after it ends is ok.
+// Verify that multiple calls to Coroutine::runCoroutine() after it ends is ok.
 test(simpleCoroutine) {
   simpleCoroutine.millis(0);
   assertTrue(simpleCoroutine.isSuspended());
 
-  simpleCoroutine.run();
+  simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isYielding());
 
-  simpleCoroutine.run();
+  simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isDelaying());
 
-  simpleCoroutine.run();
+  simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isDelaying());
 
   simpleCoroutine.millis(1);
-  simpleCoroutine.run();
-  assertTrue(simpleCoroutine.isAwaiting());
+  simpleCoroutine.runCoroutine();
+  assertTrue(simpleCoroutine.isYielding());
 
-  simpleCoroutine.run();
-  assertTrue(simpleCoroutine.isAwaiting());
+  simpleCoroutine.runCoroutine();
+  assertTrue(simpleCoroutine.isYielding());
 
   simpleCoroutineFlag = true;
-  simpleCoroutine.run();
+  simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isEnding());
 
-  simpleCoroutine.run();
+  simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isEnding());
 }
 
@@ -158,13 +226,13 @@ test(scheduler) {
   // run b
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
-  assertTrue(b.isAwaiting());
+  assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
 
   // run c
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
-  assertTrue(b.isAwaiting());
+  assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
 
   a.millis(101);
@@ -173,20 +241,20 @@ test(scheduler) {
 
   // run a
   CoroutineScheduler::loop();
-  assertTrue(a.isAwaiting());
-  assertTrue(b.isAwaiting());
+  assertTrue(a.isYielding());
+  assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
 
   // run b
   CoroutineScheduler::loop();
-  assertTrue(a.isAwaiting());
-  assertTrue(b.isAwaiting());
+  assertTrue(a.isYielding());
+  assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
 
   // run c
   CoroutineScheduler::loop();
-  assertTrue(a.isAwaiting());
-  assertTrue(b.isAwaiting());
+  assertTrue(a.isYielding());
+  assertTrue(b.isYielding());
   assertTrue(c.isEnding());
 
   a.millis(102);
@@ -195,19 +263,19 @@ test(scheduler) {
 
   // run a
   CoroutineScheduler::loop();
-  assertTrue(a.isAwaiting());
-  assertTrue(b.isAwaiting());
+  assertTrue(a.isYielding());
+  assertTrue(b.isYielding());
   assertTrue(c.isEnding());
 
   // run b
   CoroutineScheduler::loop();
-  assertTrue(a.isAwaiting());
+  assertTrue(a.isYielding());
   assertTrue(b.isEnding());
   assertTrue(c.isEnding());
 
   // run c - removed from list
   CoroutineScheduler::loop();
-  assertTrue(a.isAwaiting());
+  assertTrue(a.isYielding());
   assertTrue(b.isEnding());
   assertTrue(c.isTerminated());
 
@@ -274,6 +342,8 @@ test(scheduler) {
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
 }
+
+// ---------------------------------------------------------------------------
 
 void setup() {
   delay(1000); // some boards reboot twice

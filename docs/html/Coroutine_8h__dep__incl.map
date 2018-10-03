@@ -1,8 +1,12 @@
 <map id="/home/brian/dev/AceRoutine/src/ace_routine/Coroutine.h" name="/home/brian/dev/AceRoutine/src/ace_routine/Coroutine.h">
-<area shape="rect" id="node2" href="$Coroutine_8cpp_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/Coroutine.cpp" alt="" coords="5,95,205,136"/>
-<area shape="rect" id="node3" href="$CoroutineScheduler_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/CoroutineScheduler.h" alt="" coords="230,95,474,136"/>
-<area shape="rect" id="node5" href="$AceRoutine_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/AceRoutine.h" alt="" coords="419,184,605,225"/>
-<area shape="rect" id="node4" href="$CoroutineScheduler_8cpp_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/CoroutineScheduler.cpp" alt="" coords="136,184,395,225"/>
-<area shape="rect" id="node6" href="$CommandDispatcher_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/CommandDispatcher.h" alt="" coords="377,273,647,315"/>
-<area shape="rect" id="node7" href="$CommandDispatcher_8cpp_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/CommandDispatcher.cpp" alt="" coords="370,363,654,404"/>
+<area shape="rect" id="node2" href="$Channel_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/Channel.h" alt="" coords="105,95,291,136"/>
+<area shape="rect" id="node3" href="$AceRoutine_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/AceRoutine.h" alt="" coords="235,184,422,225"/>
+<area shape="rect" id="node9" href="$Coroutine_8cpp_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/Coroutine.cpp" alt="" coords="366,95,566,136"/>
+<area shape="rect" id="node10" href="$CoroutineScheduler_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/CoroutineScheduler.h" alt="" coords="591,95,835,136"/>
+<area shape="rect" id="node4" href="$CommandDispatcher_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/CommandDispatcher.h" alt="" coords="43,370,313,411"/>
+<area shape="rect" id="node6" href="$CommandManager_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/CommandManager.h" alt="" coords="313,467,571,508"/>
+<area shape="rect" id="node7" href="$CommandHandler_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/CommandHandler.h" alt="" coords="121,273,373,315"/>
+<area shape="rect" id="node8" href="$StreamLineReader_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/StreamLine\lReader.h" alt="" coords="449,363,651,419"/>
+<area shape="rect" id="node5" href="$CommandDispatcher_8cpp_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/CommandDispatcher.cpp" alt="" coords="5,467,289,508"/>
+<area shape="rect" id="node11" href="$CoroutineScheduler_8cpp_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/CoroutineScheduler.cpp" alt="" coords="583,184,842,225"/>
 </map>

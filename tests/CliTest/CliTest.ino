@@ -4,7 +4,7 @@
 #include <Arduino.h> // Print
 #include <AceRoutine.h>
 #include <AUnitVerbose.h>
-#include "ace_routine/cli/CommandDispatcher.h"
+#include "ace_routine/cli/CommandManager.h"
 
 using namespace ace_routine;
 using namespace ace_routine::cli;
@@ -12,8 +12,39 @@ using namespace aunit;
 
 // ---------------------------------------------------------------------------
 
-const int ARGV_SIZE = 4;
-const char* argv[ARGV_SIZE];
+const uint8_t BUF_SIZE = 64;
+const uint8_t ARGV_SIZE = 4;
+const char PROMPT[] = "> ";
+const char LIST_COMMAND_NAME_F[] PROGMEM = "list";
+const char LIST_COMMAND_HELP_STRING_F[] PROGMEM = "files ...";
+
+class DummyCommand: public CommandHandler {
+  public:
+    DummyCommand(const char* name, const char* helpString):
+      CommandHandler(name, helpString) {}
+
+    DummyCommand(const __FlashStringHelper* name,
+        const __FlashStringHelper* helpString):
+      CommandHandler(name, helpString) {}
+
+    virtual void run(Print& /* printer */, int /* argc */,
+        const char** /* argv */) const override {}
+};
+
+static DummyCommand echoCommand("echo", "args ...");
+static DummyCommand lsCommand("ls", "[flags] args ...");
+static DummyCommand listCommand(
+    (const __FlashStringHelper*) LIST_COMMAND_NAME_F,
+    (const __FlashStringHelper*) LIST_COMMAND_HELP_STRING_F);
+static const CommandHandler* const COMMANDS[] = {
+  &echoCommand,
+  &lsCommand,
+  &listCommand,
+};
+static uint8_t const NUM_COMMANDS = sizeof(COMMANDS) / sizeof(CommandHandler*);
+
+static CommandManager<BUF_SIZE, ARGV_SIZE> commandManager(
+    COMMANDS, NUM_COMMANDS, Serial, PROMPT);
 
 class CommandDispatcherTest: public TestOnce {
   protected:
@@ -25,8 +56,11 @@ class CommandDispatcherTest: public TestOnce {
     }
 };
 
+// ---------------------------------------------------------------------------
+
 testF(CommandDispatcherTest, tokenize) {
   const char* expected[] = { "a", "b", "c", "d" };
+  const char* argv[ARGV_SIZE];
 
   char BLANK[] = "\n";
   uint8_t count = CommandDispatcher::tokenize(BLANK, argv, ARGV_SIZE);
@@ -45,55 +79,26 @@ testF(CommandDispatcherTest, tokenize) {
   assertArgvEquals(argv, expected, count);
 }
 
-// ---------------------------------------------------------------------------
+test(findCommand) {
+  const CommandDispatcher* dispatcher = commandManager.getDispatcher();
 
-void dummyCommand(Print& /* printer */, int /* argc */,
-    const char** /* argv */) {}
+  // "echo" command uses normal C strings
+  const CommandHandler* echoCommandResult = dispatcher->findCommand("echo");
+  assertEqual((uintptr_t) echoCommandResult, (uintptr_t) &echoCommand);
+  assertEqual(echoCommandResult->getName().compareTo(FCString("echo")), 0);
+  assertEqual(echoCommandResult->getHelpString().compareTo(
+      FCString("args ...")), 0);
 
-static const DispatchRecordC DISPATCH_TABLE[] = {
-  {dummyCommand, "echo", "args ..."},
-  {dummyCommand, "ls", "[flags] args ..."},
-};
-const uint8_t NUM_COMMANDS = sizeof(DISPATCH_TABLE) / sizeof(DispatchRecordC);
+  // "list" command uses flash strings
+  const CommandHandler* listCommandResult = dispatcher->findCommand("list");
+  assertEqual((uintptr_t) listCommandResult, (uintptr_t) &listCommand);
+  assertEqual(listCommandResult->getName().compareTo(FCString("list")), 0);
+  assertEqual(listCommandResult->getHelpString().compareTo(
+      FCString("files ...")), 0);
 
-test(CommandDispatcherC_findCommand) {
-  const DispatchRecordC* record = CommandDispatcherC::findCommand(
-      DISPATCH_TABLE, NUM_COMMANDS, "echo");
-  assertEqual((uintptr_t) record->command, (uintptr_t) dummyCommand);
-  assertEqual((uintptr_t) record->name, (uintptr_t) "echo");
-  assertEqual((uintptr_t) record->helpString, (uintptr_t) "args ...");
-
-  record = CommandDispatcherC::findCommand(
-      DISPATCH_TABLE, NUM_COMMANDS, "NOTFOUND");
-  assertEqual((uintptr_t) record, (uintptr_t) nullptr);
-}
-
-const char ECHO_COMMAND[] PROGMEM = "echo";
-const char ECHO_HELP_STRING[] PROGMEM = "args ...";
-const char LS_COMMAND[] PROGMEM = "ls";
-const char LS_HELP_STRING[] PROGMEM = "[flags] args ...";
-
-static const DispatchRecordF DISPATCH_TABLE_F[] = {
-  {dummyCommand,
-      ACE_ROUTINE_FPSTR(ECHO_COMMAND),
-      ACE_ROUTINE_FPSTR(ECHO_HELP_STRING)},
-  {dummyCommand,
-      ACE_ROUTINE_FPSTR(LS_COMMAND),
-      ACE_ROUTINE_FPSTR(LS_HELP_STRING)},
-};
-const uint8_t NUM_COMMANDS_F =
-    sizeof(DISPATCH_TABLE_F) / sizeof(DispatchRecordF);
-
-test(CommandDispatcherF_findCommand) {
-  const DispatchRecordF* record = CommandDispatcherF::findCommand(
-      DISPATCH_TABLE_F, NUM_COMMANDS, "echo");
-  assertEqual((uintptr_t) record->command, (uintptr_t) dummyCommand);
-  assertEqual((uintptr_t) record->name, (uintptr_t) ECHO_COMMAND);
-  assertEqual((uintptr_t) record->helpString, (uintptr_t) ECHO_HELP_STRING);
-
-  record = CommandDispatcherF::findCommand(
-      DISPATCH_TABLE_F, NUM_COMMANDS, "NOTFOUND");
-  assertEqual((uintptr_t) record, (uintptr_t) nullptr);
+  // this should not be found
+  const CommandHandler* notFound = dispatcher->findCommand("NOTFOUND");
+  assertEqual((uintptr_t) notFound, (uintptr_t) nullptr);
 }
 
 // ---------------------------------------------------------------------------

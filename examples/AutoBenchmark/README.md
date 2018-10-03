@@ -1,16 +1,28 @@
 # AutoBenchmark
 
+The `AutoBenchmark` tries to measure the amount of overhead caused by the
+context switching between coroutines. It uses 2 alternating coroutines to
+increment a global counter for X number of seconds. Each time the counter is
+incremented, there is a `Coroutine` context switch. The amount of microseconds
+it takes to increment the counter by 1 is given in the `AceRoutine` column.
+
+It then uses does the same thing using just a simple while-loop, which provides
+a baseline. This is represented by the `base` column.
+
+The difference between the 2 benchmarks (represented by the `diff` column below)
+is the overhead caused by the `Coroutine` context switch.
+
 All times in microseconds.
 
 ## Arduino Nano
 
-### Memory Size
+**Memory Size**
 
 ```
 sizeof(Routine): 14
 sizeof(RoutineScheduler): 2
 ```
-### CPU
+**CPU**
 
 ```
 ------------+------+------+
@@ -26,13 +38,14 @@ The benchmark numbers for Teensy are affected greatly by the compiler
 optimization settings in the Arduino IDE dropdown menu (Tools > Optimize).
 CPU Speed set to 96 MHz (overclock).
 
-### Memory Size
+**Memory Size**
+
 ```
 sizeof(Routine): 28
 sizeof(RoutineScheduler): 4
 ```
 
-### CPU
+**CPU**
 
 ```
 ----------------------+------------+------+------+
@@ -53,24 +66,38 @@ Smallest code + LTO   |       1.81 | 0.68 | 1.12 |
 
 ## ESP8266
 
-Memory Size: (same as Teensy 3.2)
+**Memory Size**
+
+```
+sizeof(Routine): 28
+sizeof(RoutineScheduler): 4
+```
+
+**CPU**
 
 ```
 ------------+------+------+
 AceRoutine  | base | diff |
 ------------+------+------+
-      10.83 | 9.11 | 1.71 |
+       6.17 | 4.49 | 1.67 |
 ------------+------+------+
 ```
 
 ## ESP32
 
-Memory Size: (same as Teensy 3.2)
+**Memory Size**
+
+```
+sizeof(Routine): 28
+sizeof(RoutineScheduler): 4
+```
+
+**CPU**
 
 ```
 ------------+------+------+
  AceRoutine | base | diff |
 ------------+------+------+
-       6.59 | 6.13 | 0.46 |
+       1.69 | 1.23 | 0.45 |
 ------------+------+------+
 ```

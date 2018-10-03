@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.2</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -89,6 +89,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad5b37d094a08034a36a5a10eeaf2aef3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1FCString.html#ad5b37d094a08034a36a5a10eeaf2aef3">FCString</a> (const __FlashStringHelper *s)</td></tr>
 <tr class="memdesc:ad5b37d094a08034a36a5a10eeaf2aef3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct with a flash string.  <a href="#ad5b37d094a08034a36a5a10eeaf2aef3">More...</a><br /></td></tr>
 <tr class="separator:ad5b37d094a08034a36a5a10eeaf2aef3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01d4d2dab9adb4a879cc3fd09fa0b876"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1FCString.html#a01d4d2dab9adb4a879cc3fd09fa0b876">isNull</a> () const</td></tr>
+<tr class="memdesc:a01d4d2dab9adb4a879cc3fd09fa0b876"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return if this is a null string.  <a href="#a01d4d2dab9adb4a879cc3fd09fa0b876">More...</a><br /></td></tr>
+<tr class="separator:a01d4d2dab9adb4a879cc3fd09fa0b876"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f1e4eb7891ef7d1ff173f1e62ae0701"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1FCString.html#a0f1e4eb7891ef7d1ff173f1e62ae0701">getType</a> () const</td></tr>
 <tr class="memdesc:a0f1e4eb7891ef7d1ff173f1e62ae0701"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the internal type of string.  <a href="#a0f1e4eb7891ef7d1ff173f1e62ae0701">More...</a><br /></td></tr>
 <tr class="separator:a0f1e4eb7891ef7d1ff173f1e62ae0701"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -98,12 +101,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a592ab206584ae70afa9d5167f47694c1"><td class="memItemLeft" align="right" valign="top">const __FlashStringHelper *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1FCString.html#a592ab206584ae70afa9d5167f47694c1">getFString</a> () const</td></tr>
 <tr class="memdesc:a592ab206584ae70afa9d5167f47694c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the flash string pointer.  <a href="#a592ab206584ae70afa9d5167f47694c1">More...</a><br /></td></tr>
 <tr class="separator:a592ab206584ae70afa9d5167f47694c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac244d804d43afe5cd30ea7b9dc834799"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1FCString.html#ac244d804d43afe5cd30ea7b9dc834799">print</a> (Print &amp;printer) const</td></tr>
-<tr class="memdesc:ac244d804d43afe5cd30ea7b9dc834799"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience method for printing an <a class="el" href="classace__routine_1_1FCString.html" title="A union of (const char*) and (const __FlashStringHelper*) with a discriminator. ">FCString</a>.  <a href="#ac244d804d43afe5cd30ea7b9dc834799">More...</a><br /></td></tr>
-<tr class="separator:ac244d804d43afe5cd30ea7b9dc834799"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ec18e25b8fb09e72ea24f07e2e7bf09"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1FCString.html#a2ec18e25b8fb09e72ea24f07e2e7bf09">println</a> (Print &amp;printer) const</td></tr>
-<tr class="memdesc:a2ec18e25b8fb09e72ea24f07e2e7bf09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience method for printing an <a class="el" href="classace__routine_1_1FCString.html" title="A union of (const char*) and (const __FlashStringHelper*) with a discriminator. ">FCString</a>.  <a href="#a2ec18e25b8fb09e72ea24f07e2e7bf09">More...</a><br /></td></tr>
-<tr class="separator:a2ec18e25b8fb09e72ea24f07e2e7bf09"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a834801808fbe4c5b7a8af27cca07732b"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1FCString.html#a834801808fbe4c5b7a8af27cca07732b">printTo</a> (Print &amp;printer) const</td></tr>
+<tr class="memdesc:a834801808fbe4c5b7a8af27cca07732b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convenience method for printing an <a class="el" href="classace__routine_1_1FCString.html" title="A union of (const char*) and (const __FlashStringHelper*) with a discriminator. ">FCString</a> to printer.  <a href="#a834801808fbe4c5b7a8af27cca07732b">More...</a><br /></td></tr>
+<tr class="separator:a834801808fbe4c5b7a8af27cca07732b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5f05cb2b33afc7fc9a14b77534a72cb"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1FCString.html#ac5f05cb2b33afc7fc9a14b77534a72cb">compareTo</a> (const <a class="el" href="classace__routine_1_1FCString.html">FCString</a> &amp;that) const</td></tr>
 <tr class="memdesc:ac5f05cb2b33afc7fc9a14b77534a72cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare to another <a class="el" href="classace__routine_1_1FCString.html" title="A union of (const char*) and (const __FlashStringHelper*) with a discriminator. ">FCString</a>.  <a href="#ac5f05cb2b33afc7fc9a14b77534a72cb">More...</a><br /></td></tr>
 <tr class="separator:ac5f05cb2b33afc7fc9a14b77534a72cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -120,10 +120,9 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A union of (const char*) and (const __FlashStringHelper*) with a discriminator. </p>
 <p>This allows us to treat these 2 strings like a single object. The major reason this class is needed is because the F() cannot be used outside a function, it can only be used inside a function, so we are forced to use normal c-strings instead of F() strings when manually creating Test or TestOnce instances.</p>
-<p>I deliberately decided not to inherit from Printable. While it is convenient to be able to call Print::print() with an instance of this class, the cost is 2 (AVR) or 4 (Teensy-ARM or ESP8266) extra bytes of static memory for the v-table pointer for each instance. But each instance is only 3 (AVR) or 5 (Teensy-ARM or ESP8266) bytes big, so the cost of 50-100 bytes of static memory for a large suite of 25 unit tests does not seem worth the minor convenience.</p>
-<p>Instead, the <a class="el" href="classace__routine_1_1FCString.html#ac244d804d43afe5cd30ea7b9dc834799" title="Convenience method for printing an FCString. ">print()</a> and <a class="el" href="classace__routine_1_1FCString.html#a2ec18e25b8fb09e72ea24f07e2e7bf09" title="Convenience method for printing an FCString. ">println()</a> methods invert the dependency and accept a pointer to 'Print'. </p>
+<p>I deliberately decided not to inherit from Printable. While it is convenient to be able to call Print::print() with an instance of this class, the cost is 2 (AVR) or 4 (Teensy-ARM or ESP8266) extra bytes of static memory for the v-table pointer for each instance. But each instance is only 3 (AVR) or 5 (Teensy-ARM or ESP8266) bytes big, so the cost of 50-100 bytes of static memory for a large suite of 25 unit tests does not seem worth the minor convenience. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00056">56</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00053">53</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab2858192602ed465e64e07c54d6544f2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab2858192602ed465e64e07c54d6544f2">&#9670;&nbsp;</a></span>FCString() <span class="overload">[1/3]</span></h2>
@@ -150,7 +149,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 <p>Default constructor initializes to a nullptr of kCStringType. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00062">62</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00059">59</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
 
 </div>
 </div>
@@ -180,7 +179,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 <p>Construct with a c-string. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00065">65</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00062">62</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
 
 </div>
 </div>
@@ -210,7 +209,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 <p>Construct with a flash string. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00071">71</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00068">68</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
 
 </div>
 </div>
@@ -233,7 +232,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 <p>Compare to another <a class="el" href="classace__routine_1_1FCString.html" title="A union of (const char*) and (const __FlashStringHelper*) with a discriminator. ">FCString</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8cpp_source.html#l00100">100</a> of file <a class="el" href="FCString_8cpp_source.html">FCString.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8cpp_source.html#l00087">87</a> of file <a class="el" href="FCString_8cpp_source.html">FCString.cpp</a>.</p>
 
 </div>
 </div>
@@ -324,14 +323,43 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 </div>
 </div>
-<a id="ac244d804d43afe5cd30ea7b9dc834799"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac244d804d43afe5cd30ea7b9dc834799">&#9670;&nbsp;</a></span>print()</h2>
+<a id="a01d4d2dab9adb4a879cc3fd09fa0b876"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a01d4d2dab9adb4a879cc3fd09fa0b876">&#9670;&nbsp;</a></span>isNull()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool ace_routine::FCString::isNull </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Return if this is a null string. </p>
+
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00074">74</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+
+</div>
+</div>
+<a id="a834801808fbe4c5b7a8af27cca07732b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a834801808fbe4c5b7a8af27cca07732b">&#9670;&nbsp;</a></span>printTo()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void ace_routine::FCString::print </td>
+          <td class="memname">size_t ace_routine::FCString::printTo </td>
           <td>(</td>
           <td class="paramtype">Print &amp;&#160;</td>
           <td class="paramname"><em>printer</em></td><td>)</td>
@@ -340,31 +368,10 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
       </table>
 </div><div class="memdoc">
 
-<p>Convenience method for printing an <a class="el" href="classace__routine_1_1FCString.html" title="A union of (const char*) and (const __FlashStringHelper*) with a discriminator. ">FCString</a>. </p>
+<p>Convenience method for printing an <a class="el" href="classace__routine_1_1FCString.html" title="A union of (const char*) and (const __FlashStringHelper*) with a discriminator. ">FCString</a> to printer. </p>
+<p>This is identical to the method in Printable but we don't derive from Printable because we don't want to want to pay the memory cost of the vtable pointer for such a small class. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8cpp_source.html#l00035">35</a> of file <a class="el" href="FCString_8cpp_source.html">FCString.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a2ec18e25b8fb09e72ea24f07e2e7bf09"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2ec18e25b8fb09e72ea24f07e2e7bf09">&#9670;&nbsp;</a></span>println()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ace_routine::FCString::println </td>
-          <td>(</td>
-          <td class="paramtype">Print &amp;&#160;</td>
-          <td class="paramname"><em>printer</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Convenience method for printing an <a class="el" href="classace__routine_1_1FCString.html" title="A union of (const char*) and (const __FlashStringHelper*) with a discriminator. ">FCString</a>. </p>
-
-<p class="definition">Definition at line <a class="el" href="FCString_8cpp_source.html#l00048">48</a> of file <a class="el" href="FCString_8cpp_source.html">FCString.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8cpp_source.html#l00036">36</a> of file <a class="el" href="FCString_8cpp_source.html">FCString.cpp</a>.</p>
 
 </div>
 </div>

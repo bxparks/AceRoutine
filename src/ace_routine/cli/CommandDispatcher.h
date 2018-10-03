@@ -25,221 +25,161 @@ SOFTWARE.
 #ifndef ACE_ROUTINE_COMMAND_DISPATCHER_H
 #define ACE_ROUTINE_COMMAND_DISPATCHER_H
 
-#include <Arduino.h> // Print
+#include <Print.h> // Print
 #include <AceRoutine.h>
-#include "StreamReader.h"
+#include "CommandHandler.h"
+#include "InputLine.h"
+
+class __FlashStringHelper;
 
 namespace ace_routine {
 namespace cli {
 
-/** Signature for a command handler. */
-typedef void (*CommandHandler)(Print& printer, int argc, const char** argv);
-
 /**
- * A record of the command name and its handler. The helpString is the
- * "usage" string, excluding the name of the command itself to save space.
- * The name of the command will be automatically added by the 'help
- * command' handler.
- */
-struct DispatchRecordC {
-  const CommandHandler command;
-  const char* name;
-  const char* helpString;
-};
-
-/**
- * Same as DispatchRecordC but uses FlashStrings instead of (const char*) to
- * save static RAM on AVR boards.
- */
-struct DispatchRecordF {
-  const CommandHandler command;
-  const __FlashStringHelper* name;
-  const __FlashStringHelper* helpString;
-};
-
-/**
- * Base-class of a coroutine that reads lines from the Serial port, tokenizes
- * the line on whitespace boundaries, and calls the appropriate command handler
- * to handle the command. Command have the form "command arg1 arg2 ...", where
- * the 'arg*' can be any string.
+ * A coroutine that reads lines from the Serial port, tokenizes the line on
+ * whitespace boundaries, and calls the appropriate command handler to handle
+ * the command. Command have the form "command arg1 arg2 ...", where the 'arg*'
+ * can be any string.
  *
  * The calling code is expected to provide a mapping of the command string
  * (e.g. "list") to its command handler (CommandHandler). The CommandHandler is
  * called with the number of arguments (argc) and the array of tokens (argv),
  * just like the arguments of the C-language main() function.
  *
- * Use the CommandDispatcherC subclass if the DispatchRecordC class with
- * C-strings is used.
- *
- * Use the CommandDispatcherF subclass if the DispatchRecordF class with
- * FlashStrings are used.
+ * The template parameters can be either a 'char' for C-strings or
+ * '__FlashStringHelper' for F() flash strings.
  */
 class CommandDispatcher: public Coroutine {
   public:
     /**
      * Constructor.
      *
-     * @param streamReader An instance of StreamReader.
+     * @param channel A channel from the StringLineReader to this coroutine.
      * @param printer The output object, normally the global Serial object.
-     * @param numCommands Number of entries in the dispatchTable.
+     * @param commands Array of CommandHandler pointers.
+     * @param numCommands number of commands.
      * @param argv Array of (const char*) that will be used to hold the word
-     * tokens of a command line string.
+     *        tokens of a command line string.
      * @param argvSize The size of the argv array. Tokens which are beyond this
-     * limit will be silently dropped.
+     *        limit will be silently dropped.
+     * @param prompt If not null, print a prompt and echo the command entered
+     *        by the user. If null, don't print prompt and don't echo.
      */
     CommandDispatcher(
-            StreamReader& streamReader,
+            Channel<InputLine>& channel,
             Print& printer,
+            const CommandHandler* const* commands,
             uint8_t numCommands,
             const char** argv,
-            uint8_t argvSize):
-        mStreamReader(streamReader),
+            uint8_t argvSize,
+            const char* prompt):
+        mChannel(channel),
         mPrinter(printer),
+        mCommands(commands),
         mNumCommands(numCommands),
         mArgv(argv),
-        mArgvSize(argvSize) {}
+        mArgvSize(argvSize),
+        mPrompt(prompt) {}
+
+    /** Destructor. Used only in unit tests. */
+    virtual ~CommandDispatcher() {}
 
     /**
-     * Tokenize the line, and fill argv with each token until argvSize is
-     * reached. Return the number of tokens. VisibleForTesting.
+     * Tokenize the line, separating tokens delimited by whitespace (space,
+     * formfeed, carriage return, newline, tab, and vertical tab) and fill argv
+     * with each token until argvSize is reached. Return the number of tokens
+     * filled in.
+     *
+     * VisibleForTesting.
      */
-    static uint8_t tokenize(char* line, const char** argv, uint8_t argvSize);
+    static uint8_t tokenize(char* line, const char** argv, uint8_t argvSize) {
+      char* token = strtok(line, DELIMS);
+      int argc = 0;
+      while (token != nullptr && argc < argvSize) {
+        argv[argc] = token;
+        argc++;
+        token = strtok(nullptr, DELIMS);
+      }
+      return argc;
+    }
+
+    virtual int runCoroutine() override {
+      InputLine input;
+      COROUTINE_LOOP() {
+        if (mPrompt != nullptr) {
+          mPrinter.print(mPrompt);
+        }
+        COROUTINE_CHANNEL_READ(mChannel, input);
+
+        if (input.status == InputLine::kStatusOverflow) {
+          printLineError(input.line, STATUS_BUFFER_OVERFLOW);
+          continue;
+        }
+
+        if (mPrompt != nullptr) {
+          mPrinter.print(input.line); // line includes the \n
+        }
+        runCommand(input.line);
+      }
+    }
+
+    /**
+     * Find the CommandHandler of the given command name.
+     *
+     * VisibleForTesting.
+     *
+     * NOTE: this is currently a linear O(N) scan which is good enough for
+     * small number of commands. If we sorted the handlers, we could do a
+     * binary search for O(log(N)) and handle larger number of commands.
+     */
+    const CommandHandler* findCommand(const char* cmd) const {
+      for (uint8_t i = 0; i < mNumCommands; i++) {
+        const CommandHandler* command = mCommands[i];
+        if (command->getName().compareTo(FCString(cmd)) == 0) {
+          return command;
+        }
+      }
+      return nullptr;
+    }
 
   protected:
     // Disable copy-constructor and assignment operator
     CommandDispatcher(const CommandDispatcher&) = delete;
     CommandDispatcher& operator=(const CommandDispatcher&) = delete;
 
+    /** Print the input line that caused an error along with its status code. */
+    void printLineError(const char* line, uint8_t statusCode) const;
+
+    /** Handle the 'help' command. */
+    void helpCommandHandler(Print& printer, int argc, const char** argv) const;
+
+    /** Print help on all commands */
+    void helpAll(Print& printer) const;
+
+    /** Print helpString of specific cmd. Returns true if cmd was found. */
+    bool helpSpecific(Print& printer, const char* cmd) const;
+
+    /** Print help string for the given command. */
+    static void printHelp(Print& printer, const CommandHandler* command);
+
+    /** Tokenize the given line and run the command handler. */
+    void runCommand(char* line) const;
+
+    /** Find and run the given command. */
+    void findAndRunCommand(const char* cmd, int argc, const char** argv) const;
+
     static const uint8_t STATUS_SUCCESS = 0;
     static const uint8_t STATUS_BUFFER_OVERFLOW = 1;
     static const uint8_t STATUS_FLUSH_TO_EOL = 2;
     static const char DELIMS[];
 
-    /** Print the error caused by the given line. */
-    void printLineError(const char* line, uint8_t statusCode);
-
-    /** Handle the 'help' command. */
-    void helpCommandHandler(Print& printer, int argc, const char** argv);
-
-    /** Print generic help. */
-    virtual void helpGeneric(Print& printer) = 0;
-
-    /** Print helpString of specific cmd. Returns true if cmd was found. */
-    virtual bool helpSpecific(Print& printer, const char* cmd) = 0;
-
-    /** Tokenize the given line and run the command handler. */
-    void runCommand(char* line);
-
-    /** Find and run the given command. */
-    virtual void findAndRunCommand(
-        const char* cmd, int argc, const char** argv) = 0;
-
-    virtual int run() override;
-
-    StreamReader& mStreamReader;
+    Channel<InputLine>& mChannel;
     Print& mPrinter;
-    const uint8_t mNumCommands;
+    const CommandHandler* const* const mCommands;
+    uint8_t const mNumCommands;
     const char** const mArgv;
-    const uint8_t mArgvSize;
-};
-
-/** A CommandDispatcher that takes DispatchRecordC records using C-strings. */
-class CommandDispatcherC: public CommandDispatcher {
-  public:
-    /**
-     * Constructor.
-     *
-     * @param streamReader An instance of StreamReader.
-     * @param printer The output object, normally the global Serial object.
-     * @param dispatchTable An array of DispatchRecords.
-     * @param numCommands Number of entries in the dispatchTable.
-     * @param argv Array of (const char*) that will be used to hold the word
-     * tokens of a command line string.
-     * @param argvSize The size of the argv array. Tokens which are beyond this
-     * limit will be silently dropped.
-     */
-    CommandDispatcherC(
-            StreamReader& streamReader,
-            Print& printer,
-            const DispatchRecordC* dispatchTable,
-            uint8_t numCommands,
-            const char** argv,
-            uint8_t argvSize):
-        CommandDispatcher(streamReader, printer, numCommands, argv, argvSize),
-        mDispatchTable(dispatchTable) {}
-
-    /**
-     * Find the CommandHandler of the given command name. VisibleForTesting.
-     *
-     * NOTE: this is currently a linear O(N) scan which is good enough for
-     * small number of commands. If we sorted the handlers, we could do a
-     * binary search for O(log(N)) and handle larger number of commands.
-     */
-    static const DispatchRecordC* findCommand(
-        const DispatchRecordC* dispatchTable,
-        uint8_t numCommands, const char* cmd);
-
-  private:
-    /** Print generic help. */
-    virtual void helpGeneric(Print& printer) override;
-
-    /** Print helpString of specific cmd. Returns true if cmd was found. */
-    virtual bool helpSpecific(Print& printer, const char* cmd) override;
-
-    /** Find and run the given command. */
-    virtual void findAndRunCommand(
-        const char* cmd, int argc, const char** argv) override;
-
-    const DispatchRecordC* const mDispatchTable;
-};
-
-/**
- * A CommandDispatcher that takes DispatchRecordF records using
- * FlashStrings.
- */
-class CommandDispatcherF: public CommandDispatcher {
-  public:
-    /**
-     * Constructor.
-     *
-     * @param streamReader An instance of StreamReader.
-     * @param printer The output object, normally the global Serial object.
-     * @param dispatchTable An array of DispatchRecords.
-     * @param numCommands Number of entries in the dispatchTable.
-     * @param argv Array of (const char*) that will be used to hold the word
-     * tokens of a command line string.
-     * @param argvSize The size of the argv array. Tokens which are beyond this
-     * limit will be silently dropped.
-     */
-    CommandDispatcherF(
-            StreamReader& streamReader,
-            Print& printer,
-            const DispatchRecordF* dispatchTable,
-            uint8_t numCommands,
-            const char** argv,
-            uint8_t argvSize):
-        CommandDispatcher(streamReader, printer, numCommands, argv, argvSize),
-        mDispatchTable(dispatchTable) {}
-
-    /**
-     * Same as findCommand() except use DispatchTableF instead of DispatchTable.
-     */
-    static const DispatchRecordF* findCommand(
-        const DispatchRecordF* dispatchTable,
-        uint8_t numCommands, const char* cmd);
-
-  private:
-    /** Print generic help. */
-    virtual void helpGeneric(Print& printer) override;
-
-    /** Print helpString of specific cmd. Returns true if cmd was found. */
-    virtual bool helpSpecific(Print& printer, const char* cmd) override;
-
-    /** Find and run the given command. */
-    virtual void findAndRunCommand(
-        const char* cmd, int argc, const char** argv) override;
-
-    const DispatchRecordF* const mDispatchTable;
+    uint8_t const mArgvSize;
+    const char* const mPrompt;
 };
 
 }

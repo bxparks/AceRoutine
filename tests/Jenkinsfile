@@ -26,29 +26,32 @@ pipeline {
         }
         stage('Verify Examples') {
             steps {
-                sh "AUniter/tools/auniter.sh --verify \
-                    --pref sketchbook.path=$WORKSPACE \
-                    --config libraries/AceRoutine/tests/auniter.conf \
-                    --boards $BOARDS \
+                sh "AUniter/tools/auniter.sh \
+                    --config libraries/AceRoutine/tests/auniter.ini \
+                    verify \
+                    --sketchbook $WORKSPACE \
+                    $BOARDS \
                     libraries/AceRoutine/examples/*"
             }
         }
         stage('Verify Tests') {
             steps {
-                sh "AUniter/tools/auniter.sh --verify \
-                    --pref sketchbook.path=$WORKSPACE \
-                    --config libraries/AceRoutine/tests/auniter.conf \
-                    --boards $BOARDS \
+                sh "AUniter/tools/auniter.sh \
+                    --config libraries/AceRoutine/tests/auniter.ini \
+                    verify \
+                    --sketchbook $WORKSPACE \
+                    $BOARDS \
                     libraries/AceRoutine/tests/*Test"
             }
         }
         stage('Test') {
             steps {
-                sh "AUniter/tools/auniter.sh --test \
-                    --skip_if_no_port \
-                    --pref sketchbook.path=$WORKSPACE \
-                    --config libraries/AceRoutine/tests/auniter.conf \
-                    --boards $BOARDS \
+                sh "AUniter/tools/auniter.sh \
+                    --config libraries/AceRoutine/tests/auniter.ini \
+                    test \
+                    --skip_missing_port \
+                    --sketchbook $WORKSPACE \
+                    $BOARDS \
                     libraries/AceRoutine/tests/*Test"
             }
         }

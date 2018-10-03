@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['kstatusawaiting',['kStatusAwaiting',['../classace__routine_1_1Coroutine.html#a8d3aa136df895ce19da443fecf34d394',1,'ace_routine::Coroutine']]],
   ['kstatusdelaying',['kStatusDelaying',['../classace__routine_1_1Coroutine.html#a180062205c19934c2791c4185cbe0968',1,'ace_routine::Coroutine']]],
   ['kstatusending',['kStatusEnding',['../classace__routine_1_1Coroutine.html#a991b8a3e15ea272d906ab7ccf09ca56a',1,'ace_routine::Coroutine']]],
   ['kstatusrunning',['kStatusRunning',['../classace__routine_1_1Coroutine.html#a701dd15f989e1ae4852dd5d0c6335685',1,'ace_routine::Coroutine']]],

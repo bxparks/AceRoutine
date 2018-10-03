@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">0.1</span>
+   &#160;<span id="projectnumber">0.2</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -92,12 +92,16 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="Coroutine_8h__dep__incl.png" border="0" usemap="#_2home_2brian_2dev_2AceRoutine_2src_2ace__routine_2Coroutine_8hdep" alt=""/></div>
 <map name="_2home_2brian_2dev_2AceRoutine_2src_2ace__routine_2Coroutine_8hdep" id="_2home_2brian_2dev_2AceRoutine_2src_2ace__routine_2Coroutine_8hdep">
-<area shape="rect" id="node2" href="Coroutine_8cpp_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/Coroutine.cpp" alt="" coords="5,95,205,136"/>
-<area shape="rect" id="node3" href="CoroutineScheduler_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/CoroutineScheduler.h" alt="" coords="230,95,474,136"/>
-<area shape="rect" id="node5" href="AceRoutine_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/AceRoutine.h" alt="" coords="419,184,605,225"/>
-<area shape="rect" id="node4" href="CoroutineScheduler_8cpp_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/CoroutineScheduler.cpp" alt="" coords="136,184,395,225"/>
-<area shape="rect" id="node6" href="CommandDispatcher_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/CommandDispatcher.h" alt="" coords="377,273,647,315"/>
-<area shape="rect" id="node7" href="CommandDispatcher_8cpp_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/CommandDispatcher.cpp" alt="" coords="370,363,654,404"/>
+<area shape="rect" id="node2" href="Channel_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/Channel.h" alt="" coords="105,95,291,136"/>
+<area shape="rect" id="node3" href="AceRoutine_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/AceRoutine.h" alt="" coords="235,184,422,225"/>
+<area shape="rect" id="node9" href="Coroutine_8cpp_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/Coroutine.cpp" alt="" coords="366,95,566,136"/>
+<area shape="rect" id="node10" href="CoroutineScheduler_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/CoroutineScheduler.h" alt="" coords="591,95,835,136"/>
+<area shape="rect" id="node4" href="CommandDispatcher_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/CommandDispatcher.h" alt="" coords="43,370,313,411"/>
+<area shape="rect" id="node6" href="CommandManager_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/CommandManager.h" alt="" coords="313,467,571,508"/>
+<area shape="rect" id="node7" href="CommandHandler_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/CommandHandler.h" alt="" coords="121,273,373,315"/>
+<area shape="rect" id="node8" href="StreamLineReader_8h_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/StreamLine\lReader.h" alt="" coords="449,363,651,419"/>
+<area shape="rect" id="node5" href="CommandDispatcher_8cpp_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/cli/CommandDispatcher.cpp" alt="" coords="5,467,289,508"/>
+<area shape="rect" id="node11" href="CoroutineScheduler_8cpp_source.html" title="/home/brian/dev/AceRoutine\l/src/ace_routine/CoroutineScheduler.cpp" alt="" coords="583,184,842,225"/>
 </map>
 </div>
 </div>
@@ -148,6 +152,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a1391503960a4b0c48f8200f1ffa0e305"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Coroutine_8h.html#a1391503960a4b0c48f8200f1ffa0e305">COROUTINE_DELAY</a>(delayMillis)</td></tr>
 <tr class="memdesc:a1391503960a4b0c48f8200f1ffa0e305"><td class="mdescLeft">&#160;</td><td class="mdescRight">Yield for delayMillis.  <a href="#a1391503960a4b0c48f8200f1ffa0e305">More...</a><br /></td></tr>
 <tr class="separator:a1391503960a4b0c48f8200f1ffa0e305"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeae79a8865a7fd6091a75f0c6515d2d9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Coroutine_8h.html#aeae79a8865a7fd6091a75f0c6515d2d9">COROUTINE_DELAY_SECONDS</a>(loopCounter,  delaySeconds)</td></tr>
+<tr class="memdesc:aeae79a8865a7fd6091a75f0c6515d2d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delay for delaySeconds.  <a href="#aeae79a8865a7fd6091a75f0c6515d2d9">More...</a><br /></td></tr>
+<tr class="separator:aeae79a8865a7fd6091a75f0c6515d2d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e326a8df652c46c42a8d713ddc67bd7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Coroutine_8h.html#a7e326a8df652c46c42a8d713ddc67bd7">COROUTINE_END</a>()</td></tr>
 <tr class="memdesc:a7e326a8df652c46c42a8d713ddc67bd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark the end of a coroutine.  <a href="#a7e326a8df652c46c42a8d713ddc67bd7">More...</a><br /></td></tr>
 <tr class="separator:a7e326a8df652c46c42a8d713ddc67bd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -183,7 +190,7 @@ Macros</h2></td></tr>
 <li><a class="el" href="Coroutine_8h.html#ab22e58ab24b1908a7280f13603248ce3" title="Create a Coroutine instance named &#39;name&#39;. ">COROUTINE(className, name)</a> {...}</li>
 </ul>
 <p>The 1-argument form uses the Coroutine class as the base class of the coroutine. The 2-argument form uses the user-provided className which must be a subclass of Coroutine.</p>
-<p>The code in {} following this macro becomes the body of the Coroutine::run() method. </p>
+<p>The code in {} following this macro becomes the body of the Coroutine::runCoroutine() method. </p>
 
 <p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00064">64</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
@@ -204,8 +211,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">struct </span>Coroutine_##name : <a class="code" href="classace__routine_1_1Coroutine.html">ace_routine::Coroutine</a> { \</div><div class="line">  Coroutine_##name(); \</div><div class="line">  virtual <span class="keywordtype">int</span> <a class="code" href="classace__routine_1_1Coroutine.html#a8ef20c487f56cd80fafe1c2befc4f50d">run</a>() override \</div><div class="line">    __attribute__((__noinline__,__noclone__)); \</div><div class="line">} name; \</div><div class="line">Coroutine_<span class="preprocessor">##name :: Coroutine_##name() { \</span></div><div class="line"><span class="preprocessor">  init(ACE_ROUTINE_F(#name)); \</span></div><div class="line"><span class="preprocessor">} \</span></div><div class="line"><span class="preprocessor">int Coroutine_##name :: run()</span></div><div class="ttc" id="classace__routine_1_1Coroutine_html_a8ef20c487f56cd80fafe1c2befc4f50d"><div class="ttname"><a href="classace__routine_1_1Coroutine.html#a8ef20c487f56cd80fafe1c2befc4f50d">ace_routine::Coroutine::run</a></div><div class="ttdeci">virtual int run()=0</div><div class="ttdoc">The body of the coroutine. </div></div>
-<div class="ttc" id="classace__routine_1_1Coroutine_html"><div class="ttname"><a href="classace__routine_1_1Coroutine.html">ace_routine::Coroutine</a></div><div class="ttdoc">Base class of all coroutines. </div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00217">Coroutine.h:217</a></div></div>
+<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">struct </span>Coroutine_##name : <a class="code" href="classace__routine_1_1Coroutine.html">ace_routine::Coroutine</a> { \</div><div class="line">  Coroutine_##name(); \</div><div class="line">  virtual <span class="keywordtype">int</span> <a class="code" href="classace__routine_1_1Coroutine.html#a08a2c559cf86917aac8b702354ab61e4">runCoroutine</a>() override \</div><div class="line">    __attribute__((__noinline__,__noclone__)); \</div><div class="line">} name; \</div><div class="line">Coroutine_<span class="preprocessor">##name :: Coroutine_##name() { \</span></div><div class="line"><span class="preprocessor">  setupCoroutine(ACE_ROUTINE_F(#name)); \</span></div><div class="line"><span class="preprocessor">} \</span></div><div class="line"><span class="preprocessor">int Coroutine_##name :: runCoroutine()</span></div><div class="ttc" id="classace__routine_1_1Coroutine_html_a08a2c559cf86917aac8b702354ab61e4"><div class="ttname"><a href="classace__routine_1_1Coroutine.html#a08a2c559cf86917aac8b702354ab61e4">ace_routine::Coroutine::runCoroutine</a></div><div class="ttdeci">virtual int runCoroutine()=0</div><div class="ttdoc">The body of the coroutine. </div></div>
+<div class="ttc" id="classace__routine_1_1Coroutine_html"><div class="ttname"><a href="classace__routine_1_1Coroutine.html">ace_routine::Coroutine</a></div><div class="ttdoc">Base class of all coroutines. </div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00271">Coroutine.h:271</a></div></div>
 </div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00069">69</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
@@ -236,7 +243,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">struct </span>className##_##name : className { \</div><div class="line">  className##_##name(); \</div><div class="line">  virtual <span class="keywordtype">int</span> run() override \</div><div class="line">    __attribute__((__noinline__,__noclone__)); \</div><div class="line">} name; \</div><div class="line">className<span class="preprocessor">##_##name :: className##_##name() { \</span></div><div class="line"><span class="preprocessor">  init(ACE_ROUTINE_F(#name)); \</span></div><div class="line"><span class="preprocessor">} \</span></div><div class="line"><span class="preprocessor">int className##_##name :: run()</span></div></div><!-- fragment -->
+<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">struct </span>className##_##name : className { \</div><div class="line">  className##_##name(); \</div><div class="line">  virtual <span class="keywordtype">int</span> runCoroutine() override \</div><div class="line">    __attribute__((__noinline__,__noclone__)); \</div><div class="line">} name; \</div><div class="line">className<span class="preprocessor">##_##name :: className##_##name() { \</span></div><div class="line"><span class="preprocessor">  setupCoroutine(ACE_ROUTINE_F(#name)); \</span></div><div class="line"><span class="preprocessor">} \</span></div><div class="line"><span class="preprocessor">int className##_##name :: runCoroutine()</span></div></div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00080">80</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
@@ -256,12 +263,12 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> { \</div><div class="line">      while (!(condition)) { \</div><div class="line">        setAwaiting(); \</div><div class="line">        COROUTINE_YIELD_INTERNAL(); \</div><div class="line">      } \</div><div class="line">      setRunning(); \</div><div class="line">    } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div></div><!-- fragment -->
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> { \</div><div class="line">      while (!(condition)) { \</div><div class="line">        setYielding(); \</div><div class="line">        COROUTINE_YIELD_INTERNAL(); \</div><div class="line">      } \</div><div class="line">      setRunning(); \</div><div class="line">    } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div></div><!-- fragment -->
 <p>Yield until condition is true, then execution continues. </p>
 <p>This is functionally equivalent to:</p>
-<div class="fragment"><div class="line"><span class="keywordflow">while</span> (!condition) <a class="code" href="Coroutine_8h.html#a682abe1669f9fe28af63d11da5421cbf">COROUTINE_YIELD</a>();</div></div><!-- fragment --><p>but the getStatus() during the waiting is set to kStatusAwaiting instead of kStatusYielding. The current scheduler treats the two states the same, but it's possible that a different scheduler may want to treat them differently. </p>
+<div class="fragment"><div class="line"><span class="keywordflow">while</span> (!condition) <a class="code" href="Coroutine_8h.html#a682abe1669f9fe28af63d11da5421cbf">COROUTINE_YIELD</a>();</div></div><!-- fragment --><p>but potentially slightly more efficient. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00164">164</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00162">162</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -305,9 +312,44 @@ Macros</h2></td></tr>
 <p>Yield for delayMillis. </p>
 <p>A delayMillis of 0 is functionally equivalent to <a class="el" href="Coroutine_8h.html#a682abe1669f9fe28af63d11da5421cbf" title="Yield execution to another coroutine. ">COROUTINE_YIELD()</a>. To save memory, the delayMillis is stored as a uint16_t but the actual maximum is limited to 32767 millliseconds. See setDelay() for the reason for this limitation.</p>
 <p>If you need to wait for longer than that, use a for-loop to call <a class="el" href="Coroutine_8h.html#a1391503960a4b0c48f8200f1ffa0e305" title="Yield for delayMillis. ">COROUTINE_DELAY()</a> as many times as necessary.</p>
-<p>This could have been implemented using <a class="el" href="Coroutine_8h.html#a9f6714d9752740b6173b6afc4d108fa8" title="Yield until condition is true, then execution continues. ">COROUTINE_AWAIT()</a> but this macro matches the global delay(millis) function already provided by the Arduino API. Also having a separate kStatusDelaying state allows the CoroutineScheduler to be slightly more efficient by avoiding the call to Coroutine::run() if the delay has not expired. </p>
+<p>This could have been implemented using <a class="el" href="Coroutine_8h.html#a9f6714d9752740b6173b6afc4d108fa8" title="Yield until condition is true, then execution continues. ">COROUTINE_AWAIT()</a> but this macro matches the global delay(millis) function already provided by the Arduino API. Also having a separate kStatusDelaying state allows the CoroutineScheduler to be slightly more efficient by avoiding the call to Coroutine::runCoroutine() if the delay has not expired. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00188">188</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00186">186</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+
+</div>
+</div>
+<a id="aeae79a8865a7fd6091a75f0c6515d2d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeae79a8865a7fd6091a75f0c6515d2d9">&#9670;&nbsp;</a></span>COROUTINE_DELAY_SECONDS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define COROUTINE_DELAY_SECONDS</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">loopCounter, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">delaySeconds&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> { \</div><div class="line">      loopCounter = delaySeconds; \</div><div class="line">      while (loopCounter-- &gt; 0) { \</div><div class="line">        COROUTINE_DELAY(1000); \</div><div class="line">      } \</div><div class="line">    } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div></div><!-- fragment -->
+<p>Delay for delaySeconds. </p>
+<p>Maximum value is the maximum value of the loopCounter which can be any integer type. For example, if the loopCounter is a uint16_t, then the maximum delay is 65535 seconds, or 18h12m15s. This macro calls <a class="el" href="Coroutine_8h.html#a1391503960a4b0c48f8200f1ffa0e305" title="Yield for delayMillis. ">COROUTINE_DELAY()</a> every 1000 milliseconds, so over the course of the entire delay, there may be some drift. (Some of this drift could be avoided by looping in 16000ms chunks, then looping the remainder in 1000ms chunks. Division of delaySeconds by 16 would be fast. But minimizing drift doesn't seem to be important for the use cases that I have in mind, so I haven't implemented this.)</p>
+<p>The loopCounter needs to be supplied to the macro because AceRoutine coroutines are stackless so the loop cannot use the stack to keep count of the number of seconds. Instead it needs to be given a loop counter that retains information across multiple calls. That loop counter can be a member variable of the Coroutine object, or it can be a function-static variable.</p>
+<p>The usage would be something like: </p><div class="fragment"><div class="line"><span class="keyword">class </span>MyCoroutine: <span class="keyword">public</span> Coroutine {</div><div class="line">  <span class="keyword">public</span>:</div><div class="line">    <span class="keyword">virtual</span> <span class="keywordtype">int</span> runCoroutine()<span class="keyword"> override </span>{</div><div class="line">      ...</div><div class="line">      <a class="code" href="Coroutine_8h.html#aeae79a8865a7fd6091a75f0c6515d2d9">COROUTINE_DELAY_SECONDS</a>(mDelayCounter, 1000);</div><div class="line">      ...</div><div class="line">    }</div><div class="line"></div><div class="line">  <span class="keyword">private</span>:</div><div class="line">    uint16_t mDelayCounter;</div><div class="line">};</div><div class="line">...</div></div><!-- fragment --><p>or</p>
+<div class="fragment"><div class="line"><a class="code" href="Coroutine_8h.html#ab22e58ab24b1908a7280f13603248ce3">COROUTINE</a>(myRoutine) {</div><div class="line">  <a class="code" href="Coroutine_8h.html#adad73df0853c1d3040b88b3cd0a04c0e">COROUTINE_LOOP</a>() {</div><div class="line">    ...</div><div class="line">    <span class="keyword">static</span> uint16_t delayCounter;</div><div class="line">    <a class="code" href="Coroutine_8h.html#aeae79a8865a7fd6091a75f0c6515d2d9">COROUTINE_DELAY_SECONDS</a>(delayCounter, 1000);</div><div class="line">    ...</div><div class="line">  }</div><div class="line">}</div></div><!-- fragment --> 
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00242">242</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -327,9 +369,9 @@ Macros</h2></td></tr>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">do</span> { \</div><div class="line">      __label__ jumpLabel; \</div><div class="line">      setEnding(); \</div><div class="line">      setJump(&amp;&amp; jumpLabel); \</div><div class="line">      jumpLabel: ; \</div><div class="line">      return 0; \</div><div class="line">    } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div></div><!-- fragment -->
 <p>Mark the end of a coroutine. </p>
-<p>Subsequent calls to Coroutine::run() will do nothing. </p>
+<p>Subsequent calls to Coroutine::runCoroutine() will do nothing. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00202">202</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00254">254</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -438,8 +480,8 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">struct </span>Coroutine_##name : <a class="code" href="classace__routine_1_1Coroutine.html">ace_routine::Coroutine</a> { \</div><div class="line">  Coroutine_##name(); \</div><div class="line">  virtual <span class="keywordtype">int</span> <a class="code" href="classace__routine_1_1Coroutine.html#a8ef20c487f56cd80fafe1c2befc4f50d">run</a>() override \</div><div class="line">    __attribute__((__noinline__,__noclone__)); \</div><div class="line">}; \</div><div class="line">extern Coroutine_<span class="preprocessor">##name name</span></div><div class="ttc" id="classace__routine_1_1Coroutine_html_a8ef20c487f56cd80fafe1c2befc4f50d"><div class="ttname"><a href="classace__routine_1_1Coroutine.html#a8ef20c487f56cd80fafe1c2befc4f50d">ace_routine::Coroutine::run</a></div><div class="ttdeci">virtual int run()=0</div><div class="ttdoc">The body of the coroutine. </div></div>
-<div class="ttc" id="classace__routine_1_1Coroutine_html"><div class="ttname"><a href="classace__routine_1_1Coroutine.html">ace_routine::Coroutine</a></div><div class="ttdoc">Base class of all coroutines. </div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00217">Coroutine.h:217</a></div></div>
+<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">struct </span>Coroutine_##name : <a class="code" href="classace__routine_1_1Coroutine.html">ace_routine::Coroutine</a> { \</div><div class="line">  Coroutine_##name(); \</div><div class="line">  virtual <span class="keywordtype">int</span> <a class="code" href="classace__routine_1_1Coroutine.html#a08a2c559cf86917aac8b702354ab61e4">runCoroutine</a>() override \</div><div class="line">    __attribute__((__noinline__,__noclone__)); \</div><div class="line">}; \</div><div class="line">extern Coroutine_<span class="preprocessor">##name name</span></div><div class="ttc" id="classace__routine_1_1Coroutine_html_a08a2c559cf86917aac8b702354ab61e4"><div class="ttname"><a href="classace__routine_1_1Coroutine.html#a08a2c559cf86917aac8b702354ab61e4">ace_routine::Coroutine::runCoroutine</a></div><div class="ttdeci">virtual int runCoroutine()=0</div><div class="ttdoc">The body of the coroutine. </div></div>
+<div class="ttc" id="classace__routine_1_1Coroutine_html"><div class="ttname"><a href="classace__routine_1_1Coroutine.html">ace_routine::Coroutine</a></div><div class="ttdoc">Base class of all coroutines. </div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00271">Coroutine.h:271</a></div></div>
 </div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00105">105</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
@@ -470,7 +512,7 @@ Macros</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">struct </span>className##_##name : className { \</div><div class="line">  className##_##name(); \</div><div class="line">  virtual <span class="keywordtype">int</span> run() override \</div><div class="line">    __attribute__((__noinline__,__noclone__)); \</div><div class="line">}; \</div><div class="line">extern className<span class="preprocessor">##_##name name</span></div></div><!-- fragment -->
+<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">struct </span>className##_##name : className { \</div><div class="line">  className##_##name(); \</div><div class="line">  virtual <span class="keywordtype">int</span> runCoroutine() override \</div><div class="line">    __attribute__((__noinline__,__noclone__)); \</div><div class="line">}; \</div><div class="line">extern className<span class="preprocessor">##_##name name</span></div></div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00113">113</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>

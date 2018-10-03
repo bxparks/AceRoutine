@@ -16,13 +16,13 @@ All times in microseconds.
 
 ## Arduino Nano
 
-### Memory Size
+**Memory Size**
 
 ```
 sizeof(Routine): 14
 sizeof(RoutineScheduler): 2
 ```
-### CPU
+**CPU**
 
 ```
 ------------+------+------+
@@ -38,13 +38,14 @@ The benchmark numbers for Teensy are affected greatly by the compiler
 optimization settings in the Arduino IDE dropdown menu (Tools > Optimize).
 CPU Speed set to 96 MHz (overclock).
 
-### Memory Size
+**Memory Size**
+
 ```
 sizeof(Routine): 28
 sizeof(RoutineScheduler): 4
 ```
 
-### CPU
+**CPU**
 
 ```
 ----------------------+------------+------+------+
@@ -65,11 +66,14 @@ Smallest code + LTO   |       1.81 | 0.68 | 1.12 |
 
 ## ESP8266
 
-Memory Size:
+**Memory Size**
+
 ```
 sizeof(Routine): 28
 sizeof(RoutineScheduler): 4
 ```
+
+**CPU**
 
 ```
 ------------+------+------+
@@ -81,11 +85,14 @@ AceRoutine  | base | diff |
 
 ## ESP32
 
-Memory Size:
+**Memory Size**
+
 ```
 sizeof(Routine): 28
 sizeof(RoutineScheduler): 4
 ```
+
+**CPU**
 
 ```
 ------------+------+------+

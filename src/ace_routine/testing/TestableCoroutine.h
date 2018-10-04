@@ -33,7 +33,7 @@ namespace testing {
 /** A Coroutine that overrides the millis() clock for unit testing purposes. */
 class TestableCoroutine: public Coroutine {
   public:
-    virtual unsigned long millis() const override { return mMillis; }
+    unsigned long millis() const override { return mMillis; }
 
     void millis(unsigned long millis) { mMillis = millis; }
 

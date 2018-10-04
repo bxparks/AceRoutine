@@ -103,7 +103,7 @@ class CommandDispatcher: public Coroutine {
       return argc;
     }
 
-    virtual int runCoroutine() override {
+    int runCoroutine() override {
       InputLine input;
       COROUTINE_LOOP() {
         if (mPrompt != nullptr) {

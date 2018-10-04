@@ -51,7 +51,7 @@ class Incrementer: public Coroutine {
       mIsMaster(isMaster)
       {}
 
-    virtual int runCoroutine() override {
+    int runCoroutine() override {
       COROUTINE_LOOP() {
         long message;
 

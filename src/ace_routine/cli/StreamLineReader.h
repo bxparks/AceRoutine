@@ -57,7 +57,7 @@ class StreamLineReader: public ace_routine::Coroutine {
       mBufSize(bufferSize)
     {}
 
-    virtual int runCoroutine() override {
+    int runCoroutine() override {
       InputLine input;
       COROUTINE_LOOP() {
         COROUTINE_AWAIT(mStream.available() > 0);

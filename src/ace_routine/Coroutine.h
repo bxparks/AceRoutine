@@ -69,7 +69,7 @@ SOFTWARE.
 #define COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
-  virtual int runCoroutine() override \
+  int runCoroutine() override \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 Coroutine_##name :: Coroutine_##name() { \
@@ -80,7 +80,7 @@ int Coroutine_##name :: runCoroutine()
 #define COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
-  virtual int runCoroutine() override \
+  int runCoroutine() override \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 className##_##name :: className##_##name() { \
@@ -105,7 +105,7 @@ int className##_##name :: runCoroutine()
 #define EXTERN_COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
-  virtual int runCoroutine() override \
+  int runCoroutine() override \
     __attribute__((__noinline__,__noclone__)); \
 }; \
 extern Coroutine_##name name
@@ -113,7 +113,7 @@ extern Coroutine_##name name
 #define EXTERN_COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
-  virtual int runCoroutine() override \
+  int runCoroutine() override \
     __attribute__((__noinline__,__noclone__)); \
 }; \
 extern className##_##name name
@@ -214,7 +214,7 @@ extern className##_##name name
  * @code
  * class MyCoroutine: public Coroutine {
  *   public:
- *     virtual int runCoroutine() override {
+ *     int runCoroutine() override {
  *       ...
  *       COROUTINE_DELAY_SECONDS(mDelayCounter, 1000);
  *       ...
@@ -479,6 +479,9 @@ class Coroutine {
      * through the constructor.
      */
     Coroutine() {}
+
+    /** Destructor. */
+    virtual ~Coroutine() {}
 
     /** Return the status of the coroutine. Used by the CoroutineScheduler. */
     Status getStatus() const { return mStatus; }

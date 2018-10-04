@@ -103,7 +103,7 @@ class CommandManager: public Coroutine {
         mDispatcher(mChannel, mSerial, mCommands, mNumCommands,
             mArgv, ARGV_SIZE, mPrompt) {}
 
-    virtual int runCoroutine() override {
+    int runCoroutine() override {
       mStreamLineReader.runCoroutine();
       mDispatcher.runCoroutine();
       return 0;

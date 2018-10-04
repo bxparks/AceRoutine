@@ -403,7 +403,7 @@ define a coroutine with a `mDelayCounter` member variable, and use the
 ```C++
 class MyCoroutine: public Coroutine {
   public:
-    virtual int runCoroutine() override {
+    int runCoroutine() override {
       ...
       COROUTINE_DELAY_SECONDS(mDelayCounter, 1000);
       ...
@@ -627,7 +627,7 @@ class InnerCoroutine: public Coroutine {
   public:
     InnerCoroutine(..) { ...}
 
-    virtual int runCoroutine override {
+    int runCoroutine override {
       COROUTINE_BEGIN();
       ...
       COROUTINE_END();
@@ -641,7 +641,7 @@ class OuterCoroutine: public Coroutine {
       ...
     }
 
-    virtual int runCoroutine override {
+    int runCoroutine override {
       // No COROUTINE_BEGIN() and COROUTINE_END() needed if this simply
       // delegates to the InnerCoroutine.
       mInner.runCoroutine();
@@ -876,7 +876,7 @@ class ManualCoroutine : public Coroutine {
     }
 
   private:
-    virtual int runCoroutine() override {
+    int runCoroutine() override {
       COROUTINE_BEGIN();
       // insert coroutine code here
       COROUTINE_END();
@@ -1078,7 +1078,7 @@ class Writer: public Coroutine {
   public:
     Writer(...) {...}
 
-    virtual int runCoroutine() override {
+    int runCoroutine() override {
       static int i;
       COROUTINE_BEGIN();
       for (i = 0; i < 9; i++) {
@@ -1096,7 +1096,7 @@ class Reader: public Coroutine {
   public
     Reader(...) {...}
 
-    virtual int runCoroutine() override {
+    int runCoroutine() override {
       COROUTINE_LOOP() {
         Message message;
         COROUTINE_CHANNEL_READ(mChannel, message);

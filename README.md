@@ -70,6 +70,11 @@ Some limitations are:
 * A `Coroutine` is stackless cannot preserve local stack varaibles
   across multiple calls. Often the class member variables or function static
   variables are reasonable substitutes.
+* Coroutines are currently designed to be statically allocated, not dynamically
+  created and destroyed. This is mostly because dynamic memory allocation
+  on an 8-bit microcontroller with 2kB of RAM should probably be avoided.
+  Dynamically created coroutines may be added in the future for 32-bit
+  microcontrollers which have far more memory.
 * A `Channel` is an experimental feature and has limited features. It is
   currently an unbuffered, synchrronized channel. It can be used by only one
   reader and one writer.
@@ -860,7 +865,7 @@ described in the next section to be more useful.
 
 ### Manual Coroutines
 
-An manual coroutine is a custom coroutine whose body of the coroutine (i.e
+A manual coroutine is a custom coroutine whose body of the coroutine (i.e
 the`runCoroutine()` method) is defined manually and the coroutine object is also
 instantiated manually, instead of using the `COROUTINE()` macro. This is useful
 if the coroutine has external dependencies which need to be injected into the
@@ -1147,7 +1152,7 @@ and a channel between them to communicate:
 
 * Only a single AceRoutine `Coroutine` can write to a `Channel`.
 * Only a single AceRoutine `Coroutine` can read from a `Channel`.
-* There is equivalent of a
+* There is no equivalent of a
   [Go Lang select statement](https://gobyexample.com/select), so the coroutine
   cannot wait for multiple channels at the same time.
 * There is no buffered channel type.

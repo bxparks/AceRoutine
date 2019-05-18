@@ -38,5 +38,6 @@ SOFTWARE.
 
 // Version format: xxyyzz == "xx.yy.zz"
 #define ACE_ROUTINE_VERSION 200
+#define ACE_ROUTINE_VERSION_STRING "0.2"
 
 #endif

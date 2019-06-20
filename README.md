@@ -114,7 +114,7 @@ COROUTINE(printHello) {
   COROUTINE_BEGIN();
 
   Serial.print(F("Hello, "));
-  COROUTINE_DELAY(1000);
+  COROUTINE_DELAY(2000);
 
   COROUTINE_END();
 }

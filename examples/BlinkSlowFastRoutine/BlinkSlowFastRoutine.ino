@@ -16,7 +16,8 @@ using namespace ace_routine;
 #ifdef LED_BUILTIN
   const int LED = LED_BUILTIN;
 #else
-  // Some ESP32 boards do not LED_BUILTIN, sometimes they have more than 1.
+  // Some ESP32 boards do not define LED_BUILTIN. Sometimes they have more than
+  // 1. Replace this with the proper pin number.
   const int LED = 5;
 #endif
 

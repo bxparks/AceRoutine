@@ -132,6 +132,7 @@ void setup() {
   delay(1000);
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
+  pinMode(LED, OUTPUT);
 }
 
 void loop() {
@@ -157,6 +158,7 @@ void setup() {
   delay(1000);
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
+  pinMode(LED, OUTPUT);
 
   CoroutineScheduler::setup();
 }

@@ -57,7 +57,8 @@ others (in my opinion of course):
     * 1.1-2.0 microseconds on Teensy 3.2 (depending on compiler settings)
     * ~1.7 microseconds on a ESP8266
     * ~0.5 microseconds on a ESP32
-* uses "computed goto" feature of GCC to avoid the
+* uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
+  feature of the GCC compiler (also supported by Clang) to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
     * allows `switch` statemens in the coroutines
 * C/C++ macros eliminate boilerplate code and make the code easy to read
@@ -67,7 +68,7 @@ others (in my opinion of course):
 
 Some limitations are:
 * A `Coroutine` cannot return any values.
-* A `Coroutine` is stackless cannot preserve local stack varaibles
+* A `Coroutine` is stackless and therefore cannot preserve local stack variables
   across multiple calls. Often the class member variables or function static
   variables are reasonable substitutes.
 * Coroutines are currently designed to be statically allocated, not dynamically
@@ -76,7 +77,7 @@ Some limitations are:
   Dynamically created coroutines may be added in the future for 32-bit
   microcontrollers which have far more memory.
 * A `Channel` is an experimental feature and has limited features. It is
-  currently an unbuffered, synchrronized channel. It can be used by only one
+  currently an unbuffered, synchronized channel. It can be used by only one
   reader and one writer.
 
 After I had completed most of this library, I discovered that I had essentially
@@ -142,7 +143,7 @@ void loop() {
 }
 ```
 
-This prints "Hello, ", then waits one second, and then prints "World!".
+This prints "Hello, ", then waits 2 seconds, and then prints "World!".
 At the same time, the LED blinks on and off.
 
 The [HelloScheduler.ino](examples/HelloScheduler) sketch implements the same
@@ -1276,7 +1277,7 @@ pointers live on the `Coroutine` object, not in the `CoroutineScheduler`.
 
 The `Channel` object requires 2 copies of the parameterized `<T>` type so its
 size is equal to `1 + 2 * sizeof(T)`, rounded to the nearest memory alignment
-boundary (i.e. 12 for a 32-bit processor).
+boundary (i.e. a total of 12 bytes for a 32-bit processor).
 
 ### CPU
 
@@ -1290,21 +1291,21 @@ This library was developed and tested using:
 * [ESP8266 Arduino Core 2.4.2](https://arduino-esp8266.readthedocs.io/en/2.4.2/)
 * [arduino-esp32](https://github.com/espressif/arduino-esp32)
 
-I used MacOS 10.13.3 and Ubuntu 17.10 for most of my development.
+I used MacOS 10.13.3 and Ubuntu 18.04 for most of my development.
 
 The library is tested on the following hardware before each release:
 
 * Arduino Nano clone (16 MHz ATmega328P)
 * Arduino Pro Micro clone (16 MHz ATmega32U4)
-* Teensy 3.2 (72 MHz ARM Cortex-M4)
 * NodeMCU 1.0 clone (ESP-12E module, 80 MHz ESP8266)
 * ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
 
 I will occasionally test on the following hardware as a sanity check:
 
+* Teensy 3.2 (72 MHz ARM Cortex-M4)
+* Teensy LC (48 MHz ARM Cortex-M0+)
 * Arduino UNO R3 clone (16 MHz ATmega328P)
 * Arduino Pro Mini clone (16 MHz ATmega328P)
-* Teensy LC (48 MHz ARM Cortex-M0+)
 * ESP-01 (ESP-01 module, 80 MHz ESP8266)
 
 ## Changelog

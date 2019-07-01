@@ -1,5 +1,10 @@
 # Changelog
 
+* 0.2.1 (2019-07-01)
+    * Fix various typos in README.md.
+    * Fix broken compile of ESP32 and ESP8266 boards by fixing fqbn.
+    * Add missing `pinMode()` in some examples.
+    * Add `ACE_ROUTINE_VERSION_STRING` for easier display for version number.
 * 0.2 (2018-10-02)
     * Add `COROUTINE_DELAY_SECONDS()` to support delays longer than
       32767 millis.

@@ -3,7 +3,7 @@
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
 
-Version: 0.2 (2018-10-02)
+Version: 0.2.1 (2019-07-01)
 
 This library is currently in "beta" status. I'm releasing it through the Arduino
 Library Manager to solicit feedback from interested users. Send me an email or
@@ -1308,6 +1308,11 @@ I will occasionally test on the following hardware as a sanity check:
 * Arduino UNO R3 clone (16 MHz ATmega328P)
 * Arduino Pro Mini clone (16 MHz ATmega328P)
 * ESP-01 (ESP-01 module, 80 MHz ESP8266)
+
+The library has been verified to work on Linux or MacOS (using both g++ and
+clang++ compilers) using the
+[unitduino](https://github.com/bxparks/AUnit/tree/develop/unitduino) emulation
+layer.
 
 ## Changelog
 

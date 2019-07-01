@@ -1273,7 +1273,8 @@ In other words, you can create 100 `Coroutine` instances and they would use only
 
 The `CoroutineScheduler` consumes only 2 bytes of memory no matter how many
 coroutines are created. That's because it depends on a singly-linked list whose
-pointers live on the `Coroutine` object, not in the `CoroutineScheduler`.
+pointers live on the `Coroutine` object, not in the `CoroutineScheduler`. But
+the code for the class increases flash memory usage by about 150 bytes.
 
 The `Channel` object requires 2 copies of the parameterized `<T>` type so its
 size is equal to `1 + 2 * sizeof(T)`, rounded to the nearest memory alignment

@@ -9,7 +9,8 @@ using namespace ace_routine;
 #ifdef LED_BUILTIN
   const int LED = LED_BUILTIN;
 #else
-  // Some ESP32 boards do not LED_BUILTIN, sometimes they have more than 1.
+  // Some ESP32 boards do not define LED_BUILTIN. Sometimes they have more than
+  // one built-in LEDs. Replace this with the pin number of your LED.
   const int LED = 5;
 #endif
 
@@ -34,7 +35,7 @@ COROUTINE(printHello) {
   COROUTINE_BEGIN();
 
   Serial.print(F("Hello, "));
-  COROUTINE_DELAY(1000);
+  COROUTINE_DELAY(2000);
 
   COROUTINE_END();
 }
@@ -52,6 +53,7 @@ void setup() {
   delay(1000);
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
+  pinMode(LED, OUTPUT);
 }
 
 // Manually execute the coroutines.

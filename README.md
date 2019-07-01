@@ -3,7 +3,7 @@
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
 
-Version: 0.2 (2018-10-02)
+Version: 0.2.1 (2019-07-01)
 
 This library is currently in "beta" status. I'm releasing it through the Arduino
 Library Manager to solicit feedback from interested users. Send me an email or
@@ -35,11 +35,12 @@ their life cycle:
 * `COROUTINE_END()`: must occur at the end of the coroutine body
 * `COROUTINE_YIELD()`: yields execution back to the caller, often
   `CoroutineScheduler` but not necessarily
-* `COROUTINE_AWAIT(condition)`: yield until `condition` become `true`
+* `COROUTINE_AWAIT(condition)`: yield until `condition` becomes `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
 * `COROUTINE_DELAY_SECONDS(loopCounter, seconds)`: yields back execution for
-  `seconds`. The `seconds` parameter is defined as a `uint16_t`.
+  `seconds`. The maximum value of `seconds` is determined by `loopCounter`
+  which can be of any integer type.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
 * `COROUTINE_CHANNEL_WRITE(channel, value)`: writes a value to a `Channel`
 * `COROUTINE_CHANNEL_READ(channel, value)`: reads a value from a `Channel`
@@ -56,7 +57,8 @@ others (in my opinion of course):
     * 1.1-2.0 microseconds on Teensy 3.2 (depending on compiler settings)
     * ~1.7 microseconds on a ESP8266
     * ~0.5 microseconds on a ESP32
-* uses "computed goto" feature of GCC to avoid the
+* uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
+  feature of the GCC compiler (also supported by Clang) to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
     * allows `switch` statemens in the coroutines
 * C/C++ macros eliminate boilerplate code and make the code easy to read
@@ -66,11 +68,16 @@ others (in my opinion of course):
 
 Some limitations are:
 * A `Coroutine` cannot return any values.
-* A `Coroutine` is stackless cannot preserve local stack varaibles
+* A `Coroutine` is stackless and therefore cannot preserve local stack variables
   across multiple calls. Often the class member variables or function static
   variables are reasonable substitutes.
+* Coroutines are currently designed to be statically allocated, not dynamically
+  created and destroyed. This is mostly because dynamic memory allocation
+  on an 8-bit microcontroller with 2kB of RAM should probably be avoided.
+  Dynamically created coroutines may be added in the future for 32-bit
+  microcontrollers which have far more memory.
 * A `Channel` is an experimental feature and has limited features. It is
-  currently an unbuffered, synchrronized channel. It can be used by only one
+  currently an unbuffered, synchronized channel. It can be used by only one
   reader and one writer.
 
 After I had completed most of this library, I discovered that I had essentially
@@ -108,7 +115,7 @@ COROUTINE(printHello) {
   COROUTINE_BEGIN();
 
   Serial.print(F("Hello, "));
-  COROUTINE_DELAY(1000);
+  COROUTINE_DELAY(2000);
 
   COROUTINE_END();
 }
@@ -126,6 +133,7 @@ void setup() {
   delay(1000);
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
+  pinMode(LED, OUTPUT);
 }
 
 void loop() {
@@ -135,7 +143,7 @@ void loop() {
 }
 ```
 
-This prints "Hello, ", then waits one second, and then prints "World!".
+This prints "Hello, ", then waits 2 seconds, and then prints "World!".
 At the same time, the LED blinks on and off.
 
 The [HelloScheduler.ino](examples/HelloScheduler) sketch implements the same
@@ -151,6 +159,7 @@ void setup() {
   delay(1000);
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
+  pinMode(LED, OUTPUT);
 
   CoroutineScheduler::setup();
 }
@@ -402,7 +411,7 @@ define a coroutine with a `mDelayCounter` member variable, and use the
 ```C++
 class MyCoroutine: public Coroutine {
   public:
-    virtual int runCoroutine() override {
+    int runCoroutine() override {
       ...
       COROUTINE_DELAY_SECONDS(mDelayCounter, 1000);
       ...
@@ -626,7 +635,7 @@ class InnerCoroutine: public Coroutine {
   public:
     InnerCoroutine(..) { ...}
 
-    virtual int runCoroutine override {
+    int runCoroutine override {
       COROUTINE_BEGIN();
       ...
       COROUTINE_END();
@@ -640,7 +649,7 @@ class OuterCoroutine: public Coroutine {
       ...
     }
 
-    virtual int runCoroutine override {
+    int runCoroutine override {
       // No COROUTINE_BEGIN() and COROUTINE_END() needed if this simply
       // delegates to the InnerCoroutine.
       mInner.runCoroutine();
@@ -859,7 +868,7 @@ described in the next section to be more useful.
 
 ### Manual Coroutines
 
-An manual coroutine is a custom coroutine whose body of the coroutine (i.e
+A manual coroutine is a custom coroutine whose body of the coroutine (i.e
 the`runCoroutine()` method) is defined manually and the coroutine object is also
 instantiated manually, instead of using the `COROUTINE()` macro. This is useful
 if the coroutine has external dependencies which need to be injected into the
@@ -875,7 +884,7 @@ class ManualCoroutine : public Coroutine {
     }
 
   private:
-    virtual int runCoroutine() override {
+    int runCoroutine() override {
       COROUTINE_BEGIN();
       // insert coroutine code here
       COROUTINE_END();
@@ -1077,7 +1086,7 @@ class Writer: public Coroutine {
   public:
     Writer(...) {...}
 
-    virtual int runCoroutine() override {
+    int runCoroutine() override {
       static int i;
       COROUTINE_BEGIN();
       for (i = 0; i < 9; i++) {
@@ -1095,7 +1104,7 @@ class Reader: public Coroutine {
   public
     Reader(...) {...}
 
-    virtual int runCoroutine() override {
+    int runCoroutine() override {
       COROUTINE_LOOP() {
         Message message;
         COROUTINE_CHANNEL_READ(mChannel, message);
@@ -1146,7 +1155,7 @@ and a channel between them to communicate:
 
 * Only a single AceRoutine `Coroutine` can write to a `Channel`.
 * Only a single AceRoutine `Coroutine` can read from a `Channel`.
-* There is equivalent of a
+* There is no equivalent of a
   [Go Lang select statement](https://gobyexample.com/select), so the coroutine
   cannot wait for multiple channels at the same time.
 * There is no buffered channel type.
@@ -1264,11 +1273,12 @@ In other words, you can create 100 `Coroutine` instances and they would use only
 
 The `CoroutineScheduler` consumes only 2 bytes of memory no matter how many
 coroutines are created. That's because it depends on a singly-linked list whose
-pointers live on the `Coroutine` object, not in the `CoroutineScheduler`.
+pointers live on the `Coroutine` object, not in the `CoroutineScheduler`. But
+the code for the class increases flash memory usage by about 150 bytes.
 
 The `Channel` object requires 2 copies of the parameterized `<T>` type so its
 size is equal to `1 + 2 * sizeof(T)`, rounded to the nearest memory alignment
-boundary (i.e. 12 for a 32-bit processor).
+boundary (i.e. a total of 12 bytes for a 32-bit processor).
 
 ### CPU
 
@@ -1282,22 +1292,27 @@ This library was developed and tested using:
 * [ESP8266 Arduino Core 2.4.2](https://arduino-esp8266.readthedocs.io/en/2.4.2/)
 * [arduino-esp32](https://github.com/espressif/arduino-esp32)
 
-I used MacOS 10.13.3 and Ubuntu 17.10 for most of my development.
+I used MacOS 10.13.3 and Ubuntu 18.04 for most of my development.
 
 The library is tested on the following hardware before each release:
 
 * Arduino Nano clone (16 MHz ATmega328P)
 * Arduino Pro Micro clone (16 MHz ATmega32U4)
-* Teensy 3.2 (72 MHz ARM Cortex-M4)
 * NodeMCU 1.0 clone (ESP-12E module, 80 MHz ESP8266)
 * ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
 
 I will occasionally test on the following hardware as a sanity check:
 
+* Teensy 3.2 (72 MHz ARM Cortex-M4)
+* Teensy LC (48 MHz ARM Cortex-M0+)
 * Arduino UNO R3 clone (16 MHz ATmega328P)
 * Arduino Pro Mini clone (16 MHz ATmega328P)
-* Teensy LC (48 MHz ARM Cortex-M0+)
 * ESP-01 (ESP-01 module, 80 MHz ESP8266)
+
+The library has been verified to work on Linux or MacOS (using both g++ and
+clang++ compilers) using the
+[unitduino](https://github.com/bxparks/AUnit/tree/develop/unitduino) emulation
+layer.
 
 ## Changelog
 
@@ -1310,12 +1325,11 @@ See [CHANGELOG.md](CHANGELOG.md).
 ## Feedback and Support
 
 If you have any questions, comments, bug reports, or feature requests, please
-file a GitHub ticket or send me an email. I'd love to hear about how this
-software and its documentation can be improved. Instead of forking the
-repository to modify or add a feature for your own projects, let me have a
-chance to incorporate the change into the main repository so that your external
-dependencies are simpler and so that others can benefit. I can't promise that I
-will incorporate everything, but I will give your ideas serious consideration.
+file a GitHub ticket instead of emailing me unless the content is sensitive.
+(The problem with email is that I cannot reference the email conversation when
+other people ask similar questions later.) I'd love to hear about how this
+software and its documentation can be improved. I can't promise that I will
+incorporate everything, but I will give your ideas serious consideration.
 
 ## Authors
 

@@ -19,6 +19,11 @@
 using namespace ace_routine;
 using namespace ace_routine::cli;
 
+// Every board except ESP32 defines SERIAL_PORT_MONITOR..
+#if defined(ESP32)
+  #define SERIAL_PORT_MONITOR Serial
+#endif
+
 //---------------------------------------------------------------------------
 
 #ifdef LED_BUILTIN

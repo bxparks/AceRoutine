@@ -20,16 +20,6 @@ using namespace ace_routine;
 using namespace ace_routine::cli;
 
 //---------------------------------------------------------------------------
-// Compensate for buggy F() implementation in ESP8266.
-//---------------------------------------------------------------------------
-
-#if defined(AVR)
-  #define FF(x) F(x)
-#else
-  #define FF(x) (x)
-#endif
-
-//---------------------------------------------------------------------------
 
 #ifdef LED_BUILTIN
   const int LED = LED_BUILTIN;
@@ -107,10 +97,10 @@ unsigned long freeMemory() {
 class ListCommand: public CommandHandler {
   public:
     ListCommand():
-      CommandHandler("list", nullptr) {}
+      CommandHandler(F("list"), nullptr) {}
 
-    virtual void run(Print& printer, int /* argc */, const char** /* argv */)
-        const override {
+    virtual void run(Print& printer, int /* argc */,
+        const char* const* /* argv */) const override {
       CoroutineScheduler::list(printer);
     }
 };
@@ -119,9 +109,9 @@ class ListCommand: public CommandHandler {
 class EchoCommand: public CommandHandler {
   public:
     EchoCommand():
-      CommandHandler("echo", "args ...") {}
+      CommandHandler(F("echo"), F("args ...")) {}
 
-    virtual void run(Print& printer, int argc, const char** argv)
+    virtual void run(Print& printer, int argc, const char* const* argv)
         const override {
      for (int i = 1; i < argc; i++) {
         printer.print(argv[i]);
@@ -135,36 +125,50 @@ class EchoCommand: public CommandHandler {
 class FreeCommand: public CommandHandler {
   public:
     FreeCommand():
-        CommandHandler("free", nullptr) {}
+        CommandHandler(F("free"), nullptr) {}
 
-    virtual void run(Print& printer, int /* argc */, const char** /* argv */)
-        const override {
-      printer.print(FF("Free memory: "));
+    virtual void run(Print& printer, int /* argc */,
+        const char* const* /* argv */) const override {
+      printer.print(F("Free memory: "));
       printer.println(freeMemory());
     }
 };
 
-/** Change the blinking LED on and off delay parameters. */
+/**
+ * Change the blinking LED on and off delay parameters. If no argument given,
+ * simply print out the current values. Demonstrates the use of
+ * SHIFT_ARGC_ARGV() macro and the isArgEqual() helper method.
+ */
 class DelayCommand: public CommandHandler {
   public:
     DelayCommand():
-        CommandHandler("delay", "(on | off) millis") {}
+        CommandHandler(F("delay"), F("[(on | off) millis]")) {}
 
-    virtual void run(Print& printer, int argc, const char** argv)
+    virtual void run(Print& printer, int argc, const char* const* argv)
         const override {
-      if (argc != 3) {
-        printer.println(FF("Invalid number of arguments"));
+      if (argc == 1) {
+        printer.print(F("LED_ON delay: "));
+        printer.println(ledOnDelay);
+        printer.print(F("LED_OFF delay: "));
+        printer.println(ledOffDelay);
         return;
       }
-      const char* param = argv[1];
-      const char* value = argv[2];
-      if (strcmp(param, "on") == 0) {
-        ledOnDelay = atoi(value);
-      } else if (strcmp(param, "off") == 0) {
-        ledOffDelay = atoi(value);
+
+      if (argc < 3) {
+        printer.println(F("Invalid number of arguments"));
+        return;
+      }
+
+      SHIFT_ARGC_ARGV(argc, argv);
+      if (isArgEqual(argv[0], F("on"))) {
+        SHIFT_ARGC_ARGV(argc, argv);
+        ledOnDelay = atoi(argv[0]);
+      } else if (isArgEqual(argv[0], F("off"))) {
+        SHIFT_ARGC_ARGV(argc, argv);
+        ledOffDelay = atoi(argv[0]);
       } else {
-        printer.print(FF("Unknown argument: "));
-        printer.println(param);
+        printer.print(F("Unknown argument: "));
+        printer.println(argv[0]);
       }
     }
 };
@@ -186,16 +190,16 @@ static const uint8_t ARGV_SIZE = 5;
 static const char PROMPT[] = "$ ";
 
 CommandManager<BUF_SIZE, ARGV_SIZE> commandManager(
-    COMMANDS, NUM_COMMANDS, Serial, PROMPT);
+    COMMANDS, NUM_COMMANDS, SERIAL_PORT_MONITOR, PROMPT);
 
 //---------------------------------------------------------------------------
 
 void setup() {
-  Serial.begin(115200);
-  while (!Serial); // micro/leonardo
+  SERIAL_PORT_MONITOR.begin(115200);
+  while (!SERIAL_PORT_MONITOR); // micro/leonardo
   pinMode(LED, OUTPUT);
 
-  commandManager.setupCoroutine("commandManager");
+  commandManager.setupCoroutine(F("commandManager"));
   CoroutineScheduler::setup();
 }
 

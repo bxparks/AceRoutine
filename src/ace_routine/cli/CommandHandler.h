@@ -78,7 +78,7 @@ class CommandHandler {
 
     /** Test for equality when token is in PROGMEM. */
     static bool isArgEqual(const char* arg, const __FlashStringHelper* token) {
-      return strcmp_P(arg, (const char*) token);
+      return strcmp_P(arg, (const char*) token) == 0;
     }
 
     /** Constructor. Using C strings. */

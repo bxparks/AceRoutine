@@ -29,6 +29,15 @@ SOFTWARE.
 
 class Print;
 
+/**
+ * Increment argv and decrement argc so that it appears as if the command line
+ * arguments are shifted to the *left* by one position. This is useful for
+ * processing the command line tokens one at a time. Use
+ * CommandHandler::isArgEqual() method to test for match against an expected
+ * token.
+ */
+#define SHIFT_ARGC_ARGV(argc, argv) do { argc--; argv++; } while (false)
+
 namespace ace_routine {
 namespace cli {
 
@@ -61,6 +70,16 @@ class CommandHandler {
     FCString getHelpString() const { return mHelpString; }
 
   protected:
+    /** Test for equality against token. */
+    static bool isArgEqual(const char* arg, const char* token) {
+      return strcmp(arg, token) == 0;
+    }
+
+    /** Test for equality when token is in PROGMEM. */
+    static bool isArgEqual(const char* arg, const __FlashStringHelper* token) {
+      return strcmp_P(arg, (const char*) token);
+    }
+
     /** Constructor. Using C strings. */
     CommandHandler(const char* name, const char* helpString):
       mName(name),

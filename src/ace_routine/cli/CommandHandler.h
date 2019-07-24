@@ -61,7 +61,8 @@ class CommandHandler {
     *        the command itself.
     * @param argv An array of strings for each token.
     */
-    virtual void run(Print& printer, int argc, const char** argv) const = 0;
+    virtual void run(Print& printer, int argc, const char* const* argv)
+        const = 0;
 
     /** Return the name of the command. */
     FCString getName() const { return mName; }

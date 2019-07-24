@@ -53,7 +53,7 @@ void CommandDispatcher::printLineError(const char* line, uint8_t statusCode)
 }
 
 void CommandDispatcher::helpCommandHandler(
-    Print& printer, int argc, const char** argv) const {
+    Print& printer, int argc, const char* const* argv) const {
   if (argc == 2) {
     const char* cmd = argv[1];
 
@@ -120,7 +120,7 @@ void CommandDispatcher::runCommand(char* line) const {
 }
 
 void CommandDispatcher::findAndRunCommand(
-    const char* cmd, int argc, const char** argv) const {
+    const char* cmd, int argc, const char* const* argv) const {
   const CommandHandler* command = findCommand(cmd);
   if (command != nullptr) {
     command->run(mPrinter, argc, argv);

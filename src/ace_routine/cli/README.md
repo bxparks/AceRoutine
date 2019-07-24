@@ -7,7 +7,7 @@ These classes were initially an experiment to validate the `AceRoutine` macros
 and classes but they seem to be useful as an independent library. They may be
 moved to a separate project/repository later.
 
-Version: (2018-09-29)
+Version: (2019-07-23)
 
 ## Usage
 
@@ -56,7 +56,7 @@ It includes:
 You don't have to use the `CommandManager`, but it greatly simplies the creation
 and usage of the `CommandDispatcher`.
 
-### Setup Process from Sketch
+### CommandHandler Definitions and Setup
 
 An Arduino `.ino` file that uses the CLI classes to implement a commmand line
 shell will look something like this:
@@ -68,19 +68,32 @@ shell will look something like this:
 using namespace ace_routine;
 using namespace ace_routine::cli;
 
-class CommandA: public CommandHandler {
-  ...
-};
-class CommandB: public CommandHandler {
-  ...
+class FooCommand: public CommandHandler {
+  FooCommand():
+    CommandHandler("{fooName}", "{helpString}") {}
+
+  virtual void run(Print& printer, int argc, const char* const* argv)
+      const override {
+    ...
+  }
 };
 
-CommandA commandA;
-CommandB commandB;
+class BarCommand: public CommandHandler {
+  BarCommand():
+    CommandHandler(F("{barCommand}"), F("{helpString}")) {}
+
+  virtual void run(Print& printer, int argc, const char* const* argv)
+      const override {
+    ...
+  }
+};
+
+FooCommand fooCommand;
+BarCommand barCommand;
 
 static const CommandHandler* const COMMANDS[] = {
-  &commandA,
-  &commandB,
+  &fooCommand,
+  &barCommand,
 };
 static uint8_t const NUM_COMMANDS = sizeof(COMMANDS) / sizeof(CommandHandler*);
 
@@ -102,6 +115,53 @@ void loop() {
 }
 ```
 
+### Argc and Argv Parsing
+
+Within the `CommandHandler`, there are several helper routines which are useful
+for processing the `argc` and `argv` arguments:
+
+* `SHIFT_ARGC_ARGV(argc, argv)` macro shifts the input tokens by 1, incrementing
+  `argv` and decrementing `argc`
+* `bool isArgEqual(const char*, const char*);`
+* `bool isArgEqual(const char*, const __FlashHelperString*);`
+
+Here is the sketch of the Command that will parse a command whose syntax is
+`delay [(on | off) {millis}]`, where the `on {millis}` and `off {millis}`
+arguments to the `delay` command are optional:
+
+```C++
+class DelayCommand: public CommandHandler {
+  DelayCommand():
+    CommandHandler(F("delay"), F("[(on | off) {millis}")) {}
+
+  virtual void run(Print& printer, int argc, const char* const* argv)
+      const override {
+    if (argc == 1) {
+      printer.println(F("'delay' typed with no arguments"));
+      return;
+    }
+
+    if (argc != 3) {
+      printer.println(F("Incorrect number of arguments to 'delay' command"));
+      return;
+    }
+
+    SHIFT_ARGC_ARGV(argc, argv);
+    if (isArgEqual(argv[0], "on")) {
+      int delay = atoi(argv[1]));
+      printer.print(F("Executing: delay on "));
+      printer.println(delay);
+    } else if (isArgEqual(argv[0], F("off"))) {
+      int delay = atoi(argv[1]));
+      printer.print(F("Executing: delay off "));
+      printer.println(delay);
+    } else {
+      printer.println(F("Unknown argument to 'delay'"));
+    }
+  }
+};
+```
+
 ## Example
 
 See [examples/CommandLineShell/](../../../examples/CommandLineShell/)
@@ -111,4 +171,4 @@ for an demo program that implements 5 commands:
 * `list`
 * `free`
 * `echo [args ...]`
-* `delay (on | off) millis`
+* `delay [(on | off) millis]`

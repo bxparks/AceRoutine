@@ -4,6 +4,7 @@
     * Added `SHIFT_ARGC_ARGV()` macro for easy token shifting,
       and `isArgEqual()` method for easy comparison against flash string
       in the CLI library.
+    * Update unit test Makefiles to use `UnixHostDuino`.
 * 0.2.1 (2019-07-01)
     * Fix various typos in README.md.
     * Fix broken compile of ESP32 and ESP8266 boards by fixing fqbn.

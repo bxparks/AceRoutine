@@ -1311,8 +1311,7 @@ I will occasionally test on the following hardware as a sanity check:
 
 The library has been verified to work on Linux or MacOS (using both g++ and
 clang++ compilers) using the
-[unitduino](https://github.com/bxparks/AUnit/tree/develop/unitduino) emulation
-layer.
+[UnixHostDuino](https://github.com/bxparks/UnixHostDuino) emulation layer.
 
 ## Changelog
 

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">0.2.1</span>
+   &#160;<span id="projectnumber">0.2.2</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -67,6 +67,7 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="classace__routine_1_1cli_1_1CommandHandler-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">ace_routine::cli::CommandHandler Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
@@ -80,9 +81,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:abe503562487a796c860d48236fefa4d9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1cli_1_1CommandHandler.html#abe503562487a796c860d48236fefa4d9">run</a> (Print &amp;printer, int argc, const char **argv) const =0</td></tr>
-<tr class="memdesc:abe503562487a796c860d48236fefa4d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the command.  <a href="#abe503562487a796c860d48236fefa4d9">More...</a><br /></td></tr>
-<tr class="separator:abe503562487a796c860d48236fefa4d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbc879928ff5c913fbd27e4f0a6ed42d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1cli_1_1CommandHandler.html#abbc879928ff5c913fbd27e4f0a6ed42d">run</a> (Print &amp;printer, int argc, const char *const *argv) const =0</td></tr>
+<tr class="memdesc:abbc879928ff5c913fbd27e4f0a6ed42d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the command.  <a href="#abbc879928ff5c913fbd27e4f0a6ed42d">More...</a><br /></td></tr>
+<tr class="separator:abbc879928ff5c913fbd27e4f0a6ed42d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae31d7039e4e2a3e2c918b11b3cecd13c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classace__routine_1_1FCString.html">FCString</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1cli_1_1CommandHandler.html#ae31d7039e4e2a3e2c918b11b3cecd13c">getName</a> () const</td></tr>
 <tr class="memdesc:ae31d7039e4e2a3e2c918b11b3cecd13c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the name of the command.  <a href="#ae31d7039e4e2a3e2c918b11b3cecd13c">More...</a><br /></td></tr>
 <tr class="separator:ae31d7039e4e2a3e2c918b11b3cecd13c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -98,11 +99,20 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a0252adafe6a1e5b0c37120a502c2eb6f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1cli_1_1CommandHandler.html#a0252adafe6a1e5b0c37120a502c2eb6f">CommandHandler</a> (const __FlashStringHelper *name, const __FlashStringHelper *helpString)</td></tr>
 <tr class="memdesc:a0252adafe6a1e5b0c37120a502c2eb6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a0252adafe6a1e5b0c37120a502c2eb6f">More...</a><br /></td></tr>
 <tr class="separator:a0252adafe6a1e5b0c37120a502c2eb6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
+Static Protected Member Functions</h2></td></tr>
+<tr class="memitem:ad0544e9eaf24af532b66cdcaba5c2eb8"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1cli_1_1CommandHandler.html#ad0544e9eaf24af532b66cdcaba5c2eb8">isArgEqual</a> (const char *arg, const char *token)</td></tr>
+<tr class="memdesc:ad0544e9eaf24af532b66cdcaba5c2eb8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test for equality against token.  <a href="#ad0544e9eaf24af532b66cdcaba5c2eb8">More...</a><br /></td></tr>
+<tr class="separator:ad0544e9eaf24af532b66cdcaba5c2eb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affff2c401b6df70ba44a8e853bc386dd"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1cli_1_1CommandHandler.html#affff2c401b6df70ba44a8e853bc386dd">isArgEqual</a> (const char *arg, const __FlashStringHelper *token)</td></tr>
+<tr class="memdesc:affff2c401b6df70ba44a8e853bc386dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Test for equality when token is in PROGMEM.  <a href="#affff2c401b6df70ba44a8e853bc386dd">More...</a><br /></td></tr>
+<tr class="separator:affff2c401b6df70ba44a8e853bc386dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Signature for a command handler. </p>
 
-<p class="definition">Definition at line <a class="el" href="CommandHandler_8h_source.html#l00038">38</a> of file <a class="el" href="CommandHandler_8h_source.html">CommandHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="CommandHandler_8h_source.html#l00047">47</a> of file <a class="el" href="CommandHandler_8h_source.html">CommandHandler.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a893ff83965fc417194258ce4a5958b40"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a893ff83965fc417194258ce4a5958b40">&#9670;&nbsp;</a></span>CommandHandler() <span class="overload">[1/2]</span></h2>
@@ -141,7 +151,7 @@ Protected Member Functions</h2></td></tr>
 <p>Constructor. </p>
 <p>Using C strings. </p>
 
-<p class="definition">Definition at line <a class="el" href="CommandHandler_8h_source.html#l00065">65</a> of file <a class="el" href="CommandHandler_8h_source.html">CommandHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="CommandHandler_8h_source.html#l00085">85</a> of file <a class="el" href="CommandHandler_8h_source.html">CommandHandler.h</a>.</p>
 
 </div>
 </div>
@@ -182,7 +192,7 @@ Protected Member Functions</h2></td></tr>
 <p>Constructor. </p>
 <p>Using Flash strings. </p>
 
-<p class="definition">Definition at line <a class="el" href="CommandHandler_8h_source.html#l00070">70</a> of file <a class="el" href="CommandHandler_8h_source.html">CommandHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="CommandHandler_8h_source.html#l00090">90</a> of file <a class="el" href="CommandHandler_8h_source.html">CommandHandler.h</a>.</p>
 
 </div>
 </div>
@@ -212,7 +222,7 @@ Protected Member Functions</h2></td></tr>
 
 <p>Return the help string of the command. </p>
 
-<p class="definition">Definition at line <a class="el" href="CommandHandler_8h_source.html#l00061">61</a> of file <a class="el" href="CommandHandler_8h_source.html">CommandHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="CommandHandler_8h_source.html#l00071">71</a> of file <a class="el" href="CommandHandler_8h_source.html">CommandHandler.h</a>.</p>
 
 </div>
 </div>
@@ -241,12 +251,92 @@ Protected Member Functions</h2></td></tr>
 
 <p>Return the name of the command. </p>
 
-<p class="definition">Definition at line <a class="el" href="CommandHandler_8h_source.html#l00058">58</a> of file <a class="el" href="CommandHandler_8h_source.html">CommandHandler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="CommandHandler_8h_source.html#l00068">68</a> of file <a class="el" href="CommandHandler_8h_source.html">CommandHandler.h</a>.</p>
 
 </div>
 </div>
-<a id="abe503562487a796c860d48236fefa4d9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe503562487a796c860d48236fefa4d9">&#9670;&nbsp;</a></span>run()</h2>
+<a id="ad0544e9eaf24af532b66cdcaba5c2eb8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0544e9eaf24af532b66cdcaba5c2eb8">&#9670;&nbsp;</a></span>isArgEqual() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool ace_routine::cli::CommandHandler::isArgEqual </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>arg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>token</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Test for equality against token. </p>
+
+<p class="definition">Definition at line <a class="el" href="CommandHandler_8h_source.html#l00075">75</a> of file <a class="el" href="CommandHandler_8h_source.html">CommandHandler.h</a>.</p>
+
+</div>
+</div>
+<a id="affff2c401b6df70ba44a8e853bc386dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affff2c401b6df70ba44a8e853bc386dd">&#9670;&nbsp;</a></span>isArgEqual() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool ace_routine::cli::CommandHandler::isArgEqual </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>arg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const __FlashStringHelper *&#160;</td>
+          <td class="paramname"><em>token</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Test for equality when token is in PROGMEM. </p>
+
+<p class="definition">Definition at line <a class="el" href="CommandHandler_8h_source.html#l00080">80</a> of file <a class="el" href="CommandHandler_8h_source.html">CommandHandler.h</a>.</p>
+
+</div>
+</div>
+<a id="abbc879928ff5c913fbd27e4f0a6ed42d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbc879928ff5c913fbd27e4f0a6ed42d">&#9670;&nbsp;</a></span>run()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -269,7 +359,7 @@ Protected Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const char **&#160;</td>
+          <td class="paramtype">const char *const *&#160;</td>
           <td class="paramname"><em>argv</em>&#160;</td>
         </tr>
         <tr>
@@ -288,7 +378,7 @@ Protected Member Functions</h2></td></tr>
 <p>Run the command. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">printer</td><td>The output printer, normally Serial. This is not expected to change during the lifetime of the <a class="el" href="classace__routine_1_1cli_1_1CommandHandler.html" title="Signature for a command handler. ">CommandHandler</a> instance, so normally I would inject this parameter into the object. However, that would cause each instance to consume 2 more bytes, even though all instances are expected to have the same 'printer'. For an 8-bit AVR processor with only 2kB of RAM, every byte is important , so I am keeping this as a parameter passed into the <a class="el" href="classace__routine_1_1cli_1_1CommandHandler.html#abe503562487a796c860d48236fefa4d9" title="Run the command. ">run()</a> method. </td></tr>
+    <tr><td class="paramname">printer</td><td>The output printer, normally Serial. This is not expected to change during the lifetime of the <a class="el" href="classace__routine_1_1cli_1_1CommandHandler.html" title="Signature for a command handler. ">CommandHandler</a> instance, so normally I would inject this parameter into the object. However, that would cause each instance to consume 2 more bytes, even though all instances are expected to have the same 'printer'. For an 8-bit AVR processor with only 2kB of RAM, every byte is important , so I am keeping this as a parameter passed into the <a class="el" href="classace__routine_1_1cli_1_1CommandHandler.html#abbc879928ff5c913fbd27e4f0a6ed42d" title="Run the command. ">run()</a> method. </td></tr>
     <tr><td class="paramname">argc</td><td>Number of tokens in the input command, including the name of the command itself. </td></tr>
     <tr><td class="paramname">argv</td><td>An array of strings for each token. </td></tr>
   </table>

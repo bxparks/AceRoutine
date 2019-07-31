@@ -28,7 +28,7 @@ class DummyCommand: public CommandHandler {
       CommandHandler(name, helpString) {}
 
     virtual void run(Print& /* printer */, int /* argc */,
-        const char** /* argv */) const override {}
+        const char* const* /* argv */) const override {}
 };
 
 static DummyCommand echoCommand("echo", "args ...");
@@ -48,7 +48,7 @@ static CommandManager<BUF_SIZE, ARGV_SIZE> commandManager(
 
 class CommandDispatcherTest: public TestOnce {
   protected:
-    void assertArgvEquals(const char** argv, const char** expected,
+    void assertArgvEquals(const char** argv, const char* const* expected,
         uint8_t size) {
       for (uint8_t i = 0; i < size; i++) {
         assertEqual(argv[i], expected[i]);
@@ -104,7 +104,9 @@ test(findCommand) {
 // ---------------------------------------------------------------------------
 
 void setup() {
+#if defined(ARDUINO)
   delay(1000); // some boards reboot twice
+#endif
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 }

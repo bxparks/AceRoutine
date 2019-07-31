@@ -151,7 +151,8 @@ class CommandDispatcher: public Coroutine {
     void printLineError(const char* line, uint8_t statusCode) const;
 
     /** Handle the 'help' command. */
-    void helpCommandHandler(Print& printer, int argc, const char** argv) const;
+    void helpCommandHandler(Print& printer, int argc, const char* const* argv)
+        const;
 
     /** Print help on all commands */
     void helpAll(Print& printer) const;
@@ -166,7 +167,8 @@ class CommandDispatcher: public Coroutine {
     void runCommand(char* line) const;
 
     /** Find and run the given command. */
-    void findAndRunCommand(const char* cmd, int argc, const char** argv) const;
+    void findAndRunCommand(const char* cmd, int argc, const char* const* argv)
+        const;
 
     static const uint8_t STATUS_SUCCESS = 0;
     static const uint8_t STATUS_BUFFER_OVERFLOW = 1;

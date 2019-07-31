@@ -346,7 +346,10 @@ test(scheduler) {
 // ---------------------------------------------------------------------------
 
 void setup() {
+#if defined(ARDUINO)
   delay(1000); // some boards reboot twice
+#endif
+
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 

@@ -1,10 +1,13 @@
 # Changelog
 
 * Unreleased
-    * Added `SHIFT_ARGC_ARGV()` macro for easy token shifting,
+    * Add `SHIFT_ARGC_ARGV()` macro for easy token shifting,
       and `isArgEqual()` method for easy comparison against flash string
       in the CLI library.
+    * Verify library on SAMD21 (e.g. Arduino Zero) and ATmega2560 boards.
     * Update unit test Makefiles to use `UnixHostDuino`.
+    * Fix clang++ error in `cli` library due to local `c` variable inside
+      a `COROUTINE_LOOP` macro.
 * 0.2.1 (2019-07-01)
     * Fix various typos in README.md.
     * Fix broken compile of ESP32 and ESP8266 boards by fixing fqbn.

@@ -1286,32 +1286,45 @@ See [examples/AutoBenchmark](examples/AutoBenchmark).
 
 ## System Requirements
 
+### Tool Chain
+
 This library was developed and tested using:
-* [Arduino IDE 1.8.7](https://www.arduino.cc/en/Main/Software)
-* [Teensyduino 1.41](https://www.pjrc.com/teensy/td_download.html)
-* [ESP8266 Arduino Core 2.4.2](https://arduino-esp8266.readthedocs.io/en/2.4.2/)
-* [arduino-esp32](https://github.com/espressif/arduino-esp32)
+* [Arduino IDE 1.8.9](https://www.arduino.cc/en/Main/Software)
+* [Arduino AVR Boards 1.6.23](https://github.com/arduino/ArduinoCore-avr)
+* [Arduino SAMD Boards 1.8.3](https://github.com/arduino/ArduinoCore-samd)
+* [SparkFun AVR Boards 1.1.12](https://github.com/sparkfun/Arduino_Boards)
+* [SparkFun SAMD Boards 1.6.2](https://github.com/sparkfun/Arduino_Boards)
+* [ESP8266 Arduino 2.5.2](https://github.com/esp8266/Arduino)
+* [ESP32 Arduino 1.0.2](https://github.com/espressif/arduino-esp32)
+* [Teensydino 1.46](https://www.pjrc.com/teensy/td_download.html)
 
-I used MacOS 10.13.3 and Ubuntu 18.04 for most of my development.
+It should work with [PlatformIO](https://platformio.org/) but I have
+not tested it.
 
-The library is tested on the following hardware before each release:
+The library works on Linux or MacOS (using both g++ and clang++ compilers) using
+the [UnixHostDuino](https://github.com/bxparks/UnixHostDuino) emulation layer.
+
+### Operating System
+
+I use Ubuntu 18.04 for most of my development and sometimes do sanity checks on
+MacOS 10.14.5.
+
+### Hardware
+
+The library is extensively tested on the following boards:
 
 * Arduino Nano clone (16 MHz ATmega328P)
 * Arduino Pro Micro clone (16 MHz ATmega32U4)
 * NodeMCU 1.0 clone (ESP-12E module, 80 MHz ESP8266)
 * ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
+* SAMD21 M0 Mini (48 MHz ARM Cortex-M0+) (compatible with Arduino Zero)
 
 I will occasionally test on the following hardware as a sanity check:
 
 * Teensy 3.2 (72 MHz ARM Cortex-M4)
 * Teensy LC (48 MHz ARM Cortex-M0+)
-* Arduino UNO R3 clone (16 MHz ATmega328P)
 * Arduino Pro Mini clone (16 MHz ATmega328P)
-* ESP-01 (ESP-01 module, 80 MHz ESP8266)
-
-The library has been verified to work on Linux or MacOS (using both g++ and
-clang++ compilers) using the
-[UnixHostDuino](https://github.com/bxparks/UnixHostDuino) emulation layer.
+* Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 
 ## Changelog
 

@@ -59,10 +59,11 @@ class StreamLineReader: public ace_routine::Coroutine {
 
     int runCoroutine() override {
       InputLine input;
+      char c;
       COROUTINE_LOOP() {
         COROUTINE_AWAIT(mStream.available() > 0);
         while (mStream.available() > 0) {
-          char c = mStream.read();
+          c = mStream.read();
           mBuf[mIndex] = c;
           mIndex++;
           if (mIndex >= mBufSize - 1) {

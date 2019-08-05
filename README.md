@@ -429,9 +429,43 @@ is destroyed and recreated on every invocation of the coroutine. Therefore,
 any local variable created on the stack in the coroutine will not preserve
 its value after a `COROUTINE_YIELD()` or a `COROUTINE_DELAY()`.
 
-The easiest way to get around ths problem is to use `static` variables inside
-a `COROUTINE()`. Static variables are initialized once and preserve their value
-through multiple calls to the function, which is exactly what is needed.
+The problem is worse for local *objects* (with non-trivial destructors). If the
+lifetime of the object straddles a continuation point of the Coroutine
+(`COROUTINE_YIELD()`, `COROUTINE_DELAY()`, `COROUTINE_END()`), the destructor of
+the object will be called incorrectly when the coroutine is resumed, and will
+probably crash the program. In other words, do **not** do this:
+
+```C++
+COROUTINE(doSomething) {
+  COROUTINE_BEGIN();
+  String s = "hello world"; // ***crashes when doSomething() is resumed***
+  Serial.println(s);
+  COROUTINE_DELAY(1000);
+  ...
+  COROUTINE_END();
+}
+```
+
+Instead, place any local variable or object completely inside a `{ }` block
+before the `COROUTINE_YIELD()` or `COROUTINE_DELAY()`, like this:
+
+```C++
+COROUTINE(doSomething) {
+  COROUTINE_BEGIN();
+  {
+    String s = "hello world"; // ok, because String is properly destroyed
+    Serial.println(s);
+  }
+  COROUTINE_DELAY(1000);
+  ...
+  COROUTINE_END();
+}
+```
+
+The easiest way to get around these problems is to avoid local variables
+and just use `static` variables inside a `COROUTINE()`. Static variables are
+initialized once and preserve their value through multiple calls to the
+function, which is exactly what is needed.
 
 ### Conditional If-Else
 

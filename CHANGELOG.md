@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+    * Update `AutoBenchmark/READM.md` benchmark numbers for 0.2.2.
 * 0.2.2 (2019-07-31)
     * Add `SHIFT_ARGC_ARGV()` macro for easy token shifting,
       and `isArgEqual()` method for easy comparison against flash string

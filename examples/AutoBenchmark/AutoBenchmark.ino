@@ -10,12 +10,16 @@
 using namespace ace_routine;
 
 #if defined(ESP8266)
-const unsigned long DURATION = 1000;
+	const unsigned long DURATION = 1000;
 #else
-const unsigned long DURATION = 3000;
+	const unsigned long DURATION = 3000;
 #endif
 
-unsigned long counter = 0;
+#if defined(ESP32) && ! defined(SERIAL_PORT_MONITOR)
+	#define SERIAL_PORT_MONITOR Serial
+#endif
+
+volatile unsigned long counter = 0;
 
 COROUTINE(counterA) {
   COROUTINE_LOOP() {
@@ -33,24 +37,24 @@ COROUTINE(counterB) {
 
 void setup() {
   delay(1000);
-  Serial.begin(115200);
-  while (!Serial); // Leonardo/Micro
+  SERIAL_PORT_MONITOR.begin(115200);
+  while (!SERIAL_PORT_MONITOR); // Leonardo/Micro
 
-  Serial.print(F("sizeof(Coroutine): "));
-  Serial.println(sizeof(Coroutine));
-  Serial.print(F("sizeof(CoroutineScheduler): "));
-  Serial.println(sizeof(CoroutineScheduler));
-  Serial.print(F("sizeof(Channel<int>): "));
-  Serial.println(sizeof(Channel<int>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(Coroutine): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Coroutine));
+  SERIAL_PORT_MONITOR.print(F("sizeof(CoroutineScheduler): "));
+  SERIAL_PORT_MONITOR.println(sizeof(CoroutineScheduler));
+  SERIAL_PORT_MONITOR.print(F("sizeof(Channel<int>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Channel<int>));
 
   CoroutineScheduler::setup();
-  CoroutineScheduler::list(Serial);
+  CoroutineScheduler::list(SERIAL_PORT_MONITOR);
 
-  Serial.println(
+  SERIAL_PORT_MONITOR.println(
       F("------------+------+------+"));
-  Serial.println(
+  SERIAL_PORT_MONITOR.println(
       F(" AceRoutine | base | diff |"));
-  Serial.println(
+  SERIAL_PORT_MONITOR.println(
       F("------------+------+------+"));
 
   doBaseline();
@@ -60,7 +64,7 @@ void setup() {
   float aceCoroutine = DURATION * 1000.0 / counter;
 
   printStats(baseline, aceCoroutine);
-  Serial.println(
+  SERIAL_PORT_MONITOR.println(
       F("------------+------+------+"));
 }
 
@@ -71,7 +75,7 @@ void printStats(float baseline, float aceCoroutine) {
       (int)aceCoroutine, (int)(aceCoroutine*100)%100,
       (int)baseline, (int)(baseline*100)%100,
       (int)diff, (int)(diff*100)%100);
-  Serial.println(buf);
+  SERIAL_PORT_MONITOR.println(buf);
 }
 
 void doAceRoutine() {

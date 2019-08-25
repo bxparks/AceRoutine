@@ -54,9 +54,10 @@ others (in my opinion of course):
       no matter how many coroutines are active
 * extremely fast context switching
     * ~6 microseconds on a 16 MHz ATmega328P
-    * 1.1-2.0 microseconds on Teensy 3.2 (depending on compiler settings)
-    * ~1.7 microseconds on a ESP8266
-    * ~0.5 microseconds on a ESP32
+    * ~2.9 microseconds on a 48 MHz SAMD21
+    * ~1.7 microseconds on a 80 MHz ESP8266
+    * ~0.4 microseconds on a 240 MHz ESP32
+    * 0.7-1.1 microseconds on 96 MHz Teensy 3.2 (depending on compiler settings)
 * uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
   feature of the GCC compiler (also supported by Clang) to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
@@ -1345,19 +1346,19 @@ MacOS 10.14.5.
 
 ### Hardware
 
-The library is extensively tested on the following boards:
+The library has been extensively tested on the following boards:
 
 * Arduino Nano clone (16 MHz ATmega328P)
+* Arduino Pro Mini clone (16 MHz ATmega328P)
 * Arduino Pro Micro clone (16 MHz ATmega32U4)
+* SAMD21 M0 Mini (48 MHz ARM Cortex-M0+) (compatible with Arduino Zero)
 * NodeMCU 1.0 clone (ESP-12E module, 80 MHz ESP8266)
 * ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
-* SAMD21 M0 Mini (48 MHz ARM Cortex-M0+) (compatible with Arduino Zero)
 
 I will occasionally test on the following hardware as a sanity check:
 
 * Teensy 3.2 (72 MHz ARM Cortex-M4)
 * Teensy LC (48 MHz ARM Cortex-M0+)
-* Arduino Pro Mini clone (16 MHz ATmega328P)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 
 ## Changelog

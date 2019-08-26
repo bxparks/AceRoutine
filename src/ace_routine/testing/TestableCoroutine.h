@@ -37,11 +37,14 @@ namespace testing {
 class TestableCoroutine: public Coroutine {
   public:
     unsigned long coroutineMillis() const override { return mMillis; }
+    unsigned long coroutineMicros() const override { return mMicros; }
 
     void coroutineMillis(unsigned long millis) { mMillis = millis; }
+    void coroutineMicros(unsigned long micros) { mMicros = micros; }
 
   private:
     unsigned long mMillis = 0;
+    unsigned long mMicros = 0;
 };
 
 }

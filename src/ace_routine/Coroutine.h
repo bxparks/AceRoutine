@@ -171,8 +171,8 @@ extern className##_##name name
 /**
  * Yield for delayMillis. A delayMillis of 0 is functionally equivalent to
  * COROUTINE_YIELD(). To save memory, the delayMillis is stored as a uint16_t
- * but the actual maximum is limited to 32767 millliseconds. See setDelay()
- * for the reason for this limitation.
+ * but the actual maximum is limited to 32767 millliseconds. See
+ * setDelayMillis() for the reason for this limitation.
  *
  * If you need to wait for longer than that, use a for-loop to call
  * COROUTINE_DELAY() as many times as necessary.
@@ -185,7 +185,18 @@ extern className##_##name name
  */
 #define COROUTINE_DELAY(delayMillis) \
     do { \
-      setDelay(delayMillis); \
+      setDelayMillis(delayMillis); \
+      setDelaying(); \
+      do { \
+        COROUTINE_YIELD_INTERNAL(); \
+      } while (!isDelayExpired()); \
+      setRunning(); \
+    } while (false)
+
+/** Yield for delayMicros. */
+#define COROUTINE_DELAY_MICROS(delayMicros) \
+    do { \
+      setDelayMicros(delayMicros); \
       setDelaying(); \
       do { \
         COROUTINE_YIELD_INTERNAL(); \
@@ -309,6 +320,12 @@ class Coroutine {
     virtual unsigned long coroutineMillis() const;
 
     /**
+     * Returns the current millisecond clock. By default it returns the global
+     * micros() function from Arduino but can be overridden for testing.
+     */
+    virtual unsigned long coroutineMicros() const;
+
+    /**
      * Suspend the coroutine at the next scheduler iteration. If the coroutine
      * is already in the process of ending or is already terminated, then this
      * method does nothing. A coroutine cannot use this method to suspend
@@ -333,8 +350,17 @@ class Coroutine {
 
     /** Check if delay time is over. */
     bool isDelayExpired() {
-      uint16_t elapsedMillis = coroutineMillis() - mDelayStartMillis;
-      return elapsedMillis >= mDelayDurationMillis;
+      switch (mDelayType) {
+        default:
+        case kDelayTypeMillis: {
+          uint16_t elapsedMillis = coroutineMillis() - mDelayStart;
+          return elapsedMillis >= mDelayDuration;
+        }
+        case kDelayTypeMicros: {
+          uint16_t elapsedMicros = coroutineMicros() -  mDelayStart;
+          return elapsedMicros >= mDelayDuration;
+        }
+      }
     }
 
     /** The coroutine was suspended with a call to suspend(). */
@@ -468,6 +494,12 @@ class Coroutine {
     /** Coroutine has ended and no longer in the scheduler queue. */
     static const Status kStatusTerminated = 5;
 
+    /** Delay using units of millis. */
+    static const uint8_t kDelayTypeMillis = 0;
+
+    /** Delay using units of micros. */
+    static const uint8_t kDelayTypeMicros = 1;
+
     /**
      * Constructor. All subclasses are expected to call either
      * setupCoroutine(const char*) or setupCoroutine(const
@@ -513,22 +545,32 @@ class Coroutine {
     void setDelaying() { mStatus = kStatusDelaying; }
 
     /**
-     * Configure the delay timer. The maximum duration is set to (UINT16_MAX /
-     * 2) (i.e. 32767 milliseconds) if given a larger value. This makes the
-     * longest allowable time between two successive calls to isDelayExpired()
-     * for a given coroutine to be 32767 (UINT16_MAX - UINT16_MAX / 2 - 1)
-     * milliseconds, which should be long enough for basically all real
-     * use-cases. (The '- 1' comes from an edge case where isDelayExpired()
-     * evaluates to be true in the CoroutineScheduler::runCoroutine() but
-     * becomes to be false in the COROUTINE_DELAY() macro inside
-     * Coroutine::runCoroutine()) because the clock increments by 1
-     * millisecond.)
+     * Configure the delay timer for delayMillis. The maximum duration
+     * is set to (UINT16_MAX / 2) (i.e. 32767 milliseconds) if given a larger
+     * value. This makes the longest allowable time between two successive
+     * calls to isDelayExpired() for a given coroutine to be 32767 (UINT16_MAX
+     * - UINT16_MAX / 2 - 1) milliseconds, which should be long enough for
+     * all practical use-cases. (The '- 1' comes from an edge case where
+     * isDelayExpired() evaluates to be true in the
+     * CoroutineScheduler::runCoroutine() but becomes to be false in the
+     * COROUTINE_DELAY() macro inside Coroutine::runCoroutine()) because the
+     * clock increments by 1 millisecond.)
      */
-    void setDelay(uint16_t delayMillisDuration) {
-      mDelayStartMillis = coroutineMillis();
-      mDelayDurationMillis = (delayMillisDuration >= UINT16_MAX / 2)
+    void setDelayMillis(uint16_t delayMillis) {
+      mDelayType = kDelayTypeMillis;
+      mDelayStart = coroutineMillis();
+      mDelayDuration = (delayMillis >= UINT16_MAX / 2)
           ? UINT16_MAX / 2
-          : delayMillisDuration;
+          : delayMillis;
+    }
+
+    /** Configure the delay timer for delayMicros. */
+    void setDelayMicros(uint16_t delayMicros) {
+      mDelayType = kDelayTypeMicros;
+      mDelayStart = coroutineMicros();
+      mDelayDuration = (delayMicros >= UINT16_MAX / 2)
+          ? UINT16_MAX / 2
+          : delayMicros;
     }
 
     /** Set the kStatusEnding state. */
@@ -566,8 +608,9 @@ class Coroutine {
     Coroutine* mNext = nullptr;
     void* mJumpPoint = nullptr;
     Status mStatus = kStatusSuspended;
-    uint16_t mDelayStartMillis;
-    uint16_t mDelayDurationMillis;
+    uint8_t mDelayType;
+    uint16_t mDelayStart; // millis or micros
+    uint16_t mDelayDuration; // millis or micros
 };
 
 }

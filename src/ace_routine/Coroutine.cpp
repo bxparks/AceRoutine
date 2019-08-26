@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <stdint.h> // uintptr_t
-#include <Arduino.h> // millis()
+#include <Arduino.h> // millis(), micros()
 #include "Coroutine.h"
 #include "Flash.h"
 
@@ -67,6 +67,10 @@ void Coroutine::resume() {
 
 unsigned long Coroutine::coroutineMillis() const {
   return ::millis();
+}
+
+unsigned long Coroutine::coroutineMicros() const {
+  return ::micros();
 }
 
 // Create the sStatusStrings lookup table to translate Status integer to a

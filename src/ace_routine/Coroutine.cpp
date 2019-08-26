@@ -65,7 +65,7 @@ void Coroutine::resume() {
   *p = this;
 }
 
-unsigned long Coroutine::millis() const {
+unsigned long Coroutine::coroutineMillis() const {
   return ::millis();
 }
 

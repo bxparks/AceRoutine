@@ -110,7 +110,7 @@ COROUTINE(TestableCoroutine, simpleCoroutine) {
 
 // Verify that multiple calls to Coroutine::runCoroutine() after it ends is ok.
 test(simpleCoroutine) {
-  simpleCoroutine.millis(0);
+  simpleCoroutine.coroutineMillis(0);
   assertTrue(simpleCoroutine.isSuspended());
 
   simpleCoroutine.runCoroutine();
@@ -122,7 +122,7 @@ test(simpleCoroutine) {
   simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isDelaying());
 
-  simpleCoroutine.millis(1);
+  simpleCoroutine.coroutineMillis(1);
   simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isYielding());
 
@@ -190,9 +190,9 @@ test(scheduler) {
   assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
 
-  a.millis(10);
-  b.millis(10);
-  c.millis(10);
+  a.coroutineMillis(10);
+  b.coroutineMillis(10);
+  c.coroutineMillis(10);
 
   // run a
   CoroutineScheduler::loop();
@@ -212,9 +212,9 @@ test(scheduler) {
   assertTrue(b.isDelaying());
   assertTrue(c.isDelaying());
 
-  a.millis(36);
-  b.millis(36);
-  c.millis(36);
+  a.coroutineMillis(36);
+  b.coroutineMillis(36);
+  c.coroutineMillis(36);
 
   // run a
   CoroutineScheduler::loop();
@@ -234,9 +234,9 @@ test(scheduler) {
   assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
 
-  a.millis(101);
-  b.millis(101);
-  c.millis(101);
+  a.coroutineMillis(101);
+  b.coroutineMillis(101);
+  c.coroutineMillis(101);
 
   // run a
   CoroutineScheduler::loop();
@@ -256,9 +256,9 @@ test(scheduler) {
   assertTrue(b.isYielding());
   assertTrue(c.isEnding());
 
-  a.millis(102);
-  b.millis(102);
-  c.millis(102);
+  a.coroutineMillis(102);
+  b.coroutineMillis(102);
+  c.coroutineMillis(102);
 
   // run a
   CoroutineScheduler::loop();
@@ -278,9 +278,9 @@ test(scheduler) {
   assertTrue(b.isEnding());
   assertTrue(c.isTerminated());
 
-  a.millis(103);
-  b.millis(103);
-  c.millis(103);
+  a.coroutineMillis(103);
+  b.coroutineMillis(103);
+  c.coroutineMillis(103);
 
   // run a, waiting for b over, loops around to delay(25)
   CoroutineScheduler::loop();
@@ -292,28 +292,28 @@ test(scheduler) {
   assertTrue(a.isDelaying());
   assertTrue(b.isTerminated());
 
-  a.millis(104);
-  b.millis(104);
-  c.millis(104);
+  a.coroutineMillis(104);
+  b.coroutineMillis(104);
+  c.coroutineMillis(104);
 
   // run a - hits COROUTINE_DELAY()
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
 
   // step +26 millis
-  a.millis(130);
-  b.millis(130);
-  c.millis(130);
+  a.coroutineMillis(130);
+  b.coroutineMillis(130);
+  c.coroutineMillis(130);
 
   // run a - hits COROUTINE_AWAIT() which yields immediately
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
 
   // step 1 millis
-  a.millis(131);
-  b.millis(131);
-  c.millis(131);
-  extra.millis(131);
+  a.coroutineMillis(131);
+  b.coroutineMillis(131);
+  c.coroutineMillis(131);
+  extra.coroutineMillis(131);
 
   // resume 'extra'
   assertTrue(extra.isSuspended());
@@ -330,10 +330,10 @@ test(scheduler) {
   assertTrue(a.isDelaying());
 
   // step +28 millis
-  a.millis(159);
-  b.millis(159);
-  c.millis(159);
-  extra.millis(159);
+  a.coroutineMillis(159);
+  b.coroutineMillis(159);
+  c.coroutineMillis(159);
+  extra.coroutineMillis(159);
 
   // run 'extra'
   CoroutineScheduler::loop();

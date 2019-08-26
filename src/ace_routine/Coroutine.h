@@ -306,7 +306,7 @@ class Coroutine {
      * Returns the current millisecond clock. By default it returns the global
      * millis() function from Arduino but can be overridden for testing.
      */
-    virtual unsigned long millis() const;
+    virtual unsigned long coroutineMillis() const;
 
     /**
      * Suspend the coroutine at the next scheduler iteration. If the coroutine
@@ -333,7 +333,7 @@ class Coroutine {
 
     /** Check if delay time is over. */
     bool isDelayExpired() {
-      uint16_t elapsedMillis = millis() - mDelayStartMillis;
+      uint16_t elapsedMillis = coroutineMillis() - mDelayStartMillis;
       return elapsedMillis >= mDelayDurationMillis;
     }
 
@@ -525,7 +525,7 @@ class Coroutine {
      * millisecond.)
      */
     void setDelay(uint16_t delayMillisDuration) {
-      mDelayStartMillis = millis();
+      mDelayStartMillis = coroutineMillis();
       mDelayDurationMillis = (delayMillisDuration >= UINT16_MAX / 2)
           ? UINT16_MAX / 2
           : delayMillisDuration;

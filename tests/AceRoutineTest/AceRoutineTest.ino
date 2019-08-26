@@ -137,10 +137,10 @@ test(simpleCoroutine) {
   assertTrue(simpleCoroutine.isEnding());
 }
 
-// c is defined in another .cpp file
+// 'c' is defined in another .cpp file
 EXTERN_COROUTINE(TestableCoroutine, c);
 
-// Define b before a because 'a' uses 'b'
+// Define 'b' before a because 'a' uses 'b'
 COROUTINE(TestableCoroutine, b) {
   COROUTINE_BEGIN();
   COROUTINE_YIELD();
@@ -149,13 +149,12 @@ COROUTINE(TestableCoroutine, b) {
   COROUTINE_END();
 }
 
-// Define a last. If there is a circular dependency between a and b, we can use
-// a pointer (Coroutine *a and Coroutine* b) to break the circular dependency,
-// just like any other normal objects.
+// Define 'a' last. If there is a circular dependency between a and b, we can
+// use a pointer (Coroutine *a and Coroutine* b) to break the circular
+// dependency, just like any other normal objects.
 COROUTINE(TestableCoroutine, a) {
   COROUTINE_LOOP() {
     COROUTINE_DELAY(25);
-    COROUTINE_YIELD();
     COROUTINE_AWAIT(b.isDone());
   }
 }
@@ -168,7 +167,7 @@ COROUTINE(TestableCoroutine, extra) {
 
 // Only 3 coroutines are initially active: a, b, c
 test(scheduler) {
-  // initially everything is enabled
+  // initially everything (except 'extra') is enabled
   assertTrue(a.isYielding());
   assertTrue(b.isYielding());
   assertTrue(c.isYielding());
@@ -297,18 +296,20 @@ test(scheduler) {
   b.millis(104);
   c.millis(104);
 
-  // run a - continues to run the COROUTINE_LOOP()
+  // run a - hits COROUTINE_DELAY()
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
 
+  // step +26 millis
   a.millis(130);
   b.millis(130);
   c.millis(130);
 
-  // run a - continues to run the COROUTINE_LOOP()
+  // run a - hits COROUTINE_AWAIT() which yields immediately
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
 
+  // step 1 millis
   a.millis(131);
   b.millis(131);
   c.millis(131);
@@ -323,24 +324,25 @@ test(scheduler) {
   assertTrue(extra.isEnding());
   assertTrue(a.isYielding());
 
-  // run 'a'
+  // run 'a', hits COROUTINE_DELAY()
   CoroutineScheduler::loop();
   assertTrue(extra.isEnding());
   assertTrue(a.isDelaying());
 
-  a.millis(132);
-  b.millis(132);
-  c.millis(132);
-  extra.millis(132);
+  // step +28 millis
+  a.millis(159);
+  b.millis(159);
+  c.millis(159);
+  extra.millis(159);
 
   // run 'extra'
   CoroutineScheduler::loop();
   assertTrue(extra.isTerminated());
   assertTrue(a.isDelaying());
 
-  // run 'a'
+  // run 'a', hits COROUTINE_AWAIT()
   CoroutineScheduler::loop();
-  assertTrue(a.isDelaying());
+  assertTrue(a.isYielding());
 }
 
 // ---------------------------------------------------------------------------

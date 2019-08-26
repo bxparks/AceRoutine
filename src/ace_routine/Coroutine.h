@@ -161,10 +161,10 @@ extern className##_##name name
  */
 #define COROUTINE_AWAIT(condition) \
     do { \
-      while (!(condition)) { \
+      do { \
         setYielding(); \
         COROUTINE_YIELD_INTERNAL(); \
-      } \
+      } while (!(condition)); \
       setRunning(); \
     } while (false)
 

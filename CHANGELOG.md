@@ -2,6 +2,10 @@
 
 * Unreleased
     * Update `AutoBenchmark/READM.md` benchmark numbers for 0.2.2.
+    * Use a `do-while` loop `COROUTINE_AWAIT()` so that it is guaranteed to call
+      `COROUTINE_YIELD()` at least once. Previously, if the `condition` of the
+      await was already (or always) true, the `while-loop` caused the coroutine
+      to hog the control flow and no other coroutine would make progress.
 * 0.2.2 (2019-07-31)
     * Add `SHIFT_ARGC_ARGV()` macro for easy token shifting,
       and `isArgEqual()` method for easy comparison against flash string

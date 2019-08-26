@@ -5,7 +5,9 @@
     * Use a `do-while` loop `COROUTINE_AWAIT()` so that it is guaranteed to call
       `COROUTINE_YIELD()` at least once. Previously, if the `condition` of the
       await was already (or always) true, the `while-loop` caused the coroutine
-      to hog the control flow and no other coroutine would make progress.
+      to hog the control flow without yielding.
+    * Use a `do-while` loop in `COROUTINE_DELAY()` so that `COROUTINE_YIELD()`
+      is guaranteed to be called at least once, even if the delay is 0.
 * 0.2.2 (2019-07-31)
     * Add `SHIFT_ARGC_ARGV()` macro for easy token shifting,
       and `isArgEqual()` method for easy comparison against flash string

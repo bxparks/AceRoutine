@@ -161,8 +161,8 @@ extern className##_##name name
  */
 #define COROUTINE_AWAIT(condition) \
     do { \
+      setYielding(); \
       do { \
-        setYielding(); \
         COROUTINE_YIELD_INTERNAL(); \
       } while (!(condition)); \
       setRunning(); \
@@ -186,10 +186,10 @@ extern className##_##name name
 #define COROUTINE_DELAY(delayMillis) \
     do { \
       setDelay(delayMillis); \
-      while (!isDelayExpired()) { \
-        setDelaying(); \
+      setDelaying(); \
+      do { \
         COROUTINE_YIELD_INTERNAL(); \
-      } \
+      } while (!isDelayExpired()); \
       setRunning(); \
     } while (false)
 

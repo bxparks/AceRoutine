@@ -1,7 +1,8 @@
 # Changelog
 
 * Unreleased
-    * Update `AutoBenchmark/READM.md` benchmark numbers for 0.3.
+* 0.3 (2019-08-26)
+    * Update `AutoBenchmark/README.md` benchmark numbers.
     * Use a `do-while` loop `COROUTINE_AWAIT()` so that it is guaranteed to call
       `COROUTINE_YIELD()` at least once. Previously, if the `condition` of the
       await was already (or always) true, the `while-loop` caused the coroutine
@@ -12,9 +13,12 @@
       existing `COROUTINE_DELAY(delayMillis)` macro. The actual delay time may
       be inaccurate on slow processors (e.g. 16 MHz AVR processors) and become
       more accurate for faster processors (e.g. ESP32). (#9)
-    * **Breaking**: The `COROUTINE_DELAY(delaySeconds)` macro now takes only one
-      parmeter instead of 2 parameters. An external `loopCounter` variable no
-      longer needs to be provided by the user, which simplifies the API.
+    * **Breaking**: The `COROUTINE_DELAY_SECONDS(delaySeconds)` macro now takes
+      only one parmeter instead of 2 parameters. An external `loopCounter`
+      variable no longer needs to be provided by the caller, which simplifies
+      the API.
+    * Add `examples/Delay/Delay.ino` program to validate the various
+      `COROUTINE_DELAY*()` macros.
     * The `sizeof(Coroutine)` increases from 14 bytes to 15 bytes on an 8-bit
       processor. No change on 32-bit (still 28 bytes).
 * 0.2.2 (2019-07-31)

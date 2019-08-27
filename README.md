@@ -3,16 +3,6 @@
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
 
-Version: 0.2.2 (2019-07-31)
-
-This library is currently in "beta" status. I'm releasing it through the Arduino
-Library Manager to solicit feedback from interested users. Send me an email or
-create a GitHub ticket.
-
-[![AUniter Jenkins Badge](https://us-central1-xparks2018.cloudfunctions.net/badge?project=AceRoutine)](https://github.com/bxparks/AUniter)
-
-## Summary
-
 This library is an implementation of the
 [ProtoThreads](http://dunkels.com/adam/pt) library for the
 Arduino platform. It emulates a stackless coroutine that can suspend execution
@@ -89,7 +79,14 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-### HelloCoroutine
+Version: 0.3 (2019-08-26)
+
+Status: In "beta". API has been relatively stable since 0.2. Breaking change
+made to `COROUTINE_DELAY_SECONDS()` in 0.3.
+
+[![AUniter Jenkins Badge](https://us-central1-xparks2018.cloudfunctions.net/badge?project=AceRoutine)](https://github.com/bxparks/AUniter)
+
+## HelloCoroutine
 
 This is the [HelloCoroutine.ino](examples/HelloCoroutine) sample sketch.
 

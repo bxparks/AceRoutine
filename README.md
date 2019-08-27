@@ -220,6 +220,9 @@ The following example sketches are provided:
   primitive "shell". The shell is non-blocking and uses coroutines so that other
   coroutines continue to run while the board waits for commands to be typed on
   the serial port.
+* [Delay.ino](examples/Delay): validate the various delay macros
+  (`COROUTINE_DELAY()`, `COROUTINE_DELAY_MICROS()` and
+  `COROUTINE_DELAY_SECONDS()`)
 * [Pipe.ino](examples/Pipe): uses a `Channel` to allow a Writer to send
   messages to a Reader
 * [ChannelBenchmark.ino](examples/ChannelBenchmark): determines the amount of
@@ -254,7 +257,8 @@ The following macros are available to hide a lot of boilerplate code:
   allowable delay is 32767 milliseconds.
 * `COROUTINE_DELAY_MICROS(micros)`: yields back execution for `micros`. The
   maximum allowable delay is 32767 microseconds.
-* `COROUTINE_DELAY_SECONDS(seconds)`: yields back execution for `seconds`.
+* `COROUTINE_DELAY_SECONDS(seconds)`: yields back execution for `seconds`. The
+  maximum allowable delay is 32767 seconds.
 * `COROUTINE_LOOP()`: convenience macro that loops forever, replaces
   `COROUTINE_BEGIN()` and `COROUTINE_END()`
 * `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`
@@ -357,7 +361,7 @@ while (!condition) COROUTINE_YIELD();
 ### Delay
 
 The `COROUTINE_DELAY(millis)` macro yields back control to other coroutines
-until until `millis` milliseconds have elapsed. The following waits 100
+until `millis` milliseconds have elapsed. The following waits for 100
 milliseconds:
 
 ```C++
@@ -371,14 +375,15 @@ COROUTINE(waitMillis) {
 ```
 
 The `millis` argument is a `uint16_t`, a 16-bit unsigned integer, which reduces
-the size of each coroutine instance by 4 bytes. However, the actual maximum
-delay is limited to 32767 milliseconds to avoid overflow situations if the other
-coroutines in the system take too much time for their work before returning
-control to the waiting coroutine. With this limit, the other coroutines have as
-much as 32767 milliseconds before it must yield, which should be more than
-enough time for any conceivable situation. In practice, coroutines should
-complete their work within several milliseconds and yield control to the other
-coroutines as soon as possible.
+the size of each coroutine instance by 4 bytes (8-bit processors) or 8 bytes
+(32-bits processors). However, the actual maximum delay is limited to 32767
+milliseconds to avoid overflow situations if the other coroutines in the system
+take too much time for their work before returning control to the waiting
+coroutine. With this limit, the other coroutines have as much as 32767
+milliseconds before it must yield, which should be more than enough time for any
+conceivable situation. In practice, coroutines should complete their work within
+several milliseconds and yield control to the other coroutines as soon as
+possible.
 
 To delay for longer period of time, we can use the
 `COROUTINE_DELAY_SECONDS(seconds)` convenience macro. The following example
@@ -394,8 +399,8 @@ COROUTINE(waitSeconds) {
 ```
 The maximum number of seconds is 32767 seconds.
 
-On faster microcontrollers, it can be useful to yield for microseconds using the
-`COROUTINE_DELAY_MICROS(delayMicros)`.  The following example waits for 300
+On faster microcontrollers, it might be useful to yield for microseconds using
+the `COROUTINE_DELAY_MICROS(delayMicros)`.  The following example waits for 300
 microseconds:
 
 ```C++

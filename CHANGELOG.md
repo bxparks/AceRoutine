@@ -12,9 +12,11 @@
       existing `COROUTINE_DELAY(delayMillis)` macro. The actual delay time may
       be inaccurate on slow processors (e.g. 16 MHz AVR processors) and become
       more accurate for faster processors (e.g. ESP32). (#9)
-    * **Breaking**: The `COROUTINE_DELAY(delaySeconds)` now takes only one
+    * **Breaking**: The `COROUTINE_DELAY(delaySeconds)` macro now takes only one
       parmeter instead of 2 parameters. An external `loopCounter` variable no
       longer needs to be provided by the user, which simplifies the API.
+    * The `sizeof(Coroutine)` increases from 14 bytes to 15 bytes on an 8-bit
+      processor. No change on 32-bit (still 28 bytes).
 * 0.2.2 (2019-07-31)
     * Add `SHIFT_ARGC_ARGV()` macro for easy token shifting,
       and `isArgEqual()` method for easy comparison against flash string

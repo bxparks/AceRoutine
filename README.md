@@ -1310,7 +1310,7 @@ advantages:
 All objects are statically allocated (i.e. not heap or stack).
 
 * 8-bit processors (AVR Nano, UNO, etc):
-    * `sizeof(Coroutine)`: 14
+    * `sizeof(Coroutine)`: 15
     * `sizeof(CoroutineScheduler)`: 2
     * `sizeof(Channel<int>)`: 5
 * 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32)

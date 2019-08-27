@@ -16,14 +16,14 @@ All times in microseconds.
 
 ## Arduino Nano
 
-* AceRoutine 0.2.2
+* AceRoutine 0.3
 * Arduino IDE 1.8.9
 * AVR Boards 1.6.23
 
 **Memory**
 
 ```
-sizeof(Coroutine): 14
+sizeof(Coroutine): 15
 sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
 ```
@@ -38,9 +38,9 @@ sizeof(Channel<int>): 5
 ------------+------+------+
 ```
 
-## SAMD21 M0 Mini (Arduino MKR Zero Compatible)
+## SAMD21 M0 Mini (Arduino Zero Compatible)
 
-* AceRoutine 0.2.2
+* AceRoutine 0.3
 * Arduino IDE 1.8.9
 * SparkFun SAMD Boards 1.6.2
 
@@ -56,13 +56,13 @@ sizeof(Channel<int>): 12
 ------------+------+------+
  AceRoutine | base | diff |
 ------------+------+------+
-       3.34 | 0.48 | 2.85 |
+       3.28 | 0.48 | 2.80 |
 ------------+------+------+
 ```
 
 ## ESP8266
 
-* AceRoutine 0.2.2
+* AceRoutine 0.3
 * Arduino IDE 1.8.9
 * ESP8266 Boards 2.5.2
 
@@ -86,7 +86,7 @@ sizeof(Channel<int>): 12
 
 ## ESP32
 
-* AceRoutine 0.2.2
+* AceRoutine 0.3
 * Arduino IDE 1.8.9
 * ESP32 Boards 1.0.2
 
@@ -116,7 +116,7 @@ greatly by the compiler optimization settings in the Arduino IDE dropdown menu
 run times did not vary as much with respect to the optimization settings. The
 CPU Speed was set to 96 MHz (overclock).
 
-* AceRoutine 0.2.2
+* AceRoutine 0.3
 * Arduino IDE: 1.8.9
 * Teensyduino 1.46
 

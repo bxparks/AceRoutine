@@ -38,9 +38,10 @@ their life cycle:
 * `COROUTINE_AWAIT(condition)`: yield until `condition` becomes `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
-* `COROUTINE_DELAY_SECONDS(loopCounter, seconds)`: yields back execution for
-  `seconds`. The maximum value of `seconds` is determined by `loopCounter`
-  which can be of any integer type.
+* `COROUTINE_DELAY_MICROS(micros)`: yields back execution for `micros`. The
+  `micros` parameter is defined as a `uint16_t`.
+* `COROUTINE_DELAY_SECONDS(seconds)`: yields back execution for
+  `seconds`. The `seconds` parameter is defined as a `uint16_t`.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
 * `COROUTINE_CHANNEL_WRITE(channel, value)`: writes a value to a `Channel`
 * `COROUTINE_CHANNEL_READ(channel, value)`: reads a value from a `Channel`
@@ -254,9 +255,9 @@ The following macros are available to hide a lot of boilerplate code:
 * `COROUTINE_AWAIT(condition)`: yield until `condition` become `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The maximum
   allowable delay is 32767 milliseconds.
-* `COROUTINE_DELAY_SECONDS(loopCounter, seconds)`: yields back execution for
-  `seconds`. The maximum allowable delay is the maximum value of the integer
-  type of `loopCounter` which can be of any integer type.
+* `COROUTINE_DELAY_MICROS(micros)`: yields back execution for `micros`. The
+  maximum allowable delay is 32767 microseconds.
+* `COROUTINE_DELAY_SECONDS(seconds)`: yields back execution for `seconds`.
 * `COROUTINE_LOOP()`: convenience macro that loops forever, replaces
   `COROUTINE_BEGIN()` and `COROUTINE_END()`
 * `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`
@@ -358,70 +359,84 @@ while (!condition) COROUTINE_YIELD();
 
 ### Delay
 
-The `COROUTINE_DELAY(millis)` macro delays the return of control until `millis`
-milliseconds have elapsed. The `millis` argument is a `uint16_t`, a 16-bit
-unsigned integer, which reduces the size of each coroutine instance by 4 bytes.
-However, the actual maximum delay is limited to 32767 milliseconds to avoid
-overflow situations if the other coroutines in the system take too much time for
-their work before returning control to the waiting coroutine. With this limit,
-the other coroutines have as much as 32767 milliseconds to complete their work,
-which should be more than enough time for any conceivable situation. In
-practice, coroutines should complete their work within several milliseconds and
-yield control to the other coroutines as soon as possible.
+The `COROUTINE_DELAY(millis)` macro yields back control to other coroutines
+until until `millis` milliseconds have elapsed. The following waits 100
+milliseconds:
 
-To delay for longer, an explicit loop can be used. For example, to delay
-for 1000 seconds, we can do this:
+```C++
+COROUTINE(waitMillis) {
+  COROUTINE_BEGIN();
+  ...
+  COROUTINE_DELAY(100);
+  ...
+  COROUTINE_END();
+}
+```
+
+The `millis` argument is a `uint16_t`, a 16-bit unsigned integer, which reduces
+the size of each coroutine instance by 4 bytes. However, the actual maximum
+delay is limited to 32767 milliseconds to avoid overflow situations if the other
+coroutines in the system take too much time for their work before returning
+control to the waiting coroutine. With this limit, the other coroutines have as
+much as 32767 milliseconds before it must yield, which should be more than
+enough time for any conceivable situation. In practice, coroutines should
+complete their work within several milliseconds and yield control to the other
+coroutines as soon as possible.
+
+To delay for longer period of time, we can use the
+`COROUTINE_DELAY_SECONDS(seconds)` convenience macro. The following example
+waits for 200 seconds:
+```C++
+COROUTINE(waitSeconds) {
+  COROUTINE_BEGIN();
+  ...
+  COROUTINE_DELAY_SECONDS(200);
+  ...
+  COROUTINE_END();
+}
+```
+The maximum number of seconds is 32767 seconds.
+
+On faster microcontrollers, it can be useful to yield for microseconds using the
+`COROUTINE_DELAY_MICROS(delayMicros)`.  The following example waits for 300
+microseconds:
+
+```C++
+COROUTINE(waitMicros) {
+  COROUTINE_BEGIN();
+  ...
+  COROUTINE_DELAY(300);
+  ...
+  COROUTINE_END();
+}
+```
+This macro has a number constraints:
+
+* The maximum delay is 32767 micros.
+* All other coroutines in the program *must* yield within 32767 microsecond,
+  otherwise the internal timing variable will overflow and an incorrect delay
+  will occur.
+* The accuracy of `COROUTINE_DELAY_MICROS()` is not guaranteed because the
+  overhead of context switching and checking the delay's expiration may
+  consume a significant portion of the requested delay in microseconds.
+
+If the above convenience macros are not sufficient, you can choose to write an
+explicit for-loop. For example, to delay for 100,000 seconds, instead of using
+the `COROUTINE_DELAY_SECONDS()`, we can do this:
+
 ```C++
 COROUTINE(waitThousandSeconds) {
   COROUTINE_BEGIN();
-  static uint16_t i;
-  for (i = 0; i < 1000; i++) {
+  static uint32_t i;
+  for (i = 0; i < 100000; i++) {
     COROUTINE_DELAY(1000);
   }
   ...
   COROUTINE_END();
 }
 ```
+
 See **For Loop** section below for a description of the for-loop construct.
-
-This for-loop construct happens often enough that it seemed worthwhile to
-provide the `COROUTINE_DELAY_SECONDS(loopCounter, seconds)` convenience macro.
-It replaces the above for-loop, like this:
-```C++
-COROUTINE(waitThousandSeconds) {
-  COROUTINE_BEGIN();
-  static uint16_t loopCounter;
-  COROUTINE_DELAY_SECONDS(loopCounter, 1000);
-  ...
-  COROUTINE_END();
-}
-```
-The `static uint16_t loopCounter` variable is still required for the
-`COROUTINE_DELAY_SECONDS()` macro because it needs a loop counter that must
-preserve its value across multiple invocation of the coroutine. The
-`loopCounter` may be any integer type, and the maximum number of seconds is the
-maximum value of that particular integer type. For example, if the `loopCounter`
-was a `uint8_t`, the maximum delay would be 255 seconds. If the `loopCounter`
-was a `uint32_t`, the maximum delay would be about 4 billion seconds.
-
-The `loopCounter` may also be a member variable of the `Coroutine` subclass,
-when you use custom or manual coroutines (see the sections on *Custom
-Coroutines* or *Manual Coroutines* below for details). In other words, you can
-define a coroutine with a `mDelayCounter` member variable, and use the
-`COROUTINE_DELAY_SECONDS()` macro like this:
-```C++
-class MyCoroutine: public Coroutine {
-  public:
-    int runCoroutine() override {
-      ...
-      COROUTINE_DELAY_SECONDS(mDelayCounter, 1000);
-      ...
-    }
-
-  private:
-    uint16_t mDelayCounter;
-};
-```
 
 ### Stackless Coroutines
 

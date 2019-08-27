@@ -558,7 +558,10 @@ class Coroutine {
           : delayMillis;
     }
 
-    /** Configure the delay timer for delayMicros. Similar to seDelayMillis().*/
+    /**
+     * Configure the delay timer for delayMicros. Similar to seDelayMillis(),
+     * the maximum delay is 32767 micros.
+     */
     void setDelayMicros(uint16_t delayMicros) {
       mDelayType = kDelayTypeMicros;
       mDelayStart = coroutineMicros();
@@ -568,7 +571,8 @@ class Coroutine {
     }
 
     /**
-     * Configure the delay timer for delaySeconds. Similar to seDelayMillis().
+     * Configure the delay timer for delaySeconds. Similar to seDelayMillis(),
+     * the maximum delay is 32767 seconds.
      */
     void setDelaySeconds(uint16_t delaySeconds) {
       mDelayType = kDelayTypeSeconds;

@@ -1,13 +1,20 @@
 # Changelog
 
 * Unreleased
-    * Update `AutoBenchmark/READM.md` benchmark numbers for 0.2.2.
+    * Update `AutoBenchmark/READM.md` benchmark numbers for 0.3.
     * Use a `do-while` loop `COROUTINE_AWAIT()` so that it is guaranteed to call
       `COROUTINE_YIELD()` at least once. Previously, if the `condition` of the
       await was already (or always) true, the `while-loop` caused the coroutine
       to hog the control flow without yielding.
     * Use a `do-while` loop in `COROUTINE_DELAY()` so that `COROUTINE_YIELD()`
       is guaranteed to be called at least once, even if the delay is 0.
+    * Add `COROUTINE_DELAY_MICROS(delayMicros)` which is similar to the
+      existing `COROUTINE_DELAY(delayMillis)` macro. The actual delay time may
+      be inaccurate on slow processors (e.g. 16 MHz AVR processors) and become
+      more accurate for faster processors (e.g. ESP32). (#9)
+    * **Breaking**: The `COROUTINE_DELAY(delaySeconds)` now takes only one
+      parmeter instead of 2 parameters. An external `loopCounter` variable no
+      longer needs to be provided by the user, which simplifies the API.
 * 0.2.2 (2019-07-31)
     * Add `SHIFT_ARGC_ARGV()` macro for easy token shifting,
       and `isArgEqual()` method for easy comparison against flash string

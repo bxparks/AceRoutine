@@ -337,7 +337,6 @@ class Coroutine {
     /** Check if delay time is over. */
     bool isDelayExpired() {
       switch (mDelayType) {
-        default:
         case kDelayTypeMillis: {
           uint16_t elapsedMillis = coroutineMillis() - mDelayStart;
           return elapsedMillis >= mDelayDuration;
@@ -350,6 +349,9 @@ class Coroutine {
           uint16_t elapsedSeconds = coroutineSeconds() -  mDelayStart;
           return elapsedSeconds >= mDelayDuration;
         }
+        default:
+          // This should never happen.
+          return true;
       }
     }
 

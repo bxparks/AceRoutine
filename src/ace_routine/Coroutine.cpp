@@ -73,6 +73,16 @@ unsigned long Coroutine::coroutineMicros() const {
   return ::micros();
 }
 
+unsigned long Coroutine::coroutineSeconds() const {
+  unsigned long m = ::millis();
+#if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_SAMD) || defined(ESP8266)
+  // No hardware division so the udiv1000() approximation is faster
+  return internal::udiv1000(m);
+#else
+  return m / 1000;
+#endif
+}
+
 // Create the sStatusStrings lookup table to translate Status integer to a
 // human-readable string. When it is used, it increases flash memory by 86
 // bytes, and static RAM by 14 bytes. It is currently only used by

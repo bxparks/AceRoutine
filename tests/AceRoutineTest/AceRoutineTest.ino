@@ -10,7 +10,7 @@ using namespace aunit;
 
 // ---------------------------------------------------------------------------
 
-test(FCString_compareTo) {
+test(AceRoutineTest, FCString_compareTo) {
   FCString n;
   FCString a("a");
   FCString b("b");
@@ -32,36 +32,26 @@ test(FCString_compareTo) {
 
 // ---------------------------------------------------------------------------
 
-// Create a named subclass of TestOnce so that we can add it as a friend of the
-// Coroutine class, which allows it access to the protected Status constants
-// and sStatusStrings.
-class StatusStringTest: public TestOnce {
-  public:
-    void assertStatusStringsEqual() {
-      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusSuspended],
-          "Suspended");
-      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusYielding],
-          "Yielding");
-      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusDelaying],
-          "Delaying");
-      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusRunning],
-          "Running");
-      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusEnding],
-          "Ending");
-      assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusTerminated],
-          "Terminated");
-    }
-};
-
-testF(StatusStringTest, statusStrings) {
-  assertStatusStringsEqual();
+test(AceRoutineTest, statusStrings) {
+  assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusSuspended],
+      "Suspended");
+  assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusYielding],
+      "Yielding");
+  assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusDelaying],
+      "Delaying");
+  assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusRunning],
+      "Running");
+  assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusEnding],
+      "Ending");
+  assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusTerminated],
+      "Terminated");
 }
 
 // ---------------------------------------------------------------------------
 
 Channel<int> channel;
 
-test(channelReadAndWrite) {
+test(AceRoutineTest, channelReadAndWrite) {
   int writeValue = 2;
   int readValue = 0;
 
@@ -76,7 +66,7 @@ test(channelReadAndWrite) {
   assertEqual(readValue, writeValue);
 }
 
-test(channelWriteMacro) {
+test(AceRoutineTest, channelWriteMacro) {
   int writeValue = 2;
   int readValue = 0;
 
@@ -109,7 +99,7 @@ COROUTINE(TestableCoroutine, simpleCoroutine) {
 }
 
 // Verify that multiple calls to Coroutine::runCoroutine() after it ends is ok.
-test(simpleCoroutine) {
+test(AceRoutineTest, simpleCoroutine) {
   simpleCoroutine.coroutineMillis(0);
   assertTrue(simpleCoroutine.isSuspended());
 
@@ -166,7 +156,7 @@ COROUTINE(TestableCoroutine, extra) {
 }
 
 // Only 3 coroutines are initially active: a, b, c
-test(scheduler) {
+test(AceRoutineTest, scheduler) {
   // initially everything (except 'extra') is enabled
   assertTrue(a.isYielding());
   assertTrue(b.isYielding());
@@ -343,6 +333,20 @@ test(scheduler) {
   // run 'a', hits COROUTINE_AWAIT()
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
+}
+
+// ---------------------------------------------------------------------------
+test(AceRoutineTest, udiv1000Test) {
+  assertEqual((unsigned long) 9, ace_routine::internal::udiv1000(10*1000));
+  assertEqual((unsigned long) 97, ace_routine::internal::udiv1000(100*1000));
+  assertEqual((unsigned long) 997,
+      ace_routine::internal::udiv1000(1000*1000));
+  assertEqual((unsigned long) 9993,
+      ace_routine::internal::udiv1000(10*1000*1000));
+  assertEqual((unsigned long) 99987,
+      ace_routine::internal::udiv1000(100*1000*1000));
+  assertEqual((unsigned long) 999980,
+      ace_routine::internal::udiv1000(1000*1000*1000));
 }
 
 // ---------------------------------------------------------------------------

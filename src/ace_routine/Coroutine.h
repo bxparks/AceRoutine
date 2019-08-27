@@ -30,6 +30,8 @@ SOFTWARE.
 #include "Flash.h" // ACE_ROUTINE_F()
 #include "FCString.h"
 
+class AceRoutineTest_statusStrings;
+
 /**
  * @file Coroutine.h
  *
@@ -271,9 +273,27 @@ extern className##_##name name
       return 0; \
     } while (false)
 
-class StatusStringTest;
-
 namespace ace_routine {
+
+namespace internal {
+  /**
+   * Approximate division by 1000. More accurate algorithms exist (see for
+   * example http://www.hackersdelight.org/divcMore.pdf) but I'm pretty sure
+   * that this good enough since we don't guarantee accurate timing of the
+   * COROUTINE_DELAY*() methods.
+   */
+  inline unsigned long udiv1000(unsigned long n) {
+    // Use binomial expansion of 1/(1-x).
+    // 1/1000 = 1/(1024 - 24)
+    //        = (1/2^10) * (1 / (1 - 3/2^7))
+    //        = (1/2^10) * (1 + 3/2^7 + 9/2^14 + 27/2^21 + ...)
+    //        = (1/2^10 + 3/2^17 + 9/2^24 + 27/2^31 + ...)
+    unsigned long x = (n >> 8);
+    unsigned long y = (x >> 8);
+    unsigned long z = (y >> 8);
+    return (x >> 2) + 3 * (y >> 1) + 9 * z;
+  }
+}
 
 /**
  * Base class of all coroutines. The actual coroutine code is an implementation
@@ -281,7 +301,7 @@ namespace ace_routine {
  */
 class Coroutine {
   friend class CoroutineScheduler;
-  friend class ::StatusStringTest;
+  friend class ::AceRoutineTest_statusStrings;
 
   public:
     /**
@@ -324,6 +344,14 @@ class Coroutine {
      * micros() function from Arduino but can be overridden for testing.
      */
     virtual unsigned long coroutineMicros() const;
+
+    /**
+     * Returns the current clock in unit of seconds, truncated to the lower
+     * 16-bits. This is an approximation of (millis / 1000). It does not need
+     * to be perfectly accurate because COROUTINE_DELAY_SECONS() is not
+     * guaranteed to be precise.
+     */
+    virtual unsigned long coroutineSeconds() const;
 
     /**
      * Suspend the coroutine at the next scheduler iteration. If the coroutine

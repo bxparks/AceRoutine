@@ -16,33 +16,116 @@ All times in microseconds.
 
 ## Arduino Nano
 
-**Memory Size**
+* AceRoutine 0.3
+* Arduino IDE 1.8.9
+* AVR Boards 1.6.23
+
+**Memory**
 
 ```
-sizeof(Routine): 14
-sizeof(RoutineScheduler): 2
+sizeof(Coroutine): 15
+sizeof(CoroutineScheduler): 2
+sizeof(Channel<int>): 5
 ```
+
 **CPU**
 
 ```
 ------------+------+------+
  AceRoutine | base | diff |
 ------------+------+------+
-       9.71 | 3.26 | 6.44 |
+       9.58 | 3.27 | 6.31 |
+------------+------+------+
+```
+
+## SAMD21 M0 Mini (Arduino Zero Compatible)
+
+* AceRoutine 0.3
+* Arduino IDE 1.8.9
+* SparkFun SAMD Boards 1.6.2
+
+**Memory**
+```
+sizeof(Coroutine): 28
+sizeof(CoroutineScheduler): 4
+sizeof(Channel<int>): 12
+```
+
+**CPU**
+```
+------------+------+------+
+ AceRoutine | base | diff |
+------------+------+------+
+       3.28 | 0.48 | 2.80 |
+------------+------+------+
+```
+
+## ESP8266
+
+* AceRoutine 0.3
+* Arduino IDE 1.8.9
+* ESP8266 Boards 2.5.2
+
+**Memory**
+
+```
+sizeof(Coroutine): 28
+sizeof(CoroutineScheduler): 4
+sizeof(Channel<int>): 12
+```
+
+**CPU**
+
+```
+------------+------+------+
+ AceRoutine | base | diff |
+------------+------+------+
+       6.00 | 4.52 | 1.48 |
+------------+------+------+
+```
+
+## ESP32
+
+* AceRoutine 0.3
+* Arduino IDE 1.8.9
+* ESP32 Boards 1.0.2
+
+**Memory**
+
+```
+sizeof(Coroutine): 28
+sizeof(CoroutineScheduler): 4
+sizeof(Channel<int>): 12
+```
+
+**CPU**
+
+```
+------------+------+------+
+ AceRoutine | base | diff |
+------------+------+------+
+       1.60 | 1.19 | 0.40 |
 ------------+------+------+
 ```
 
 ## Teensy 3.2
 
-The benchmark numbers for Teensy are affected greatly by the compiler
-optimization settings in the Arduino IDE dropdown menu (Tools > Optimize).
-CPU Speed set to 96 MHz (overclock).
+Prior to TeesyDuino 1.46 (or so), the benchmark numbers for Teensy were affected
+greatly by the compiler optimization settings in the Arduino IDE dropdown menu
+(Tools > Optimize). However, when the benchmark was run with version 1.46, the
+run times did not vary as much with respect to the optimization settings. The
+CPU Speed was set to 96 MHz (overclock).
 
-**Memory Size**
+* AceRoutine 0.3
+* Arduino IDE: 1.8.9
+* Teensyduino 1.46
+
+**Memory**
 
 ```
-sizeof(Routine): 28
-sizeof(RoutineScheduler): 4
+sizeof(Coroutine): 28
+sizeof(CoroutineScheduler): 4
+sizeof(Channel<int>): 12
 ```
 
 **CPU**
@@ -51,53 +134,15 @@ sizeof(RoutineScheduler): 4
 ----------------------+------------+------+------+
 Optimization          | AceRoutine | base | diff |
 ----------------------+------------+------+------+
-Faster                |       3.65 | 1.67 | 1.98 |
-Faster+LTO            |       2.10 | 0.72 | 1.38 |
-Fast                  |       3.55 | 1.88 | 1.67 |
-Fast+LTO              |       1.69 | 0.54 | 1.14 |
-Fastest               |       3.59 | 1.83 | 1.75 |
-Fastest+pure-code     |       3.61 | 2.00 | 1.60 |
-Fastest+LTO           |       1.81 | 0.73 | 1.08 |
-Fastest+pure-code+LTO |       1.90 | 0.72 | 1.18 |
-Smallest code         |       3.88 | 1.88 | 2.00 |
-Smallest code + LTO   |       1.81 | 0.68 | 1.12 |
+Faster                |       1.29 | 0.15 | 1.13 |
+Faster+LTO            |       0.85 | 0.16 | 0.68 |
+Fast                  |       1.27 | 0.15 | 1.11 |
+Fast+LTO              |       0.83 | 0.15 | 0.67 |
+Fastest               |       1.27 | 0.15 | 1.11 |
+Fastest+pure-code     |       1.27 | 0.15 | 1.11 |
+Fastest+LTO           |       0.83 | 0.15 | 0.67 |
+Fastest+pure-code+LTO |       0.91 | 0.15 | 0.76 |
+Smallest code         |       1.35 | 0.16 | 1.19 |
+Smallest code + LTO   |       1.17 | 0.16 | 1.00 |
 ----------------------+------------+------+------+
-```
-
-## ESP8266
-
-**Memory Size**
-
-```
-sizeof(Routine): 28
-sizeof(RoutineScheduler): 4
-```
-
-**CPU**
-
-```
-------------+------+------+
-AceRoutine  | base | diff |
-------------+------+------+
-       6.17 | 4.49 | 1.67 |
-------------+------+------+
-```
-
-## ESP32
-
-**Memory Size**
-
-```
-sizeof(Routine): 28
-sizeof(RoutineScheduler): 4
-```
-
-**CPU**
-
-```
-------------+------+------+
- AceRoutine | base | diff |
-------------+------+------+
-       1.69 | 1.23 | 0.45 |
-------------+------+------+
 ```

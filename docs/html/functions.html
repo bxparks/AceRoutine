@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">0.2.2</span>
+   &#160;<span id="projectnumber">0.3</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -70,7 +70,7 @@ $(function() {
 : <a class="el" href="classace__routine_1_1cli_1_1CommandDispatcher.html#a89c8fee3b7623bf3a710995d1155ab3d">ace_routine::cli::CommandDispatcher</a>
 </li>
 <li>CommandHandler()
-: <a class="el" href="classace__routine_1_1cli_1_1CommandHandler.html#a893ff83965fc417194258ce4a5958b40">ace_routine::cli::CommandHandler</a>
+: <a class="el" href="classace__routine_1_1cli_1_1CommandHandler.html#a0252adafe6a1e5b0c37120a502c2eb6f">ace_routine::cli::CommandHandler</a>
 </li>
 <li>CommandManager()
 : <a class="el" href="classace__routine_1_1cli_1_1CommandManager.html#ab3fc5075f6d006f86cdbfe1bae11545c">ace_routine::cli::CommandManager&lt; BUF_SIZE, ARGV_SIZE &gt;</a>
@@ -80,6 +80,15 @@ $(function() {
 </li>
 <li>Coroutine()
 : <a class="el" href="classace__routine_1_1Coroutine.html#a77f4a6850863fd2f0f161b8cccdfab18">ace_routine::Coroutine</a>
+</li>
+<li>coroutineMicros()
+: <a class="el" href="classace__routine_1_1Coroutine.html#a826df2b7d3db16170a13ba4b2756c853">ace_routine::Coroutine</a>
+</li>
+<li>coroutineMillis()
+: <a class="el" href="classace__routine_1_1Coroutine.html#ab8ee6720cd9c78c5f61218e0f01bcdb8">ace_routine::Coroutine</a>
+</li>
+<li>coroutineSeconds()
+: <a class="el" href="classace__routine_1_1Coroutine.html#ad5e6271ee3fbee2c2c25785916be8a00">ace_routine::Coroutine</a>
 </li>
 </ul>
 
@@ -180,6 +189,15 @@ $(function() {
 
 
 <h3><a id="index_k"></a>- k -</h3><ul>
+<li>kDelayTypeMicros
+: <a class="el" href="classace__routine_1_1Coroutine.html#a5eda214828fb06f133f84743b518e46a">ace_routine::Coroutine</a>
+</li>
+<li>kDelayTypeMillis
+: <a class="el" href="classace__routine_1_1Coroutine.html#a668e339557964dc092540bad162056a7">ace_routine::Coroutine</a>
+</li>
+<li>kDelayTypeSeconds
+: <a class="el" href="classace__routine_1_1Coroutine.html#a79844c12576ff2fd2065c5f5e4b422c8">ace_routine::Coroutine</a>
+</li>
 <li>kStatusDelaying
 : <a class="el" href="classace__routine_1_1Coroutine.html#a180062205c19934c2791c4185cbe0968">ace_routine::Coroutine</a>
 </li>
@@ -207,13 +225,6 @@ $(function() {
 </li>
 <li>loop()
 : <a class="el" href="classace__routine_1_1CoroutineScheduler.html#a2dd0d1ca2b8fe39bebc1c9b275d7893b">ace_routine::CoroutineScheduler</a>
-</li>
-</ul>
-
-
-<h3><a id="index_m"></a>- m -</h3><ul>
-<li>millis()
-: <a class="el" href="classace__routine_1_1Coroutine.html#a7ac841f1ac847c356f367e7883ebf480">ace_routine::Coroutine</a>
 </li>
 </ul>
 
@@ -254,11 +265,17 @@ $(function() {
 
 
 <h3><a id="index_s"></a>- s -</h3><ul>
-<li>setDelay()
-: <a class="el" href="classace__routine_1_1Coroutine.html#aa36b776d2447e1653b3bfeabc64224a9">ace_routine::Coroutine</a>
-</li>
 <li>setDelaying()
 : <a class="el" href="classace__routine_1_1Coroutine.html#aa7db4b21985bbed9996427179d9a6dba">ace_routine::Coroutine</a>
+</li>
+<li>setDelayMicros()
+: <a class="el" href="classace__routine_1_1Coroutine.html#a5cf7c47f82ca67910955e4a9c2c7afe9">ace_routine::Coroutine</a>
+</li>
+<li>setDelayMillis()
+: <a class="el" href="classace__routine_1_1Coroutine.html#af89fa38dbebbd7b4ab31d5af821e3da6">ace_routine::Coroutine</a>
+</li>
+<li>setDelaySeconds()
+: <a class="el" href="classace__routine_1_1Coroutine.html#a63564eb4165b40c40ce6d44c63ef78b8">ace_routine::Coroutine</a>
 </li>
 <li>setEnding()
 : <a class="el" href="classace__routine_1_1Coroutine.html#a5dd0810009383cdeae859fc227d933bb">ace_routine::Coroutine</a>
@@ -276,7 +293,7 @@ $(function() {
 : <a class="el" href="classace__routine_1_1CoroutineScheduler.html#a7a1e65b27de84506ed1427c240314ade">ace_routine::CoroutineScheduler</a>
 </li>
 <li>setupCoroutine()
-: <a class="el" href="classace__routine_1_1Coroutine.html#a3417537c1ff3a7c737719d32192f3733">ace_routine::Coroutine</a>
+: <a class="el" href="classace__routine_1_1Coroutine.html#a68dc92a6cce8435bc745a3582bbca210">ace_routine::Coroutine</a>
 </li>
 <li>setValue()
 : <a class="el" href="classace__routine_1_1Channel.html#ab950ccdf77fdfaeea67ac19031733229">ace_routine::Channel&lt; T &gt;</a>

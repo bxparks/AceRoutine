@@ -30,15 +30,21 @@ SOFTWARE.
 namespace ace_routine {
 namespace testing {
 
-/** A Coroutine that overrides the millis() clock for unit testing purposes. */
+/**
+ * A Coroutine that overrides the coroutineMillis() clock for unit testing
+ * purposes.
+ */
 class TestableCoroutine: public Coroutine {
   public:
-    unsigned long millis() const override { return mMillis; }
+    unsigned long coroutineMillis() const override { return mMillis; }
+    unsigned long coroutineMicros() const override { return mMicros; }
 
-    void millis(unsigned long millis) { mMillis = millis; }
+    void coroutineMillis(unsigned long millis) { mMillis = millis; }
+    void coroutineMicros(unsigned long micros) { mMicros = micros; }
 
   private:
     unsigned long mMillis = 0;
+    unsigned long mMicros = 0;
 };
 
 }

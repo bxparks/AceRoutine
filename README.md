@@ -3,16 +3,6 @@
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
 
-Version: 0.2.2 (2019-07-31)
-
-This library is currently in "beta" status. I'm releasing it through the Arduino
-Library Manager to solicit feedback from interested users. Send me an email or
-create a GitHub ticket.
-
-[![AUniter Jenkins Badge](https://us-central1-xparks2018.cloudfunctions.net/badge?project=AceRoutine)](https://github.com/bxparks/AUniter)
-
-## Summary
-
 This library is an implementation of the
 [ProtoThreads](http://dunkels.com/adam/pt) library for the
 Arduino platform. It emulates a stackless coroutine that can suspend execution
@@ -38,9 +28,10 @@ their life cycle:
 * `COROUTINE_AWAIT(condition)`: yield until `condition` becomes `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
-* `COROUTINE_DELAY_SECONDS(loopCounter, seconds)`: yields back execution for
-  `seconds`. The maximum value of `seconds` is determined by `loopCounter`
-  which can be of any integer type.
+* `COROUTINE_DELAY_MICROS(micros)`: yields back execution for `micros`. The
+  `micros` parameter is defined as a `uint16_t`.
+* `COROUTINE_DELAY_SECONDS(seconds)`: yields back execution for
+  `seconds`. The `seconds` parameter is defined as a `uint16_t`.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
 * `COROUTINE_CHANNEL_WRITE(channel, value)`: writes a value to a `Channel`
 * `COROUTINE_CHANNEL_READ(channel, value)`: reads a value from a `Channel`
@@ -54,9 +45,10 @@ others (in my opinion of course):
       no matter how many coroutines are active
 * extremely fast context switching
     * ~6 microseconds on a 16 MHz ATmega328P
-    * 1.1-2.0 microseconds on Teensy 3.2 (depending on compiler settings)
-    * ~1.7 microseconds on a ESP8266
-    * ~0.5 microseconds on a ESP32
+    * ~2.9 microseconds on a 48 MHz SAMD21
+    * ~1.7 microseconds on a 80 MHz ESP8266
+    * ~0.4 microseconds on a 240 MHz ESP32
+    * 0.7-1.1 microseconds on 96 MHz Teensy 3.2 (depending on compiler settings)
 * uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
   feature of the GCC compiler (also supported by Clang) to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
@@ -87,7 +79,14 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-### HelloCoroutine
+Version: 0.3 (2019-08-26)
+
+Status: In "beta". API has been relatively stable since 0.2. Breaking change
+made to `COROUTINE_DELAY_SECONDS()` in 0.3.
+
+[![AUniter Jenkins Badge](https://us-central1-xparks2018.cloudfunctions.net/badge?project=AceRoutine)](https://github.com/bxparks/AUniter)
+
+## HelloCoroutine
 
 This is the [HelloCoroutine.ino](examples/HelloCoroutine) sample sketch.
 
@@ -221,6 +220,9 @@ The following example sketches are provided:
   primitive "shell". The shell is non-blocking and uses coroutines so that other
   coroutines continue to run while the board waits for commands to be typed on
   the serial port.
+* [Delay.ino](examples/Delay): validate the various delay macros
+  (`COROUTINE_DELAY()`, `COROUTINE_DELAY_MICROS()` and
+  `COROUTINE_DELAY_SECONDS()`)
 * [Pipe.ino](examples/Pipe): uses a `Channel` to allow a Writer to send
   messages to a Reader
 * [ChannelBenchmark.ino](examples/ChannelBenchmark): determines the amount of
@@ -253,9 +255,10 @@ The following macros are available to hide a lot of boilerplate code:
 * `COROUTINE_AWAIT(condition)`: yield until `condition` become `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The maximum
   allowable delay is 32767 milliseconds.
-* `COROUTINE_DELAY_SECONDS(loopCounter, seconds)`: yields back execution for
-  `seconds`. The maximum allowable delay is the maximum value of the integer
-  type of `loopCounter` which can be of any integer type.
+* `COROUTINE_DELAY_MICROS(micros)`: yields back execution for `micros`. The
+  maximum allowable delay is 32767 microseconds.
+* `COROUTINE_DELAY_SECONDS(seconds)`: yields back execution for `seconds`. The
+  maximum allowable delay is 32767 seconds.
 * `COROUTINE_LOOP()`: convenience macro that loops forever, replaces
   `COROUTINE_BEGIN()` and `COROUTINE_END()`
 * `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`
@@ -357,70 +360,85 @@ while (!condition) COROUTINE_YIELD();
 
 ### Delay
 
-The `COROUTINE_DELAY(millis)` macro delays the return of control until `millis`
-milliseconds have elapsed. The `millis` argument is a `uint16_t`, a 16-bit
-unsigned integer, which reduces the size of each coroutine instance by 4 bytes.
-However, the actual maximum delay is limited to 32767 milliseconds to avoid
-overflow situations if the other coroutines in the system take too much time for
-their work before returning control to the waiting coroutine. With this limit,
-the other coroutines have as much as 32767 milliseconds to complete their work,
-which should be more than enough time for any conceivable situation. In
-practice, coroutines should complete their work within several milliseconds and
-yield control to the other coroutines as soon as possible.
+The `COROUTINE_DELAY(millis)` macro yields back control to other coroutines
+until `millis` milliseconds have elapsed. The following waits for 100
+milliseconds:
 
-To delay for longer, an explicit loop can be used. For example, to delay
-for 1000 seconds, we can do this:
+```C++
+COROUTINE(waitMillis) {
+  COROUTINE_BEGIN();
+  ...
+  COROUTINE_DELAY(100);
+  ...
+  COROUTINE_END();
+}
+```
+
+The `millis` argument is a `uint16_t`, a 16-bit unsigned integer, which reduces
+the size of each coroutine instance by 4 bytes (8-bit processors) or 8 bytes
+(32-bits processors). However, the actual maximum delay is limited to 32767
+milliseconds to avoid overflow situations if the other coroutines in the system
+take too much time for their work before returning control to the waiting
+coroutine. With this limit, the other coroutines have as much as 32767
+milliseconds before it must yield, which should be more than enough time for any
+conceivable situation. In practice, coroutines should complete their work within
+several milliseconds and yield control to the other coroutines as soon as
+possible.
+
+To delay for longer period of time, we can use the
+`COROUTINE_DELAY_SECONDS(seconds)` convenience macro. The following example
+waits for 200 seconds:
+```C++
+COROUTINE(waitSeconds) {
+  COROUTINE_BEGIN();
+  ...
+  COROUTINE_DELAY_SECONDS(200);
+  ...
+  COROUTINE_END();
+}
+```
+The maximum number of seconds is 32767 seconds.
+
+On faster microcontrollers, it might be useful to yield for microseconds using
+the `COROUTINE_DELAY_MICROS(delayMicros)`.  The following example waits for 300
+microseconds:
+
+```C++
+COROUTINE(waitMicros) {
+  COROUTINE_BEGIN();
+  ...
+  COROUTINE_DELAY(300);
+  ...
+  COROUTINE_END();
+}
+```
+This macro has a number constraints:
+
+* The maximum delay is 32767 micros.
+* All other coroutines in the program *must* yield within 32767 microsecond,
+  otherwise the internal timing variable will overflow and an incorrect delay
+  will occur.
+* The accuracy of `COROUTINE_DELAY_MICROS()` is not guaranteed because the
+  overhead of context switching and checking the delay's expiration may
+  consume a significant portion of the requested delay in microseconds.
+
+If the above convenience macros are not sufficient, you can choose to write an
+explicit for-loop. For example, to delay for 100,000 seconds, instead of using
+the `COROUTINE_DELAY_SECONDS()`, we can do this:
+
 ```C++
 COROUTINE(waitThousandSeconds) {
   COROUTINE_BEGIN();
-  static uint16_t i;
-  for (i = 0; i < 1000; i++) {
+  static uint32_t i;
+  for (i = 0; i < 100000; i++) {
     COROUTINE_DELAY(1000);
   }
   ...
   COROUTINE_END();
 }
 ```
+
 See **For Loop** section below for a description of the for-loop construct.
-
-This for-loop construct happens often enough that it seemed worthwhile to
-provide the `COROUTINE_DELAY_SECONDS(loopCounter, seconds)` convenience macro.
-It replaces the above for-loop, like this:
-```C++
-COROUTINE(waitThousandSeconds) {
-  COROUTINE_BEGIN();
-  static uint16_t loopCounter;
-  COROUTINE_DELAY_SECONDS(loopCounter, 1000);
-  ...
-  COROUTINE_END();
-}
-```
-The `static uint16_t loopCounter` variable is still required for the
-`COROUTINE_DELAY_SECONDS()` macro because it needs a loop counter that must
-preserve its value across multiple invocation of the coroutine. The
-`loopCounter` may be any integer type, and the maximum number of seconds is the
-maximum value of that particular integer type. For example, if the `loopCounter`
-was a `uint8_t`, the maximum delay would be 255 seconds. If the `loopCounter`
-was a `uint32_t`, the maximum delay would be about 4 billion seconds.
-
-The `loopCounter` may also be a member variable of the `Coroutine` subclass,
-when you use custom or manual coroutines (see the sections on *Custom
-Coroutines* or *Manual Coroutines* below for details). In other words, you can
-define a coroutine with a `mDelayCounter` member variable, and use the
-`COROUTINE_DELAY_SECONDS()` macro like this:
-```C++
-class MyCoroutine: public Coroutine {
-  public:
-    int runCoroutine() override {
-      ...
-      COROUTINE_DELAY_SECONDS(mDelayCounter, 1000);
-      ...
-    }
-
-  private:
-    uint16_t mDelayCounter;
-};
-```
 
 ### Stackless Coroutines
 
@@ -429,9 +447,43 @@ is destroyed and recreated on every invocation of the coroutine. Therefore,
 any local variable created on the stack in the coroutine will not preserve
 its value after a `COROUTINE_YIELD()` or a `COROUTINE_DELAY()`.
 
-The easiest way to get around ths problem is to use `static` variables inside
-a `COROUTINE()`. Static variables are initialized once and preserve their value
-through multiple calls to the function, which is exactly what is needed.
+The problem is worse for local *objects* (with non-trivial destructors). If the
+lifetime of the object straddles a continuation point of the Coroutine
+(`COROUTINE_YIELD()`, `COROUTINE_DELAY()`, `COROUTINE_END()`), the destructor of
+the object will be called incorrectly when the coroutine is resumed, and will
+probably crash the program. In other words, do **not** do this:
+
+```C++
+COROUTINE(doSomething) {
+  COROUTINE_BEGIN();
+  String s = "hello world"; // ***crashes when doSomething() is resumed***
+  Serial.println(s);
+  COROUTINE_DELAY(1000);
+  ...
+  COROUTINE_END();
+}
+```
+
+Instead, place any local variable or object completely inside a `{ }` block
+before the `COROUTINE_YIELD()` or `COROUTINE_DELAY()`, like this:
+
+```C++
+COROUTINE(doSomething) {
+  COROUTINE_BEGIN();
+  {
+    String s = "hello world"; // ok, because String is properly destroyed
+    Serial.println(s);
+  }
+  COROUTINE_DELAY(1000);
+  ...
+  COROUTINE_END();
+}
+```
+
+The easiest way to get around these problems is to avoid local variables
+and just use `static` variables inside a `COROUTINE()`. Static variables are
+initialized once and preserve their value through multiple calls to the
+function, which is exactly what is needed.
 
 ### Conditional If-Else
 
@@ -1260,7 +1312,7 @@ advantages:
 All objects are statically allocated (i.e. not heap or stack).
 
 * 8-bit processors (AVR Nano, UNO, etc):
-    * `sizeof(Coroutine)`: 14
+    * `sizeof(Coroutine)`: 15
     * `sizeof(CoroutineScheduler)`: 2
     * `sizeof(Channel<int>)`: 5
 * 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32)
@@ -1311,19 +1363,19 @@ MacOS 10.14.5.
 
 ### Hardware
 
-The library is extensively tested on the following boards:
+The library has been extensively tested on the following boards:
 
 * Arduino Nano clone (16 MHz ATmega328P)
+* Arduino Pro Mini clone (16 MHz ATmega328P)
 * Arduino Pro Micro clone (16 MHz ATmega32U4)
+* SAMD21 M0 Mini (48 MHz ARM Cortex-M0+) (compatible with Arduino Zero)
 * NodeMCU 1.0 clone (ESP-12E module, 80 MHz ESP8266)
 * ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
-* SAMD21 M0 Mini (48 MHz ARM Cortex-M0+) (compatible with Arduino Zero)
 
 I will occasionally test on the following hardware as a sanity check:
 
 * Teensy 3.2 (72 MHz ARM Cortex-M4)
 * Teensy LC (48 MHz ARM Cortex-M0+)
-* Arduino Pro Mini clone (16 MHz ATmega328P)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 
 ## Changelog

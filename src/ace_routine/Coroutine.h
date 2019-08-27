@@ -177,7 +177,8 @@ extern className##_##name name
  * setDelayMillis() for the reason for this limitation.
  *
  * If you need to wait for longer than that, use a for-loop to call
- * COROUTINE_DELAY() as many times as necessary.
+ * COROUTINE_DELAY() as many times as necessary or use
+ * COROUTINE_DELAY_SECONDS().
  *
  * This could have been implemented using COROUTINE_AWAIT() but this macro
  * matches the global delay(millis) function already provided by the Arduino
@@ -195,7 +196,7 @@ extern className##_##name name
       setRunning(); \
     } while (false)
 
-/** Yield for delayMicros. */
+/** Yield for delayMicros. Similiar to COROUTINE_DELAY(delayMillis). */
 #define COROUTINE_DELAY_MICROS(delayMicros) \
     do { \
       setDelayMicros(delayMicros); \
@@ -206,58 +207,15 @@ extern className##_##name name
       setRunning(); \
     } while (false)
 
-/**
- * Delay for delaySeconds. Maximum value is the maximum value of the
- * loopCounter which can be any integer type. For example, if the loopCounter
- * is a uint16_t, then the maximum delay is 65535 seconds, or 18h12m15s. This
- * macro calls COROUTINE_DELAY() every 1000 milliseconds, so over the course of
- * the entire delay, there may be some drift. (Some of this drift could be
- * avoided by looping in 16000ms chunks, then looping the remainder in 1000ms
- * chunks. Division of delaySeconds by 16 would be fast. But minimizing drift
- * doesn't seem to be important for the use cases that I have in mind, so I
- * haven't implemented this.)
- *
- * The loopCounter needs to be supplied to the macro because AceRoutine
- * coroutines are stackless so the loop cannot use the stack to keep count of
- * the number of seconds. Instead it needs to be given a loop counter that
- * retains information across multiple calls. That loop counter can be a member
- * variable of the Coroutine object, or it can be a function-static variable.
- *
- * The usage would be something like:
- * @code
- * class MyCoroutine: public Coroutine {
- *   public:
- *     int runCoroutine() override {
- *       ...
- *       COROUTINE_DELAY_SECONDS(mDelayCounter, 1000);
- *       ...
- *     }
- *
- *   private:
- *     uint16_t mDelayCounter;
- * };
- * ...
- * @endcode
- *
- * or
- *
- * @code
- * COROUTINE(myRoutine) {
- *   COROUTINE_LOOP() {
- *     ...
- *     static uint16_t delayCounter;
- *     COROUTINE_DELAY_SECONDS(delayCounter, 1000);
- *     ...
- *   }
- * }
- * @endcode
- */
-#define COROUTINE_DELAY_SECONDS(loopCounter, delaySeconds) \
+/** Yield for delaySeconds. Similar to COROUTINE_DELAY(delayMillis). */
+#define COROUTINE_DELAY_SECONDS(delaySeconds) \
     do { \
-      loopCounter = delaySeconds; \
-      while (loopCounter-- > 0) { \
-        COROUTINE_DELAY(1000); \
-      } \
+      setDelaySeconds(delaySeconds); \
+      setDelaying(); \
+      do { \
+        COROUTINE_YIELD_INTERNAL(); \
+      } while (!isDelayExpired()); \
+      setRunning(); \
     } while (false)
 
 /**
@@ -387,6 +345,10 @@ class Coroutine {
         case kDelayTypeMicros: {
           uint16_t elapsedMicros = coroutineMicros() -  mDelayStart;
           return elapsedMicros >= mDelayDuration;
+        }
+        case kDelayTypeSeconds: {
+          uint16_t elapsedSeconds = coroutineSeconds() -  mDelayStart;
+          return elapsedSeconds >= mDelayDuration;
         }
       }
     }
@@ -528,6 +490,9 @@ class Coroutine {
     /** Delay using units of micros. */
     static const uint8_t kDelayTypeMicros = 1;
 
+    /** Delay using units of seconds. */
+    static const uint8_t kDelayTypeSeconds = 2;
+
     /**
      * Constructor. All subclasses are expected to call either
      * setupCoroutine(const char*) or setupCoroutine(const
@@ -573,14 +538,15 @@ class Coroutine {
     void setDelaying() { mStatus = kStatusDelaying; }
 
     /**
-     * Configure the delay timer for delayMillis. The maximum duration
-     * is set to (UINT16_MAX / 2) (i.e. 32767 milliseconds) if given a larger
-     * value. This makes the longest allowable time between two successive
-     * calls to isDelayExpired() for a given coroutine to be 32767 (UINT16_MAX
-     * - UINT16_MAX / 2 - 1) milliseconds, which should be long enough for
-     * all practical use-cases. (The '- 1' comes from an edge case where
-     * isDelayExpired() evaluates to be true in the
-     * CoroutineScheduler::runCoroutine() but becomes to be false in the
+     * Configure the delay timer for delayMillis.
+     *
+     * The maximum duration is set to (UINT16_MAX / 2) (i.e. 32767
+     * milliseconds) if given a larger value. This makes the longest allowable
+     * time between two successive calls to isDelayExpired() for a given
+     * coroutine to be 32767 (UINT16_MAX - UINT16_MAX / 2 - 1) milliseconds,
+     * which should be long enough for all practical use-cases. (The '- 1'
+     * comes from an edge case where isDelayExpired() evaluates to be true in
+     * the CoroutineScheduler::runCoroutine() but becomes to be false in the
      * COROUTINE_DELAY() macro inside Coroutine::runCoroutine()) because the
      * clock increments by 1 millisecond.)
      */
@@ -592,13 +558,24 @@ class Coroutine {
           : delayMillis;
     }
 
-    /** Configure the delay timer for delayMicros. */
+    /** Configure the delay timer for delayMicros. Similar to seDelayMillis().*/
     void setDelayMicros(uint16_t delayMicros) {
       mDelayType = kDelayTypeMicros;
       mDelayStart = coroutineMicros();
       mDelayDuration = (delayMicros >= UINT16_MAX / 2)
           ? UINT16_MAX / 2
           : delayMicros;
+    }
+
+    /**
+     * Configure the delay timer for delaySeconds. Similar to seDelayMillis().
+     */
+    void setDelaySeconds(uint16_t delaySeconds) {
+      mDelayType = kDelayTypeSeconds;
+      mDelayStart = coroutineSeconds();
+      mDelayDuration = (delaySeconds >= UINT16_MAX / 2)
+          ? UINT16_MAX / 2
+          : delaySeconds;
     }
 
     /** Set the kStatusEnding state. */

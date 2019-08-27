@@ -1,7 +1,7 @@
 /*
  * Validate the actual delays of DELAY_SECONDS(), DELAY() and DELAY_MICROS() by
  * incrementing a counter for TEST_DURATION_MILLIS, then printing the actual
- * count versus expected count.
+ * count versus the expected count.
  */
 
 #include <Arduino.h>
@@ -57,10 +57,9 @@ COROUTINE(countWithDelayMillis) {
 
 COROUTINE(countWithDelaySeconds) {
   static volatile unsigned long counter = 0;
-  static uint16_t loopCounter = 0;
   COROUTINE_LOOP() {
     counter++;
-    COROUTINE_DELAY_SECONDS(loopCounter, DELAY_SECONDS);
+    COROUTINE_DELAY_SECONDS(DELAY_SECONDS);
     unsigned long elapsed = millis() - startMillis;
     if (elapsed >= TEST_DURATION_MILLIS) {
       Serial.print("countWithDelaySeconds(): ");

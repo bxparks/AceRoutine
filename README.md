@@ -39,7 +39,7 @@ their life cycle:
 Here are some of the compelling features of this library compared to
 others (in my opinion of course):
 * low memory usage
-    * each coroutine consumes only 14 bytes of RAM on 8-bit processors (AVR) and
+    * each coroutine consumes only 15 bytes of RAM on 8-bit processors (AVR) and
       28 bytes on 32-bit processors (ARM, ESP8266, ESP32)
     * the `CoroutineScheduler` consumes only 2 bytes (8-bit) or 4 bytes (32-bit)
       no matter how many coroutines are active

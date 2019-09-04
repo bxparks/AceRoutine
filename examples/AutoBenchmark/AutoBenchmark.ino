@@ -6,6 +6,7 @@
  * dependent on compiler optimizer settings.
  */
 
+#include <Arduino.h>
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -33,6 +34,36 @@ COROUTINE(counterB) {
     counter++;
     COROUTINE_YIELD();
   }
+}
+
+void doBaseline() {
+  counter = 0;
+  unsigned long start = millis();
+  yield();
+  while (millis() - start < DURATION) {
+    counter++;
+  }
+  yield();
+}
+
+void doAceRoutine() {
+  counter = 0;
+  unsigned long start = millis();
+  yield();
+  while (millis() - start < DURATION) {
+    CoroutineScheduler::loop();
+  }
+  yield();
+}
+
+void printStats(float baseline, float aceCoroutine) {
+  char buf[100];
+  float diff = aceCoroutine - baseline;
+  sprintf(buf, "      %2d.%02d |%2d.%02d |%2d.%02d |",
+      (int)aceCoroutine, (int)(aceCoroutine*100)%100,
+      (int)baseline, (int)(baseline*100)%100,
+      (int)diff, (int)(diff*100)%100);
+  SERIAL_PORT_MONITOR.println(buf);
 }
 
 void setup() {
@@ -66,36 +97,6 @@ void setup() {
   printStats(baseline, aceCoroutine);
   SERIAL_PORT_MONITOR.println(
       F("------------+------+------+"));
-}
-
-void printStats(float baseline, float aceCoroutine) {
-  char buf[100];
-  float diff = aceCoroutine - baseline;
-  sprintf(buf, "      %2d.%02d |%2d.%02d |%2d.%02d |",
-      (int)aceCoroutine, (int)(aceCoroutine*100)%100,
-      (int)baseline, (int)(baseline*100)%100,
-      (int)diff, (int)(diff*100)%100);
-  SERIAL_PORT_MONITOR.println(buf);
-}
-
-void doAceRoutine() {
-  counter = 0;
-  unsigned long start = millis();
-  yield();
-  while (millis() - start < DURATION) {
-    CoroutineScheduler::loop();
-  }
-  yield();
-}
-
-void doBaseline() {
-  counter = 0;
-  unsigned long start = millis();
-  yield();
-  while (millis() - start < DURATION) {
-    counter++;
-  }
-  yield();
 }
 
 void loop() {

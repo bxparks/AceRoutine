@@ -16,6 +16,10 @@
 #include <AceRoutine.h>
 #include "ace_routine/cli/CommandManager.h"
 
+#if defined(UNIX_HOST_DUINO)
+  #include <unistd.h>
+#endif
+
 using namespace ace_routine;
 using namespace ace_routine::cli;
 
@@ -65,7 +69,7 @@ extern char *__brkval;
 #endif
 
 /**
- * Return the amount of free memory. For AVR and Teensy, see:
+ * Return the amount of free memory. See various tutorials and references:
  *
  * - https://learn.adafruit.com/memories-of-an-arduino/measuring-free-memory
  * - https://arduino.stackexchange.com/questions/30497
@@ -81,18 +85,30 @@ extern char *__brkval;
  *
  * For ESP32, see:
  * - https://techtutorialsx.com/2017/12/17/esp32-arduino-getting-the-free-heap/
+ *
+ * For Unix:
+ * - https://stackoverflow.com/questions/2513505
  */
 unsigned long freeMemory() {
-#ifdef __arm__
+#if defined(ARDUINO_ARCH_AVR)
+  char top;
+  return &top - (__brkval ? __brkval : __malloc_heap_start);
+#elif defined(ARDUINO_ARCH_SAMD)
+  char top;
+  return &top - reinterpret_cast<char*>(sbrk(0));
+#elif defined(TEENSYDUINO)
   char top;
   return &top - reinterpret_cast<char*>(sbrk(0));
 #elif defined(ESP8266)
   return system_get_free_heap_size();
 #elif defined(ESP32)
   return ESP.getFreeHeap();
+#elif defined(UNIX_HOST_DUINO)
+  long pages = sysconf(_SC_PHYS_PAGES);
+  long page_size = sysconf(_SC_PAGE_SIZE);
+  return pages * page_size;
 #else
-  char top;
-  return &top - (__brkval ? __brkval : __malloc_heap_start);
+  #error Unsupported platform
 #endif
 }
 

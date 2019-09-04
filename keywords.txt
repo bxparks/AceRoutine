@@ -32,8 +32,8 @@ EXTERN_COROUTINE	KEYWORD2
 getRoot	KEYWORD2
 getNext	KEYWORD2
 getName	KEYWORD2
+setupCoroutine	KEYWORD2
 run	KEYWORD2
-getStatus	KEYWORD2
 getDelayStart	KEYWORD2
 getDelay	KEYWORD2
 isSuspended	KEYWORD2
@@ -45,12 +45,17 @@ isTerminated	KEYWORD2
 isDone	KEYWORD2
 setTerminated	KEYWORD2
 # protected methods
-setupCoroutine	KEYWORD2
+getStatus	KEYWORD2
+statusPrintTo	KEYWORD2
 setJump	KEYWORD2
 getJump	KEYWORD2
+setRunning	KEYWORD2
 setYielding	KEYWORD2
 setDelaying	KEYWORD2
 setEnding	KEYWORD2
+setDelayMillis	KEYWORD2
+setDelayMicros	KEYWORD2
+setDelaySeconds	KEYWORD2
 
 # public methods from CoroutineScheduler.h
 setup	KEYWORD2

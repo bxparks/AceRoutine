@@ -501,7 +501,7 @@ class Coroutine {
      * COROUTINE() macro will automatically call setupCoroutine().
      *
      * See comment in setupCoroutine(const __FlashStringHelper*) for reason why
-     * an setupCoroutine() function is used instead of chaining the name
+     * the setupCoroutine() function is used instead of chaining the name
      * through the constructor.
      */
     Coroutine() {}
@@ -537,6 +537,15 @@ class Coroutine {
 
     /** Set the kStatusDelaying state. */
     void setDelaying() { mStatus = kStatusDelaying; }
+
+    /** Set the kStatusEnding state. */
+    void setEnding() { mStatus = kStatusEnding; }
+
+    /**
+     * Set status to indicate that the Coroutine has been removed from the
+     * Scheduler queue. Should be used only by the CoroutineScheduler.
+     */
+    void setTerminated() { mStatus = kStatusTerminated; }
 
     /**
      * Configure the delay timer for delayMillis.
@@ -582,15 +591,6 @@ class Coroutine {
           ? UINT16_MAX / 2
           : delaySeconds;
     }
-
-    /** Set the kStatusEnding state. */
-    void setEnding() { mStatus = kStatusEnding; }
-
-    /**
-     * Set status to indicate that the Coroutine has been removed from the
-     * Scheduler queue. Should be used only by the CoroutineScheduler.
-     */
-    void setTerminated() { mStatus = kStatusTerminated; }
 
   private:
     // Disable copy-constructor and assignment operator

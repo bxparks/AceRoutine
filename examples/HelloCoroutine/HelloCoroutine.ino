@@ -3,6 +3,7 @@
  * A 3rd coroutine spins away on the side, blinking the LED.
  */
 
+#include <Arduino.h>
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -35,6 +36,7 @@ COROUTINE(printHello) {
   COROUTINE_BEGIN();
 
   Serial.print(F("Hello, "));
+  Serial.flush();
   COROUTINE_DELAY(2000);
 
   COROUTINE_END();
@@ -50,7 +52,9 @@ COROUTINE(printWorld) {
 }
 
 void setup() {
+#if ! defined(UNIX_HOST_DUINO)
   delay(1000);
+#endif
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
   pinMode(LED, OUTPUT);

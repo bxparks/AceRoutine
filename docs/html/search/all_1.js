@@ -6,6 +6,7 @@ var searchData=
   ['commandhandler',['CommandHandler',['../classace__routine_1_1cli_1_1CommandHandler.html',1,'ace_routine::cli::CommandHandler'],['../classace__routine_1_1cli_1_1CommandHandler.html#a893ff83965fc417194258ce4a5958b40',1,'ace_routine::cli::CommandHandler::CommandHandler(const char *name, const char *helpString)'],['../classace__routine_1_1cli_1_1CommandHandler.html#a0252adafe6a1e5b0c37120a502c2eb6f',1,'ace_routine::cli::CommandHandler::CommandHandler(const __FlashStringHelper *name, const __FlashStringHelper *helpString)']]],
   ['commandmanager',['CommandManager',['../classace__routine_1_1cli_1_1CommandManager.html',1,'ace_routine::cli::CommandManager&lt; BUF_SIZE, ARGV_SIZE &gt;'],['../classace__routine_1_1cli_1_1CommandManager.html#ab3fc5075f6d006f86cdbfe1bae11545c',1,'ace_routine::cli::CommandManager::CommandManager()']]],
   ['compareto',['compareTo',['../classace__routine_1_1FCString.html#ac5f05cb2b33afc7fc9a14b77534a72cb',1,'ace_routine::FCString']]],
+  ['compat_2eh',['compat.h',['../compat_8h.html',1,'']]],
   ['coroutine',['Coroutine',['../classace__routine_1_1Coroutine.html',1,'ace_routine::Coroutine'],['../classace__routine_1_1Coroutine.html#a77f4a6850863fd2f0f161b8cccdfab18',1,'ace_routine::Coroutine::Coroutine()'],['../Coroutine_8h.html#ab22e58ab24b1908a7280f13603248ce3',1,'COROUTINE():&#160;Coroutine.h']]],
   ['coroutine_2eh',['Coroutine.h',['../Coroutine_8h.html',1,'']]],
   ['coroutine_5fawait',['COROUTINE_AWAIT',['../Coroutine_8h.html#a9f6714d9752740b6173b6afc4d108fa8',1,'Coroutine.h']]],

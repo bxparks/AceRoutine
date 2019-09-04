@@ -39,7 +39,7 @@ their life cycle:
 Here are some of the compelling features of this library compared to
 others (in my opinion of course):
 * low memory usage
-    * each coroutine consumes only 14 bytes of RAM on 8-bit processors (AVR) and
+    * each coroutine consumes only 15 bytes of RAM on 8-bit processors (AVR) and
       28 bytes on 32-bit processors (ARM, ESP8266, ESP32)
     * the `CoroutineScheduler` consumes only 2 bytes (8-bit) or 4 bytes (32-bit)
       no matter how many coroutines are active
@@ -79,10 +79,7 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-Version: 0.3 (2019-08-26)
-
-Status: In "beta". API has been relatively stable since 0.2. Breaking change
-made to `COROUTINE_DELAY_SECONDS()` in 0.3.
+Version: 1.0 (2019-09-04)
 
 [![AUniter Jenkins Badge](https://us-central1-xparks2018.cloudfunctions.net/badge?project=AceRoutine)](https://github.com/bxparks/AUniter)
 
@@ -1371,10 +1368,10 @@ The library has been extensively tested on the following boards:
 * SAMD21 M0 Mini (48 MHz ARM Cortex-M0+) (compatible with Arduino Zero)
 * NodeMCU 1.0 clone (ESP-12E module, 80 MHz ESP8266)
 * ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
+* Teensy 3.2 (72 MHz ARM Cortex-M4)
 
 I will occasionally test on the following hardware as a sanity check:
 
-* Teensy 3.2 (72 MHz ARM Cortex-M4)
 * Teensy LC (48 MHz ARM Cortex-M0+)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 

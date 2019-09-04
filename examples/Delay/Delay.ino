@@ -26,13 +26,13 @@
  *      * countWithDelaySeconds(): count=11; expected=10; elapsed=10700
  */
 
-#if defined(ESP32) && ! defined(SERIAL_PORT_MONITOR)
-  #define SERIAL_PORT_MONITOR Serial
-#endif
-
 #include <Arduino.h>
 #include <AceRoutine.h>
 using namespace ace_routine;
+
+#if defined(ESP32) && ! defined(SERIAL_PORT_MONITOR)
+  #define SERIAL_PORT_MONITOR Serial
+#endif
 
 static const unsigned long TEST_DURATION_MILLIS = 10000;
 static const unsigned long DELAY_MICROS = 50; // 50 micros
@@ -53,10 +53,11 @@ void printResults(unsigned long count, unsigned long expected,
 
 COROUTINE(countWithDelayMicros) {
   static volatile unsigned long counter = 0;
+  static unsigned long elapsed;
   COROUTINE_LOOP() {
     counter++;
     COROUTINE_DELAY_MICROS(DELAY_MICROS);
-    unsigned long elapsed = millis() - startMillis;
+    elapsed = millis() - startMillis;
     if (elapsed >= TEST_DURATION_MILLIS) {
       SERIAL_PORT_MONITOR.print("countWithDelayMicros(): ");
       printResults(counter, TEST_DURATION_MILLIS * 1000 / DELAY_MICROS,
@@ -68,10 +69,11 @@ COROUTINE(countWithDelayMicros) {
 
 COROUTINE(countWithDelayMillis) {
   static volatile unsigned long counter = 0;
+  static unsigned long elapsed;
   COROUTINE_LOOP() {
     counter++;
     COROUTINE_DELAY(DELAY_MILLIS);
-    unsigned long elapsed = millis() - startMillis;
+    elapsed = millis() - startMillis;
     if (elapsed >= TEST_DURATION_MILLIS) {
       SERIAL_PORT_MONITOR.print("countWithDelayMillis(): ");
       printResults(counter, TEST_DURATION_MILLIS / DELAY_MILLIS,
@@ -83,10 +85,11 @@ COROUTINE(countWithDelayMillis) {
 
 COROUTINE(countWithDelaySeconds) {
   static volatile unsigned long counter = 0;
+  static unsigned long elapsed;
   COROUTINE_LOOP() {
     counter++;
     COROUTINE_DELAY_SECONDS(DELAY_SECONDS);
-    unsigned long elapsed = millis() - startMillis;
+    elapsed = millis() - startMillis;
     if (elapsed >= TEST_DURATION_MILLIS) {
       SERIAL_PORT_MONITOR.print("countWithDelaySeconds(): ");
       printResults(counter, TEST_DURATION_MILLIS / (DELAY_SECONDS * 1000),
@@ -97,7 +100,9 @@ COROUTINE(countWithDelaySeconds) {
 }
 
 void setup() {
+#if ! defined(UNIX_HOST_DUINO)
   delay(1000);
+#endif
   SERIAL_PORT_MONITOR.begin(115200);
   while (!SERIAL_PORT_MONITOR); // Leonardo/Micro
 

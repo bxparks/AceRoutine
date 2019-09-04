@@ -25,7 +25,7 @@ SOFTWARE.
 #include <stdint.h> // uintptr_t
 #include <Arduino.h> // millis(), micros()
 #include "Coroutine.h"
-#include "Flash.h"
+#include "compat.h" // FPSTR()
 
 namespace ace_routine {
 
@@ -97,12 +97,12 @@ static const char kStatusEndingString[] PROGMEM = "Ending";
 static const char kStatusTerminatedString[] PROGMEM = "Terminated";
 
 const __FlashStringHelper* const Coroutine::sStatusStrings[] = {
-  ACE_ROUTINE_FPSTR(kStatusSuspendedString),
-  ACE_ROUTINE_FPSTR(kStatusYieldingString),
-  ACE_ROUTINE_FPSTR(kStatusDelayingString),
-  ACE_ROUTINE_FPSTR(kStatusRunningString),
-  ACE_ROUTINE_FPSTR(kStatusEndingString),
-  ACE_ROUTINE_FPSTR(kStatusTerminatedString),
+  FPSTR(kStatusSuspendedString),
+  FPSTR(kStatusYieldingString),
+  FPSTR(kStatusDelayingString),
+  FPSTR(kStatusRunningString),
+  FPSTR(kStatusEndingString),
+  FPSTR(kStatusTerminatedString),
 };
 
 }

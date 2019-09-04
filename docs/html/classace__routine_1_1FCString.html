@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">0.3</span>
+   &#160;<span id="projectnumber">1.0</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -119,10 +119,10 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A union of (const char*) and (const __FlashStringHelper*) with a discriminator. </p>
-<p>This allows us to treat these 2 strings like a single object. The major reason this class is needed is because the F() cannot be used outside a function, it can only be used inside a function, so we are forced to use normal c-strings instead of F() strings when manually creating Test or TestOnce instances.</p>
-<p>I deliberately decided not to inherit from Printable. While it is convenient to be able to call Print::print() with an instance of this class, the cost is 2 (AVR) or 4 (Teensy-ARM or ESP8266) extra bytes of static memory for the v-table pointer for each instance. But each instance is only 3 (AVR) or 5 (Teensy-ARM or ESP8266) bytes big, so the cost of 50-100 bytes of static memory for a large suite of 25 unit tests does not seem worth the minor convenience. </p>
+<p>This allows us to treat these 2 strings like a single object.</p>
+<p>I deliberately decided not to inherit from Printable. While it is convenient to be able to call Print::print() with an instance of this class, the cost is 2 (AVR) or 4 (Teensy-ARM or ESP8266) extra bytes of static memory for the v-table pointer for each instance. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00053">53</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00046">46</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ab2858192602ed465e64e07c54d6544f2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab2858192602ed465e64e07c54d6544f2">&#9670;&nbsp;</a></span>FCString() <span class="overload">[1/3]</span></h2>
@@ -149,7 +149,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 <p>Default constructor initializes to a nullptr of kCStringType. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00059">59</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00052">52</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
 
 </div>
 </div>
@@ -179,7 +179,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 <p>Construct with a c-string. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00062">62</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00055">55</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
 
 </div>
 </div>
@@ -209,7 +209,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 <p>Construct with a flash string. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00068">68</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00061">61</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
 
 </div>
 </div>
@@ -232,7 +232,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 <p>Compare to another <a class="el" href="classace__routine_1_1FCString.html" title="A union of (const char*) and (const __FlashStringHelper*) with a discriminator. ">FCString</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8cpp_source.html#l00087">87</a> of file <a class="el" href="FCString_8cpp_source.html">FCString.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8cpp_source.html#l00086">86</a> of file <a class="el" href="FCString_8cpp_source.html">FCString.cpp</a>.</p>
 
 </div>
 </div>
@@ -261,7 +261,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 <p>Get the c-string pointer. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00080">80</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00073">73</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
 
 </div>
 </div>
@@ -290,7 +290,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 <p>Get the flash string pointer. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00083">83</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00076">76</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
 
 </div>
 </div>
@@ -319,7 +319,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 <p>Get the internal type of string. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00077">77</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00070">70</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
 
 </div>
 </div>
@@ -348,7 +348,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 
 <p>Return if this is a null string. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00074">74</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8h_source.html#l00067">67</a> of file <a class="el" href="FCString_8h_source.html">FCString.h</a>.</p>
 
 </div>
 </div>
@@ -371,7 +371,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kFStr
 <p>Convenience method for printing an <a class="el" href="classace__routine_1_1FCString.html" title="A union of (const char*) and (const __FlashStringHelper*) with a discriminator. ">FCString</a> to printer. </p>
 <p>This is identical to the method in Printable but we don't derive from Printable because we don't want to want to pay the memory cost of the vtable pointer for such a small class. </p>
 
-<p class="definition">Definition at line <a class="el" href="FCString_8cpp_source.html#l00036">36</a> of file <a class="el" href="FCString_8cpp_source.html">FCString.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="FCString_8cpp_source.html#l00035">35</a> of file <a class="el" href="FCString_8cpp_source.html">FCString.cpp</a>.</p>
 
 </div>
 </div>

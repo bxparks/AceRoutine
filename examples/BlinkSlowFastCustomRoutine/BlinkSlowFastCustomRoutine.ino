@@ -1,10 +1,11 @@
 /*
- * This sketch is the same as BlinkCoroutine except that it uses the 2-argument
- * version of COROUTINE() to use custom Coroutine classes. The custom classes
- * are able to support additional variables and methods which are used by the
- * coroutines to communicate with each other.
+ * This sketch is the same as BlinkSlowFastRoutine except that it uses the
+ * 2-argument version of COROUTINE() to use custom Coroutine classes. The
+ * custom classes are able to support additional variables and methods which
+ * are used by the coroutines to communicate with each other.
  */
 
+#include <Arduino.h>
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -16,9 +17,12 @@ using namespace ace_routine;
   const int LED = 5;
 #endif
 
+// Replace with the pin of your button.
+const int BUTTON_PIN = 2;
+
+// If the LED of your board is wired in reverse, flip these values.
 const int LED_ON = HIGH;
 const int LED_OFF = LOW;
-const int BUTTON_PIN = 2;
 
 class BlinkCoroutine : public Coroutine {
   public:
@@ -95,6 +99,11 @@ class ButtonCoroutine : public Coroutine {
 
 int ButtonCoroutine::blinkState = BLINK_STATE_BOTH;
 
+// Clicking on a button (BUTTON_PIN) cycles through the LED blinking pattern:
+//  * Blink both
+//  * Blink fast only
+//  * Blink slow only
+//
 // You probably shouldn't use code like this in your real project. Consider
 // using https://github.com/bxparks/AceButton instead.
 COROUTINE(ButtonCoroutine, button) {
@@ -125,7 +134,9 @@ COROUTINE(ButtonCoroutine, button) {
 }
 
 void setup() {
+#if ! defined(UNIX_HOST_DUINO)
   delay(1000);
+#endif
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 

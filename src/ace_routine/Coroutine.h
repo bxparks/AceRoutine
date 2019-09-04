@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include <stdint.h> // UINT16_MAX
 #include <Print.h> // Print
-#include "Flash.h" // ACE_ROUTINE_F()
 #include "FCString.h"
 
 class AceRoutineTest_statusStrings;
@@ -71,22 +70,20 @@ class AceRoutineTest_statusStrings;
 #define COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
-  int runCoroutine() override \
-    __attribute__((__noinline__,__noclone__)); \
+  int runCoroutine() override; \
 } name; \
 Coroutine_##name :: Coroutine_##name() { \
-  setupCoroutine(ACE_ROUTINE_F(#name)); \
+  setupCoroutine(F(#name)); \
 } \
 int Coroutine_##name :: runCoroutine()
 
 #define COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
-  int runCoroutine() override \
-    __attribute__((__noinline__,__noclone__)); \
+  int runCoroutine() override; \
 } name; \
 className##_##name :: className##_##name() { \
-  setupCoroutine(ACE_ROUTINE_F(#name)); \
+  setupCoroutine(F(#name)); \
 } \
 int className##_##name :: runCoroutine()
 
@@ -107,16 +104,14 @@ int className##_##name :: runCoroutine()
 #define EXTERN_COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
-  int runCoroutine() override \
-    __attribute__((__noinline__,__noclone__)); \
+  int runCoroutine() override; \
 }; \
 extern Coroutine_##name name
 
 #define EXTERN_COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
-  int runCoroutine() override \
-    __attribute__((__noinline__,__noclone__)); \
+  int runCoroutine() override; \
 }; \
 extern className##_##name name
 
@@ -502,7 +497,7 @@ class Coroutine {
      * COROUTINE() macro will automatically call setupCoroutine().
      *
      * See comment in setupCoroutine(const __FlashStringHelper*) for reason why
-     * an setupCoroutine() function is used instead of chaining the name
+     * the setupCoroutine() function is used instead of chaining the name
      * through the constructor.
      */
     Coroutine() {}
@@ -538,6 +533,15 @@ class Coroutine {
 
     /** Set the kStatusDelaying state. */
     void setDelaying() { mStatus = kStatusDelaying; }
+
+    /** Set the kStatusEnding state. */
+    void setEnding() { mStatus = kStatusEnding; }
+
+    /**
+     * Set status to indicate that the Coroutine has been removed from the
+     * Scheduler queue. Should be used only by the CoroutineScheduler.
+     */
+    void setTerminated() { mStatus = kStatusTerminated; }
 
     /**
      * Configure the delay timer for delayMillis.
@@ -583,15 +587,6 @@ class Coroutine {
           ? UINT16_MAX / 2
           : delaySeconds;
     }
-
-    /** Set the kStatusEnding state. */
-    void setEnding() { mStatus = kStatusEnding; }
-
-    /**
-     * Set status to indicate that the Coroutine has been removed from the
-     * Scheduler queue. Should be used only by the CoroutineScheduler.
-     */
-    void setTerminated() { mStatus = kStatusTerminated; }
 
   private:
     // Disable copy-constructor and assignment operator

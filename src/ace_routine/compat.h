@@ -23,18 +23,25 @@ SOFTWARE.
 */
 
 /**
- * @file Flash.h
+ * @file compat.h
  *
  * Various macros to smooth over the differences among the various platforms
  * with regards to their support for flash strings and the various macros used
  * to create and access them.
  *
- * Copied from AUnit/src/aunit/Flash.h, see that file for more info.
+ * Copied from AUnit/src/aunit/Flash.h and
+ * AceTime/src/ace_time/common/compat.h.
  *
- * In summary, we support flash strings for AVR because those MCUs have very
- * small static RAM (1-2kB), but we disable flash strings for Teensy, ESP8266,
- * and ESP32 because those implementations tend to be buggy or tricky, and
- * they have far more static RAM.
+ * We support flash strings (F() macro) for AVR because those MCUs have very
+ * small static RAM (1-2kB). Prior to v1.0, we disabled F() for ESP8266 because
+ * those implementations were buggy. But it seems that recent ESP8266 cores
+ * (v2.5 and higher) seems to have fixed the problems with F(), so I have
+ * reactivated it. The F() is automatically a no-op for Teensy and ESP32.
+ *
+ * The FPSTR() macro is a useful macro that was originally created on the
+ * ESP8266. But it was incorrectly implemented on the ESP32, until
+ * https://github.com/espressif/arduino-esp32/issues/1371 is fixed (hopefully
+ * by v1.0.3).
  */
 
 #ifndef ACE_ROUTINE_FLASH_H
@@ -42,33 +49,37 @@ SOFTWARE.
 
 class __FlashStringHelper;
 
-/**
- * The FPSTR() macro is defined on ESP8266, not defined on Teensy and AVR, and
- * broken on ESP32. We define our own version to make this work on all 4
- * platforms. We might be able to use just FPSTR() if
- * https://github.com/espressif/arduino-esp32/issues/1371 is fixed.
- */
-#define ACE_ROUTINE_FPSTR(pstr_pointer) \
-    (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
-
-#if defined(__AVR__) || defined(__arm__)
+#if defined(ARDUINO_ARCH_AVR)
   #include <avr/pgmspace.h>
-#elif defined(ESP8266) || defined(ESP32)
-  #include <pgmspace.h>
-#elif defined(__linux__) || defined(__APPLE__)
-  #include <pgmspace.h>
-#else
-  #error Unsupported platform
-#endif
+  #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
 
-#if defined(__AVR__)
-  #define ACE_ROUTINE_F(x) F(x)
-#elif defined(ESP8266) || defined(ESP32) || defined(__arm__)
-  #define ACE_ROUTINE_F(x) ACE_ROUTINE_FPSTR(x)
-#elif defined(__linux__) || defined(__APPLE__)
-  #define ACE_ROUTINE_F(x) ACE_ROUTINE_FPSTR(x)
+#elif defined(ARDUINO_ARCH_SAMD)
+  #include <avr/pgmspace.h>
+  #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
+
+#elif defined(TEENSYDUINO)
+  #include <avr/pgmspace.h>
+  #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
+
+
+#elif defined(ESP8266)
+  #include <pgmspace.h>
+
+#elif defined(ESP32)
+  #include <pgmspace.h>
+
+  // The FPSTR() macro is broken on ESP32 until
+  // https://github.com/espressif/arduino-esp32/issues/1371 is fixed, hopefully
+  // in v1.0.3.
+  #undef FPSTR
+  #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
+
+#elif defined(UNIX_HOST_DUINO)
+  #include <pgmspace.h>
+
 #else
   #error Unsupported platform
+
 #endif
 
 #endif

@@ -2,6 +2,7 @@
  * Same as HelloCoroutine, but using the CoroutineScheduler.
  */
 
+#include <Arduino.h>
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -34,6 +35,7 @@ COROUTINE(printHello) {
   COROUTINE_BEGIN();
 
   Serial.print(F("Hello, "));
+  Serial.flush();
   COROUTINE_DELAY(1000);
 
   COROUTINE_END();

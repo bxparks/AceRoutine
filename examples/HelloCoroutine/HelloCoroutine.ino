@@ -3,6 +3,7 @@
  * A 3rd coroutine spins away on the side, blinking the LED.
  */
 
+#include <Arduino.h>
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -35,6 +36,7 @@ COROUTINE(printHello) {
   COROUTINE_BEGIN();
 
   Serial.print(F("Hello, "));
+  Serial.flush();
   COROUTINE_DELAY(2000);
 
   COROUTINE_END();

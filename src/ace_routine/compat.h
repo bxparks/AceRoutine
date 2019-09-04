@@ -62,7 +62,7 @@ class __FlashStringHelper;
   #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
 
 
-#elif defined(ESP8266) 
+#elif defined(ESP8266)
   #include <pgmspace.h>
 
 #elif defined(ESP32)

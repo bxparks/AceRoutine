@@ -1,9 +1,10 @@
 /*
- * This sketch uses the 'blinkSlow' coroutine to blink the LED slowly.
- * The 'blinkFast' coroutine blinks the LED quickly.
- * The 'button' coroutine scans the D2 pin for a button press. Each time
- * the button is pressed, the blink mode cycles from "both", "fast" only,
- * to "slow" only, then "both" again.
+ * This sketch uses 3 coroutines:
+ *    * the 'blinkSlow' coroutine to blink the LED slowly.
+ *    * the 'blinkFast' coroutine blinks the LED quickly.
+ *    * The 'button' coroutine scans the D2 pin for a button press. Each time
+ *    the button is pressed, the blink mode cycles from "both", "fast" only, to
+ *    "slow" only, then "both" again.
  *
  * Communication between the coroutines happens through the 'blinkState' global
  * variable. See BlinkCustomCoroutine to see how this communication can happen
@@ -21,9 +22,12 @@ using namespace ace_routine;
   const int LED = 5;
 #endif
 
+// Replace with the pin of your button.
+const int BUTTON_PIN = 2;
+
+// If the LED of your board is wired in reverse, flip these values.
 const int LED_ON = HIGH;
 const int LED_OFF = LOW;
-const int BUTTON_PIN = 2;
 
 const int BLINK_STATE_BOTH = 0;
 const int BLINK_STATE_FAST = 1;

@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include <stdint.h> // UINT16_MAX
 #include <Print.h> // Print
-#include "Flash.h" // ACE_ROUTINE_F()
 #include "FCString.h"
 
 class AceRoutineTest_statusStrings;
@@ -75,7 +74,7 @@ struct Coroutine_##name : ace_routine::Coroutine { \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 Coroutine_##name :: Coroutine_##name() { \
-  setupCoroutine(ACE_ROUTINE_F(#name)); \
+  setupCoroutine(F(#name)); \
 } \
 int Coroutine_##name :: runCoroutine()
 
@@ -86,7 +85,7 @@ struct className##_##name : className { \
     __attribute__((__noinline__,__noclone__)); \
 } name; \
 className##_##name :: className##_##name() { \
-  setupCoroutine(ACE_ROUTINE_F(#name)); \
+  setupCoroutine(F(#name)); \
 } \
 int className##_##name :: runCoroutine()
 

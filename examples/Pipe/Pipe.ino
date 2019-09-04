@@ -101,11 +101,12 @@ struct Message {
 // Test the ordering of sending 10 integers and receiving 10 integers.
 COROUTINE(writer) {
   static int i;
+  static Message message;
   COROUTINE_BEGIN();
   for (i = 0; i < 10; i++) {
     Serial.print("Writer: sending ");
     Serial.println(i);
-    Message message = {Message::kStatusOk, i};
+    message = {Message::kStatusOk, i};
     COROUTINE_CHANNEL_WRITE(channel, message);
   }
   Serial.println("Writer: done");
@@ -113,8 +114,8 @@ COROUTINE(writer) {
 }
 
 COROUTINE(reader) {
+  static Message message;
   COROUTINE_LOOP() {
-    Message message;
     COROUTINE_CHANNEL_READ(channel, message);
     Serial.print("Reader: received ");
     Serial.println(message.value);

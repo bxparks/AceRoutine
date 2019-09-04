@@ -1,7 +1,7 @@
 # Changelog
 
 * Unreleased
-* 1.0 (2019-09-05)
+* 1.0 (2019-09-04)
     * Support UnixHostDuino in all sketches under `examples/`.
     * Rename `Flash.h' to `compat.h`. Reenable `F()` strings for ESP8266.
     * Graduate out of beta to v1.0.

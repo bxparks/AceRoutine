@@ -16,7 +16,7 @@ All times in microseconds.
 
 ## Arduino Nano
 
-* AceRoutine 0.3
+* AceRoutine 1.0
 * Arduino IDE 1.8.9
 * AVR Boards 1.6.23
 
@@ -40,7 +40,7 @@ sizeof(Channel<int>): 5
 
 ## SAMD21 M0 Mini (Arduino Zero Compatible)
 
-* AceRoutine 0.3
+* AceRoutine 1.0
 * Arduino IDE 1.8.9
 * SparkFun SAMD Boards 1.6.2
 
@@ -56,13 +56,13 @@ sizeof(Channel<int>): 12
 ------------+------+------+
  AceRoutine | base | diff |
 ------------+------+------+
-       3.28 | 0.48 | 2.80 |
+       3.36 | 0.44 | 2.92 |
 ------------+------+------+
 ```
 
 ## ESP8266
 
-* AceRoutine 0.3
+* AceRoutine 1.0
 * Arduino IDE 1.8.9
 * ESP8266 Boards 2.5.2
 
@@ -80,13 +80,13 @@ sizeof(Channel<int>): 12
 ------------+------+------+
  AceRoutine | base | diff |
 ------------+------+------+
-       6.00 | 4.52 | 1.48 |
+       6.03 | 4.53 | 1.50 |
 ------------+------+------+
 ```
 
 ## ESP32
 
-* AceRoutine 0.3
+* AceRoutine 1.0
 * Arduino IDE 1.8.9
 * ESP32 Boards 1.0.2
 
@@ -116,7 +116,7 @@ greatly by the compiler optimization settings in the Arduino IDE dropdown menu
 run times did not vary as much with respect to the optimization settings. The
 CPU Speed was set to 96 MHz (overclock).
 
-* AceRoutine 0.3
+* AceRoutine 1.0
 * Arduino IDE: 1.8.9
 * Teensyduino 1.46
 
@@ -134,15 +134,17 @@ sizeof(Channel<int>): 12
 ----------------------+------------+------+------+
 Optimization          | AceRoutine | base | diff |
 ----------------------+------------+------+------+
-Faster                |       1.29 | 0.15 | 1.13 |
-Faster+LTO            |       0.85 | 0.16 | 0.68 |
-Fast                  |       1.27 | 0.15 | 1.11 |
-Fast+LTO              |       0.83 | 0.15 | 0.67 |
-Fastest               |       1.27 | 0.15 | 1.11 |
-Fastest+pure-code     |       1.27 | 0.15 | 1.11 |
-Fastest+LTO           |       0.83 | 0.15 | 0.67 |
-Fastest+pure-code+LTO |       0.91 | 0.15 | 0.76 |
-Smallest code         |       1.35 | 0.16 | 1.19 |
-Smallest code + LTO   |       1.17 | 0.16 | 1.00 |
+Faster                |       1.35 | 0.15 | 1.20 |
+Faster+LTO            |       0.91 | 0.16 | 0.75 |
+Fast                  |       1.29 | 0.15 | 1.13 |
+Fast+LTO              |       0.87 | 0.15 | 0.72 |
+Fastest               |       1.33 | 0.15 | 1.18 |
+Fastest+pure-code     |       1.46 | 0.15 | 1.30 |
+Fastest+LTO           |       0.77 | 0.15 | 0.61 |
+Fastest+pure-code+LTO |       0.79 | 0.15 | 0.63 |
+Debug                 |       1.40 | 0.21 | 1.18 |
+Debug + LTO           |       1.33 | 0.21 | 1.11 |
+Smallest code         |       1.33 | 0.16 | 1.17 |
+Smallest code + LTO   |       0.91 | 0.16 | 0.75 |
 ----------------------+------------+------+------+
 ```

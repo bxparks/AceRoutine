@@ -38,6 +38,7 @@ class TestableCoroutine: public Coroutine {
   public:
     unsigned long coroutineMillis() const override { return mMillis; }
     unsigned long coroutineMicros() const override { return mMicros; }
+    unsigned long coroutineSeconds() const override { return mMillis / 1000; }
 
     void coroutineMillis(unsigned long millis) { mMillis = millis; }
     void coroutineMicros(unsigned long micros) { mMicros = micros; }

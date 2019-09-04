@@ -70,8 +70,7 @@ class AceRoutineTest_statusStrings;
 #define COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
-  int runCoroutine() override \
-    __attribute__((__noinline__,__noclone__)); \
+  int runCoroutine() override; \
 } name; \
 Coroutine_##name :: Coroutine_##name() { \
   setupCoroutine(F(#name)); \
@@ -81,8 +80,7 @@ int Coroutine_##name :: runCoroutine()
 #define COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
-  int runCoroutine() override \
-    __attribute__((__noinline__,__noclone__)); \
+  int runCoroutine() override; \
 } name; \
 className##_##name :: className##_##name() { \
   setupCoroutine(F(#name)); \
@@ -106,16 +104,14 @@ int className##_##name :: runCoroutine()
 #define EXTERN_COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
-  int runCoroutine() override \
-    __attribute__((__noinline__,__noclone__)); \
+  int runCoroutine() override; \
 }; \
 extern Coroutine_##name name
 
 #define EXTERN_COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
-  int runCoroutine() override \
-    __attribute__((__noinline__,__noclone__)); \
+  int runCoroutine() override; \
 }; \
 extern className##_##name name
 

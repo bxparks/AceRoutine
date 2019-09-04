@@ -53,10 +53,11 @@ void printResults(unsigned long count, unsigned long expected,
 
 COROUTINE(countWithDelayMicros) {
   static volatile unsigned long counter = 0;
+  static unsigned long elapsed;
   COROUTINE_LOOP() {
     counter++;
     COROUTINE_DELAY_MICROS(DELAY_MICROS);
-    unsigned long elapsed = millis() - startMillis;
+    elapsed = millis() - startMillis;
     if (elapsed >= TEST_DURATION_MILLIS) {
       SERIAL_PORT_MONITOR.print("countWithDelayMicros(): ");
       printResults(counter, TEST_DURATION_MILLIS * 1000 / DELAY_MICROS,
@@ -68,10 +69,11 @@ COROUTINE(countWithDelayMicros) {
 
 COROUTINE(countWithDelayMillis) {
   static volatile unsigned long counter = 0;
+  static unsigned long elapsed;
   COROUTINE_LOOP() {
     counter++;
     COROUTINE_DELAY(DELAY_MILLIS);
-    unsigned long elapsed = millis() - startMillis;
+    elapsed = millis() - startMillis;
     if (elapsed >= TEST_DURATION_MILLIS) {
       SERIAL_PORT_MONITOR.print("countWithDelayMillis(): ");
       printResults(counter, TEST_DURATION_MILLIS / DELAY_MILLIS,
@@ -83,10 +85,11 @@ COROUTINE(countWithDelayMillis) {
 
 COROUTINE(countWithDelaySeconds) {
   static volatile unsigned long counter = 0;
+  static unsigned long elapsed;
   COROUTINE_LOOP() {
     counter++;
     COROUTINE_DELAY_SECONDS(DELAY_SECONDS);
-    unsigned long elapsed = millis() - startMillis;
+    elapsed = millis() - startMillis;
     if (elapsed >= TEST_DURATION_MILLIS) {
       SERIAL_PORT_MONITOR.print("countWithDelaySeconds(): ");
       printResults(counter, TEST_DURATION_MILLIS / (DELAY_SECONDS * 1000),

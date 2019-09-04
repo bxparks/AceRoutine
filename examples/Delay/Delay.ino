@@ -26,13 +26,13 @@
  *      * countWithDelaySeconds(): count=11; expected=10; elapsed=10700
  */
 
-#if defined(ESP32) && ! defined(SERIAL_PORT_MONITOR)
-  #define SERIAL_PORT_MONITOR Serial
-#endif
-
 #include <Arduino.h>
 #include <AceRoutine.h>
 using namespace ace_routine;
+
+#if defined(ESP32) && ! defined(SERIAL_PORT_MONITOR)
+  #define SERIAL_PORT_MONITOR Serial
+#endif
 
 static const unsigned long TEST_DURATION_MILLIS = 10000;
 static const unsigned long DELAY_MICROS = 50; // 50 micros
@@ -97,7 +97,9 @@ COROUTINE(countWithDelaySeconds) {
 }
 
 void setup() {
+#if ! defined(UNIX_HOST_DUINO)
   delay(1000);
+#endif
   SERIAL_PORT_MONITOR.begin(115200);
   while (!SERIAL_PORT_MONITOR); // Leonardo/Micro
 

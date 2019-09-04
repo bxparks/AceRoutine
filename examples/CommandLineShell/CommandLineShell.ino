@@ -216,6 +216,9 @@ CommandManager<BUF_SIZE, ARGV_SIZE> commandManager(
 //---------------------------------------------------------------------------
 
 void setup() {
+#if ! defined(UNIX_HOST_DUINO)
+  delay(1000);
+#endif
   SERIAL_PORT_MONITOR.begin(115200);
   while (!SERIAL_PORT_MONITOR); // micro/leonardo
   pinMode(LED, OUTPUT);

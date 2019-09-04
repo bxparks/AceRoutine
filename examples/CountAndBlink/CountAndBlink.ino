@@ -4,6 +4,7 @@
  * counting.
  */
 
+#include <Arduino.h>
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -81,7 +82,9 @@ COROUTINE(slowDownBlinking) {
 }
 
 void setup() {
+#if ! defined(UNIX_HOST_DUINO)
   delay(1000);
+#endif
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
   pinMode(LED, OUTPUT);

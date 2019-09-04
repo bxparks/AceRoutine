@@ -11,6 +11,7 @@
  * through methods on custom Coroutine classes.
  */
 
+#include <Arduino.h>
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -110,7 +111,9 @@ COROUTINE(button) {
 }
 
 void setup() {
+#if ! defined(UNIX_HOST_DUINO)
   delay(1000);
+#endif
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 

@@ -51,7 +51,9 @@ COROUTINE(printWorld) {
 }
 
 void setup() {
+#if ! defined(UNIX_HOST_DUINO)
   delay(1000);
+#endif
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
   pinMode(LED, OUTPUT);

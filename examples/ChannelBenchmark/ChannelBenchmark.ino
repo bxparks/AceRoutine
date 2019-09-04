@@ -14,6 +14,7 @@
  * the Coroutine::loop() method, which causes additional calls to yield().
  */
 
+#include <Arduino.h>
 #include <AceRoutine.h>
 using namespace ace_routine;
 
@@ -122,7 +123,9 @@ void printStats(float baselineDuration, float channelDuration) {
 }
 
 void setup() {
+#if ! defined(UNIX_HOST_DUINO)
   delay(1000);
+#endif
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 

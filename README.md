@@ -1368,10 +1368,10 @@ The library has been extensively tested on the following boards:
 * SAMD21 M0 Mini (48 MHz ARM Cortex-M0+) (compatible with Arduino Zero)
 * NodeMCU 1.0 clone (ESP-12E module, 80 MHz ESP8266)
 * ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
+* Teensy 3.2 (72 MHz ARM Cortex-M4)
 
 I will occasionally test on the following hardware as a sanity check:
 
-* Teensy 3.2 (72 MHz ARM Cortex-M4)
 * Teensy LC (48 MHz ARM Cortex-M0+)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 

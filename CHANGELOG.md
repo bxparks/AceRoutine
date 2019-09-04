@@ -4,6 +4,8 @@
 * 1.0 (2019-09-04)
     * Support UnixHostDuino in all sketches under `examples/`.
     * Rename `Flash.h' to `compat.h`. Reenable `F()` strings for ESP8266.
+    * Fix various programs in `examples/` to work using clang++ (using
+      UnixHostDuio) which automatically fixes them on MacOS.
     * Graduate out of beta to v1.0.
 * 0.3 (2019-08-26)
     * Update `AutoBenchmark/README.md` benchmark numbers.

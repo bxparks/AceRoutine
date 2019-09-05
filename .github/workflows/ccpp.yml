@@ -1,0 +1,20 @@
+name: C/C++ CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-18.04
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: Verify examples
+      run: |
+        make -C examples clean
+        make -C examples
+    - name: Verify tests
+      run: |
+        make -C tests clean
+        make -C tests
+        make -C tests runtests

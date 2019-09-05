@@ -9,6 +9,12 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - name: Setup
+      run: |
+        cd ..
+        git clone https://github.com/bxparks/UnixHostDuino
+        git clone https://github.com/bxparks/AceButton
+        git clone https://github.com/bxparks/AUnit
     - name: Verify examples
       run: |
         make -C examples clean

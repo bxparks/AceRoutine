@@ -404,7 +404,7 @@ microseconds:
 COROUTINE(waitMicros) {
   COROUTINE_BEGIN();
   ...
-  COROUTINE_DELAY(300);
+  COROUTINE_DELAY_MICROS(300);
   ...
   COROUTINE_END();
 }

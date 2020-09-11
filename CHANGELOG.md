@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+    * Add continuous integration using GitHub Actions.
 * 1.0 (2019-09-04)
     * Support UnixHostDuino in all sketches under `examples/`.
     * Rename `Flash.h' to `compat.h`. Reenable `F()` strings for ESP8266.

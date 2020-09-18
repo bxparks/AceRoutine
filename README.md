@@ -208,8 +208,8 @@ The following example sketches are provided:
   coroutines
 * [BlinkSlowFastRoutine.ino](examples/BlinkSlowFastRoutine): use coroutines
   to read a button and control how the LED blinks
-* [BlinkSlowFastCustomRoutine.ino](examples/BlinkSlowFastCustomRoutine): same
-  as BlinkSlowFastRoutine but using a custom `Coroutine` class
+* [BlinkSlowFastManualRoutine.ino](examples/BlinkSlowFastManualRoutine): same
+  as BlinkSlowFastRoutine but using a manual `Coroutine` subclass
 * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same time
 * [CommandLineShell.ino](examples/CommandLineShell): uses the
   `src/ace_routine/cli` classes to implement a command line interface that

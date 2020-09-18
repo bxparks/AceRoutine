@@ -30,10 +30,10 @@ const int BUTTON_PIN = 2;
 const int LED_ON = HIGH;
 const int LED_OFF = LOW;
 
-const int BLINK_STATE_BOTH = 0;
+const int BLINK_STATE_SLOW = 0;
 const int BLINK_STATE_FAST = 1;
-const int BLINK_STATE_SLOW = 2;
-int blinkState = BLINK_STATE_BOTH;
+const int BLINK_STATE_BOTH = 2;
+int blinkState = BLINK_STATE_SLOW;
 
 COROUTINE(blinkSlow) {
   COROUTINE_LOOP() {
@@ -65,25 +65,25 @@ COROUTINE(blinkFast) {
       case BLINK_STATE_FAST:
         Serial.print("F1 ");
         digitalWrite(LED, LED_ON);
-        COROUTINE_DELAY(300);
+        COROUTINE_DELAY(200);
         Serial.print("F1a ");
 
         Serial.print("F0 ");
         digitalWrite(LED, LED_OFF);
-        COROUTINE_DELAY(300);
+        COROUTINE_DELAY(200);
         Serial.print("F0a ");
         break;
 
       default:
         Serial.print("F ");
-        COROUTINE_DELAY(600);
+        COROUTINE_DELAY(400);
     }
   }
 }
 
 COROUTINE(button) {
-  static int buttonState;
-  static int prevButtonState;
+  static int buttonState = HIGH;
+  static int prevButtonState = HIGH;
 
   COROUTINE_LOOP() {
     buttonState = digitalRead(BUTTON_PIN);

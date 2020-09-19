@@ -135,10 +135,10 @@ void loop() {
 }
 ```
 
-The first coroutine prints "Hello, ", then waits 1 second, and then prints
-"World", waits 4 seconds, and repeats from the start. At the same time, the
-second coroutine blinks the builtin LED on and off, on for 100 ms and off for
-500 ms.
+The `printHelloWorld` coroutine prints "Hello, ", waits 1 second, then prints
+"World", then waits 4 more seconds, then repeats from the start. At the same
+time, the `blinkLed` coroutine blinks the builtin LED on and off, on for 100 ms
+and off for 500 ms.
 
 ### HelloScheduler
 
@@ -171,9 +171,10 @@ the `loop()` method manually.
 
 ### HelloManualCoroutine
 
-The [HelloManualCoroutine.ino](examples/HelloManualCoroutine) program does
-not use the `COROUTINE()` macro, instead creates the `Coroutine` subclasses
-and coroutine instances manually.
+The [HelloManualCoroutine.ino](examples/HelloManualCoroutine) program shows what
+the code looks like without the convenience of the `COROUTINE()` macro. For more
+complex programs, with more than a few coroutines, especially if the coroutines
+need to communicate with each other, this coding structure can be more powerful.
 
 ```C++
 #include <Arduino.h>

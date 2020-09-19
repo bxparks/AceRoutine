@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 1.0.1 (2020-09-18)
     * Add continuous integration using GitHub Actions.
     * Add more documentation and examples of Manual Coroutines in README.md.
       Manual Coroutines are often more useful than Custom Coroutines, which I

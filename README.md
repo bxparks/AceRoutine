@@ -80,7 +80,7 @@ Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
 
-**Version**: 1.0 (2019-09-04)
+**Version**: 1.0.1 (2020-09-18)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md).
 
@@ -1479,14 +1479,13 @@ See [examples/AutoBenchmark](examples/AutoBenchmark).
 ### Tool Chain
 
 This library was developed and tested using:
-* [Arduino IDE 1.8.9](https://www.arduino.cc/en/Main/Software)
-* [Arduino AVR Boards 1.6.23](https://github.com/arduino/ArduinoCore-avr)
-* [Arduino SAMD Boards 1.8.3](https://github.com/arduino/ArduinoCore-samd)
-* [SparkFun AVR Boards 1.1.12](https://github.com/sparkfun/Arduino_Boards)
-* [SparkFun SAMD Boards 1.6.2](https://github.com/sparkfun/Arduino_Boards)
-* [ESP8266 Arduino 2.5.2](https://github.com/esp8266/Arduino)
-* [ESP32 Arduino 1.0.2](https://github.com/espressif/arduino-esp32)
-* [Teensydino 1.46](https://www.pjrc.com/teensy/td_download.html)
+* [Arduino IDE 1.8.13](https://www.arduino.cc/en/Main/Software)
+* [Arduino AVR Boards 1.8.3](https://github.com/arduino/ArduinoCore-avr)
+* [Arduino SAMD Boards 1.8.6](https://github.com/arduino/ArduinoCore-samd)
+* [SparkFun AVR Boards 1.1.13](https://github.com/sparkfun/Arduino_Boards)
+* [ESP8266 Arduino 2.7.1](https://github.com/esp8266/Arduino)
+* [ESP32 Arduino 1.0.4](https://github.com/espressif/arduino-esp32)
+* [Teensydino 1.53.beta](https://www.pjrc.com/teensy/td_download.html)
 
 It should work with [PlatformIO](https://platformio.org/) but I have
 not tested it.
@@ -1496,8 +1495,8 @@ the [UnixHostDuino](https://github.com/bxparks/UnixHostDuino) emulation layer.
 
 ### Operating System
 
-I use Ubuntu 18.04 for most of my development and sometimes do sanity checks on
-MacOS 10.14.5.
+I use Ubuntu 18.04 and 20.04 for most of my development and sometimes do sanity
+checks on MacOS 10.14.5.
 
 ### Hardware
 

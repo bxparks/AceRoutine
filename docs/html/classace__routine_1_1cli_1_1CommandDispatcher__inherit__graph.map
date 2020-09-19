@@ -1,3 +1,4 @@
 <map id="ace_routine::cli::CommandDispatcher" name="ace_routine::cli::CommandDispatcher">
-<area shape="rect" id="node2" href="$classace__routine_1_1Coroutine.html" title="Base class of all coroutines. " alt="" coords="18,5,171,32"/>
+<area shape="rect" id="node1" title="A coroutine that reads lines from the Serial port, tokenizes the line on whitespace boundaries,..." alt="" coords="5,80,201,121"/>
+<area shape="rect" id="node2" href="$classace__routine_1_1Coroutine.html" title="Base class of all coroutines." alt="" coords="19,5,188,32"/>
 </map>

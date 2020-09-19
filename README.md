@@ -84,7 +84,7 @@ additional macros that can reduce boilerplate code.
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md).
 
-![AUnit Tests](https://github.com/bxparks/AceRoutine/workflows/AUnit%20Tests/badge.svg
+![AUnit Tests](https://github.com/bxparks/AceRoutine/workflows/AUnit%20Tests/badge.svg)
 
 ## HelloCoroutine
 

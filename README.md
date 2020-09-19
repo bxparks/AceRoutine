@@ -14,7 +14,7 @@ There are only 3 classes in this library:
 * `Coroutine` class provides the context variables for all coroutines,
 * `CoroutineScheduler` class optionally handles the scheduling,
 * `Channel` class allows coroutines to send messages to each other. This is
-  an early experimental feature whose API and feature may change considerably
+  an experimental feature whose API and feature may change considerably
   in the future.
 
 The library provides a number of macros to help create coroutines and manage
@@ -86,9 +86,14 @@ additional macros that can reduce boilerplate code.
 
 ![AUnit Tests](https://github.com/bxparks/AceRoutine/workflows/AUnit%20Tests/badge.svg)
 
-## HelloCoroutine
+## Hello Coroutines
 
-This is the [HelloCoroutine.ino](examples/HelloCoroutine) sample sketch.
+### HelloCoroutine
+
+This is the [HelloCoroutine.ino](examples/HelloCoroutine) sample sketch which
+uses the `COROUTINE()` macro to automatically handle a number of boilerplate
+code, and some internal bookkeeping operations. Using the `COROUTINE()` macro
+works well for relatively small and simple coroutines.
 
 ```C++
 #include <AceRoutine.h>
@@ -98,34 +103,23 @@ const int LED = LED_BUILTIN;
 const int LED_ON = HIGH;
 const int LED_OFF = LOW;
 
-const int LED_ON_DELAY = 100;
-const int LED_OFF_DELAY = 500;
-
 COROUTINE(blinkLed) {
   COROUTINE_LOOP() {
     digitalWrite(LED, LED_ON);
-    COROUTINE_DELAY(LED_ON_DELAY);
+    COROUTINE_DELAY(100);
     digitalWrite(LED, LED_OFF);
-    COROUTINE_DELAY(LED_OFF_DELAY);
+    COROUTINE_DELAY(500);
   }
 }
 
-COROUTINE(printHello) {
-  COROUTINE_BEGIN();
-
-  Serial.print(F("Hello, "));
-  COROUTINE_DELAY(2000);
-
-  COROUTINE_END();
-}
-
-COROUTINE(printWorld) {
-  COROUTINE_BEGIN();
-
-  COROUTINE_AWAIT(printHello.isDone());
-  Serial.println(F("World!"));
-
-  COROUTINE_END();
+COROUTINE(printHelloWorld) {
+  COROUTINE_LOOP() {
+    Serial.print(F("Hello, "));
+    Serial.flush();
+    COROUTINE_DELAY(1000);
+    Serial.println(F("World"));
+    COROUTINE_DELAY_SECONDS(4);
+  }
 }
 
 void setup() {
@@ -137,13 +131,16 @@ void setup() {
 
 void loop() {
   blinkLed.runCoroutine();
-  printHello.runCoroutine();
-  printWorld.runCoroutine();
+  printHelloWorld.runCoroutine();
 }
 ```
 
-This prints "Hello, ", then waits 2 seconds, and then prints "World!".
-At the same time, the LED blinks on and off.
+The first coroutine prints "Hello, ", then waits 1 second, and then prints
+"World", waits 4 seconds, and repeats from the start. At the same time, the
+second coroutine blinks the builtin LED on and off, on for 100 ms and off for
+500 ms.
+
+### HelloScheduler
 
 The [HelloScheduler.ino](examples/HelloScheduler) sketch implements the same
 thing using the `CoroutineScheduler`:
@@ -171,6 +168,65 @@ void loop() {
 The `CoroutineScheduler` can automatically manage all coroutines defined by the
 `COROUTINE()` macro, which eliminates the need to itemize your coroutines in
 the `loop()` method manually.
+
+### HelloManualCoroutine
+
+The [HelloManualCoroutine.ino](examples/HelloManualCoroutine) program does
+not use the `COROUTINE()` macro, instead creates the `Coroutine` subclasses
+and coroutine instances manually.
+
+```C++
+#include <Arduino.h>
+#include <AceRoutine.h>
+using namespace ace_routine;
+
+const int LED = LED_BUILTIN;
+const int LED_ON = HIGH;
+const int LED_OFF = LOW;
+
+class BlinkLedCoroutine: public Coroutine {
+  public:
+    int runCoroutine() override {
+      COROUTINE_LOOP() {
+        digitalWrite(LED, LED_ON);
+        COROUTINE_DELAY(100);
+        digitalWrite(LED, LED_OFF);
+        COROUTINE_DELAY(500);
+      }
+    }
+};
+
+class PrintHelloWorldCoroutine: public Coroutine {
+  public:
+    int runCoroutine() override {
+      COROUTINE_LOOP() {
+        Serial.print(F("Hello, "));
+        Serial.flush();
+        COROUTINE_DELAY(1000);
+        Serial.println(F("World"));
+        COROUTINE_DELAY_SECONDS(4);
+      }
+    }
+};
+
+BlinkLedCoroutine blinkLed;
+PrintHelloWorldCoroutine printHelloWorld;
+
+void setup() {
+  delay(1000);
+  Serial.begin(115200);
+  while (!Serial); // Leonardo/Micro
+  pinMode(LED, OUTPUT);
+
+  blinkLed.setupCoroutine("blinkLed");
+  printHelloWorld.setupCoroutine("printHelloWorld");
+  CoroutineScheduler::setup();
+}
+
+void loop() {
+  CoroutineScheduler::loop();
+}
+```
 
 ## Installation
 
@@ -209,6 +265,9 @@ The following example sketches are provided:
 * [HelloScheduler.ino](examples/HelloScheduler): same as `HelloCoroutine`
   except using the `CoroutineScheduler` instead of manually running the
   coroutines
+* [HelloManualCoroutine.ino](examples/HelloManualCoroutine): same as
+  `HelloCoroutine` except the `Coroutine` subclasses and instances are created
+  and registered manually
 * [BlinkSlowFastRoutine.ino](examples/BlinkSlowFastRoutine): use coroutines
   to read a button and control how the LED blinks
 * [BlinkSlowFastManualRoutine.ino](examples/BlinkSlowFastManualRoutine): same
@@ -1136,7 +1195,7 @@ void loop() {
 
 ### Channels
 
-I have provided an early experimental implementation of channels inspired by the
+I have included an experimental implementation of channels inspired by the
 [Go Lang Channels](https://www.golang-book.com/books/intro/10). The `Channel`
 class implements an unbuffered, bidirectional channel. The API and features
 of the `Channel` class may change significantly in the future.

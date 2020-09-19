@@ -1,6 +1,7 @@
 /*
- * HelloCoroutine. Use 2 coroutines to print "Hello, World", the hard way.
- * A 3rd coroutine spins away on the side, blinking the LED.
+ * HelloCoroutine.
+ * Use one coroutine to print "Hello, World" repeatedly.
+ * Use another coroutine to blink the LED with assymetric on and off durations.
  */
 
 #include <Arduino.h>
@@ -18,37 +19,23 @@ using namespace ace_routine;
 const int LED_ON = HIGH;
 const int LED_OFF = LOW;
 
-// Use asymmetric delays to demonstrate that COROUTINES eliminate the need to
-// keep track of the blinking states explicitly.
-const int LED_ON_DELAY = 100;
-const int LED_OFF_DELAY = 500;
-
 COROUTINE(blinkLed) {
   COROUTINE_LOOP() {
     digitalWrite(LED, LED_ON);
-    COROUTINE_DELAY(LED_ON_DELAY);
+    COROUTINE_DELAY(100);
     digitalWrite(LED, LED_OFF);
-    COROUTINE_DELAY(LED_OFF_DELAY);
+    COROUTINE_DELAY(500);
   }
 }
 
-COROUTINE(printHello) {
-  COROUTINE_BEGIN();
-
-  Serial.print(F("Hello, "));
-  Serial.flush();
-  COROUTINE_DELAY(2000);
-
-  COROUTINE_END();
-}
-
-COROUTINE(printWorld) {
-  COROUTINE_BEGIN();
-
-  COROUTINE_AWAIT(printHello.isDone());
-  Serial.println(F("World!"));
-
-  COROUTINE_END();
+COROUTINE(printHelloWorld) {
+  COROUTINE_LOOP() {
+    Serial.print(F("Hello, "));
+    Serial.flush();
+    COROUTINE_DELAY(1000);
+    Serial.println(F("World"));
+    COROUTINE_DELAY_SECONDS(4);
+  }
 }
 
 void setup() {
@@ -63,6 +50,5 @@ void setup() {
 // Manually execute the coroutines.
 void loop() {
   blinkLed.runCoroutine();
-  printHello.runCoroutine();
-  printWorld.runCoroutine();
+  printHelloWorld.runCoroutine();
 }

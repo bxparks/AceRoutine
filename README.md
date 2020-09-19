@@ -14,7 +14,7 @@ There are only 3 classes in this library:
 * `Coroutine` class provides the context variables for all coroutines,
 * `CoroutineScheduler` class optionally handles the scheduling,
 * `Channel` class allows coroutines to send messages to each other. This is
-  an early experimental feature whose API and feature may change considerably
+  an experimental feature whose API and feature may change considerably
   in the future.
 
 The library provides a number of macros to help create coroutines and manage
@@ -79,13 +79,21 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-Version: 1.0 (2019-09-04)
 
-[![AUniter Jenkins Badge](https://us-central1-xparks2018.cloudfunctions.net/badge?project=AceRoutine)](https://github.com/bxparks/AUniter)
+**Version**: 1.0.1 (2020-09-18)
 
-## HelloCoroutine
+**Changelog**: [CHANGELOG.md](CHANGELOG.md).
 
-This is the [HelloCoroutine.ino](examples/HelloCoroutine) sample sketch.
+![AUnit Tests](https://github.com/bxparks/AceRoutine/workflows/AUnit%20Tests/badge.svg)
+
+## Hello Coroutines
+
+### HelloCoroutine
+
+This is the [HelloCoroutine.ino](examples/HelloCoroutine) sample sketch which
+uses the `COROUTINE()` macro to automatically handle a number of boilerplate
+code, and some internal bookkeeping operations. Using the `COROUTINE()` macro
+works well for relatively small and simple coroutines.
 
 ```C++
 #include <AceRoutine.h>
@@ -95,34 +103,23 @@ const int LED = LED_BUILTIN;
 const int LED_ON = HIGH;
 const int LED_OFF = LOW;
 
-const int LED_ON_DELAY = 100;
-const int LED_OFF_DELAY = 500;
-
 COROUTINE(blinkLed) {
   COROUTINE_LOOP() {
     digitalWrite(LED, LED_ON);
-    COROUTINE_DELAY(LED_ON_DELAY);
+    COROUTINE_DELAY(100);
     digitalWrite(LED, LED_OFF);
-    COROUTINE_DELAY(LED_OFF_DELAY);
+    COROUTINE_DELAY(500);
   }
 }
 
-COROUTINE(printHello) {
-  COROUTINE_BEGIN();
-
-  Serial.print(F("Hello, "));
-  COROUTINE_DELAY(2000);
-
-  COROUTINE_END();
-}
-
-COROUTINE(printWorld) {
-  COROUTINE_BEGIN();
-
-  COROUTINE_AWAIT(printHello.isDone());
-  Serial.println(F("World!"));
-
-  COROUTINE_END();
+COROUTINE(printHelloWorld) {
+  COROUTINE_LOOP() {
+    Serial.print(F("Hello, "));
+    Serial.flush();
+    COROUTINE_DELAY(1000);
+    Serial.println(F("World"));
+    COROUTINE_DELAY_SECONDS(4);
+  }
 }
 
 void setup() {
@@ -134,13 +131,16 @@ void setup() {
 
 void loop() {
   blinkLed.runCoroutine();
-  printHello.runCoroutine();
-  printWorld.runCoroutine();
+  printHelloWorld.runCoroutine();
 }
 ```
 
-This prints "Hello, ", then waits 2 seconds, and then prints "World!".
-At the same time, the LED blinks on and off.
+The `printHelloWorld` coroutine prints "Hello, ", waits 1 second, then prints
+"World", then waits 4 more seconds, then repeats from the start. At the same
+time, the `blinkLed` coroutine blinks the builtin LED on and off, on for 100 ms
+and off for 500 ms.
+
+### HelloScheduler
 
 The [HelloScheduler.ino](examples/HelloScheduler) sketch implements the same
 thing using the `CoroutineScheduler`:
@@ -168,6 +168,66 @@ void loop() {
 The `CoroutineScheduler` can automatically manage all coroutines defined by the
 `COROUTINE()` macro, which eliminates the need to itemize your coroutines in
 the `loop()` method manually.
+
+### HelloManualCoroutine
+
+The [HelloManualCoroutine.ino](examples/HelloManualCoroutine) program shows what
+the code looks like without the convenience of the `COROUTINE()` macro. For more
+complex programs, with more than a few coroutines, especially if the coroutines
+need to communicate with each other, this coding structure can be more powerful.
+
+```C++
+#include <Arduino.h>
+#include <AceRoutine.h>
+using namespace ace_routine;
+
+const int LED = LED_BUILTIN;
+const int LED_ON = HIGH;
+const int LED_OFF = LOW;
+
+class BlinkLedCoroutine: public Coroutine {
+  public:
+    int runCoroutine() override {
+      COROUTINE_LOOP() {
+        digitalWrite(LED, LED_ON);
+        COROUTINE_DELAY(100);
+        digitalWrite(LED, LED_OFF);
+        COROUTINE_DELAY(500);
+      }
+    }
+};
+
+class PrintHelloWorldCoroutine: public Coroutine {
+  public:
+    int runCoroutine() override {
+      COROUTINE_LOOP() {
+        Serial.print(F("Hello, "));
+        Serial.flush();
+        COROUTINE_DELAY(1000);
+        Serial.println(F("World"));
+        COROUTINE_DELAY_SECONDS(4);
+      }
+    }
+};
+
+BlinkLedCoroutine blinkLed;
+PrintHelloWorldCoroutine printHelloWorld;
+
+void setup() {
+  delay(1000);
+  Serial.begin(115200);
+  while (!Serial); // Leonardo/Micro
+  pinMode(LED, OUTPUT);
+
+  blinkLed.setupCoroutine("blinkLed");
+  printHelloWorld.setupCoroutine("printHelloWorld");
+  CoroutineScheduler::setup();
+}
+
+void loop() {
+  CoroutineScheduler::loop();
+}
+```
 
 ## Installation
 
@@ -206,10 +266,13 @@ The following example sketches are provided:
 * [HelloScheduler.ino](examples/HelloScheduler): same as `HelloCoroutine`
   except using the `CoroutineScheduler` instead of manually running the
   coroutines
+* [HelloManualCoroutine.ino](examples/HelloManualCoroutine): same as
+  `HelloCoroutine` except the `Coroutine` subclasses and instances are created
+  and registered manually
 * [BlinkSlowFastRoutine.ino](examples/BlinkSlowFastRoutine): use coroutines
   to read a button and control how the LED blinks
-* [BlinkSlowFastCustomRoutine.ino](examples/BlinkSlowFastCustomRoutine): same
-  as BlinkSlowFastRoutine but using a custom `Coroutine` class
+* [BlinkSlowFastManualRoutine.ino](examples/BlinkSlowFastManualRoutine): same
+  as BlinkSlowFastRoutine but using manual `Coroutine` subclasses
 * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same time
 * [CommandLineShell.ino](examples/CommandLineShell): uses the
   `src/ace_routine/cli` classes to implement a command line interface that
@@ -404,7 +467,7 @@ microseconds:
 COROUTINE(waitMicros) {
   COROUTINE_BEGIN();
   ...
-  COROUTINE_DELAY(300);
+  COROUTINE_DELAY_MICROS(300);
   ...
   COROUTINE_END();
 }
@@ -882,7 +945,7 @@ is allowed. For example, the following is allowed:
   ...
 ```
 
-### Custom Coroutines
+### Custom Coroutines (Not Recommended)
 
 All coroutines are instances of the `Coroutine` class, or one of its subclasses.
 You can create custom subclasses of `Coroutine` and create coroutines which are
@@ -906,22 +969,25 @@ COROUTINE(CustomCoroutine, blinkSlow) {
 }
 ...
 ```
+
 The 2-argument version created an object instance called `blinkSlow` which is an
 instance of an internally generated class named `CustomCoroutine_blinkSlow`
 which is a subclass of `CustomCoroutine`.
 
 Custom coroutines were intended to be useful if you need to create multiple
-coroutines which share methods or data structures. In practice, however, I have
-yet to find a use for them. Instead, I have found that the *Manual Coroutines*
-described in the next section to be more useful.
+coroutines which share methods or data structures. In practice, the only place
+where I have found this feature to be useful is in writing the
+[tests/AceRoutineTest](tests/AceRoutineTest) unit tests. In any other normal
+situation, I suspect that the *Manual Coroutines* described in the next section
+will be more useful and easier to understand.
 
-### Manual Coroutines
+### Manual Coroutines (Recommended)
 
 A manual coroutine is a custom coroutine whose body of the coroutine (i.e
-the`runCoroutine()` method) is defined manually and the coroutine object is also
-instantiated manually, instead of using the `COROUTINE()` macro. This is useful
-if the coroutine has external dependencies which need to be injected into the
-constructor. The `COROUTINE()` macro does not allow the constructor to be
+the `runCoroutine()` method) is defined manually and the coroutine object is
+also instantiated manually, instead of using the `COROUTINE()` macro. This is
+useful if the coroutine has external dependencies which need to be injected into
+the constructor. The `COROUTINE()` macro does not allow the constructor to be
 customized.
 
 ```C++
@@ -988,9 +1054,9 @@ anonymous coroutine is represented by the integer representation of the `this`
 pointer of the coroutine object.
 
 A good example of a manual coroutine is
-[src/ace_routine/cli/CommandManager.h](src/ace_routine/cli/CommandManager.h)
-and you can see how it is configured in
-[examples/CommandLineShell](examples/CommandLineShell).
+[BlinkSlowFastManualRoutine](examples/BlinkSlowFastManualRoutine) which shows
+the same functionality as [BlinkSlowFastRoutine](examples/BlinkSlowFastRoutine)
+rewritten using manual coroutines.
 
 ### External Coroutines
 
@@ -1039,6 +1105,26 @@ COROUTINE(doSomething) {
 }
 ```
 
+For manual coroutines with an explicit `Coroutine` subclass, you can
+reference the coroutine instance using the normal C++ mechanism. In other words,
+import the header file, then reference the instance:
+
+```C++
+// MyCoroutine.h
+class MyCoroutine: public Coroutine {
+  ...
+};
+
+// MyCoroutine.cpp
+MyCoroutine myCoroutine;
+...
+
+// Application.ino
+#include "MyCoroutine.h"
+extern MyCoroutine myCoroutine;
+...
+```
+
 ### Communication Between Coroutines
 
 There are a handful ways that `Coroutine` instances can pass data between
@@ -1049,13 +1135,68 @@ each other.
 * To avoid polluting the global namespace, you can subclass the `Coroutine`
   class and define **class static variables** which can be shared among
   coroutines which inherit this custom class
-* You can define **methods on the custom Coroutine class**, and pass messages
-  back and forth between coroutines using these methods.
+* You can define **methods on the manual Coroutine class**, inject the
+  reference/pointer of one coroutine into the constructor of another, and
+  call the methods from one coroutine to the other. See skeleton code below.
 * You can use **channels** as explained in the next section.
+
+**Passing Information from a Manual Coroutine to Another**
+
+```C++
+class RoutineA: public Coroutine {
+  public:
+    int runCoroutine() override {
+      COROUTINE_LOOP() {
+        ...
+      }
+    }
+
+    void setState(bool s) {
+      state = s;
+    }
+
+  private:
+    bool state;
+};
+
+class RoutineB: public Coroutine {
+  public:
+    RoutineB(RoutineA& routineACoroutine):
+      routineA(routineACoroutine)
+    {}
+
+    int runCoroutine() override {
+      COROUTINE_LOOP() {
+        ...
+        routineA.setState(state);
+        COROUTINE_YIELD();
+      }
+    }
+
+  private:
+    RoutineA& routineA;
+};
+
+
+RoutineA routineA;
+RoutineB routineB(routineA);
+
+void setup() {
+  ...
+  routineA.setupCoroutine("routineA");
+  routineB.setupCoroutine("routineB");
+  CoroutineScheduler::setup();
+  ...
+}
+
+void loop() {
+  CoroutineScheduler::loop();
+}
+```
 
 ### Channels
 
-I have provided an early experimental implementation of channels inspired by the
+I have included an experimental implementation of channels inspired by the
 [Go Lang Channels](https://www.golang-book.com/books/intro/10). The `Channel`
 class implements an unbuffered, bidirectional channel. The API and features
 of the `Channel` class may change significantly in the future.
@@ -1338,14 +1479,13 @@ See [examples/AutoBenchmark](examples/AutoBenchmark).
 ### Tool Chain
 
 This library was developed and tested using:
-* [Arduino IDE 1.8.9](https://www.arduino.cc/en/Main/Software)
-* [Arduino AVR Boards 1.6.23](https://github.com/arduino/ArduinoCore-avr)
-* [Arduino SAMD Boards 1.8.3](https://github.com/arduino/ArduinoCore-samd)
-* [SparkFun AVR Boards 1.1.12](https://github.com/sparkfun/Arduino_Boards)
-* [SparkFun SAMD Boards 1.6.2](https://github.com/sparkfun/Arduino_Boards)
-* [ESP8266 Arduino 2.5.2](https://github.com/esp8266/Arduino)
-* [ESP32 Arduino 1.0.2](https://github.com/espressif/arduino-esp32)
-* [Teensydino 1.46](https://www.pjrc.com/teensy/td_download.html)
+* [Arduino IDE 1.8.13](https://www.arduino.cc/en/Main/Software)
+* [Arduino AVR Boards 1.8.3](https://github.com/arduino/ArduinoCore-avr)
+* [Arduino SAMD Boards 1.8.6](https://github.com/arduino/ArduinoCore-samd)
+* [SparkFun AVR Boards 1.1.13](https://github.com/sparkfun/Arduino_Boards)
+* [ESP8266 Arduino 2.7.1](https://github.com/esp8266/Arduino)
+* [ESP32 Arduino 1.0.4](https://github.com/espressif/arduino-esp32)
+* [Teensydino 1.53.beta](https://www.pjrc.com/teensy/td_download.html)
 
 It should work with [PlatformIO](https://platformio.org/) but I have
 not tested it.
@@ -1355,8 +1495,8 @@ the [UnixHostDuino](https://github.com/bxparks/UnixHostDuino) emulation layer.
 
 ### Operating System
 
-I use Ubuntu 18.04 for most of my development and sometimes do sanity checks on
-MacOS 10.14.5.
+I use Ubuntu 18.04 and 20.04 for most of my development and sometimes do sanity
+checks on MacOS 10.14.5.
 
 ### Hardware
 
@@ -1374,10 +1514,6 @@ I will occasionally test on the following hardware as a sanity check:
 
 * Teensy LC (48 MHz ARM Cortex-M0+)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

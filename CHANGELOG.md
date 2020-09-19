@@ -1,9 +1,17 @@
 # Changelog
 
 * Unreleased
+* 1.0.1 (2020-09-18)
+    * Add continuous integration using GitHub Actions.
+    * Add more documentation and examples of Manual Coroutines in README.md.
+      Manual Coroutines are often more useful than Custom Coroutines, which I
+      have found useful only for unit testing.
+        * [HelloManualCoroutine](examples/HelloManualCoroutine)
+        * [BlinkSlowFastManualRoutine](examples/BlinkSlowFastManualRoutine)
+    * Simplify the HelloCoroutine and HelloScheduler examples.
 * 1.0 (2019-09-04)
     * Support UnixHostDuino in all sketches under `examples/`.
-    * Rename `Flash.h' to `compat.h`. Reenable `F()` strings for ESP8266.
+    * Rename `Flash.h` to `compat.h`. Reenable `F()` strings for ESP8266.
     * Fix various programs in `examples/` to work using clang++ (using
       UnixHostDuio) which automatically fixes them on MacOS.
     * Graduate out of beta to v1.0.

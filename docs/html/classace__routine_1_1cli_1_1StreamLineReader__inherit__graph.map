@@ -1,3 +1,4 @@
 <map id="ace_routine::cli::StreamLineReader" name="ace_routine::cli::StreamLineReader">
-<area shape="rect" id="node2" href="$classace__routine_1_1Coroutine.html" title="Base class of all coroutines. " alt="" coords="9,5,162,32"/>
+<area shape="rect" id="node1" title="An AceRoutine coroutine that reads lines (terminated by &#39;\n&#39; or &#39;\r&#39; from the Stream device,..." alt="" coords="5,80,181,121"/>
+<area shape="rect" id="node2" href="$classace__routine_1_1Coroutine.html" title="Base class of all coroutines." alt="" coords="9,5,178,32"/>
 </map>

@@ -1,5 +1,6 @@
 <map id="ace_routine::cli::CommandDispatcher" name="ace_routine::cli::CommandDispatcher">
-<area shape="rect" id="node2" href="$classace__routine_1_1Coroutine.html" title="Base class of all coroutines. " alt="" coords="26,5,179,32"/>
-<area shape="rect" id="node3" href="$classace__routine_1_1cli_1_1CommandHandler.html" title="Signature for a command handler. " alt="" coords="13,57,192,98"/>
-<area shape="rect" id="node4" href="$classace__routine_1_1Channel.html" title="ace_routine::Channel\l\&lt; ace_routine::cli::InputLine \&gt;" alt="" coords="5,122,200,163"/>
+<area shape="rect" id="node1" title="A coroutine that reads lines from the Serial port, tokenizes the line on whitespace boundaries,..." alt="" coords="364,57,560,98"/>
+<area shape="rect" id="node2" href="$classace__routine_1_1Coroutine.html" title="Base class of all coroutines." alt="" coords="30,5,199,32"/>
+<area shape="rect" id="node3" href="$classace__routine_1_1cli_1_1CommandHandler.html" title="Signature for a command handler." alt="" coords="17,57,213,98"/>
+<area shape="rect" id="node4" href="$classace__routine_1_1Channel.html" title=" " alt="" coords="5,122,224,163"/>
 </map>

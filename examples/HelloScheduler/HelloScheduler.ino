@@ -1,5 +1,5 @@
 /*
- * Same as HelloCoroutine, but using the CoroutineScheduler.
+ * HelloScheduler. Same as HelloCoroutine, but using the CoroutineScheduler.
  */
 
 #include <Arduino.h>
@@ -17,37 +17,23 @@ using namespace ace_routine;
 const int LED_ON = HIGH;
 const int LED_OFF = LOW;
 
-// Use asymmetric delays for blinking to demonstrate how easy it is using
-// COROUTINES.
-const int LED_SHORT_DELAY = 100;
-const int LED_LONG_DELAY = 500;
-
 COROUTINE(blinkLed) {
   COROUTINE_LOOP() {
     digitalWrite(LED, LED_ON);
-    COROUTINE_DELAY(LED_SHORT_DELAY);
+    COROUTINE_DELAY(100);
     digitalWrite(LED, LED_OFF);
-    COROUTINE_DELAY(LED_LONG_DELAY);
+    COROUTINE_DELAY(500);
   }
 }
 
-COROUTINE(printHello) {
-  COROUTINE_BEGIN();
-
-  Serial.print(F("Hello, "));
-  Serial.flush();
-  COROUTINE_DELAY(1000);
-
-  COROUTINE_END();
-}
-
-COROUTINE(printWorld) {
-  COROUTINE_BEGIN();
-
-  COROUTINE_AWAIT(printHello.isDone());
-  Serial.println(F("World!"));
-
-  COROUTINE_END();
+COROUTINE(printHelloWorld) {
+  COROUTINE_LOOP() {
+    Serial.print(F("Hello, "));
+    Serial.flush();
+    COROUTINE_DELAY(1000);
+    Serial.println(F("World"));
+    COROUTINE_DELAY_SECONDS(4);
+  }
 }
 
 void setup() {

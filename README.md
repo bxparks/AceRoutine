@@ -79,7 +79,10 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-Version: 1.0 (2019-09-04)
+
+**Version**: 1.0 (2019-09-04)
+
+**Changelog**: [CHANGELOG.md](CHANGELOG.md).
 
 [![AUniter Jenkins Badge](https://us-central1-xparks2018.cloudfunctions.net/badge?project=AceRoutine)](https://github.com/bxparks/AUniter)
 
@@ -209,7 +212,7 @@ The following example sketches are provided:
 * [BlinkSlowFastRoutine.ino](examples/BlinkSlowFastRoutine): use coroutines
   to read a button and control how the LED blinks
 * [BlinkSlowFastManualRoutine.ino](examples/BlinkSlowFastManualRoutine): same
-  as BlinkSlowFastRoutine but using a manual `Coroutine` subclass
+  as BlinkSlowFastRoutine but using manual `Coroutine` subclasses
 * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same time
 * [CommandLineShell.ino](examples/CommandLineShell): uses the
   `src/ace_routine/cli` classes to implement a command line interface that
@@ -882,7 +885,7 @@ is allowed. For example, the following is allowed:
   ...
 ```
 
-### Custom Coroutines
+### Custom Coroutines (Not Recommended)
 
 All coroutines are instances of the `Coroutine` class, or one of its subclasses.
 You can create custom subclasses of `Coroutine` and create coroutines which are
@@ -906,22 +909,25 @@ COROUTINE(CustomCoroutine, blinkSlow) {
 }
 ...
 ```
+
 The 2-argument version created an object instance called `blinkSlow` which is an
 instance of an internally generated class named `CustomCoroutine_blinkSlow`
 which is a subclass of `CustomCoroutine`.
 
 Custom coroutines were intended to be useful if you need to create multiple
-coroutines which share methods or data structures. In practice, however, I have
-yet to find a use for them. Instead, I have found that the *Manual Coroutines*
-described in the next section to be more useful.
+coroutines which share methods or data structures. In practice, the only place
+where I have found this feature to be useful is in writing the
+[tests/AceRoutineTest](tests/AceRoutineTest) unit tests. In any other normal
+situation, I suspect that the *Manual Coroutines* described in the next section
+will be more useful and easier to understand.
 
-### Manual Coroutines
+### Manual Coroutines (Recommended)
 
 A manual coroutine is a custom coroutine whose body of the coroutine (i.e
-the`runCoroutine()` method) is defined manually and the coroutine object is also
-instantiated manually, instead of using the `COROUTINE()` macro. This is useful
-if the coroutine has external dependencies which need to be injected into the
-constructor. The `COROUTINE()` macro does not allow the constructor to be
+the `runCoroutine()` method) is defined manually and the coroutine object is
+also instantiated manually, instead of using the `COROUTINE()` macro. This is
+useful if the coroutine has external dependencies which need to be injected into
+the constructor. The `COROUTINE()` macro does not allow the constructor to be
 customized.
 
 ```C++
@@ -988,9 +994,9 @@ anonymous coroutine is represented by the integer representation of the `this`
 pointer of the coroutine object.
 
 A good example of a manual coroutine is
-[src/ace_routine/cli/CommandManager.h](src/ace_routine/cli/CommandManager.h)
-and you can see how it is configured in
-[examples/CommandLineShell](examples/CommandLineShell).
+[BlinkSlowFastManualRoutine](examples/BlinkSlowFastManualRoutine) which shows
+the same functionality as [BlinkSlowFastRoutine](examples/BlinkSlowFastRoutine)
+rewritten using manual coroutines.
 
 ### External Coroutines
 
@@ -1039,6 +1045,26 @@ COROUTINE(doSomething) {
 }
 ```
 
+For manual coroutines with an explicit `Coroutine` subclass, you can
+reference the coroutine instance using the normal C++ mechanism. In other words,
+import the header file, then reference the instance:
+
+```C++
+// MyCoroutine.h
+class MyCoroutine: public Coroutine {
+  ...
+};
+
+// MyCoroutine.cpp
+MyCoroutine myCoroutine;
+...
+
+// Application.ino
+#include "MyCoroutine.h"
+extern MyCoroutine myCoroutine;
+...
+```
+
 ### Communication Between Coroutines
 
 There are a handful ways that `Coroutine` instances can pass data between
@@ -1049,9 +1075,64 @@ each other.
 * To avoid polluting the global namespace, you can subclass the `Coroutine`
   class and define **class static variables** which can be shared among
   coroutines which inherit this custom class
-* You can define **methods on the custom Coroutine class**, and pass messages
-  back and forth between coroutines using these methods.
+* You can define **methods on the manual Coroutine class**, inject the
+  reference/pointer of one coroutine into the constructor of another, and
+  call the methods from one coroutine to the other. See skeleton code below.
 * You can use **channels** as explained in the next section.
+
+**Passing Information from a Manual Coroutine to Another**
+
+```C++
+class RoutineA: public Coroutine {
+  public:
+    int runCoroutine() override {
+      COROUTINE_LOOP() {
+        ...
+      }
+    }
+
+    void setState(bool s) {
+      state = s;
+    }
+
+  private:
+    bool state;
+};
+
+class RoutineB: public Coroutine {
+  public:
+    RoutineB(RoutineA& routineACoroutine):
+      routineA(routineACoroutine)
+    {}
+
+    int runCoroutine() override {
+      COROUTINE_LOOP() {
+        ...
+        routineA.setState(state);
+        COROUTINE_YIELD();
+      }
+    }
+
+  private:
+    RoutineA& routineA;
+};
+
+
+RoutineA routineA;
+RoutineB routineB(routineA);
+
+void setup() {
+  ...
+  routineA.setupCoroutine("routineA");
+  routineB.setupCoroutine("routineB");
+  CoroutineScheduler::setup();
+  ...
+}
+
+void loop() {
+  CoroutineScheduler::loop();
+}
+```
 
 ### Channels
 
@@ -1374,10 +1455,6 @@ I will occasionally test on the following hardware as a sanity check:
 
 * Teensy LC (48 MHz ARM Cortex-M0+)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

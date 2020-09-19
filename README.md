@@ -84,7 +84,7 @@ additional macros that can reduce boilerplate code.
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md).
 
-[![AUniter Jenkins Badge](https://us-central1-xparks2018.cloudfunctions.net/badge?project=AceRoutine)](https://github.com/bxparks/AUniter)
+![AUnit Tests](https://github.com/bxparks/AceRoutine/workflows/AUnit%20Tests/badge.svg
 
 ## HelloCoroutine
 

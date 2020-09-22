@@ -329,6 +329,24 @@ class Coroutine {
      */
     void resume();
 
+    /**
+     * Reset the coroutine to its initial state. Only the Coroutine base-class
+     * state is reset to the original state. If the subclass runCoroutine()
+     * uses any static variables (for example, a loop counter), you must reset
+     * those variables manually as well, since this library does not have any
+     * knowledge about them.
+     *
+     * It is expected that this method will be called from outside the
+     * runCoroutine() method. If it is called within the method, I'm not sure
+     * what will happen. I think the coroutine will abandon the current
+     * continuation point, and start executing from the beginning of the
+     * Coroutine upon the next iteration.
+     */
+    void reset() {
+      mStatus = kStatusSuspended;
+      mJumpPoint = nullptr;
+    }
+
     /** Check if delay time is over. */
     bool isDelayExpired() {
       switch (mDelayType) {

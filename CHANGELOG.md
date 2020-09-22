@@ -1,6 +1,9 @@
 # Changelog
 
 * Unreleased
+    * Add a `Coroutine::reset()` method that causes the Coroutine to restart
+      from the beginning of the coroutine upon the next iteration. (Fixes #13
+      and #14).
 * 1.0.1 (2020-09-18)
     * Add continuous integration using GitHub Actions.
     * Add more documentation and examples of Manual Coroutines in README.md.

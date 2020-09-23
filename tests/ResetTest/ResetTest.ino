@@ -18,22 +18,64 @@ class ResettingCoroutine: public TestableCoroutine {
     ResettingCoroutine() = default;
 
     int runCoroutine() override {
-      COROUTINE_LOOP() {
-        Serial.print(count);
-        Serial.print(' ');
-        count++;
+      // loop 5 times, then end the coroutine
+      COROUTINE_BEGIN();
+      for (; count < 5; count++) {
         COROUTINE_YIELD();
       }
+      COROUTINE_END();
     }
 
+  public:
+    // exposed for testing purposes
     int count = 0;
 };
 
-ResettingCoroutine resettingRoutine;
+ResettingCoroutine resettableCoroutine;
+
+test(ResetTest, reset) {
+  // Verify that the coroutine loops 5 times.
+  resettableCoroutine.runCoroutine();
+  assertEqual(0, resettableCoroutine.count);
+  assertTrue(resettableCoroutine.isYielding());
+
+  resettableCoroutine.runCoroutine();
+  assertEqual(1, resettableCoroutine.count);
+  assertTrue(resettableCoroutine.isYielding());
+
+  resettableCoroutine.runCoroutine();
+  assertEqual(2, resettableCoroutine.count);
+  assertTrue(resettableCoroutine.isYielding());
+
+  resettableCoroutine.runCoroutine();
+  assertEqual(3, resettableCoroutine.count);
+  assertTrue(resettableCoroutine.isYielding());
+
+  resettableCoroutine.runCoroutine();
+  assertEqual(4, resettableCoroutine.count);
+  assertTrue(resettableCoroutine.isYielding());
+
+  resettableCoroutine.runCoroutine();
+  assertEqual(5, resettableCoroutine.count);
+  assertTrue(resettableCoroutine.isDone());
+
+  resettableCoroutine.runCoroutine();
+  assertEqual(5, resettableCoroutine.count);
+  assertTrue(resettableCoroutine.isDone());
+
+  // Reset the coroutine. Must also reset any additional internal state of the
+  // coroutine, i.e. the 'count' variable.
+  resettableCoroutine.reset();
+  assertTrue(resettableCoroutine.isSuspended());
+  resettableCoroutine.count = 0;
+
+  // Verify that it runs from the beginning of the loop again.
+  resettableCoroutine.runCoroutine();
+  assertEqual(0, resettableCoroutine.count);
+  assertTrue(resettableCoroutine.isYielding());
+}
 
 // ---------------------------------------------------------------------------
-
-int iterCount = 0;
 
 void setup() {
 #if defined(ARDUINO)
@@ -43,29 +85,10 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 
-  resettingRoutine.setupCoroutine("resettingRoutine");
+  resettableCoroutine.setupCoroutine("resettableCoroutine");
 }
 
-// This should cause the ResettingCoroutine to run twice.
-// The output should be:
-//
-//    0 1 2 3 4 5 6 7 8 9
-//    0 1 2 3 4 5 6 7 8 9
-//    Done
-
 void loop() {
-  if (iterCount < 2) {
-    resettingRoutine.runCoroutine();
-    if (resettingRoutine.count >= 10) {
-      Serial.println();
-      resettingRoutine.count = 0;
-      resettingRoutine.reset();
-
-      iterCount++;
-    }
-  } else if (iterCount == 2) {
-    Serial.println("Done");
-    iterCount++;
-  }
+  TestRunner::run();
 }
 

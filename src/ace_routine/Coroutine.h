@@ -65,8 +65,10 @@ class AceRoutineTest_statusStrings;
 #define COROUTINE(...) \
     GET_COROUTINE(__VA_ARGS__, COROUTINE2, COROUTINE1)(__VA_ARGS__)
 
+/** Internal helper macro to allow overloading of the COROUTINE() macro. */
 #define GET_COROUTINE(_1, _2, NAME, ...) NAME
 
+/** Implement the 1-argument COROUTINE() macro. */
 #define COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
@@ -77,6 +79,7 @@ Coroutine_##name :: Coroutine_##name() { \
 } \
 int Coroutine_##name :: runCoroutine()
 
+/** Implement the 2-argument COROUTINE() macro. */
 #define COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
@@ -99,8 +102,12 @@ int className##_##name :: runCoroutine()
     GET_EXTERN_COROUTINE(\
         __VA_ARGS__, EXTERN_COROUTINE2, EXTERN_COROUTINE1)(__VA_ARGS__)
 
+/**
+ * Internal helper macro to allow overloading of the EXTERN_COROUTINE() macro.
+ */
 #define GET_EXTERN_COROUTINE(_1, _2, NAME, ...) NAME
 
+/** Implement the 1-argument EXTERN_COROUTINE() macro. */
 #define EXTERN_COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
@@ -108,6 +115,7 @@ struct Coroutine_##name : ace_routine::Coroutine { \
 }; \
 extern Coroutine_##name name
 
+/** Implement the 2-argument EXTERN_COROUTINE() macro. */
 #define EXTERN_COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
@@ -130,6 +138,10 @@ extern className##_##name name
    COROUTINE_BEGIN(); \
    while (true) \
 
+/**
+ * Implement the common logic for COROUTINE_YIELD(), COROUTINE_AWAIT(),
+ * COROUTINE_DELAY(), COROUTINE_DELAY_SECONDS(), and COROUTINE_DELAY_MICROS().
+ */
 #define COROUTINE_YIELD_INTERNAL() \
     do { \
       __label__ jumpLabel; \

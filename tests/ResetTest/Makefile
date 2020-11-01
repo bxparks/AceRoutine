@@ -2,5 +2,5 @@
 # Makefile to compile and run Arduino programs natively on Linux or MacOS.
 
 APP_NAME := ResetTest
-ARDUINO_LIBS := AUnit AceRoutine
+ARDUINO_LIBS := AUnit AceCommon AceRoutine
 include ../../../UnixHostDuino/UnixHostDuino.mk

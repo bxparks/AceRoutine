@@ -336,20 +336,6 @@ test(AceRoutineTest, scheduler) {
 }
 
 // ---------------------------------------------------------------------------
-test(AceRoutineTest, udiv1000Test) {
-  assertEqual((unsigned long) 9, ace_routine::internal::udiv1000(10L*1000));
-  assertEqual((unsigned long) 97, ace_routine::internal::udiv1000(100L*1000));
-  assertEqual((unsigned long) 997,
-      ace_routine::internal::udiv1000(1000L*1000));
-  assertEqual((unsigned long) 9993,
-      ace_routine::internal::udiv1000(10L*1000*1000));
-  assertEqual((unsigned long) 99987,
-      ace_routine::internal::udiv1000(100L*1000*1000));
-  assertEqual((unsigned long) 999980,
-      ace_routine::internal::udiv1000(1000L*1000*1000));
-}
-
-// ---------------------------------------------------------------------------
 
 void setup() {
 #if defined(ARDUINO)

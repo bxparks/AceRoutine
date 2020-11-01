@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include <stdint.h> // uintptr_t
 #include <Arduino.h> // millis(), micros()
+#include <AceCommon.h> // udiv1000()
 #include "Coroutine.h"
 #include "compat.h" // FPSTR()
 
@@ -77,7 +78,7 @@ unsigned long Coroutine::coroutineSeconds() const {
   unsigned long m = ::millis();
 #if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_SAMD) || defined(ESP8266)
   // No hardware division so the udiv1000() approximation is faster
-  return internal::udiv1000(m);
+  return ace_common::udiv1000(m);
 #else
   return m / 1000;
 #endif

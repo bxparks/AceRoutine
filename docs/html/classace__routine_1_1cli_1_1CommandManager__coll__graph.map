@@ -1,4 +1,0 @@
-<map id="ace_routine::cli::CommandManager&lt; BUF_SIZE, ARGV_SIZE &gt;" name="ace_routine::cli::CommandManager&lt; BUF_SIZE, ARGV_SIZE &gt;">
-<area shape="rect" id="node1" title="A convenience wrapper around a CommandDispatcher that hides complexity of creating,..." alt="" coords="5,80,259,121"/>
-<area shape="rect" id="node2" href="$classace__routine_1_1Coroutine.html" title="Base class of all coroutines." alt="" coords="47,5,217,32"/>
-</map>

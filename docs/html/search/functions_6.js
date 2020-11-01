@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['printhelp_140',['printHelp',['../classace__routine_1_1cli_1_1CommandDispatcher.html#ad4eddd78d17333dfaa58e6d426dce25e',1,'ace_routine::cli::CommandDispatcher']]],
-  ['printlineerror_141',['printLineError',['../classace__routine_1_1cli_1_1CommandDispatcher.html#ae0d64db2ed48fa0605f0df33715f40c6',1,'ace_routine::cli::CommandDispatcher']]],
-  ['printto_142',['printTo',['../classace__routine_1_1FCString.html#a834801808fbe4c5b7a8af27cca07732b',1,'ace_routine::FCString']]]
+  ['write_113',['write',['../classace__routine_1_1Channel.html#ad7fa46d27162b4ec9ffa257f3881931d',1,'ace_routine::Channel::write()'],['../classace__routine_1_1Channel.html#a1134e9c905c7c0bb7255f208534355d8',1,'ace_routine::Channel::write(const T &amp;value)']]]
 ];

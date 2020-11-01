@@ -1,6 +1,12 @@
 var searchData=
 [
-  ['helpall_37',['helpAll',['../classace__routine_1_1cli_1_1CommandDispatcher.html#a54e0253192cedd6579f6dce982f356ca',1,'ace_routine::cli::CommandDispatcher']]],
-  ['helpcommandhandler_38',['helpCommandHandler',['../classace__routine_1_1cli_1_1CommandDispatcher.html#a6432c31ce0aa188295256fc48b694414',1,'ace_routine::cli::CommandDispatcher']]],
-  ['helpspecific_39',['helpSpecific',['../classace__routine_1_1cli_1_1CommandDispatcher.html#af0795638742833c9d98c1530397ef505',1,'ace_routine::cli::CommandDispatcher']]]
+  ['kdelaytypemicros_38',['kDelayTypeMicros',['../classace__routine_1_1Coroutine.html#a5eda214828fb06f133f84743b518e46a',1,'ace_routine::Coroutine']]],
+  ['kdelaytypemillis_39',['kDelayTypeMillis',['../classace__routine_1_1Coroutine.html#a668e339557964dc092540bad162056a7',1,'ace_routine::Coroutine']]],
+  ['kdelaytypeseconds_40',['kDelayTypeSeconds',['../classace__routine_1_1Coroutine.html#a79844c12576ff2fd2065c5f5e4b422c8',1,'ace_routine::Coroutine']]],
+  ['kstatusdelaying_41',['kStatusDelaying',['../classace__routine_1_1Coroutine.html#a180062205c19934c2791c4185cbe0968',1,'ace_routine::Coroutine']]],
+  ['kstatusending_42',['kStatusEnding',['../classace__routine_1_1Coroutine.html#a991b8a3e15ea272d906ab7ccf09ca56a',1,'ace_routine::Coroutine']]],
+  ['kstatusrunning_43',['kStatusRunning',['../classace__routine_1_1Coroutine.html#a701dd15f989e1ae4852dd5d0c6335685',1,'ace_routine::Coroutine']]],
+  ['kstatussuspended_44',['kStatusSuspended',['../classace__routine_1_1Coroutine.html#a397f0d87d99b538189353fa47e918022',1,'ace_routine::Coroutine']]],
+  ['kstatusterminated_45',['kStatusTerminated',['../classace__routine_1_1Coroutine.html#a358eaa3370734c4d881abd8fd0074ed4',1,'ace_routine::Coroutine']]],
+  ['kstatusyielding_46',['kStatusYielding',['../classace__routine_1_1Coroutine.html#a44536673988682d943524d28d260f42e',1,'ace_routine::Coroutine']]]
 ];

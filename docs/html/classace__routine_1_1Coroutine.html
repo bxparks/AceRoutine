@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">1.0.1</span>
+   &#160;<span id="projectnumber">1.1</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -84,27 +84,16 @@ $(function() {
  <a href="classace__routine_1_1Coroutine.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for ace_routine::Coroutine:</div>
-<div class="dyncontent">
-<div class="center"><img src="classace__routine_1_1Coroutine__inherit__graph.png" border="0" usemap="#ace__routine_1_1Coroutine_inherit__map" alt="Inheritance graph"/></div>
-<map name="ace__routine_1_1Coroutine_inherit__map" id="ace__routine_1_1Coroutine_inherit__map">
-<area shape="rect" title="Base class of all coroutines." alt="" coords="5,78,175,105"/>
-<area shape="rect" href="classace__routine_1_1cli_1_1CommandDispatcher.html" title="A coroutine that reads lines from the Serial port, tokenizes the line on whitespace boundaries,..." alt="" coords="251,5,447,47"/>
-<area shape="rect" href="classace__routine_1_1cli_1_1CommandManager.html" title="A convenience wrapper around a CommandDispatcher that hides complexity of creating,..." alt="" coords="223,71,476,112"/>
-<area shape="rect" href="classace__routine_1_1cli_1_1StreamLineReader.html" title="An AceRoutine coroutine that reads lines (terminated by &#39;\n&#39; or &#39;\r&#39; from the Stream device,..." alt="" coords="261,136,437,177"/>
-</map>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:abac7ce4542f9a27462b35fb9d92151d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classace__routine_1_1Coroutine.html">Coroutine</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1Coroutine.html#abac7ce4542f9a27462b35fb9d92151d8">getNext</a> ()</td></tr>
 <tr class="memdesc:abac7ce4542f9a27462b35fb9d92151d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the next pointer as a pointer to the pointer, similar to <a class="el" href="classace__routine_1_1Coroutine.html#a8a2a6d50806df1706eb313aea17ce45e" title="Get the pointer to the root pointer.">getRoot()</a>.  <a href="classace__routine_1_1Coroutine.html#abac7ce4542f9a27462b35fb9d92151d8">More...</a><br /></td></tr>
 <tr class="separator:abac7ce4542f9a27462b35fb9d92151d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3ae9a51f27913228607b865cc76b530"><td class="memItemLeft" align="right" valign="top"><a id="ac3ae9a51f27913228607b865cc76b530"></a>
-const <a class="el" href="classace__routine_1_1FCString.html">FCString</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1Coroutine.html#ac3ae9a51f27913228607b865cc76b530">getName</a> () const</td></tr>
-<tr class="memdesc:ac3ae9a51f27913228607b865cc76b530"><td class="mdescLeft">&#160;</td><td class="mdescRight">Human-readable name of the coroutine. <br /></td></tr>
-<tr class="separator:ac3ae9a51f27913228607b865cc76b530"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ee1f35bacffebf86c79c22a62fa8891"><td class="memItemLeft" align="right" valign="top"><a id="a6ee1f35bacffebf86c79c22a62fa8891"></a>
+const ace_common::FCString &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1Coroutine.html#a6ee1f35bacffebf86c79c22a62fa8891">getName</a> () const</td></tr>
+<tr class="memdesc:a6ee1f35bacffebf86c79c22a62fa8891"><td class="mdescLeft">&#160;</td><td class="mdescRight">Human-readable name of the coroutine. <br /></td></tr>
+<tr class="separator:a6ee1f35bacffebf86c79c22a62fa8891"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08a2c559cf86917aac8b702354ab61e4"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1Coroutine.html#a08a2c559cf86917aac8b702354ab61e4">runCoroutine</a> ()=0</td></tr>
 <tr class="memdesc:a08a2c559cf86917aac8b702354ab61e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The body of the coroutine.  <a href="classace__routine_1_1Coroutine.html#a08a2c559cf86917aac8b702354ab61e4">More...</a><br /></td></tr>
 <tr class="separator:a08a2c559cf86917aac8b702354ab61e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -123,6 +112,9 @@ const <a class="el" href="classace__routine_1_1FCString.html">FCString</a> &amp;
 <tr class="memitem:ad29d0f43128b49c48a71a167331dac51"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1Coroutine.html#ad29d0f43128b49c48a71a167331dac51">resume</a> ()</td></tr>
 <tr class="memdesc:ad29d0f43128b49c48a71a167331dac51"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add a Suspended coroutine into the head of the scheduler linked list, and change the state to Yielding.  <a href="classace__routine_1_1Coroutine.html#ad29d0f43128b49c48a71a167331dac51">More...</a><br /></td></tr>
 <tr class="separator:ad29d0f43128b49c48a71a167331dac51"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6e334380f6a057b3487a930c52ae96a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1Coroutine.html#aa6e334380f6a057b3487a930c52ae96a">reset</a> ()</td></tr>
+<tr class="memdesc:aa6e334380f6a057b3487a930c52ae96a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the coroutine to its initial state.  <a href="classace__routine_1_1Coroutine.html#aa6e334380f6a057b3487a930c52ae96a">More...</a><br /></td></tr>
+<tr class="separator:aa6e334380f6a057b3487a930c52ae96a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06263c92812815a813f0eec8a61d2894"><td class="memItemLeft" align="right" valign="top"><a id="a06263c92812815a813f0eec8a61d2894"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1Coroutine.html#a06263c92812815a813f0eec8a61d2894">isDelayExpired</a> ()</td></tr>
 <tr class="memdesc:a06263c92812815a813f0eec8a61d2894"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if delay time is over. <br /></td></tr>
@@ -273,7 +265,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <div class="textblock"><p>Base class of all coroutines. </p>
 <p>The actual coroutine code is an implementation of the virtual <a class="el" href="classace__routine_1_1Coroutine.html#a08a2c559cf86917aac8b702354ab61e4" title="The body of the coroutine.">runCoroutine()</a> method. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00255">255</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00247">247</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a2c0991faf233080e16bd81b94db0adbb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2c0991faf233080e16bd81b94db0adbb">&#9670;&nbsp;</a></span>Status</h2>
@@ -318,7 +310,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 *              v
 *         Terminated
 * </pre> 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00459">459</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00469">469</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -350,7 +342,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>All subclasses are expected to call either <a class="el" href="classace__routine_1_1Coroutine.html#a3417537c1ff3a7c737719d32192f3733" title="Initialize the coroutine for the CoroutineScheduler, set it to Yielding state, and add it to the link...">setupCoroutine(const char*)</a> or setupCoroutine(const __FlashStringHelper*) before the <a class="el" href="classace__routine_1_1CoroutineScheduler.html" title="Class that manages instances of the Coroutine class, and executes them in a round-robin fashion.">CoroutineScheduler</a> is used. The <a class="el" href="Coroutine_8h.html#ab22e58ab24b1908a7280f13603248ce3" title="Create a Coroutine instance named &#39;name&#39;.">COROUTINE()</a> macro will automatically call <a class="el" href="classace__routine_1_1Coroutine.html#a3417537c1ff3a7c737719d32192f3733" title="Initialize the coroutine for the CoroutineScheduler, set it to Yielding state, and add it to the link...">setupCoroutine()</a>.</p>
 <p>See comment in <a class="el" href="classace__routine_1_1Coroutine.html#a68dc92a6cce8435bc745a3582bbca210" title="Same as setupCoroutine(const char*) except using flash string type.">setupCoroutine(const __FlashStringHelper*)</a> for reason why the <a class="el" href="classace__routine_1_1Coroutine.html#a3417537c1ff3a7c737719d32192f3733" title="Initialize the coroutine for the CoroutineScheduler, set it to Yielding state, and add it to the link...">setupCoroutine()</a> function is used instead of chaining the name through the constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00503">503</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00513">513</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -381,7 +373,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Returns the current millisecond clock. </p>
 <p>By default it returns the global micros() function from Arduino but can be overridden for testing. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8cpp_source.html#l00072">72</a> of file <a class="el" href="Coroutine_8cpp_source.html">Coroutine.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8cpp_source.html#l00073">73</a> of file <a class="el" href="Coroutine_8cpp_source.html">Coroutine.cpp</a>.</p>
 
 </div>
 </div>
@@ -411,7 +403,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Returns the current millisecond clock. </p>
 <p>By default it returns the global millis() function from Arduino but can be overridden for testing. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8cpp_source.html#l00068">68</a> of file <a class="el" href="Coroutine_8cpp_source.html">Coroutine.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8cpp_source.html#l00069">69</a> of file <a class="el" href="Coroutine_8cpp_source.html">Coroutine.cpp</a>.</p>
 
 </div>
 </div>
@@ -441,7 +433,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Returns the current clock in unit of seconds, truncated to the lower 16-bits. </p>
 <p>This is an approximation of (millis / 1000). It does not need to be perfectly accurate because COROUTINE_DELAY_SECONS() is not guaranteed to be precise. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8cpp_source.html#l00076">76</a> of file <a class="el" href="Coroutine_8cpp_source.html">Coroutine.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8cpp_source.html#l00077">77</a> of file <a class="el" href="Coroutine_8cpp_source.html">Coroutine.cpp</a>.</p>
 
 </div>
 </div>
@@ -471,7 +463,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Return the next pointer as a pointer to the pointer, similar to <a class="el" href="classace__routine_1_1Coroutine.html#a8a2a6d50806df1706eb313aea17ce45e" title="Get the pointer to the root pointer.">getRoot()</a>. </p>
 <p>This makes it much easier to manipulate a singly-linked list. Also makes setNext() method unnecessary. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00272">272</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00264">264</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -501,7 +493,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Get the pointer to the root pointer. </p>
 <p>Implemented as a function static to fix the C++ static initialization problem, making it safe to use this in other static contexts. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8cpp_source.html#l00034">34</a> of file <a class="el" href="Coroutine_8cpp_source.html">Coroutine.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8cpp_source.html#l00035">35</a> of file <a class="el" href="Coroutine_8cpp_source.html">Coroutine.cpp</a>.</p>
 
 </div>
 </div>
@@ -531,7 +523,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Return the status of the coroutine. </p>
 <p>Used by the <a class="el" href="classace__routine_1_1CoroutineScheduler.html" title="Class that manages instances of the Coroutine class, and executes them in a round-robin fashion.">CoroutineScheduler</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00509">509</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00519">519</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -561,7 +553,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>The coroutine is either Ending or Terminated. </p>
 <p>This method is recommended over <a class="el" href="classace__routine_1_1Coroutine.html#a74e627ca0d1addae672a8b4d968b0394" title="The coroutine returned using COROUTINE_END().">isEnding()</a> or <a class="el" href="classace__routine_1_1Coroutine.html#aacfb6a9daca17be7c0c61508845b701b" title="The coroutine was terminated by the scheduler with a call to setTerminated().">isTerminated()</a> because it works when the coroutine is executed either manually or through the <a class="el" href="classace__routine_1_1CoroutineScheduler.html" title="Class that manages instances of the Coroutine class, and executes them in a round-robin fashion.">CoroutineScheduler</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00385">385</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00395">395</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -591,7 +583,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>The coroutine returned using <a class="el" href="Coroutine_8h.html#a7e326a8df652c46c42a8d713ddc67bd7" title="Mark the end of a coroutine.">COROUTINE_END()</a>. </p>
 <p>In most cases, <a class="el" href="classace__routine_1_1Coroutine.html#a0a405f235f740be8b673657153821bb6" title="The coroutine is either Ending or Terminated.">isDone()</a> is recommended instead because it works when coroutines are executed manually or through the <a class="el" href="classace__routine_1_1CoroutineScheduler.html" title="Class that manages instances of the Coroutine class, and executes them in a round-robin fashion.">CoroutineScheduler</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00370">370</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00380">380</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -621,7 +613,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>The coroutine is currently running. </p>
 <p>True only within the coroutine. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00363">363</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00373">373</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -651,7 +643,38 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>The coroutine was terminated by the scheduler with a call to <a class="el" href="classace__routine_1_1Coroutine.html#a9c3fa246606d04d205eb4b0c2e91406c" title="Set status to indicate that the Coroutine has been removed from the Scheduler queue.">setTerminated()</a>. </p>
 <p>In most cases, <a class="el" href="classace__routine_1_1Coroutine.html#a0a405f235f740be8b673657153821bb6" title="The coroutine is either Ending or Terminated.">isDone()</a> should be used instead because it works when coroutines are executed manually or through the CoroutineScheudler. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00378">378</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00388">388</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+
+</div>
+</div>
+<a id="aa6e334380f6a057b3487a930c52ae96a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6e334380f6a057b3487a930c52ae96a">&#9670;&nbsp;</a></span>reset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ace_routine::Coroutine::reset </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reset the coroutine to its initial state. </p>
+<p>Only the <a class="el" href="classace__routine_1_1Coroutine.html" title="Base class of all coroutines.">Coroutine</a> base-class state is reset to the original state. If the subclass <a class="el" href="classace__routine_1_1Coroutine.html#a08a2c559cf86917aac8b702354ab61e4" title="The body of the coroutine.">runCoroutine()</a> uses any static variables (for example, a loop counter), you must reset those variables manually as well, since this library does not have any knowledge about them.</p>
+<p>It is expected that this method will be called from outside the <a class="el" href="classace__routine_1_1Coroutine.html#a08a2c559cf86917aac8b702354ab61e4" title="The body of the coroutine.">runCoroutine()</a> method. If it is called within the method, I'm not sure what will happen. I think the coroutine will abandon the current continuation point, and start executing from the beginning of the <a class="el" href="classace__routine_1_1Coroutine.html" title="Base class of all coroutines.">Coroutine</a> upon the next iteration. </p>
+
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00337">337</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -673,7 +696,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Add a Suspended coroutine into the head of the scheduler linked list, and change the state to Yielding. </p>
 <p>If the coroutine is in any other state, this method does nothing. This method works only if the <a class="el" href="classace__routine_1_1CoroutineScheduler.html#a2dd0d1ca2b8fe39bebc1c9b275d7893b" title="Run the current coroutine using the current scheduler.">CoroutineScheduler::loop()</a> is used. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8cpp_source.html#l00052">52</a> of file <a class="el" href="Coroutine_8cpp_source.html">Coroutine.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8cpp_source.html#l00053">53</a> of file <a class="el" href="Coroutine_8cpp_source.html">Coroutine.cpp</a>.</p>
 
 </div>
 </div>
@@ -704,8 +727,6 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>The COROUTINE macro creates a subclass of this class and puts the body of the coroutine into this method.</p>
 <dl class="section return"><dt>Returns</dt><dd>The return value is always ignored. This method is declared to return an int to prevent the user from accidentally returning from this method using an explicit 'return' statement instead of through one of the macros (e.g. <a class="el" href="Coroutine_8h.html#a682abe1669f9fe28af63d11da5421cbf" title="Yield execution to another coroutine.">COROUTINE_YIELD()</a>, <a class="el" href="Coroutine_8h.html#a1391503960a4b0c48f8200f1ffa0e305" title="Yield for delayMillis.">COROUTINE_DELAY()</a>, <a class="el" href="Coroutine_8h.html#a9f6714d9752740b6173b6afc4d108fa8" title="Yield until condition is true, then execution continues.">COROUTINE_AWAIT()</a> or <a class="el" href="Coroutine_8h.html#a7e326a8df652c46c42a8d713ddc67bd7" title="Mark the end of a coroutine.">COROUTINE_END()</a>). </dd></dl>
 
-<p>Implemented in <a class="el" href="classace__routine_1_1cli_1_1CommandDispatcher.html#aecfa506ce0ad3040545ede38a0c3dac7">ace_routine::cli::CommandDispatcher</a>, <a class="el" href="classace__routine_1_1cli_1_1CommandManager.html#a6270aedc5d30fede8ed8561ed5743833">ace_routine::cli::CommandManager&lt; BUF_SIZE, ARGV_SIZE &gt;</a>, and <a class="el" href="classace__routine_1_1cli_1_1StreamLineReader.html#a1873206140389689c03b0b5a516008cc">ace_routine::cli::StreamLineReader</a>.</p>
-
 </div>
 </div>
 <a id="a5cf7c47f82ca67910955e4a9c2c7afe9"></a>
@@ -735,7 +756,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Configure the delay timer for delayMicros. </p>
 <p>Similar to seDelayMillis(), the maximum delay is 32767 micros. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00571">571</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00581">581</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -766,7 +787,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Configure the delay timer for delayMillis. </p>
 <p>The maximum duration is set to (UINT16_MAX / 2) (i.e. 32767 milliseconds) if given a larger value. This makes the longest allowable time between two successive calls to <a class="el" href="classace__routine_1_1Coroutine.html#a06263c92812815a813f0eec8a61d2894" title="Check if delay time is over.">isDelayExpired()</a> for a given coroutine to be 32767 (UINT16_MAX - UINT16_MAX / 2 - 1) milliseconds, which should be long enough for all practical use-cases. (The '- 1' comes from an edge case where <a class="el" href="classace__routine_1_1Coroutine.html#a06263c92812815a813f0eec8a61d2894" title="Check if delay time is over.">isDelayExpired()</a> evaluates to be true in the CoroutineScheduler::runCoroutine() but becomes to be false in the <a class="el" href="Coroutine_8h.html#a1391503960a4b0c48f8200f1ffa0e305" title="Yield for delayMillis.">COROUTINE_DELAY()</a> macro inside <a class="el" href="classace__routine_1_1Coroutine.html#a08a2c559cf86917aac8b702354ab61e4" title="The body of the coroutine.">Coroutine::runCoroutine()</a>) because the clock increments by 1 millisecond.) </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00559">559</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00569">569</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -797,7 +818,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Configure the delay timer for delaySeconds. </p>
 <p>Similar to seDelayMillis(), the maximum delay is 32767 seconds. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00583">583</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00593">593</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -827,7 +848,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Set status to indicate that the <a class="el" href="classace__routine_1_1Coroutine.html" title="Base class of all coroutines.">Coroutine</a> has been removed from the Scheduler queue. </p>
 <p>Should be used only by the <a class="el" href="classace__routine_1_1CoroutineScheduler.html" title="Class that manages instances of the Coroutine class, and executes them in a round-robin fashion.">CoroutineScheduler</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00544">544</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00554">554</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -859,7 +880,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Normally, the name would be passed from the subclass into this parent class through constructor chaining. But if we try to do that with the F() string, the compiler complains because F() macros work only inside a function. Therefore, the <a class="el" href="Coroutine_8h.html#ab22e58ab24b1908a7280f13603248ce3" title="Create a Coroutine instance named &#39;name&#39;.">COROUTINE()</a> macro uses the <a class="el" href="classace__routine_1_1Coroutine.html#a3417537c1ff3a7c737719d32192f3733" title="Initialize the coroutine for the CoroutineScheduler, set it to Yielding state, and add it to the link...">setupCoroutine()</a> method to pass the name of the coroutine.</p>
 <p>The problem doesn't exist for a (const char*) but for consistency, I made both types of strings pass through the <a class="el" href="classace__routine_1_1Coroutine.html#a3417537c1ff3a7c737719d32192f3733" title="Initialize the coroutine for the CoroutineScheduler, set it to Yielding state, and add it to the link...">setupCoroutine()</a> method instead of chaining the constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00422">422</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00432">432</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -897,7 +918,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00403">403</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00413">413</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -927,7 +948,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p>Suspend the coroutine at the next scheduler iteration. </p>
 <p>If the coroutine is already in the process of ending or is already terminated, then this method does nothing. A coroutine cannot use this method to suspend itself, it can only suspend some other coroutine. Currently, there is no ability for a coroutine to suspend itself, that would require the addition of a COROUTINE_SUSPEND() macro. Also, this method works only if the <a class="el" href="classace__routine_1_1CoroutineScheduler.html#a2dd0d1ca2b8fe39bebc1c9b275d7893b" title="Run the current coroutine using the current scheduler.">CoroutineScheduler::loop()</a> is used because the suspend functionality is implemented by the <a class="el" href="classace__routine_1_1CoroutineScheduler.html" title="Class that manages instances of the Coroutine class, and executes them in a round-robin fashion.">CoroutineScheduler</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00319">319</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00311">311</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -955,7 +976,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p><a class="el" href="classace__routine_1_1Coroutine.html" title="Base class of all coroutines.">Coroutine</a> is currenly running. </p>
 <p>True only within the coroutine itself. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00476">476</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00486">486</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -982,7 +1003,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::AceRoutineTest_sta
 <p><a class="el" href="classace__routine_1_1Coroutine.html" title="Base class of all coroutines.">Coroutine</a> has been suspended using <a class="el" href="classace__routine_1_1Coroutine.html#ad919229c4f2f2c85d8d65238d19316f8" title="Suspend the coroutine at the next scheduler iteration.">suspend()</a> and the scheduler should remove it from the queue upon the next iteration. </p>
 <p>We don't distinguish whether the coroutine is still in the queue or not with this status. We can add that later if we need to. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00467">467</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00477">477</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>

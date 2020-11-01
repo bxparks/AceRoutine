@@ -80,9 +80,9 @@ Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
 
-**Version**: 1.0.1 (2020-09-18)
+**Version**: 1.1 (2020-11-01)
 
-**Changelog**: [CHANGELOG.md](CHANGELOG.md).
+**Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
 ![AUnit Tests](https://github.com/bxparks/AceRoutine/workflows/AUnit%20Tests/badge.svg)
 
@@ -242,7 +242,7 @@ The development version can be installed by cloning the 2 git repos:
 * AceRoutine (https://github.com/bxparks/AceRoutine)
 * AceCommon  (https://github.com/bxparks/AceCommon)
 
-You can copy these directories over the `./libraries` directory used by the
+You can copy these directories to the `./libraries` directory used by the
 Arduino IDE. (The result is a directory named `./libraries/AceRoutine` and
 `./libraries/AceCommon`). Or you can create symlinks from `/.libraries` to these
 directories.

@@ -37,7 +37,7 @@ SOFTWARE.
 #include "ace_routine/Channel.h"
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_ROUTINE_VERSION 10001
-#define ACE_ROUTINE_VERSION_STRING "1.0.1"
+#define ACE_ROUTINE_VERSION 10100
+#define ACE_ROUTINE_VERSION_STRING "1.1"
 
 #endif

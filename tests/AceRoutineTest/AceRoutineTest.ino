@@ -10,28 +10,6 @@ using namespace aunit;
 
 // ---------------------------------------------------------------------------
 
-test(AceRoutineTest, FCString_compareTo) {
-  FCString n;
-  FCString a("a");
-  FCString b("b");
-  FCString fa(F("a"));
-  FCString fb(F("b"));
-
-  assertEqual(n.compareTo(n), 0);
-  assertLess(n.compareTo(a), 0);
-  assertLess(n.compareTo(fa), 0);
-
-  assertEqual(a.compareTo(fa), 0);
-  assertEqual(fb.compareTo(b), 0);
-
-  assertLess(a.compareTo(b), 0);
-  assertLess(a.compareTo(fb), 0);
-  assertMore(fb.compareTo(a), 0);
-  assertMore(fb.compareTo(fa), 0);
-}
-
-// ---------------------------------------------------------------------------
-
 test(AceRoutineTest, statusStrings) {
   assertEqual(Coroutine::sStatusStrings[Coroutine::kStatusSuspended],
       "Suspended");

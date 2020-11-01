@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include <stdint.h> // UINT16_MAX
 #include <Print.h> // Print
-#include "FCString.h"
+#include <AceCommon.h> // FCString
 
 class AceRoutineTest_statusStrings;
 
@@ -252,7 +252,7 @@ class Coroutine {
     Coroutine** getNext() { return &mNext; }
 
     /** Human-readable name of the coroutine. */
-    const FCString& getName() const { return mName; }
+    const ace_common::FCString& getName() const { return mName; }
 
     /**
      * The body of the coroutine. The COROUTINE macro creates a subclass of
@@ -399,7 +399,7 @@ class Coroutine {
      * @param name The name of the coroutine as a human-readable string.
      */
     void setupCoroutine(const char* name) {
-      mName = FCString(name);
+      mName = ace_common::FCString(name);
       mStatus = kStatusYielding;
       insertSorted();
     }
@@ -418,7 +418,7 @@ class Coroutine {
      * instead of chaining the constructor.
      */
     void setupCoroutine(const __FlashStringHelper* name) {
-      mName = FCString(name);
+      mName = ace_common::FCString(name);
       mStatus = kStatusYielding;
       insertSorted();
     }
@@ -608,7 +608,7 @@ class Coroutine {
      */
     void insertSorted();
 
-    FCString mName;
+    ace_common::FCString mName;
     Coroutine* mNext = nullptr;
     void* mJumpPoint = nullptr;
     Status mStatus = kStatusSuspended;

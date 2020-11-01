@@ -378,7 +378,7 @@ class Coroutine {
   public:
     static Coroutine** getRoot();
 
-    const FCString& getName() const;
+    const ace_common::FCString& getName() const;
 
     virtual int runCoroutine() = 0;
 

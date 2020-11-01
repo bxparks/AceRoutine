@@ -231,14 +231,24 @@ void loop() {
 
 ## Installation
 
-The latest stable release is available in the Arduino IDE Library Manager.
-Search for "AceRoutine". Click Install.
+The latest stable release is available in the Arduino IDE Library Manager. Two
+libraries need to be installed since v1.1:
 
-The development version can be installed by cloning the
-[GitHub repository](https://github.com/bxparks/AceRoutine), checking out the
-`develop` branch, then manually copying over the contents to the `./libraries`
-directory used by the Arduino IDE. (The result is a directory named
-`./libraries/AceRoutine`.) The `master` branch contains the stable release.
+* Search for "AceRoutine". Click Install.
+* Search for "AceCommon". Click Install.
+
+The development version can be installed by cloning the 2 git repos:
+
+* AceRoutine (https://github.com/bxparks/AceRoutine)
+* AceCommon  (https://github.com/bxparks/AceCommon)
+
+You can copy these directories over the `./libraries` directory used by the
+Arduino IDE. (The result is a directory named `./libraries/AceRoutine` and
+`./libraries/AceCommon`). Or you can create symlinks from `/.libraries` to these
+directories.
+
+The `develop` branch contains the latest working version.
+The `master` branch contains the stable release.
 
 ### Source Code
 

@@ -1,6 +1,20 @@
 # Changelog
 
 * Unreleased
+* 1.1 (2020-11-01)
+    * Add a `Coroutine::reset()` method that causes the Coroutine to restart
+      from the beginning of the coroutine upon the next iteration. (Fixes #13
+      and #14).
+    * **Potentially Breaking**: AceRoutine now depends on the AceCommon
+      (https://github.com/bxparks/AceCommon) library to avoid maintaining
+      multiple versions of low-level common code. The externally exposed API has
+      not changed. The AceCommon library can be installed through the Arduino
+      IDE Library Manager, as explained in Installation section of the
+      README.md.
+    * **Potentially Breaking**: Move the CommandLineInterface package from
+      `src/ace_routine/cli` to the AceUtils library
+      (https://github.com/bxparks/AceUtils). The AceUtils library is a better
+      home for this higher-level package that depends on AceRoutine.
 * 1.0.1 (2020-09-18)
     * Add continuous integration using GitHub Actions.
     * Add more documentation and examples of Manual Coroutines in README.md.

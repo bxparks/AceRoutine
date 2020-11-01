@@ -61,18 +61,11 @@ class __FlashStringHelper;
   #include <avr/pgmspace.h>
   #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
 
-
 #elif defined(ESP8266)
   #include <pgmspace.h>
 
 #elif defined(ESP32)
   #include <pgmspace.h>
-
-  // The FPSTR() macro is broken on ESP32 until
-  // https://github.com/espressif/arduino-esp32/issues/1371 is fixed, hopefully
-  // in v1.0.3.
-  #undef FPSTR
-  #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
 
 #elif defined(UNIX_HOST_DUINO)
   #include <pgmspace.h>

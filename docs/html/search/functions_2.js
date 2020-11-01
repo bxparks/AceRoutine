@@ -1,13 +1,11 @@
 var searchData=
 [
-  ['getcstring_115',['getCString',['../classace__routine_1_1FCString.html#a33d3e7f0dfe1f089ec8b9dd4fcb32f68',1,'ace_routine::FCString']]],
-  ['getdispatcher_116',['getDispatcher',['../classace__routine_1_1cli_1_1CommandManager.html#a2f9fac10b30818e683d42ec20f3e5144',1,'ace_routine::cli::CommandManager']]],
-  ['getfstring_117',['getFString',['../classace__routine_1_1FCString.html#a592ab206584ae70afa9d5167f47694c1',1,'ace_routine::FCString']]],
-  ['gethelpstring_118',['getHelpString',['../classace__routine_1_1cli_1_1CommandHandler.html#ab5ef4ed0dea7db2996a610c48602c892',1,'ace_routine::cli::CommandHandler']]],
-  ['getjump_119',['getJump',['../classace__routine_1_1Coroutine.html#aefae39030b3e5ee90eb1099d818f4d7d',1,'ace_routine::Coroutine']]],
-  ['getname_120',['getName',['../classace__routine_1_1cli_1_1CommandHandler.html#ae31d7039e4e2a3e2c918b11b3cecd13c',1,'ace_routine::cli::CommandHandler::getName()'],['../classace__routine_1_1Coroutine.html#ac3ae9a51f27913228607b865cc76b530',1,'ace_routine::Coroutine::getName()']]],
-  ['getnext_121',['getNext',['../classace__routine_1_1Coroutine.html#abac7ce4542f9a27462b35fb9d92151d8',1,'ace_routine::Coroutine']]],
-  ['getroot_122',['getRoot',['../classace__routine_1_1Coroutine.html#a8a2a6d50806df1706eb313aea17ce45e',1,'ace_routine::Coroutine']]],
-  ['getstatus_123',['getStatus',['../classace__routine_1_1Coroutine.html#a5418ff8930ad549fff574ff40c9bdaee',1,'ace_routine::Coroutine']]],
-  ['gettype_124',['getType',['../classace__routine_1_1FCString.html#a0f1e4eb7891ef7d1ff173f1e62ae0701',1,'ace_routine::FCString']]]
+  ['isdelayexpired_85',['isDelayExpired',['../classace__routine_1_1Coroutine.html#a06263c92812815a813f0eec8a61d2894',1,'ace_routine::Coroutine']]],
+  ['isdelaying_86',['isDelaying',['../classace__routine_1_1Coroutine.html#ab138ca54222e8ddbe7657230dff0a49f',1,'ace_routine::Coroutine']]],
+  ['isdone_87',['isDone',['../classace__routine_1_1Coroutine.html#a0a405f235f740be8b673657153821bb6',1,'ace_routine::Coroutine']]],
+  ['isending_88',['isEnding',['../classace__routine_1_1Coroutine.html#a74e627ca0d1addae672a8b4d968b0394',1,'ace_routine::Coroutine']]],
+  ['isrunning_89',['isRunning',['../classace__routine_1_1Coroutine.html#ac67940de63de823c92b96efb858ef287',1,'ace_routine::Coroutine']]],
+  ['issuspended_90',['isSuspended',['../classace__routine_1_1Coroutine.html#a3747a9970a9608edda34a97978fdcf1e',1,'ace_routine::Coroutine']]],
+  ['isterminated_91',['isTerminated',['../classace__routine_1_1Coroutine.html#aacfb6a9daca17be7c0c61508845b701b',1,'ace_routine::Coroutine']]],
+  ['isyielding_92',['isYielding',['../classace__routine_1_1Coroutine.html#ae52a28f0e3c096cce4eb5e0698c038b1',1,'ace_routine::Coroutine']]]
 ];

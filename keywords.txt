@@ -9,7 +9,6 @@
 Coroutine	KEYWORD1
 CoroutineScheduler	KEYWORD1
 Channel	KEYWORD1
-FCString	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)

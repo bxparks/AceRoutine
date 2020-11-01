@@ -1,4 +1,4 @@
-#line 2 "AceCoroutineTest.ino"
+#line 2 "AceRoutineTest.ino"
 
 #include <AceRoutine.h>
 #include <AUnitVerbose.h>
@@ -7,28 +7,6 @@
 using namespace ace_routine;
 using namespace ace_routine::testing;
 using namespace aunit;
-
-// ---------------------------------------------------------------------------
-
-test(AceRoutineTest, FCString_compareTo) {
-  FCString n;
-  FCString a("a");
-  FCString b("b");
-  FCString fa(F("a"));
-  FCString fb(F("b"));
-
-  assertEqual(n.compareTo(n), 0);
-  assertLess(n.compareTo(a), 0);
-  assertLess(n.compareTo(fa), 0);
-
-  assertEqual(a.compareTo(fa), 0);
-  assertEqual(fb.compareTo(b), 0);
-
-  assertLess(a.compareTo(b), 0);
-  assertLess(a.compareTo(fb), 0);
-  assertMore(fb.compareTo(a), 0);
-  assertMore(fb.compareTo(fa), 0);
-}
 
 // ---------------------------------------------------------------------------
 
@@ -333,20 +311,6 @@ test(AceRoutineTest, scheduler) {
   // run 'a', hits COROUTINE_AWAIT()
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
-}
-
-// ---------------------------------------------------------------------------
-test(AceRoutineTest, udiv1000Test) {
-  assertEqual((unsigned long) 9, ace_routine::internal::udiv1000(10L*1000));
-  assertEqual((unsigned long) 97, ace_routine::internal::udiv1000(100L*1000));
-  assertEqual((unsigned long) 997,
-      ace_routine::internal::udiv1000(1000L*1000));
-  assertEqual((unsigned long) 9993,
-      ace_routine::internal::udiv1000(10L*1000*1000));
-  assertEqual((unsigned long) 99987,
-      ace_routine::internal::udiv1000(100L*1000*1000));
-  assertEqual((unsigned long) 999980,
-      ace_routine::internal::udiv1000(1000L*1000*1000));
 }
 
 // ---------------------------------------------------------------------------

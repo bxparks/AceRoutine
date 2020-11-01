@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include <stdint.h> // UINT16_MAX
 #include <Print.h> // Print
-#include "FCString.h"
+#include <AceCommon.h> // FCString
 
 class AceRoutineTest_statusStrings;
 
@@ -65,8 +65,10 @@ class AceRoutineTest_statusStrings;
 #define COROUTINE(...) \
     GET_COROUTINE(__VA_ARGS__, COROUTINE2, COROUTINE1)(__VA_ARGS__)
 
+/** Internal helper macro to allow overloading of the COROUTINE() macro. */
 #define GET_COROUTINE(_1, _2, NAME, ...) NAME
 
+/** Implement the 1-argument COROUTINE() macro. */
 #define COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
@@ -77,6 +79,7 @@ Coroutine_##name :: Coroutine_##name() { \
 } \
 int Coroutine_##name :: runCoroutine()
 
+/** Implement the 2-argument COROUTINE() macro. */
 #define COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
@@ -99,8 +102,12 @@ int className##_##name :: runCoroutine()
     GET_EXTERN_COROUTINE(\
         __VA_ARGS__, EXTERN_COROUTINE2, EXTERN_COROUTINE1)(__VA_ARGS__)
 
+/**
+ * Internal helper macro to allow overloading of the EXTERN_COROUTINE() macro.
+ */
 #define GET_EXTERN_COROUTINE(_1, _2, NAME, ...) NAME
 
+/** Implement the 1-argument EXTERN_COROUTINE() macro. */
 #define EXTERN_COROUTINE1(name) \
 struct Coroutine_##name : ace_routine::Coroutine { \
   Coroutine_##name(); \
@@ -108,6 +115,7 @@ struct Coroutine_##name : ace_routine::Coroutine { \
 }; \
 extern Coroutine_##name name
 
+/** Implement the 2-argument EXTERN_COROUTINE() macro. */
 #define EXTERN_COROUTINE2(className, name) \
 struct className##_##name : className { \
   className##_##name(); \
@@ -130,6 +138,10 @@ extern className##_##name name
    COROUTINE_BEGIN(); \
    while (true) \
 
+/**
+ * Implement the common logic for COROUTINE_YIELD(), COROUTINE_AWAIT(),
+ * COROUTINE_DELAY(), COROUTINE_DELAY_SECONDS(), and COROUTINE_DELAY_MICROS().
+ */
 #define COROUTINE_YIELD_INTERNAL() \
     do { \
       __label__ jumpLabel; \
@@ -228,26 +240,6 @@ extern className##_##name name
 
 namespace ace_routine {
 
-namespace internal {
-  /**
-   * Approximate division by 1000. More accurate algorithms exist (see for
-   * example http://www.hackersdelight.org/divcMore.pdf) but I'm pretty sure
-   * that this good enough since we don't guarantee accurate timing of the
-   * COROUTINE_DELAY*() methods.
-   */
-  inline unsigned long udiv1000(unsigned long n) {
-    // Use binomial expansion of 1/(1-x).
-    // 1/1000 = 1/(1024 - 24)
-    //        = (1/2^10) * (1 / (1 - 3/2^7))
-    //        = (1/2^10) * (1 + 3/2^7 + 9/2^14 + 27/2^21 + ...)
-    //        = (1/2^10 + 3/2^17 + 9/2^24 + 27/2^31 + ...)
-    unsigned long x = (n >> 8);
-    unsigned long y = (x >> 8);
-    unsigned long z = (y >> 8);
-    return (x >> 2) + 3 * (y >> 1) + 9 * z;
-  }
-}
-
 /**
  * Base class of all coroutines. The actual coroutine code is an implementation
  * of the virtual runCoroutine() method.
@@ -272,7 +264,7 @@ class Coroutine {
     Coroutine** getNext() { return &mNext; }
 
     /** Human-readable name of the coroutine. */
-    const FCString& getName() const { return mName; }
+    const ace_common::FCString& getName() const { return mName; }
 
     /**
      * The body of the coroutine. The COROUTINE macro creates a subclass of
@@ -328,6 +320,24 @@ class Coroutine {
      * CoroutineScheduler::loop() is used.
      */
     void resume();
+
+    /**
+     * Reset the coroutine to its initial state. Only the Coroutine base-class
+     * state is reset to the original state. If the subclass runCoroutine()
+     * uses any static variables (for example, a loop counter), you must reset
+     * those variables manually as well, since this library does not have any
+     * knowledge about them.
+     *
+     * It is expected that this method will be called from outside the
+     * runCoroutine() method. If it is called within the method, I'm not sure
+     * what will happen. I think the coroutine will abandon the current
+     * continuation point, and start executing from the beginning of the
+     * Coroutine upon the next iteration.
+     */
+    void reset() {
+      mStatus = kStatusSuspended;
+      mJumpPoint = nullptr;
+    }
 
     /** Check if delay time is over. */
     bool isDelayExpired() {
@@ -401,7 +411,7 @@ class Coroutine {
      * @param name The name of the coroutine as a human-readable string.
      */
     void setupCoroutine(const char* name) {
-      mName = FCString(name);
+      mName = ace_common::FCString(name);
       mStatus = kStatusYielding;
       insertSorted();
     }
@@ -420,7 +430,7 @@ class Coroutine {
      * instead of chaining the constructor.
      */
     void setupCoroutine(const __FlashStringHelper* name) {
-      mName = FCString(name);
+      mName = ace_common::FCString(name);
       mStatus = kStatusYielding;
       insertSorted();
     }
@@ -610,7 +620,7 @@ class Coroutine {
      */
     void insertSorted();
 
-    FCString mName;
+    ace_common::FCString mName;
     Coroutine* mNext = nullptr;
     void* mJumpPoint = nullptr;
     Status mStatus = kStatusSuspended;

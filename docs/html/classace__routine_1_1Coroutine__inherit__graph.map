@@ -1,6 +1,0 @@
-<map id="ace_routine::Coroutine" name="ace_routine::Coroutine">
-<area shape="rect" id="node1" title="Base class of all coroutines." alt="" coords="5,78,175,105"/>
-<area shape="rect" id="node2" href="$classace__routine_1_1cli_1_1CommandDispatcher.html" title="A coroutine that reads lines from the Serial port, tokenizes the line on whitespace boundaries,..." alt="" coords="251,5,447,47"/>
-<area shape="rect" id="node3" href="$classace__routine_1_1cli_1_1CommandManager.html" title="A convenience wrapper around a CommandDispatcher that hides complexity of creating,..." alt="" coords="223,71,476,112"/>
-<area shape="rect" id="node4" href="$classace__routine_1_1cli_1_1StreamLineReader.html" title="An AceRoutine coroutine that reads lines (terminated by &#39;\n&#39; or &#39;\r&#39; from the Stream device,..." alt="" coords="261,136,437,177"/>
-</map>

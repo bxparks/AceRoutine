@@ -1,6 +1,7 @@
 /*
  * A sketch that illustrates using two coroutines and a channel to create a
- * pipe between them.
+ * pipe between them. Work in progress... Haven't had time to finish this
+ * line of research.
  */
 
 #include <Arduino.h>

@@ -255,7 +255,6 @@ The `master` branch contains the stable release.
 The source files are organized as follows:
 * `src/AceRoutine.h` - main header file
 * `src/ace_routine/` - implementation files
-* `src/ace_routine/cli` - command line interface library
 * `src/ace_routine/testing/` - internal testing files
 * `tests/` - unit tests which depend on
   [AUnit](https://github.com/bxparks/AUnit)
@@ -284,12 +283,6 @@ The following example sketches are provided:
 * [BlinkSlowFastManualRoutine.ino](examples/BlinkSlowFastManualRoutine): same
   as BlinkSlowFastRoutine but using manual `Coroutine` subclasses
 * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same time
-* [CommandLineShell.ino](examples/CommandLineShell): uses the
-  `src/ace_routine/cli` classes to implement a command line interface that
-  accepts a number of commands on the serial port. In other words, it is a
-  primitive "shell". The shell is non-blocking and uses coroutines so that other
-  coroutines continue to run while the board waits for commands to be typed on
-  the serial port.
 * [Delay.ino](examples/Delay): validate the various delay macros
   (`COROUTINE_DELAY()`, `COROUTINE_DELAY_MICROS()` and
   `COROUTINE_DELAY_SECONDS()`)
@@ -1423,14 +1416,12 @@ void loop() {
 
 **Examples**
 
-A really good example of using a `Channel` can be found in the
-[ace_routine/cli](src/ace_routine/cli) package which uses 2 coroutines
-and a channel between them to communicate:
-
-* `StreamLineReader.h`: a coroutine that reads from `Serial` and writes to a
-  `Channel`
-* `CommandDispatcher.h`: a coroutine that reads from a `Channel` and dispatches
-  to a `CommandHandler`
+The CommandLineInterface package in the AceUtils library
+(https://github.com/bxparks/AceUtils) uses 2 Coroutines which communicate with
+each other using a Channel. One coroutine reads from the `Serial` port, while
+the other coroutine writes the output of the command to the `Serial` port.
+Neither coroutines are blocking, which allows other coroutines to do other
+things.
 
 **Limitations**
 

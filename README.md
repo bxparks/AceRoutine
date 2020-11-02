@@ -84,6 +84,9 @@ additional macros that can reduce boilerplate code.
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
+**Important Change in v1.1**: This library now depends on the AceCommon library
+(https://github.com/bxparks/AceCommon). See the *Installation* section below.
+
 ![AUnit Tests](https://github.com/bxparks/AceRoutine/workflows/AUnit%20Tests/badge.svg)
 
 ## Hello Coroutines

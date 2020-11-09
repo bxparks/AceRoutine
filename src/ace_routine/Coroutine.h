@@ -249,20 +249,6 @@ class Coroutine {
   friend class ::AceRoutineTest_statusStrings;
 
   public:
-    /**
-     * Get the pointer to the root pointer. Implemented as a function static to
-     * fix the C++ static initialization problem, making it safe to use this in
-     * other static contexts.
-     */
-    static Coroutine** getRoot();
-
-    /**
-     * Return the next pointer as a pointer to the pointer, similar to
-     * getRoot(). This makes it much easier to manipulate a singly-linked list.
-     * Also makes setNext() method unnecessary.
-     */
-    Coroutine** getNext() { return &mNext; }
-
     /** Human-readable name of the coroutine. */
     const ace_common::FCString& getName() const { return mName; }
 
@@ -605,6 +591,21 @@ class Coroutine {
 
     /** A lookup table from Status integer to human-readable strings. */
     static const __FlashStringHelper* const sStatusStrings[];
+
+    /**
+     * Get the pointer to the root pointer. Implemented as a function static to
+     * fix the C++ static initialization problem, making it safe to use this in
+     * other static contexts.
+     */
+    static Coroutine** getRoot();
+
+    /**
+     * Return the next pointer as a pointer to the pointer, similar to
+     * getRoot(). This makes it much easier to manipulate a singly-linked list.
+     * Also makes setNext() method unnecessary. Should be used only by
+     * CoroutineScheduler.
+     */
+    Coroutine** getNext() { return &mNext; }
 
     /**
      * Insert the current coroutine into the singly linked list. The order of

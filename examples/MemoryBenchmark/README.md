@@ -12,7 +12,19 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceRoutine v1.1
+**Version**: AceRoutine v1.2
+
+**Changes**:
+
+* v1.1 to v1.2 saw a significant *decrease* of flash usage by about 200-400
+  bytes for various scenarios. This was due to several factors including:
+    * `Coroutine::setupCoroutine()` no longer sorts the coroutines in the linked
+      list by name
+    * `Coroutine::suspend()` and `resume()` no longer modify the linked list
+    * `CoroutineScheduler::runCoroutine()` simplified due to immutable
+      linked list
+    * `CoroutineScheduler::setupScheduler()` simplified due to immutable linked
+      list
 
 ## How to Generate
 
@@ -67,10 +79,10 @@ $ ./generate_table.awk < nano.txt
 |---------------------------------+--------------+-------------|
 | Baseline                        |    606/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |   1890/   54 |  1284/   43 |
-| Two Coroutines                  |   2202/   85 |  1596/   74 |
-| Scheduler, One Coroutine        |   2028/   64 |  1422/   53 |
-| Scheduler, Two Coroutines       |   2286/   79 |  1680/   68 |
+| One Coroutine                   |   1704/   54 |  1098/   43 |
+| Two Coroutines                  |   1932/   85 |  1326/   74 |
+| Scheduler, One Coroutine        |   1844/   64 |  1238/   53 |
+| Scheduler, Two Coroutines       |   1994/   79 |  1388/   68 |
 +--------------------------------------------------------------+
 ```
 
@@ -86,10 +98,10 @@ $ ./generate_table.awk < nano.txt
 |---------------------------------+--------------+-------------|
 | Baseline                        |   3554/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |   4794/  194 |  1240/   43 |
-| Two Coroutines                  |   5090/  225 |  1536/   74 |
-| Scheduler, One Coroutine        |   4918/  204 |  1364/   53 |
-| Scheduler, Two Coroutines       |   5174/  219 |  1620/   68 |
+| One Coroutine                   |   4592/  194 |  1038/   43 |
+| Two Coroutines                  |   4820/  225 |  1266/   74 |
+| Scheduler, One Coroutine        |   4732/  204 |  1178/   53 |
+| Scheduler, Two Coroutines       |   4888/  219 |  1334/   68 |
 +--------------------------------------------------------------+
 ```
 
@@ -105,10 +117,10 @@ $ ./generate_table.awk < nano.txt
 |---------------------------------+--------------+-------------|
 | Baseline                        |  11104/ 2368 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  11740/ 2416 |   636/   48 |
-| Two Coroutines                  |  11964/ 2444 |   860/   76 |
-| Scheduler, One Coroutine        |  11820/ 2424 |   716/   56 |
-| Scheduler, Two Coroutines       |  11964/ 2452 |   860/   84 |
+| One Coroutine                   |  11540/ 2416 |   436/   48 |
+| Two Coroutines                  |  11728/ 2444 |   624/   76 |
+| Scheduler, One Coroutine        |  11604/ 2424 |   500/   56 |
+| Scheduler, Two Coroutines       |  11684/ 2452 |   580/   84 |
 +--------------------------------------------------------------+
 ```
 
@@ -116,7 +128,7 @@ $ ./generate_table.awk < nano.txt
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
 * Arduino IDE 1.8.13
-* ESP8266 Boards 2.7.4
+* ESP8266 Boards 2.7.1
 
 ```
 +--------------------------------------------------------------+
@@ -124,10 +136,10 @@ $ ./generate_table.awk < nano.txt
 |---------------------------------+--------------+-------------|
 | Baseline                        | 256924/26800 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   | 257876/26832 |   952/   32 |
-| Two Coroutines                  | 258152/26864 |  1228/   64 |
-| Scheduler, One Coroutine        | 258020/26848 |  1096/   48 |
-| Scheduler, Two Coroutines       | 258248/26880 |  1324/   80 |
+| One Coroutine                   | 257604/26832 |   680/   32 |
+| Two Coroutines                  | 257832/26864 |   908/   64 |
+| Scheduler, One Coroutine        | 257732/26848 |   808/   48 |
+| Scheduler, Two Coroutines       | 257832/26880 |   908/   80 |
 +--------------------------------------------------------------+
 ```
 
@@ -141,12 +153,12 @@ $ ./generate_table.awk < nano.txt
 +--------------------------------------------------------------+
 | functionality                   |    flash/ram |       delta |
 |---------------------------------+--------------+-------------|
-| Baseline                        | 207021/14588 |     0/    0 |
+| Baseline                        | 207093/14588 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   | 207749/14620 |   728/   32 |
-| Two Coroutines                  | 208065/14652 |  1044/   64 |
-| Scheduler, One Coroutine        | 208829/14660 |  1808/   72 |
-| Scheduler, Two Coroutines       | 209033/14684 |  2012/   96 |
+| One Coroutine                   | 207709/14620 |   616/   32 |
+| Two Coroutines                  | 207953/14652 |   860/   64 |
+| Scheduler, One Coroutine        | 208745/14660 |  1652/   72 |
+| Scheduler, Two Coroutines       | 208857/14684 |  1764/   96 |
 +--------------------------------------------------------------+
 ```
 
@@ -163,9 +175,9 @@ $ ./generate_table.awk < nano.txt
 |---------------------------------+--------------+-------------|
 | Baseline                        |  10832/ 4148 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  12160/ 4188 |  1328/   40 |
-| Two Coroutines                  |  12388/ 4216 |  1556/   68 |
-| Scheduler, One Coroutine        |  12320/ 4196 |  1488/   48 |
-| Scheduler, Two Coroutines       |  12452/ 4224 |  1620/   76 |
+| One Coroutine                   |  11324/ 4188 |   492/   40 |
+| Two Coroutines                  |  11512/ 4216 |   680/   68 |
+| Scheduler, One Coroutine        |  11464/ 4196 |   632/   48 |
+| Scheduler, Two Coroutines       |  11548/ 4224 |   716/   76 |
 +--------------------------------------------------------------+
 ```

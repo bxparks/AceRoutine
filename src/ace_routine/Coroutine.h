@@ -30,6 +30,7 @@ SOFTWARE.
 #include <AceCommon.h> // FCString
 
 class AceRoutineTest_statusStrings;
+class SuspendTest_suspendAndResume;
 
 /**
  * @file Coroutine.h
@@ -247,6 +248,7 @@ namespace ace_routine {
 class Coroutine {
   friend class CoroutineScheduler;
   friend class ::AceRoutineTest_statusStrings;
+  friend class ::SuspendTest_suspendAndResume;
 
   public:
     /** Human-readable name of the coroutine. */
@@ -399,7 +401,7 @@ class Coroutine {
     void setupCoroutine(const char* name) {
       mName = ace_common::FCString(name);
       mStatus = kStatusYielding;
-      insertSorted();
+      insertAtRoot();
     }
 
     /**
@@ -414,8 +416,39 @@ class Coroutine {
      * The problem doesn't exist for a (const char*) but for consistency, I
      * made both types of strings pass through the setupCoroutine() method
      * instead of chaining the constructor.
+     *
+     * @param name The name of the coroutine as a human-readable string.
      */
     void setupCoroutine(const __FlashStringHelper* name) {
+      mName = ace_common::FCString(name);
+      mStatus = kStatusYielding;
+      insertAtRoot();
+    }
+
+    /**
+     * A version of setupCoroutine(const char*) where the ordering of the
+     * coroutines executed by CoroutineScheduler is ordered by the name. This
+     * was the default behavior of setupCoroutine() before v1.2. This method
+     * recreates the previous behavior, but it exists only for testing purposes
+     * where a deterministic ordering is required. The stability of this method
+     * is not guaranteed and client code should **not** use this method.
+     */
+    void setupCoroutineOrderedByName(const char* name) {
+      mName = ace_common::FCString(name);
+      mStatus = kStatusYielding;
+      insertSorted();
+    }
+
+    /**
+     * A version of setupCoroutine(const __FlashStringHelper*) where the
+     * ordering of the coroutines executed by CoroutineScheduler is ordered by
+     * the name. This was the default behavior of setupCoroutine() before v1.2.
+     * This method recreates the previous behavior, but it exists only for
+     * testing purposes where a deterministic ordering is required. The
+     * stability of this method is not guaranteed and client code should
+     * **not** use this method.
+     */
+    void setupCoroutineOrderedByName(const __FlashStringHelper* name) {
       mName = ace_common::FCString(name);
       mStatus = kStatusYielding;
       insertSorted();
@@ -620,6 +653,14 @@ class Coroutine {
      * coroutines are inserted, then this method needs to be optimized.
      */
     void insertSorted();
+
+    /**
+     * Insert the current coroutine at the root of the singly linked list. This
+     * is the most efficient and becomes the default with v1.2 because the
+     * ordering of the coroutines in the CoroutineScheduler is no longer an
+     * externally defined property.
+     */
+    void insertAtRoot();
 
     ace_common::FCString mName;
     Coroutine* mNext = nullptr;

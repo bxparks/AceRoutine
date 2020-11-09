@@ -50,6 +50,12 @@ void Coroutine::insertSorted() {
   *p = this;
 }
 
+void Coroutine::insertAtRoot() {
+  Coroutine** root = getRoot();
+  mNext = *root;
+  *root = this;
+}
+
 void Coroutine::resume() {
   if (mStatus != kStatusSuspended) return;
 

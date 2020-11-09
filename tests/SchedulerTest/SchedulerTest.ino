@@ -12,33 +12,56 @@ using ace_common::PrintStr;
 
 // ---------------------------------------------------------------------------
 
-// 'c' is defined ExternalRoutine.cpp, executes COROUTINE_DELAY(100) then ends.
-EXTERN_COROUTINE(TestableCoroutine, c);
+class CoroutineC : public TestableCoroutine {
+  public:
+    int runCoroutine() override {
+      COROUTINE_BEGIN();
+      COROUTINE_DELAY(100);
+      COROUTINE_END();
+    }
+};
+
+CoroutineC c;
+
+class CoroutineB : public TestableCoroutine {
+  public:
+    int runCoroutine() override {
+      COROUTINE_BEGIN();
+      COROUTINE_YIELD();
+      COROUTINE_DELAY(25);
+      COROUTINE_AWAIT(c.isDone());
+      COROUTINE_END();
+    }
+};
 
 // Define 'b' before a because 'a' uses 'b'
-COROUTINE(TestableCoroutine, b) {
-  COROUTINE_BEGIN();
-  COROUTINE_YIELD();
-  COROUTINE_DELAY(25);
-  COROUTINE_AWAIT(c.isDone());
-  COROUTINE_END();
-}
+CoroutineB b;
+
+class CoroutineA : public TestableCoroutine {
+  public:
+    int runCoroutine() override {
+      COROUTINE_LOOP() {
+        COROUTINE_DELAY(25);
+        COROUTINE_AWAIT(b.isDone());
+      }
+    }
+};
 
 // Define 'a' last. If there is a circular dependency between a and b, we can
 // use a pointer (Coroutine *a and Coroutine* b) to break the circular
 // dependency, just like any other normal objects.
-COROUTINE(TestableCoroutine, a) {
-  COROUTINE_LOOP() {
-    COROUTINE_DELAY(25);
-    COROUTINE_AWAIT(b.isDone());
-  }
-}
+CoroutineA a;
+
+class CoroutineExtra : public TestableCoroutine {
+  public:
+    int runCoroutine() override {
+      COROUTINE_BEGIN();
+      COROUTINE_END();
+    }
+};
 
 // An extra coroutine, initially suspended using extra.suspend().
-COROUTINE(TestableCoroutine, extra) {
-  COROUTINE_BEGIN();
-  COROUTINE_END();
-}
+CoroutineExtra extra;
 
 // Only 3 coroutines are initially active: a, b, c
 test(AceRoutineTest, scheduler) {
@@ -403,6 +426,11 @@ void setup() {
 
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
+
+  a.setupCoroutineOrderedByName("a");
+  b.setupCoroutineOrderedByName("b");
+  c.setupCoroutineOrderedByName("c");
+  extra.setupCoroutineOrderedByName("extra");
 
   // Start the 'extra' coroutine in suspended state. Starting v1.2, a
   // suspended coroutine will be retained in the linked list of coroutines.

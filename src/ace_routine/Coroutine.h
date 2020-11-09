@@ -215,7 +215,24 @@ extern className##_##name name
       setRunning(); \
     } while (false)
 
-/** Yield for delaySeconds. Similar to COROUTINE_DELAY(delayMillis). */
+/**
+ * Yield for delaySeconds. Similar to COROUTINE_DELAY(delayMillis).
+ *
+ * The accuracy of the delay interval in units of seconds has at least 2
+ * sources of errors, so you should not depend on this for perfectly accurate
+ * delays:
+ *
+ * 1) The current implementation uses the builtin millis() to infer the
+ * "seconds". The millis() function returns a value that overflows after
+ * 4,294,967.296 seconds. Therefore, the last inferred second just before
+ * overflowing contains only 0.296 seconds instead of a full second. A delay
+ * which straddles this overflow will return 0.704 seconds earlier than it
+ * should.
+ * 2) On microcontrollers without support for fast hardware integer division,
+ * (i.e. AVR, SAMD21, ESP8266), the division by 1000 is approximated using
+ * integer multiplications. The calculated value is off by a fraction of a
+ * percent from the correct value.
+ */
 #define COROUTINE_DELAY_SECONDS(delaySeconds) \
     do { \
       setDelaySeconds(delaySeconds); \

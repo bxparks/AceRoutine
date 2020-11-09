@@ -3,14 +3,16 @@
 #include <AceRoutine.h>
 #include <AUnitVerbose.h>
 #include "ace_routine/testing/TestableCoroutine.h"
+#include <AceCommon.h> // PrintStr
 
-using namespace ace_routine;
-using namespace ace_routine::testing;
 using namespace aunit;
+using namespace ace_routine;
+using ace_routine::testing::TestableCoroutine;
+using ace_common::PrintStr;
 
 // ---------------------------------------------------------------------------
 
-// 'c' is defined in another .cpp file
+// 'c' is defined ExternalRoutine.cpp, executes COROUTINE_DELAY(100) then ends.
 EXTERN_COROUTINE(TestableCoroutine, c);
 
 // Define 'b' before a because 'a' uses 'b'
@@ -40,147 +42,284 @@ COROUTINE(TestableCoroutine, extra) {
 
 // Only 3 coroutines are initially active: a, b, c
 test(AceRoutineTest, scheduler) {
+  // Validate the initial states of various coroutines.
+  PrintStr<256> output;
+  CoroutineScheduler::list(output);
+  assertEqual(
+    F(
+      "Coroutine a; status: Yielding\r\n"
+      "Coroutine b; status: Yielding\r\n"
+      "Coroutine c; status: Yielding\r\n"
+      "Coroutine extra; status: Suspended\r\n"
+    ),
+    output.getCstr()
+  );
+
   // initially everything (except 'extra') is enabled
   assertTrue(a.isYielding());
   assertTrue(b.isYielding());
   assertTrue(c.isYielding());
+  assertTrue(extra.isSuspended());
 
   // run a
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
   assertTrue(b.isYielding());
   assertTrue(c.isYielding());
+  assertTrue(extra.isSuspended());
 
   // run b
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
   assertTrue(b.isYielding());
   assertTrue(c.isYielding());
+  assertTrue(extra.isSuspended());
 
   // run c
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
   assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
+  assertTrue(extra.isSuspended());
+
+  // skip extra
+  CoroutineScheduler::loop();
+  assertTrue(a.isDelaying());
+  assertTrue(b.isYielding());
+  assertTrue(c.isDelaying());
+  assertTrue(extra.isSuspended());
 
   a.coroutineMillis(10);
   b.coroutineMillis(10);
   c.coroutineMillis(10);
+  extra.coroutineMillis(10);
 
   // run a
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
   assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
+  assertTrue(extra.isSuspended());
 
   // run b
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
   assertTrue(b.isDelaying());
   assertTrue(c.isDelaying());
+  assertTrue(extra.isSuspended());
 
   // run c
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
   assertTrue(b.isDelaying());
   assertTrue(c.isDelaying());
+  assertTrue(extra.isSuspended());
+
+  // skip extra
+  CoroutineScheduler::loop();
+  assertTrue(a.isDelaying());
+  assertTrue(b.isDelaying());
+  assertTrue(c.isDelaying());
+  assertTrue(extra.isSuspended());
 
   a.coroutineMillis(36);
   b.coroutineMillis(36);
   c.coroutineMillis(36);
+  extra.coroutineMillis(36);
 
   // run a
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
   assertTrue(b.isDelaying());
   assertTrue(c.isDelaying());
+  assertTrue(extra.isSuspended());
 
-  // run b
+  // run b, goes into Yielding
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
   assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
+  assertTrue(extra.isSuspended());
 
   // run c
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
   assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
+  assertTrue(extra.isSuspended());
+
+  // run c
+  CoroutineScheduler::loop();
+  assertTrue(a.isYielding());
+  assertTrue(b.isYielding());
+  assertTrue(c.isDelaying());
+  assertTrue(extra.isSuspended());
 
   a.coroutineMillis(101);
   b.coroutineMillis(101);
   c.coroutineMillis(101);
+  extra.coroutineMillis(101);
 
   // run a
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
   assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
+  assertTrue(extra.isSuspended());
 
   // run b
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
   assertTrue(b.isYielding());
   assertTrue(c.isDelaying());
+  assertTrue(extra.isSuspended());
 
   // run c
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
   assertTrue(b.isYielding());
   assertTrue(c.isEnding());
+  assertTrue(extra.isSuspended());
+
+  // run extra
+  CoroutineScheduler::loop();
+  assertTrue(a.isYielding());
+  assertTrue(b.isYielding());
+  assertTrue(c.isEnding());
+  assertTrue(extra.isSuspended());
 
   a.coroutineMillis(102);
   b.coroutineMillis(102);
   c.coroutineMillis(102);
+  extra.coroutineMillis(102);
 
   // run a
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
   assertTrue(b.isYielding());
   assertTrue(c.isEnding());
+  assertTrue(extra.isSuspended());
 
-  // run b
+  // run b - ending
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
   assertTrue(b.isEnding());
   assertTrue(c.isEnding());
+  assertTrue(extra.isSuspended());
 
-  // run c - removed from list
+  // run c - terminated
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
   assertTrue(b.isEnding());
   assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
+
+  // run extra - suspended
+  CoroutineScheduler::loop();
+  assertTrue(a.isYielding());
+  assertTrue(b.isEnding());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
 
   a.coroutineMillis(103);
   b.coroutineMillis(103);
   c.coroutineMillis(103);
+  extra.coroutineMillis(103);
 
-  // run a, waiting for b over, loops around to delay(25)
+  // run a, waiting for b over
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
   assertTrue(b.isEnding());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
 
-  // run b - removed from list
+  // run b - terminated
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
   assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
+
+  // run c - terminated
+  CoroutineScheduler::loop();
+  assertTrue(a.isDelaying());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
+
+  // run extra - suspended
+  CoroutineScheduler::loop();
+  assertTrue(a.isDelaying());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
 
   a.coroutineMillis(104);
   b.coroutineMillis(104);
   c.coroutineMillis(104);
+  extra.coroutineMillis(104);
 
-  // run a - hits COROUTINE_DELAY()
+  // run a - hits COROUTINE_DELAY(25)
   CoroutineScheduler::loop();
   assertTrue(a.isDelaying());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
+
+  // run b - terminated
+  CoroutineScheduler::loop();
+  assertTrue(a.isDelaying());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
+
+  // run c - terminated
+  CoroutineScheduler::loop();
+  assertTrue(a.isDelaying());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
+
+  // run extra - suspended
+  CoroutineScheduler::loop();
+  assertTrue(a.isDelaying());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
 
   // step +26 millis
   a.coroutineMillis(130);
   b.coroutineMillis(130);
   c.coroutineMillis(130);
+  extra.coroutineMillis(130);
 
   // run a - hits COROUTINE_AWAIT() which yields immediately
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
+
+  // run b - terminated
+  CoroutineScheduler::loop();
+  assertTrue(a.isYielding());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
+
+  // run c - terminated
+  CoroutineScheduler::loop();
+  assertTrue(a.isYielding());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
+
+  // run extra - suspended
+  CoroutineScheduler::loop();
+  assertTrue(a.isYielding());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isSuspended());
 
   // step 1 millis
   a.coroutineMillis(131);
@@ -192,15 +331,33 @@ test(AceRoutineTest, scheduler) {
   assertTrue(extra.isSuspended());
   extra.resume();
 
-  // run 'extra'
+  // run a, hits COROUTINE_DELAY()
   CoroutineScheduler::loop();
-  assertTrue(extra.isEnding());
-  assertTrue(a.isYielding());
-
-  // run 'a', hits COROUTINE_DELAY()
-  CoroutineScheduler::loop();
-  assertTrue(extra.isEnding());
   assertTrue(a.isDelaying());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isYielding());
+
+  // run b
+  CoroutineScheduler::loop();
+  assertTrue(a.isDelaying());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isYielding());
+
+  // run c
+  CoroutineScheduler::loop();
+  assertTrue(a.isDelaying());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isYielding());
+
+  // run extra
+  CoroutineScheduler::loop();
+  assertTrue(a.isDelaying());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isEnding());
 
   // step +28 millis
   a.coroutineMillis(159);
@@ -208,14 +365,33 @@ test(AceRoutineTest, scheduler) {
   c.coroutineMillis(159);
   extra.coroutineMillis(159);
 
-  // run 'extra'
-  CoroutineScheduler::loop();
-  assertTrue(extra.isTerminated());
-  assertTrue(a.isDelaying());
-
-  // run 'a', hits COROUTINE_AWAIT()
+  // run a, hits AWAIT()
   CoroutineScheduler::loop();
   assertTrue(a.isYielding());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isEnding());
+
+  // run b
+  CoroutineScheduler::loop();
+  assertTrue(a.isYielding());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isEnding());
+
+  // run c
+  CoroutineScheduler::loop();
+  assertTrue(a.isYielding());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isEnding());
+
+  // run extra
+  CoroutineScheduler::loop();
+  assertTrue(a.isYielding());
+  assertTrue(b.isTerminated());
+  assertTrue(c.isTerminated());
+  assertTrue(extra.isTerminated());
 }
 
 // ---------------------------------------------------------------------------
@@ -228,13 +404,11 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 
-  // The 'extra' coroutine is suspended before calling
-  // CoroutineScheduler::setup() because test(AceRoutineTest, scheduler)
-  // requires that only the coroutines 'a', 'b' and 'c' are active initially.
+  // Start the 'extra' coroutine in suspended state. Starting v1.2, a
+  // suspended coroutine will be retained in the linked list of coroutines.
   extra.suspend();
 
   CoroutineScheduler::setup();
-  CoroutineScheduler::list(Serial);
 }
 
 void loop() {

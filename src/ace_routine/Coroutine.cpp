@@ -59,11 +59,6 @@ void Coroutine::resume() {
   // COROUTINE_DELAY() and COROUTINE_AWAIT() are written to restore their
   // status.
   mStatus = kStatusYielding;
-
-  // insert at the head of the linked list
-  Coroutine** p = getRoot();
-  mNext = *p;
-  *p = this;
 }
 
 unsigned long Coroutine::coroutineMillis() const {

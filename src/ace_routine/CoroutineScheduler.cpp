@@ -42,6 +42,14 @@ CoroutineScheduler* CoroutineScheduler::getScheduler() {
 void CoroutineScheduler::setupScheduler() {
   mCurrent = Coroutine::getRoot();
 
+  // For v1.1 and earlier, calling Coroutine::suspend() caused the coroutine to
+  // be omitted from the linked list. But this can cause a cycle in the
+  // linked-list if the resume() is called immediately after a suspend. For
+  // v1.2, we keep all coroutines (even those in Suspended, Ending or
+  // Terminated) in the linked list. Since everything is always in the linked
+  // list, the following code for omitted suspended coroutines from the list
+  // is no longer needed.
+  /*
   // Pre-scan to remove any coroutines whose suspend() was called before the
   // CoroutineScheduler::setup(). This makes unit tests easier to write because
   // they can just concentrate on only the active coroutines. And this is also
@@ -55,6 +63,7 @@ void CoroutineScheduler::setupScheduler() {
       current = (*current)->getNext();
     }
   }
+  */
 }
 
 void CoroutineScheduler::runCoroutine() {
@@ -71,7 +80,7 @@ void CoroutineScheduler::runCoroutine() {
 
 #if ACE_ROUTINE_DEBUG == 1
   Serial.print(F("Processing "));
-  (*mCurrent)->printeName(Serial);
+  (*mCurrent)->getName().printTo(Serial);
   Serial.println();
 #endif
 
@@ -79,9 +88,9 @@ void CoroutineScheduler::runCoroutine() {
   switch ((*mCurrent)->getStatus()) {
     case Coroutine::kStatusYielding:
       (*mCurrent)->runCoroutine();
-      mCurrent = (*mCurrent)->getNext();
       break;
-    case Coroutine::kStatusDelaying: {
+
+    case Coroutine::kStatusDelaying:
       // Check isDelayExpired() here to optimize away an extra call into the
       // Coroutine::runCoroutine(). Everything would still work if we just
       // dispatched into the Coroutine::runCoroutine() because that method
@@ -89,24 +98,20 @@ void CoroutineScheduler::runCoroutine() {
       if ((*mCurrent)->isDelayExpired()) {
         (*mCurrent)->runCoroutine();
       }
-      mCurrent = (*mCurrent)->getNext();
       break;
-    }
+
     case Coroutine::kStatusEnding:
-      // take the coroutine out of the list, and mark it terminated
+      // mark it terminated
       (*mCurrent)->setTerminated();
-      *mCurrent = *((*mCurrent)->getNext());
       break;
-    case Coroutine::kStatusSuspended:
-      // take the coroutine out of the list
-      *mCurrent = *((*mCurrent)->getNext());
-      break;
+
     default:
-      // Should never happen but skip to next coroutine to prevent infinite
-      // loop.
-      mCurrent = (*mCurrent)->getNext();
+      // For all other cases, just skip to the next coroutine.
       break;
   }
+
+  // Go to the next coroutine
+  mCurrent = (*mCurrent)->getNext();
 }
 
 void CoroutineScheduler::listCoroutines(Print& printer) {

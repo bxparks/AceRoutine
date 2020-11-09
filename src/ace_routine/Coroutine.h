@@ -345,25 +345,7 @@ class Coroutine {
     }
 
     /** Check if delay time is over. */
-    bool isDelayExpired() {
-      switch (mDelayType) {
-        case kDelayTypeMillis: {
-          uint16_t elapsedMillis = coroutineMillis() - mDelayStart;
-          return elapsedMillis >= mDelayDuration;
-        }
-        case kDelayTypeMicros: {
-          uint16_t elapsedMicros = coroutineMicros() -  mDelayStart;
-          return elapsedMicros >= mDelayDuration;
-        }
-        case kDelayTypeSeconds: {
-          uint16_t elapsedSeconds = coroutineSeconds() -  mDelayStart;
-          return elapsedSeconds >= mDelayDuration;
-        }
-        default:
-          // This should never happen.
-          return true;
-      }
-    }
+    bool isDelayExpired() const;
 
     /** The coroutine was suspended with a call to suspend(). */
     bool isSuspended() const { return mStatus == kStatusSuspended; }
@@ -415,11 +397,7 @@ class Coroutine {
      *
      * @param name The name of the coroutine as a human-readable string.
      */
-    void setupCoroutine(const char* name) {
-      mName = ace_common::FCString(name);
-      mStatus = kStatusYielding;
-      insertAtRoot();
-    }
+    void setupCoroutine(const char* name);
 
     /**
      * Same as setupCoroutine(const char*) except using flash string type.
@@ -436,11 +414,7 @@ class Coroutine {
      *
      * @param name The name of the coroutine as a human-readable string.
      */
-    void setupCoroutine(const __FlashStringHelper* name) {
-      mName = ace_common::FCString(name);
-      mStatus = kStatusYielding;
-      insertAtRoot();
-    }
+    void setupCoroutine(const __FlashStringHelper* name);
 
     /**
      * A version of setupCoroutine(const char*) where the ordering of the
@@ -450,11 +424,7 @@ class Coroutine {
      * where a deterministic ordering is required. The stability of this method
      * is not guaranteed and client code should **not** use this method.
      */
-    void setupCoroutineOrderedByName(const char* name) {
-      mName = ace_common::FCString(name);
-      mStatus = kStatusYielding;
-      insertSorted();
-    }
+    void setupCoroutineOrderedByName(const char* name);
 
     /**
      * A version of setupCoroutine(const __FlashStringHelper*) where the
@@ -465,11 +435,7 @@ class Coroutine {
      * stability of this method is not guaranteed and client code should
      * **not** use this method.
      */
-    void setupCoroutineOrderedByName(const __FlashStringHelper* name) {
-      mName = ace_common::FCString(name);
-      mStatus = kStatusYielding;
-      insertSorted();
-    }
+    void setupCoroutineOrderedByName(const __FlashStringHelper* name);
 
   protected:
     /**

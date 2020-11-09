@@ -27,42 +27,6 @@ test(AceRoutineTest, statusStrings) {
 
 // ---------------------------------------------------------------------------
 
-Channel<int> channel;
-
-test(AceRoutineTest, channelReadAndWrite) {
-  int writeValue = 2;
-  int readValue = 0;
-
-  assertFalse(channel.read(readValue));
-  assertFalse(channel.read(readValue)); // second call should also return false
-  assertFalse(channel.write(writeValue));
-  assertFalse(channel.write(writeValue)); // second call should return false
-
-  assertTrue(channel.read(readValue));
-  assertTrue(channel.write(writeValue)); // write() can proceed after read()
-
-  assertEqual(readValue, writeValue);
-}
-
-test(AceRoutineTest, channelWriteMacro) {
-  int writeValue = 2;
-  int readValue = 0;
-
-  assertFalse(channel.read(readValue));
-  assertFalse(channel.read(readValue)); // second call should also return false
-
-  // Test the methods used by COROUTINE_CHANNEL_WRITE()
-  channel.setValue(writeValue);
-  assertFalse(channel.write());
-  assertFalse(channel.write()); // second call should return false
-
-  assertTrue(channel.read(readValue));
-  assertTrue(channel.write()); // write() can proceed after read()
-
-  assertEqual(readValue, writeValue);
-}
-
-// ---------------------------------------------------------------------------
 
 // An external flag to await upon, for testing.
 bool simpleCoroutineFlag = false;
@@ -104,6 +68,8 @@ test(AceRoutineTest, simpleCoroutine) {
   simpleCoroutine.runCoroutine();
   assertTrue(simpleCoroutine.isEnding());
 }
+
+// ---------------------------------------------------------------------------
 
 // 'c' is defined in another .cpp file
 EXTERN_COROUTINE(TestableCoroutine, c);
@@ -323,8 +289,12 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 
+  // The coroutines 'extra' and 'simpleCoroutine' are suspended before calling
+  // CoroutineScheduler::setup() because test(AceRoutineTest, scheduler)
+  // requires that only the coroutines 'a', 'b' and 'c' are active initially.
   extra.suspend();
   simpleCoroutine.suspend();
+
   CoroutineScheduler::setup();
   CoroutineScheduler::list(Serial);
 }

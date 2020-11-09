@@ -506,7 +506,7 @@ COROUTINE(waitMillis) {
 
 The `millis` argument is a `uint16_t`, a 16-bit unsigned integer, which reduces
 the size of each coroutine instance by 4 bytes (8-bit processors) or 8 bytes
-(32-bits processors). However, the actual maximum delay is limited to 32767
+(32-bit processors). However, the actual maximum delay is limited to 32767
 milliseconds to avoid overflow situations if the other coroutines in the system
 take too much time for their work before returning control to the waiting
 coroutine. With this limit, the other coroutines have as much as 32767
@@ -1318,7 +1318,7 @@ class Message {
 ```
 
 A `Channel` of this type can be created like this:
-```C+++
+```C++
 Channel<Message> channel;
 ```
 

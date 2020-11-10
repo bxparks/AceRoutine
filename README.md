@@ -1540,7 +1540,7 @@ advantages:
 
 ## Resource Consumption
 
-### Memory
+### Static Memory
 
 All objects are statically allocated (i.e. not heap or stack).
 
@@ -1564,6 +1564,23 @@ the code for the class increases flash memory usage by about 150 bytes.
 The `Channel` object requires 2 copies of the parameterized `<T>` type so its
 size is equal to `1 + 2 * sizeof(T)`, rounded to the nearest memory alignment
 boundary (i.e. a total of 12 bytes for a 32-bit processor).
+
+### Flash Memory
+
+The [examples/MemoryBenchmark](examples/MemoryBenchmark) program gathers
+flash and memory consumption numbers for various boards (AVR, ESP8266, ESP32,
+etc) for a handful of AceRoutine features. Here are some highlights:
+
+* AVR (e.g. Nano)
+    * 1 Coroutine: 1098 bytes
+    * 2 Coroutines: 1326 bytes
+    * `CoroutineScheduler()` + 1 Coroutine: 1238 bytes
+    * `CoroutineScheduler()` + 2 Coroutines: 1388 bytes
+* ESP8266
+    * 1 Coroutine: 680 bytes
+    * 2 Coroutines: 908 bytes
+    * `CoroutineScheduler()` + 1 Coroutine: 808 bytes
+    * `CoroutineScheduler()` + 2 Coroutines: 908 bytes
 
 ### CPU
 

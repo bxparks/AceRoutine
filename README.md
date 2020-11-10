@@ -274,6 +274,8 @@ The following example sketches are provided:
 
 * [AutoBenchmark.ino](examples/AutoBenchmark):
   a program that performs CPU benchmarking
+* [MemoryBenchmark.ino](examples/MemoryBenchmark): determines the flash and
+  static memory consumptions of certain AceRoutine features
 * [HelloCoroutine.ino](examples/HelloCoroutine)
 * [HelloScheduler.ino](examples/HelloScheduler): same as `HelloCoroutine`
   except using the `CoroutineScheduler` instead of manually running the
@@ -379,8 +381,6 @@ The `Coroutine` class looks something like this (not all public methods shown):
 ```C++
 class Coroutine {
   public:
-    static Coroutine** getRoot();
-
     const ace_common::FCString& getName() const;
 
     virtual int runCoroutine() = 0;
@@ -890,12 +890,17 @@ coroutines that are managed by the scheduler. Each call to
 `CoroutineScheduler::loop()` executes one coroutine in that list in a simple
 round-robin scheduling algorithm.
 
-The list of scheduled coroutines is initially ordered by using
-`Coroutine::getName()` as the sorting key. This makes the scheduling
-deterministic, which allows unit tests to work. However,
-calling `Coroutine.suspend()` then subsequently calling`Coroutine.resume()` puts
-the coroutine at the beginning of the scheduling list, so the ordering may
-become mixed up over time if these functions are used.
+Prior to v1.2, the initial ordering was sorted by the `Coroutine::getName()`.
+And calling `suspend()` would remove the coroutine from the internal list
+of coroutines, and `resume()` would add the the coroutine back into the list.
+This behavior turned out to be
+[fatally flawed](https://github.com/bxparks/AceRoutine/issues/19)
+
+Starting with v1.2, the ordering of the coroutines in the internal list is
+officially undefined. As well, the actual properties of the coroutine list is
+also considered to be an internal implementation detail that may change in the
+future. Client code should not depend on the implementation details of this
+internal list.
 
 #### Manual Scheduling or the CoroutineScheduler
 
@@ -911,10 +916,15 @@ of all coroutines defined by the `COROUTINE()` macro, even if they are
 defined in multiple files. It allows coroutines to be suspended and resumed (see
 below). However, there is a small overhead in switching between coroutines
 because the scheduler needs to walk down the list of active coroutines to find
-the next one. The scheduler is able to remove coroutines which are not running,
-if there are a significant number of these inactive coroutines, then the
-`CoroutineScheduler` may actually be more efficient than manually calling the
-coroutines through the global `loop()` method.
+the next one.
+
+The scheduler may choose to remove coroutines which are not running from the
+active list. If there are a significant number of these inactive coroutines,
+then the `CoroutineScheduler` can be more efficient than manually calling the
+coroutines through the global `loop()` method. However, as of v1.2, suspended
+coroutines are *not* removed from the scheduling list, so the
+`CoroutineScheduler` is slightly less efficient, but the difference is probably
+not worth worrying about for almost all cases.
 
 ### Suspend and Resume
 
@@ -922,15 +932,15 @@ The `Coroutine::suspend()` and `Coroutine::resume()` methods are available
 *only* if the `CoroutineScheduler` is used. If the coroutines are called
 explicitly in the global `loop()` method, then these methods have no impact.
 
-A coroutine can suspend itself or be suspended by another coroutine.
-It causes the `CoroutineScheduler` to remove the coroutine from the list of
-actively running coroutines, just before the next time the scheduler attempts to
-run the coroutine.
+The `Coroutine::suspend()` and `Coroutine::resume()` **should not** be called
+from inside the coroutine. Fortunately, if they are accidentially called,
+they will have no effect. They must be called from outside of the coroutine.
+When a coroutine is suspended,  the `CoroutineScheduler` will skip over this
+coroutine and `Coroutine::runCoroutine()` will not be called.
 
-If the `Coroutine::suspend()` method is called on the coroutine *before*
-`CoroutineScheduler::setup()` is called, the scheduler will not insert the
-coroutine into the active list of coroutines at all. This is useful in unit
-tests to prevent extraneous coroutines from interfering with test validation.
+It is currently not possible to suspend a coroutine from inside itself. A future
+version may add a `COROUTINE_SUSPEND()` macro. In the meantime, consider using
+the `COROUTINE_AWAIT()` macro on an external flag to stop and start a coroutine.
 
 ### Reset Coroutine
 
@@ -1530,7 +1540,7 @@ advantages:
 
 ## Resource Consumption
 
-### Memory
+### Static Memory
 
 All objects are statically allocated (i.e. not heap or stack).
 
@@ -1554,6 +1564,23 @@ the code for the class increases flash memory usage by about 150 bytes.
 The `Channel` object requires 2 copies of the parameterized `<T>` type so its
 size is equal to `1 + 2 * sizeof(T)`, rounded to the nearest memory alignment
 boundary (i.e. a total of 12 bytes for a 32-bit processor).
+
+### Flash Memory
+
+The [examples/MemoryBenchmark](examples/MemoryBenchmark) program gathers
+flash and memory consumption numbers for various boards (AVR, ESP8266, ESP32,
+etc) for a handful of AceRoutine features. Here are some highlights:
+
+* AVR (e.g. Nano)
+    * 1 Coroutine: 1098 bytes
+    * 2 Coroutines: 1326 bytes
+    * `CoroutineScheduler()` + 1 Coroutine: 1238 bytes
+    * `CoroutineScheduler()` + 2 Coroutines: 1388 bytes
+* ESP8266
+    * 1 Coroutine: 680 bytes
+    * 2 Coroutines: 908 bytes
+    * `CoroutineScheduler()` + 1 Coroutine: 808 bytes
+    * `CoroutineScheduler()` + 2 Coroutines: 908 bytes
 
 ### CPU
 

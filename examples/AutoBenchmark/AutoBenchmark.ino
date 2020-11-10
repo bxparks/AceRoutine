@@ -99,6 +99,10 @@ void setup() {
   printStats(baseline, aceCoroutine);
   SERIAL_PORT_MONITOR.println(
       F("------------+------+------+"));
+
+#if defined(UNIX_HOST_DUINO)
+  exit(0);
+#endif
 }
 
 void loop() {

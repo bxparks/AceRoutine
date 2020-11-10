@@ -340,7 +340,7 @@ class Coroutine {
      * Coroutine upon the next iteration.
      */
     void reset() {
-      mStatus = kStatusSuspended;
+      mStatus = kStatusYielding;
       mJumpPoint = nullptr;
     }
 
@@ -648,7 +648,7 @@ class Coroutine {
     ace_common::FCString mName;
     Coroutine* mNext = nullptr;
     void* mJumpPoint = nullptr;
-    Status mStatus = kStatusSuspended;
+    Status mStatus = kStatusYielding;
     uint8_t mDelayType;
     uint16_t mDelayStart; // millis or micros
     uint16_t mDelayDuration; // millis or micros

@@ -89,6 +89,48 @@ additional macros that can reduce boilerplate code.
 
 ![AUnit Tests](https://github.com/bxparks/AceRoutine/workflows/AUnit%20Tests/badge.svg)
 
+**Table of Contents**
+
+* [Hello Coroutines](#HelloCoroutines)
+* [Installation](#Installation)
+* [Usage](#Usage)
+    * [Include Header and Namespace](#Include)
+    * [Macros](#Macros)
+    * [Overall Structure](#OverallStructure)
+    * [Coroutine Class](#CoroutineClass)
+    * [Coroutine Instance](#CoroutineInstance)
+    * [Coroutine Body](#CoroutineBody)
+    * [Begin and End Markers](#BeginAndEnd)
+    * [Yield](#Yield)
+    * [Await](#Await)
+    * [Delay](#Delay)
+    * [Stackless Coroutines](#Stackless)
+    * [Conditional If-Else](#IfElse)
+    * [Switch Statements](#Switch)
+    * [For Loops](#For)
+    * [While Loops](#While)
+    * [Forever Loops](#Forever)
+    * [No Nested](#NoNested)
+    * [Chaining](#Chaining)
+    * [Running and Scheduling](#RunningAndScheduling)
+    * [Suspend and Resume](#SuspendAndResume)
+    * [Reset Coroutine](#Reset)
+    * [Coroutine States](#States)
+    * [Macros As Statements](#MacrosAsStatements)
+    * [Custom Coroutines](#Custom)
+    * [Manual Coroutines](#Manual)
+    * [External Coroutines](#External)
+    * [Communication Between Coroutines](#Communication)
+    * [Channels](#Channels)
+    * [Functors](#Functors)
+* [Comparisons](#Comparisons)
+* [Resource Consumption](#ResourceConsumption)
+* [System Requirements](#SystemRequirements)
+* [License](#LicenseSystemRequirements)
+* [Feedback](#Feedback)
+* [Authors](#Authors)
+
+<a name="HelloCoroutines"></a>
 ## Hello Coroutines
 
 ### HelloCoroutine
@@ -232,6 +274,7 @@ void loop() {
 }
 ```
 
+<a name="Installation"></a>
 ## Installation
 
 The latest stable release is available in the Arduino IDE Library Manager. Two
@@ -297,8 +340,10 @@ The following example sketches are provided:
   CPU overhead of a `Channel` by using 2 coroutines to ping-pong an integer
   across 2 channels
 
+<a name="Usage"></a>
 ## Usage
 
+<a name="Include"></a>
 ### Include Header and Namespace
 
 Only a single header file `AceRoutine.h` is required to use this library.
@@ -311,6 +356,7 @@ prepending the `ace_routine::` prefix, use the `using` directive:
 using namespace ace_routine;
 ```
 
+<a name="Macros"></a>
 ### Macros
 
 The following macros are available to hide a lot of boilerplate code:
@@ -332,6 +378,7 @@ The following macros are available to hide a lot of boilerplate code:
 * `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`
 * `COROUTINE_CHANNEL_READ()`: reads a message from a `Channel`
 
+<a name="OverallStucture"></a>
 ### Overall Structure
 
 The overall structure looks like this:
@@ -374,6 +421,7 @@ void loop() {
 }
 ```
 
+<a name="CoroutineClass"></a>
 ### Coroutine Class
 
 The `Coroutine` class looks something like this (not all public methods shown):
@@ -417,6 +465,7 @@ class Coroutine {
 };
 ```
 
+<a name="CoroutineInstance"></a>
 ### Coroutine Instance
 
 All coroutines are instances of the `Coroutine` class or one of its
@@ -453,6 +502,7 @@ struct Coroutine_doSomething: Coroutine {
 Coroutine_doSomething doSomething;
 ```
 
+<a name="CoroutineBody"></a>
 ### Coroutine Body
 
 The code immediately following the `COROUTINE()` macro becomes the body of the
@@ -460,6 +510,7 @@ The code immediately following the `COROUTINE()` macro becomes the body of the
 various helper macros (e.g. `COROUTINE_BEGIN()`, `COROUTINE_YIELD()`,
 `COROUTINE_DELAY()`, etc) can be used. These helper macros are described below.
 
+<a name="BeginAndEnd"></a>
 ### Begin and End Markers
 
 Within the `COROUTINE()` macro, the beginning of the coroutine code must start
@@ -472,6 +523,7 @@ The `COROUTINE_LOOP()` macro is a special case that replaces the
 `COROUTINE_BEGIN()` and `COROUTINE_END()` macros. See the **Forever Loops**
 section below.
 
+<a name="Yield"></a>
 ### Yield
 
 `COROUTINE_YIELD()` returns control to the `CoroutineScheduler` which is then
@@ -480,6 +532,7 @@ just after `COROUTINE_YIELD()`. (Technically, the execution always begins at the
 top of the function, but the `COROUTINE_BEGIN()` contains a dispatcher that
 gives the illusion that the execution continues further down the function.)
 
+<a name="Await"></a>
 ### Await
 
 `COROUTINE_AWAIT(condition)` yields until the `condition` evaluates to `true`.
@@ -488,6 +541,7 @@ This is a convenience macro that is identical to:
 while (!condition) COROUTINE_YIELD();
 ```
 
+<a name="Delay"></a>
 ### Delay
 
 The `COROUTINE_DELAY(millis)` macro yields back control to other coroutines
@@ -570,6 +624,7 @@ COROUTINE(waitThousandSeconds) {
 
 See **For Loop** section below for a description of the for-loop construct.
 
+<a name="Stackless"></a>
 ### Stackless Coroutines
 
 Each coroutine is stackless. More accurately, the stack of the coroutine
@@ -615,6 +670,7 @@ and just use `static` variables inside a `COROUTINE()`. Static variables are
 initialized once and preserve their value through multiple calls to the
 function, which is exactly what is needed.
 
+<a name="IfElse"></a>
 ### Conditional If-Else
 
 Conditional if-statements work as expected with the various macros:
@@ -636,6 +692,7 @@ COROUTINE(doIfThenElse) {
 }
 ```
 
+<a name="Switch"></a>
 ### Switch Statements
 
 Unlike some implementations of stackless coroutines, AceRoutine coroutines are
@@ -663,6 +720,7 @@ COROUTINE(doThingsBasedOnSwitchConditions) {
 }
 ```
 
+<a name="For"></a>
 ### For Loops
 
 You cannot use a local variable in the `for-loop` because the variable counter
@@ -683,6 +741,7 @@ COROUTINE(countToTen) {
 }
 ```
 
+<a name="While"></a>
 ### While Loops
 
 You can write a coroutine that loops while certain condition is valid like this,
@@ -705,6 +764,7 @@ Make sure that the `condition` expression does not use any local variables,
 since local variables are destroyed and recreated after each YIELD, DELAY or
 AWAIT.
 
+<a name="Forever"></a>
 ### Forever Loops
 
 In many cases, you just want to loop forever. You could use a `while (true)`
@@ -755,6 +815,7 @@ COROUTINE(loopForever) {
 I hadn't explicitly designed this syntax to be valid from the start, and was
 surprised to find that it actually worked.
 
+<a name="NoNested"></a>
 ### No Nested Coroutine Macros
 
 Coroutines macros **cannot** be nested. In other words, if you call another
@@ -779,6 +840,7 @@ COROUTINE(cannotUseNestedMacros) {
 }
 ```
 
+<a name="Chaining"></a>
 ### Chaining Coroutines
 
 Coroutines can be chained, in other words, one coroutine *can* explicitly
@@ -848,6 +910,7 @@ Most likely, only the `OuterCoroutine` would be registered in the
 (i.e. doesn't actuall use the `COROUTINE_BEGIN()` and `COROUTINE_END()` macros.
 It simply delegates the `runCoroutine()` call to the inner one.
 
+<a name="RunningAndScheduling"></a>
 ### Running and Scheduling
 
 There are 2 ways to run the coroutines:
@@ -926,6 +989,7 @@ coroutines are *not* removed from the scheduling list, so the
 `CoroutineScheduler` is slightly less efficient, but the difference is probably
 not worth worrying about for almost all cases.
 
+<a name="SuspendAndResume"></a>
 ### Suspend and Resume
 
 The `Coroutine::suspend()` and `Coroutine::resume()` methods are available
@@ -942,6 +1006,7 @@ It is currently not possible to suspend a coroutine from inside itself. A future
 version may add a `COROUTINE_SUSPEND()` macro. In the meantime, consider using
 the `COROUTINE_AWAIT()` macro on an external flag to stop and start a coroutine.
 
+<a name="Reset"></a>
 ### Reset Coroutine
 
 A coroutine can be reset to its initial state using the `Coroutine::reset()`
@@ -959,6 +1024,7 @@ useful for some people. See for example
 [Issue #13](https://github.com/bxparks/AceRoutine/issues/13) and
 [Issue #14](https://github.com/bxparks/AceRoutine/issues/14).
 
+<a name="States"></a>
 ### Coroutine States
 
 A coroutine has several internal states:
@@ -1031,7 +1097,8 @@ COROUTINE(doSomethingElse) {
 }
 ```
 
-### Macros Can Be Used As Statements
+<a name="MacrosAsStatements"></a>
+### Macros As Statements
 
 The `COROUTINE_YIELD()`, `COROUTINE_DELAY()`, `COROUTINE_AWAIT()` macros have
 been designed to allow them to be used almost everywhere a valid C/C++ statement
@@ -1042,6 +1109,7 @@ is allowed. For example, the following is allowed:
   ...
 ```
 
+<a name="Custom"></a>
 ### Custom Coroutines (Not Recommended)
 
 All coroutines are instances of the `Coroutine` class, or one of its subclasses.
@@ -1078,6 +1146,7 @@ where I have found this feature to be useful is in writing the
 situation, I suspect that the *Manual Coroutines* described in the next section
 will be more useful and easier to understand.
 
+<a name="Manual"></a>
 ### Manual Coroutines (Recommended)
 
 A manual coroutine is a custom coroutine whose body of the coroutine (i.e
@@ -1155,6 +1224,7 @@ A good example of a manual coroutine is
 the same functionality as [BlinkSlowFastRoutine](examples/BlinkSlowFastRoutine)
 rewritten using manual coroutines.
 
+<a name="External"></a>
 ### External Coroutines
 
 A coroutine can be defined in a separate `.cpp` file. However, if you want to
@@ -1222,6 +1292,7 @@ extern MyCoroutine myCoroutine;
 ...
 ```
 
+<a name="Communication"></a>
 ### Communication Between Coroutines
 
 There are a handful ways that `Coroutine` instances can pass data between
@@ -1291,6 +1362,7 @@ void loop() {
 }
 ```
 
+<a name="Channels"></a>
 ### Channels
 
 I have included an experimental implementation of channels inspired by the
@@ -1450,6 +1522,7 @@ things.
 Some of these features may be implemented in the future if I find compelling
 use-cases and if they are easy to implement.
 
+<a name="Functors"></a>
 ### Functors
 
 C++ allows the creation of objects that look syntactically like functions.
@@ -1457,6 +1530,7 @@ by defining the `operator()` method on the class. I have not defined this method
 in the `Coroutine` class because I have not found a use-case for it. However, if
 someone can demonstrate a compelling use-case, then I would be happy to add it.
 
+<a name="Comparisons"></a>
 ## Comparisons to Other Multitasking Libraries
 
 There are several interesting and useful multithreading libraries for Arduino.
@@ -1538,6 +1612,7 @@ advantages:
 * it is a standalone Arduino library that does not depend on a larger
   framework.
 
+<a name="ResourceConsumption"></a>
 ## Resource Consumption
 
 ### Static Memory
@@ -1586,6 +1661,7 @@ etc) for a handful of AceRoutine features. Here are some highlights:
 
 See [examples/AutoBenchmark](examples/AutoBenchmark).
 
+<a name="SystemRequirements"></a>
 ## System Requirements
 
 ### Tool Chain
@@ -1627,10 +1703,12 @@ I will occasionally test on the following hardware as a sanity check:
 * Teensy LC (48 MHz ARM Cortex-M0+)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 
+<a name="License"></a>
 ## License
 
 [MIT License](https://opensource.org/licenses/MIT)
 
+<a name="Feedback"></a>
 ## Feedback and Support
 
 If you have any questions, comments, bug reports, or feature requests, please
@@ -1640,6 +1718,7 @@ other people ask similar questions later.) I'd love to hear about how this
 software and its documentation can be improved. I can't promise that I will
 incorporate everything, but I will give your ideas serious consideration.
 
+<a name="Authors"></a>
 ## Authors
 
 Created by Brian T. Park (brian@xparks.net).

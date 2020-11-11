@@ -94,7 +94,7 @@ The following macros are available to hide a lot of boilerplate code:
 * `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`
 * `COROUTINE_CHANNEL_READ()`: reads a message from a `Channel`
 
-<a name="OverallStucture"></a>
+<a name="OverallStructure"></a>
 ### Overall Structure
 
 The overall structure looks like this:
@@ -683,7 +683,6 @@ COROUTINE(cannotUseNestedMacros) {
 Coroutines can be chained, in other words, the `runCoroutine()` of one coroutine
 *can* explicitly call the `runCoroutine()` of another coroutine.
 
-```
 I have found it useful to chain coroutines when using the **Manual Coroutines**
 described in the section below. The ability to chain coroutines allows us to
 implement a [Decorator
@@ -749,6 +748,7 @@ COROUTINE(outer) {
     COROUTINE_YIELD();
   }
 }
+```
 
 But I have yet to come across a situation where this was useful.
 

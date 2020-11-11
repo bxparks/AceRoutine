@@ -1,24 +1,28 @@
 # Changelog
 
 * Unreleased
+* 1.2 (2020-11-10)
     * Fix an infinite loop in the internal singly-linked list of coroutines when
       `resume()` is called immediately after `suspend()`, without waiting for
       `CoroutineScheduler::loop()` to actually remove the coroutine from the
       list. The fix no longer removes suspended coroutine from the linked list,
       simplifying the code considerably. Fixes [Issue
       #19](https://github.com/bxparks/AceRoutine/issues/19).
-    * Fix documentation bug in README.md to say that `suspend()` and `resume()`
-      *should not* be called within the coroutine itself. They can only be
-      called from outside the coroutine. They are no-ops inside a coroutine.
-      Added note that a `COROUTINE_SUSPEND()` may be added in the future, but
-      currently, a viable workaround may be to use the `COROUTINE_AWAIT()` on an
-      external flag.
+    * Fix incorrect status set by `Coroutine::reset()` which prevented it from
+      actually working. Fixes [Issue
+      #20](https://github.com/bxparks/AceRoutine/issues/20).
     * **Potentially Breaking**: The internal linked list of coroutines is now
       considered to be a private implementation detail that may change in the
       future. The ordering of the list of coroutines is now undefined. The
       `Coroutine::getRoot()` and `Coroutine::getNext()` public methods are now
       private. The new `setupCoroutineOrderedByName()` methods replicate the old
       behavior, but these are exposed only for testing purposes.
+    * Fix documentation bug in README.md to say that `suspend()` and `resume()`
+      *should not* be called within the coroutine itself. They can only be
+      called from outside the coroutine. They are no-ops inside a coroutine.
+    * Extract lengthy Usage section of `README.md` into `USER_GUIDE.md`. Add
+      table of contents to help navigate the long document. Rewrite and update
+      content to be more useful and more clear hopefully.
 * 1.1 (2020-11-01)
     * Add a `Coroutine::reset()` method that causes the Coroutine to restart
       from the beginning of the coroutine upon the next iteration. (Fixes #13

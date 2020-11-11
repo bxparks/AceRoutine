@@ -730,6 +730,10 @@ coroutine and `Coroutine::runCoroutine()` will not be called.
 As of v1.2, it is not possible to suspend a coroutine from inside itself. I have
 some ideas on how to fix this in the future.
 
+I have personally never needed to use `suspend()` and `resume()` so this
+functionality may not be tested well. See for example
+[Issue #19](https://github.com/bxparks/AceRoutine/issues/19).
+
 <a name="Reset"></a>
 ### Reset Coroutine
 
@@ -743,10 +747,16 @@ member variables of the Coroutine subclass, or static variables inside the
 `runCoroutine()` method, you may ned to manually reset those variables to their
 initial states as well.
 
-Personally, I have never needed the `reset()` functionalty, but it is apparently
-useful for some people. See for example
-[Issue #13](https://github.com/bxparks/AceRoutine/issues/13) and
-[Issue #14](https://github.com/bxparks/AceRoutine/issues/14).
+Personally, I have never needed the `reset()` functionalty (so it is
+unfortunatesly not tested as much as it could be), but it is apparently useful
+for some people. See for example:
+
+* [Issue #13](https://github.com/bxparks/AceRoutine/issues/13)
+* [Issue #14](https://github.com/bxparks/AceRoutine/issues/14)
+* [Issue #20](https://github.com/bxparks/AceRoutine/issues/20)
+
+A good example of how to use the `reset()` can be seen in
+[examples/SoundManager](examples/SoundManager).
 
 <a name="States"></a>
 ### Coroutine States
@@ -758,8 +768,8 @@ A coroutine has several internal states:
 * `kStatusDelaying`: coroutine returned using `COROUTINE_DELAY()`
 * `kStatusRunning`: coroutine is currently running
 * `kStatusEnding`: coroutine returned using `COROUTINE_END()`
-* `kStatusTerminated`: coroutine has been removed from the scheduler queue and
-  is permanently terminated. Set only by the `CoroutineScheduler`.
+* `kStatusTerminated`: coroutine is permanently terminated. Set only by the
+  `CoroutineScheduler`.
 
 The finite state diagram looks like this:
 ```
@@ -799,6 +809,16 @@ You can query these internal states using the following methods on the
 * `Coroutine::isDone()`: same as `isEnding() || isTerminated()`. This method
   is preferred because it works when the `Coroutine` is executed manually or
   through the `CoroutineScheduler`.
+
+Prior to v1.2, there was a small operational difference between `kStatusEnding`
+and `kStatusTerminated`. A terminated coroutine was removed from the internal
+linked list of "active" coroutines that was managed by the `CoroutineScheduler`.
+However, there was a serious flaw with this design ([Issue
+#19](https://github.com/bxparks/AceRoutine/issues/19)) so with v1.2, there is
+now no practical difference between these 2 states. It is possible that a future
+design change (something I am noodling over in my mind) may reintroduce a
+difference. Regardless, I recommended that the `isDone()` method should be used
+to detect a coroutine that has "finished".
 
 To call these functions on a specific coroutine, use the `Coroutine` instance
 variable that was created using the `COROUTINE()` macro:

@@ -27,6 +27,10 @@ SOFTWARE.
  *
  * This is the Doxygen documentation for the
  * <a href="https://github.com/bxparks/AceRoutine">AceRoutine Library</a>.
+ *
+ * Click on the "Classes" menu above to see the list of classes.
+ *
+ * Click on the "Files" menu above to see the list of header files.
  */
 
 #ifndef ACE_ROUTINE_ACE_ROUTINE_H
@@ -37,7 +41,7 @@ SOFTWARE.
 #include "ace_routine/Channel.h"
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_ROUTINE_VERSION 10100
-#define ACE_ROUTINE_VERSION_STRING "1.1"
+#define ACE_ROUTINE_VERSION 10200
+#define ACE_ROUTINE_VERSION_STRING "1.2"
 
 #endif

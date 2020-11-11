@@ -26,8 +26,13 @@ class ResettingCoroutine: public TestableCoroutine {
       COROUTINE_END();
     }
 
+    void restart() {
+      count = 0;
+      reset();
+    }
+
   public:
-    // exposed for testing purposes
+    // Public for testing purposes.
     int count = 0;
 };
 
@@ -63,11 +68,13 @@ test(ResetTest, reset) {
   assertEqual(5, resettableCoroutine.count);
   assertTrue(resettableCoroutine.isDone());
 
-  // Reset the coroutine. Must also reset any additional internal state of the
-  // coroutine, i.e. the 'count' variable.
-  resettableCoroutine.reset();
-  assertTrue(resettableCoroutine.isSuspended());
-  resettableCoroutine.count = 0;
+  // Reset the coroutine using the custom restart() method, which delegates to
+  // the Coroutine::reset() method. The coroutine goes into the Yielding state
+  // so that it will run upon the next call to CoroutineScheduler::loop(). The
+  // custom restart() method performs any additional reset of internal
+  // variables, in this example, the 'count' variable.
+  resettableCoroutine.restart();
+  assertTrue(resettableCoroutine.isYielding());
 
   // Verify that it runs from the beginning of the loop again.
   resettableCoroutine.runCoroutine();

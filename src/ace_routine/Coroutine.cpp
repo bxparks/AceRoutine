@@ -30,6 +30,50 @@ SOFTWARE.
 
 namespace ace_routine {
 
+bool Coroutine::isDelayExpired() const {
+  switch (mDelayType) {
+    case kDelayTypeMillis: {
+      uint16_t elapsedMillis = coroutineMillis() - mDelayStart;
+      return elapsedMillis >= mDelayDuration;
+    }
+    case kDelayTypeMicros: {
+      uint16_t elapsedMicros = coroutineMicros() -  mDelayStart;
+      return elapsedMicros >= mDelayDuration;
+    }
+    case kDelayTypeSeconds: {
+      uint16_t elapsedSeconds = coroutineSeconds() -  mDelayStart;
+      return elapsedSeconds >= mDelayDuration;
+    }
+    default:
+      // This should never happen.
+      return true;
+  }
+}
+
+void Coroutine::setupCoroutine(const char* name) {
+  mName = ace_common::FCString(name);
+  mStatus = kStatusYielding;
+  insertAtRoot();
+}
+
+void Coroutine::setupCoroutine(const __FlashStringHelper* name) {
+  mName = ace_common::FCString(name);
+  mStatus = kStatusYielding;
+  insertAtRoot();
+}
+
+void Coroutine::setupCoroutineOrderedByName(const char* name) {
+  mName = ace_common::FCString(name);
+  mStatus = kStatusYielding;
+  insertSorted();
+}
+
+void Coroutine::setupCoroutineOrderedByName(const __FlashStringHelper* name) {
+  mName = ace_common::FCString(name);
+  mStatus = kStatusYielding;
+  insertSorted();
+}
+
 // Use a static variable inside a function to solve the static initialization
 // ordering problem.
 Coroutine** Coroutine::getRoot() {
@@ -50,6 +94,12 @@ void Coroutine::insertSorted() {
   *p = this;
 }
 
+void Coroutine::insertAtRoot() {
+  Coroutine** root = getRoot();
+  mNext = *root;
+  *root = this;
+}
+
 void Coroutine::resume() {
   if (mStatus != kStatusSuspended) return;
 
@@ -59,11 +109,6 @@ void Coroutine::resume() {
   // COROUTINE_DELAY() and COROUTINE_AWAIT() are written to restore their
   // status.
   mStatus = kStatusYielding;
-
-  // insert at the head of the linked list
-  Coroutine** p = getRoot();
-  mNext = *p;
-  *p = this;
 }
 
 unsigned long Coroutine::coroutineMillis() const {

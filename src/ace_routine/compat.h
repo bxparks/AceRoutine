@@ -71,7 +71,8 @@ class __FlashStringHelper;
   #include <pgmspace.h>
 
 #else
-  #error Unsupported platform
+  #warning Untested platform, AceRoutine may still work...
+  #include <avr/pgmspace.h>
 
 #endif
 

@@ -30,6 +30,7 @@ SOFTWARE.
 #include <AceCommon.h> // FCString
 
 class AceRoutineTest_statusStrings;
+class SuspendTest_suspendAndResume;
 
 /**
  * @file Coroutine.h
@@ -214,7 +215,24 @@ extern className##_##name name
       setRunning(); \
     } while (false)
 
-/** Yield for delaySeconds. Similar to COROUTINE_DELAY(delayMillis). */
+/**
+ * Yield for delaySeconds. Similar to COROUTINE_DELAY(delayMillis).
+ *
+ * The accuracy of the delay interval in units of seconds has at least 2
+ * sources of errors, so you should not depend on this for perfectly accurate
+ * delays:
+ *
+ * 1) The current implementation uses the builtin millis() to infer the
+ * "seconds". The millis() function returns a value that overflows after
+ * 4,294,967.296 seconds. Therefore, the last inferred second just before
+ * overflowing contains only 0.296 seconds instead of a full second. A delay
+ * which straddles this overflow will return 0.704 seconds earlier than it
+ * should.
+ * 2) On microcontrollers without support for fast hardware integer division,
+ * (i.e. AVR, SAMD21, ESP8266), the division by 1000 is approximated using
+ * integer multiplications. The calculated value is off by a fraction of a
+ * percent from the correct value.
+ */
 #define COROUTINE_DELAY_SECONDS(delaySeconds) \
     do { \
       setDelaySeconds(delaySeconds); \
@@ -247,22 +265,9 @@ namespace ace_routine {
 class Coroutine {
   friend class CoroutineScheduler;
   friend class ::AceRoutineTest_statusStrings;
+  friend class ::SuspendTest_suspendAndResume;
 
   public:
-    /**
-     * Get the pointer to the root pointer. Implemented as a function static to
-     * fix the C++ static initialization problem, making it safe to use this in
-     * other static contexts.
-     */
-    static Coroutine** getRoot();
-
-    /**
-     * Return the next pointer as a pointer to the pointer, similar to
-     * getRoot(). This makes it much easier to manipulate a singly-linked list.
-     * Also makes setNext() method unnecessary.
-     */
-    Coroutine** getNext() { return &mNext; }
-
     /** Human-readable name of the coroutine. */
     const ace_common::FCString& getName() const { return mName; }
 
@@ -335,30 +340,12 @@ class Coroutine {
      * Coroutine upon the next iteration.
      */
     void reset() {
-      mStatus = kStatusSuspended;
+      mStatus = kStatusYielding;
       mJumpPoint = nullptr;
     }
 
     /** Check if delay time is over. */
-    bool isDelayExpired() {
-      switch (mDelayType) {
-        case kDelayTypeMillis: {
-          uint16_t elapsedMillis = coroutineMillis() - mDelayStart;
-          return elapsedMillis >= mDelayDuration;
-        }
-        case kDelayTypeMicros: {
-          uint16_t elapsedMicros = coroutineMicros() -  mDelayStart;
-          return elapsedMicros >= mDelayDuration;
-        }
-        case kDelayTypeSeconds: {
-          uint16_t elapsedSeconds = coroutineSeconds() -  mDelayStart;
-          return elapsedSeconds >= mDelayDuration;
-        }
-        default:
-          // This should never happen.
-          return true;
-      }
-    }
+    bool isDelayExpired() const;
 
     /** The coroutine was suspended with a call to suspend(). */
     bool isSuspended() const { return mStatus == kStatusSuspended; }
@@ -410,11 +397,7 @@ class Coroutine {
      *
      * @param name The name of the coroutine as a human-readable string.
      */
-    void setupCoroutine(const char* name) {
-      mName = ace_common::FCString(name);
-      mStatus = kStatusYielding;
-      insertSorted();
-    }
+    void setupCoroutine(const char* name);
 
     /**
      * Same as setupCoroutine(const char*) except using flash string type.
@@ -428,12 +411,31 @@ class Coroutine {
      * The problem doesn't exist for a (const char*) but for consistency, I
      * made both types of strings pass through the setupCoroutine() method
      * instead of chaining the constructor.
+     *
+     * @param name The name of the coroutine as a human-readable string.
      */
-    void setupCoroutine(const __FlashStringHelper* name) {
-      mName = ace_common::FCString(name);
-      mStatus = kStatusYielding;
-      insertSorted();
-    }
+    void setupCoroutine(const __FlashStringHelper* name);
+
+    /**
+     * A version of setupCoroutine(const char*) where the ordering of the
+     * coroutines executed by CoroutineScheduler is ordered by the name. This
+     * was the default behavior of setupCoroutine() before v1.2. This method
+     * recreates the previous behavior, but it exists only for testing purposes
+     * where a deterministic ordering is required. The stability of this method
+     * is not guaranteed and client code should **not** use this method.
+     */
+    void setupCoroutineOrderedByName(const char* name);
+
+    /**
+     * A version of setupCoroutine(const __FlashStringHelper*) where the
+     * ordering of the coroutines executed by CoroutineScheduler is ordered by
+     * the name. This was the default behavior of setupCoroutine() before v1.2.
+     * This method recreates the previous behavior, but it exists only for
+     * testing purposes where a deterministic ordering is required. The
+     * stability of this method is not guaranteed and client code should
+     * **not** use this method.
+     */
+    void setupCoroutineOrderedByName(const __FlashStringHelper* name);
 
   protected:
     /**
@@ -607,6 +609,21 @@ class Coroutine {
     static const __FlashStringHelper* const sStatusStrings[];
 
     /**
+     * Get the pointer to the root pointer. Implemented as a function static to
+     * fix the C++ static initialization problem, making it safe to use this in
+     * other static contexts.
+     */
+    static Coroutine** getRoot();
+
+    /**
+     * Return the next pointer as a pointer to the pointer, similar to
+     * getRoot(). This makes it much easier to manipulate a singly-linked list.
+     * Also makes setNext() method unnecessary. Should be used only by
+     * CoroutineScheduler.
+     */
+    Coroutine** getNext() { return &mNext; }
+
+    /**
      * Insert the current coroutine into the singly linked list. The order of
      * C++ static initialization is undefined, but if getName() is not null
      * (which will normally be the case when using the COROUTINE() macro), the
@@ -620,10 +637,18 @@ class Coroutine {
      */
     void insertSorted();
 
+    /**
+     * Insert the current coroutine at the root of the singly linked list. This
+     * is the most efficient and becomes the default with v1.2 because the
+     * ordering of the coroutines in the CoroutineScheduler is no longer an
+     * externally defined property.
+     */
+    void insertAtRoot();
+
     ace_common::FCString mName;
     Coroutine* mNext = nullptr;
     void* mJumpPoint = nullptr;
-    Status mStatus = kStatusSuspended;
+    Status mStatus = kStatusYielding;
     uint8_t mDelayType;
     uint16_t mDelayStart; // millis or micros
     uint16_t mDelayDuration; // millis or micros

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['status_124',['Status',['../classace__routine_1_1Coroutine.html#a2c0991faf233080e16bd81b94db0adbb',1,'ace_routine::Coroutine']]]
+  ['status_122',['Status',['../classace__routine_1_1Coroutine.html#a2c0991faf233080e16bd81b94db0adbb',1,'ace_routine::Coroutine']]]
 ];

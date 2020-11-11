@@ -290,32 +290,46 @@ The [docs/](docs/) directory contains the
 <a name="Examples"></a>
 ### Examples
 
-The following example sketches are provided:
+The following programs are provided under the `examples` directory:
 
-* [AutoBenchmark.ino](examples/AutoBenchmark):
-  a program that performs CPU benchmarking
-* [MemoryBenchmark.ino](examples/MemoryBenchmark): determines the flash and
-  static memory consumptions of certain AceRoutine features
-* [HelloCoroutine.ino](examples/HelloCoroutine)
-* [HelloScheduler.ino](examples/HelloScheduler): same as `HelloCoroutine`
-  except using the `CoroutineScheduler` instead of manually running the
-  coroutines
-* [HelloManualCoroutine.ino](examples/HelloManualCoroutine): same as
-  `HelloCoroutine` except the `Coroutine` subclasses and instances are created
-  and registered manually
-* [BlinkSlowFastRoutine.ino](examples/BlinkSlowFastRoutine): use coroutines
-  to read a button and control how the LED blinks
-* [BlinkSlowFastManualRoutine.ino](examples/BlinkSlowFastManualRoutine): same
-  as BlinkSlowFastRoutine but using manual `Coroutine` subclasses
-* [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same time
-* [Delay.ino](examples/Delay): validate the various delay macros
-  (`COROUTINE_DELAY()`, `COROUTINE_DELAY_MICROS()` and
-  `COROUTINE_DELAY_SECONDS()`)
-* [Pipe.ino](examples/Pipe): uses a `Channel` to allow a Writer to send
-  messages to a Reader
-* [ChannelBenchmark.ino](examples/ChannelBenchmark): determines the amount of
-  CPU overhead of a `Channel` by using 2 coroutines to ping-pong an integer
-  across 2 channels
+* Beginner Examples
+    * [HelloCoroutine.ino](examples/HelloCoroutine)
+    * [HelloScheduler.ino](examples/HelloScheduler): same as `HelloCoroutine`
+      except using the `CoroutineScheduler` instead of manually running the
+      coroutines
+    * [HelloManualCoroutine.ino](examples/HelloManualCoroutine): same as
+      `HelloCoroutine` except the `Coroutine` subclasses and instances are
+      created and registered manually
+* Intermediate Examples
+    * [BlinkSlowFastRoutine.ino](examples/BlinkSlowFastRoutine): use coroutines
+      to read a button and control how the LED blinks
+    * [BlinkSlowFastManualRoutine.ino](examples/BlinkSlowFastManualRoutine):
+      same as BlinkSlowFastRoutine but using manual `Coroutine` subclasses
+    * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same
+      time
+    * [Delay.ino](examples/Delay): validate the various delay macros
+      (`COROUTINE_DELAY()`, `COROUTINE_DELAY_MICROS()` and
+      `COROUTINE_DELAY_SECONDS()`)
+* Advanced Examples
+    * [SoundManager](examples/SoundManager): Use a sound manager coroutine to
+      control the sounds made by a sound generator coroutine, using the
+      `reset()` function to interrupt the sound generator.
+* Channels
+    * [Pipe.ino](examples/Pipe): uses a `Channel` to allow a Writer to send
+      messages to a Reader through a "pipe" (unfinished)
+    * [Task.ino](examples/Pipe): uses a `Channel` to allow a Writer to send
+      messages to a Reade (unfinished)
+    * a working example of Channels can be found in the
+      [CommandLineInterface](https://github.com/bxparks/AceUtils/blob/develop/src/cli/README.md)
+      package in the AceUtils library (https://github.com/bxparks/AceUtils).
+* Benchmarks
+    * Internal programs to extract various CPU and memory benchmarks.
+    * [AutoBenchmark.ino](examples/AutoBenchmark): performs CPU benchmarking
+    * [MemoryBenchmark.ino](examples/MemoryBenchmark): determines the flash and
+      static memory consumptions of certain AceRoutine features
+    * [ChannelBenchmark.ino](examples/ChannelBenchmark): determines the amount
+      of CPU overhead of a `Channel` by using 2 coroutines to ping-pong an
+      integer across 2 channels
 
 <a name="UserGuide"></a>
 ## User Guide

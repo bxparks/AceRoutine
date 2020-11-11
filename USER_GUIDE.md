@@ -22,13 +22,14 @@ is installed.
     * [Local Variables](#LocalVariables)
     * [Conditional If-Else](#IfElse)
     * [Switch Statements](#Switch)
-    * [For Loops](#For)
-    * [While Loops](#While)
-    * [Forever Loops](#Forever)
+    * [For Loops](#ForLoops)
+    * [While Loops](#WhileLoops)
+    * [Forever Loops](#ForeverLoops)
     * [Macros As Statements](#MacrosAsStatements)
-* [Coroutine Chaining](#CoroutineChaining)
-    * [No Nested](#NoNested)
-    * [Chaining](#Chaining)
+* [Coroutine Interactions](#CoroutineInteractions)
+    * [No Nested Loop Macro](#NoNestedLoop)
+    * [No Delegation to Regular Functions](#NoDelegation)
+    * [Chaining Coroutines](#Chaining)
 * [Running and Scheduling](#RunningAndScheduling)
     * [Manual Scheduling](#ManualScheduling)
     * [CoroutineScheduler](#CoroutineScheduler)
@@ -60,6 +61,15 @@ prepending the `ace_routine::` prefix, use the `using` directive:
 ```C++
 #include <AceRoutine.h>
 using namespace ace_routine;
+```
+
+There are only 3 classes in this namespace (`Coroutine`, `CoroutineScheduler`,
+and `Channel`) so you may also just import one or more of those classes
+directly:
+
+```C++
+#include <AceRoutine.h>
+using ace_routine::Coroutine;
 ```
 
 <a name="Macros"></a>
@@ -175,7 +185,17 @@ class Coroutine {
 ### Coroutine Instance
 
 All coroutines are instances of the `Coroutine` class or one of its
-subclasses. The name of the coroutine instance is the name provided
+subclasses. There are 2 recommended ways of creating coroutines:
+
+* Using the `COROUTINE()` macro
+* Manually subclassing the `Coroutine` class.
+
+(The third option is useful mostly for unit testing purposes, and is explained
+later in the [Custom Coroutines](#Custom) section below.)
+
+**Using COROUTINE() Macro**
+
+The name of the coroutine instance is the name provided
 in the `COROUTINE()` macro. For example, in the following example:
 ```C++
 COROUTINE(doSomething) {
@@ -208,6 +228,40 @@ struct Coroutine_doSomething: Coroutine {
 Coroutine_doSomething doSomething;
 ```
 
+**Manually Subclassing the Coroutine Class**
+
+After seeing how the `COROUTINE()` macro expands out the code, it should
+relatively straightforward to see how we can create our own subclasses of
+`Coroutine` class, and create multiple instances of that subclass:
+
+```C++
+class MyCoroutine : public Coroutine {
+  int runCoroutine() override {
+    COROUTINE_BEGIN();
+    ...
+    COROUTINE_END();
+  }
+};
+
+
+MyCoroutine routine1;
+MyCoroutine routine2;
+
+void setup() {
+  ...
+  routine1.setupCoroutine(F("routine1"));
+  routine2.setupCoroutine(F("routine2"));
+  ...
+}
+```
+
+Since we are creating 2 instances of the `MyCoroutine` class, we call the
+`Coroutine::setupCoroutine()` in the global `setup()` instead of calling them in
+the constructor.
+
+For more details on manual Coroutine instances, see the
+[Manual Coroutines](#Manual) section below.
+
 <a name="CoroutineBody"></a>
 ## Coroutine Body
 
@@ -226,8 +280,8 @@ in the `Coroutine` class that enable coroutines to be implemented. All other
 `COROUTINE_xxx()` macros must appear between these BEGIN and END macros.
 
 The `COROUTINE_LOOP()` macro is a special case that replaces the
-`COROUTINE_BEGIN()` and `COROUTINE_END()` macros. See the **Forever Loops**
-section below.
+`COROUTINE_BEGIN()` and `COROUTINE_END()` macros. See the
+[Forever Loops](#ForeverLoops) section below.
 
 <a name="Yield"></a>
 ### Yield
@@ -328,7 +382,8 @@ COROUTINE(waitThousandSeconds) {
 }
 ```
 
-See **For Loop** section below for a description of the for-loop construct.
+See [For Loops](#ForLoops) section below for a description of the for-loop
+construct.
 
 <a name="LocalVariables"></a>
 ### Local Variables
@@ -347,7 +402,7 @@ probably crash the program. In other words, do **not** do this:
 ```C++
 COROUTINE(doSomething) {
   COROUTINE_BEGIN();
-  String s = "hello world"; // ***crashes when doSomething() is resumed***
+  String s = "hello world"; // ***crashes when 'doSomething' is resumed***
   Serial.println(s);
   COROUTINE_DELAY(1000);
   ...
@@ -371,10 +426,42 @@ COROUTINE(doSomething) {
 }
 ```
 
-The easiest way to get around these problems is to avoid local variables
-and just use `static` variables inside a `COROUTINE()`. Static variables are
-initialized once and preserve their value through multiple calls to the
-function, which is exactly what is needed.
+One way around these problem is to avoid local variables and use `static`
+variables inside a `COROUTINE()`. Function-static variables are initialized once
+and preserve their value through multiple calls to the function, which is
+exactly what is needed.
+
+For Manual Coroutines created from your own subclass, using a function-static
+variable inside the `runCoroutine()` method may not be an option if you create
+multiple instances. This is because the function-static variable will be shared
+among multiple instances which may conflict with each other. Instead, you can
+add a private member variable to the custom class and treat it like a local
+variable inside the `runCoroutine()` function, like this:
+
+```C++
+class MyCoroutine : public Coroutine {
+  public:
+    MyCoroutine(int val):
+        internal(val) {
+      ...
+    }
+
+    int runCoroutine() override {
+      COROUTINE_LOOP() {
+        ...
+        internal++; // operate on 'internal' variable
+        ...
+        COROUTINE_YIELD();
+      }
+    }
+
+  private:
+    int internal;
+};
+
+MyCoroutine a(1);
+MyCoroutine b(2);
+```
 
 <a name="IfElse"></a>
 ### Conditional If-Else
@@ -426,7 +513,7 @@ COROUTINE(doThingsBasedOnSwitchConditions) {
 }
 ```
 
-<a name="For"></a>
+<a name="ForLoops"></a>
 ### For Loops
 
 You cannot use a local variable in the `for-loop` because the variable counter
@@ -447,7 +534,7 @@ COROUTINE(countToTen) {
 }
 ```
 
-<a name="While"></a>
+<a name="WhileLoops"></a>
 ### While Loops
 
 You can write a coroutine that loops while certain condition is valid like this,
@@ -470,7 +557,7 @@ Make sure that the `condition` expression does not use any local variables,
 since local variables are destroyed and recreated after each YIELD, DELAY or
 AWAIT.
 
-<a name="Forever"></a>
+<a name="ForeverLoops"></a>
 ### Forever Loops
 
 In many cases, you just want to loop forever. You could use a `while (true)`
@@ -524,36 +611,65 @@ surprised to find that it actually worked.
 <a name="MacrosAsStatements"></a>
 ### Macros As Statements
 
-The `COROUTINE_YIELD()`, `COROUTINE_DELAY()`, `COROUTINE_AWAIT()` macros have
-been designed to allow them to be used almost everywhere a valid C/C++ statement
-is allowed. For example, the following is allowed:
+The various macros (`COROUTINE_YIELD()`, `COROUTINE_DELAY()`,
+`COROUTINE_DELAY_MICROS()`, `COROUTINE_AWAIT()`, etc.) have been designed to
+allow them to be used almost everywhere a valid C/C++ statement is allowed. For
+example, the following is allowed:
+
 ```C++
   ...
   if (condition) COROUTINE_YIELD();
   ...
 ```
 
-<a name="CoroutineChaining"></a>
-## Coroutine Chaining
+<a name="CoroutineInteractions"></a>
+## Coroutine Interactions
 
-<a name="NoNested"></a>
-### No Nested Coroutine Macros
+Here are some potentially surprising ways that certain macros or Coroutine
+features interact with each other inside the `runCoroutine()` method.
 
-Coroutines macros **cannot** be nested. In other words, if you call another
-function from within a coroutine, you cannot use the various `COROUTINE_XXX()`
-macros inside the nested function. The macros will trigger compiler errors if
-you try:
+<a name="NoNestedLoop"></a>
+### No Nested Loop Macro
+
+The `COROUTINE_LOOP()` macro cannot be nested. In other words, the following is
+**not** allowed:
+
+```C++
+COROUTINE(routine) {
+  COROUTINE_LOOP() {
+    ...
+    if (condition) {
+      COROUTINE_LOOP() { // <----- NOT ALLOWED
+        ...
+        COROUTINE_YIELD();
+      }
+    }
+    COROUTINE_YIELD();
+  }
+}
+```
+
+<a name="NoDelegation"></a>
+### No Delegation to Regular Functions
+
+Coroutines macros inside the `runCoroutine()` **cannot** be delegated to another
+C/C++ function, even though this becomes tempting when the `runCoroutine()`
+implementation becomes complex. In other words, if you call another function
+from within the `runCoroutine()`, you cannot use the various `COROUTINE_XXX()`
+macros inside the delegated function. The macros were designed to trigger a
+compiler error in most cases, but this is not guaranteed:
+
 ```C++
 void doSomething() {
   ...
-  COROUTINE_YIELD(); // ***compiler error***
+  COROUTINE_YIELD(); // <--- ***compiler error***
   ...
 }
 
 COROUTINE(cannotUseNestedMacros) {
   COROUTINE_LOOP() {
     if (condition) {
-      doSomething(); // doesn't work
+      doSomething(); // <--- doesn't work
     } else {
       COROUTINE_YIELD();
     }
@@ -564,8 +680,58 @@ COROUTINE(cannotUseNestedMacros) {
 <a name="Chaining"></a>
 ### Chaining Coroutines
 
-Coroutines can be chained, in other words, one coroutine *can* explicitly
-call another coroutine, like this:
+Coroutines can be chained, in other words, the `runCoroutine()` of one coroutine
+*can* explicitly call the `runCoroutine()` of another coroutine.
+
+```
+I have found it useful to chain coroutines when using the **Manual Coroutines**
+described in the section below. The ability to chain coroutines allows us to
+implement a [Decorator
+Pattern](https://en.wikipedia.org/wiki/Decorator_pattern), also known as "a
+chain of responsibility". Using manual coroutines, we can wrap one coroutine
+with another and delegate to the inner coroutine like this:
+
+```C++
+class InnerCoroutine: public Coroutine {
+  public:
+    InnerCoroutine(..) { ...}
+
+    int runCoroutine override {
+      COROUTINE_BEGIN();
+      ...
+      COROUTINE_END();
+      ...
+    }
+};
+
+class OuterCoroutine: public Coroutine {
+  public:
+    OuterCoroutine(InnerCoroutine& inner):
+        mInner(inner) {
+      ...
+    }
+
+    int runCoroutine override {
+      // No COROUTINE_BEGIN() and COROUTINE_END() needed if this simply
+      // delegates to the InnerCoroutine.
+      mInner.runCoroutine();
+    }
+
+  private:
+    Coroutine& mInner;
+};
+
+```
+In situtations like this, it is likely only the `OuterCoroutine` would be
+registered in the `CoroutineScheduler` since we do not want to call the
+`InnerCoroutine` directly. And in the cases that I've come across, the
+`OuterCoroutine` doesn't actually use much of the Coroutine functionality (i.e.
+it doesn't actually use the `COROUTINE_BEGIN()` and `COROUTINE_END()` macros. It
+simply delegates the `runCoroutine()` call to the inner one.
+
+This type of chaining is also allowed for coroutines defined using the
+`COROUTINE()` macro, like this:
+
 ```C++
 COROUTINE(inner) {
   COROUTINE_LOOP() {
@@ -584,52 +750,7 @@ COROUTINE(outer) {
   }
 }
 
-```
-I have yet to find it useful to call a Coroutine defined with the `COROUTINE()`
-from another Coroutine defined by the same `COROUTINE()` macro.
-
-However, I have found it useful to chain coroutines when using the **Manual
-Coroutines** described in one of the sections below. The ability to chain
-coroutines allows us to implement a [Decorator
-Pattern](https://en.wikipedia.org/wiki/Decorator_pattern) or a chain of
-responsibility. Using manual coroutines, we can wrap one coroutine with another
-and delegate to the inner coroutine like this:
-
-```C++
-class InnerCoroutine: public Coroutine {
-  public:
-    InnerCoroutine(..) { ...}
-
-    int runCoroutine override {
-      COROUTINE_BEGIN();
-      ...
-      COROUTINE_END();
-      ...
-    }
-};
-
-class OuterCoroutine: public Coroutine {
-  public:
-    OuterCoroutine(InnerCoroutine& inner): mInner(inner) {
-      ...
-    }
-
-    int runCoroutine override {
-      // No COROUTINE_BEGIN() and COROUTINE_END() needed if this simply
-      // delegates to the InnerCoroutine.
-      mInner.runCoroutine();
-    }
-
-  private:
-    Coroutine& mInner;
-};
-
-```
-Most likely, only the `OuterCoroutine` would be registered in the
-`CoroutineScheduler`. And in the cases that I've come across, the
-`OuterCoroutine` doesn't actually use much of the Coroutine functionality
-(i.e. doesn't actuall use the `COROUTINE_BEGIN()` and `COROUTINE_END()` macros.
-It simply delegates the `runCoroutine()` call to the inner one.
+But I have yet to come across a situation where this was useful.
 
 <a name="RunningAndScheduling"></a>
 ## Running and Scheduling
@@ -879,8 +1000,8 @@ Custom coroutines were intended to be useful if you need to create multiple
 coroutines which share methods or data structures. In practice, the only place
 where I have found this feature to be useful is in writing the
 [tests/AceRoutineTest](tests/AceRoutineTest) unit tests. In any other normal
-situation, I suspect that the *Manual Coroutines* described in the next section
-will be more useful and easier to understand.
+situation, I suspect that the **Manual Coroutines** section described in
+below will be more useful and easier to understand.
 
 <a name="Manual"></a>
 ### Manual Coroutines (Recommended)
@@ -955,10 +1076,13 @@ printed (e.g. using the `CoroutineScheduler::list()` method), the name of an
 anonymous coroutine is represented by the integer representation of the `this`
 pointer of the coroutine object.
 
-A good example of a manual coroutine is
-[BlinkSlowFastManualRoutine](examples/BlinkSlowFastManualRoutine) which shows
-the same functionality as [BlinkSlowFastRoutine](examples/BlinkSlowFastRoutine)
-rewritten using manual coroutines.
+Some examples of manual coroutines:
+
+* [BlinkSlowFastManualRoutine](examples/BlinkSlowFastManualRoutine) which shows
+  the same functionality as
+  [BlinkSlowFastRoutine](examples/BlinkSlowFastRoutine)
+* [HelloManualCoroutine](examples/HelloManualCoroutine) which shows the same
+  functionality as [HelloCoroutine](examples/HelloCoroutine).
 
 <a name="Communication"></a>
 ## Coroutine Communication

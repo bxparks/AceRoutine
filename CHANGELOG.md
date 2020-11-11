@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+    * Add `DEVELOPER.md` notes to myself.
 * 1.2 (2020-11-10)
     * Fix an infinite loop in the internal singly-linked list of coroutines when
       `resume()` is called immediately after `suspend()`, without waiting for

@@ -52,7 +52,7 @@ others (in my opinion of course):
 * uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
   feature of the GCC compiler (also supported by Clang) to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
-    * allows `switch` statemens in the coroutines
+    * allows `switch` statements in the coroutines
 * C/C++ macros eliminate boilerplate code and make the code easy to read
 * the base `Coroutine` class is easy to subclass to add additional variables and
   functions

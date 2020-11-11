@@ -38,7 +38,7 @@ class PrintHelloWorldCoroutine: public Coroutine {
         Serial.flush();
         COROUTINE_DELAY(1000);
         Serial.println(F("World"));
-        COROUTINE_DELAY_SECONDS(4);
+        COROUTINE_DELAY(4000);
       }
     }
 };
@@ -55,8 +55,8 @@ void setup() {
   pinMode(LED, OUTPUT);
 
   // Register the coroutines manually since we are not using COROUTINE() macro.
-  blinkLed.setupCoroutine("blinkLed");
-  printHelloWorld.setupCoroutine("printHelloWorld");
+  blinkLed.setupCoroutine(F("blinkLed"));
+  printHelloWorld.setupCoroutine(F("printHelloWorld"));
 
   CoroutineScheduler::setup();
 }

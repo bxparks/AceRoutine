@@ -747,9 +747,9 @@ member variables of the Coroutine subclass, or static variables inside the
 `runCoroutine()` method, you may ned to manually reset those variables to their
 initial states as well.
 
-Personally, I have never needed the `reset()` functionalty (so it is
-unfortunatesly not tested as much as it could be), but it is apparently useful
-for some people. See for example:
+I have not personally needed the `reset()` functionalty so it has not been
+tested as much as I would like, but it is apparently useful for some people. See
+for example:
 
 * [Issue #13](https://github.com/bxparks/AceRoutine/issues/13)
 * [Issue #14](https://github.com/bxparks/AceRoutine/issues/14)
@@ -764,7 +764,8 @@ A good example of how to use the `reset()` can be seen in
 A coroutine has several internal states:
 * `kStatusSuspended`: coroutine was suspended using `Coroutine::suspend()`
 * `kStatusYielding`: coroutine returned using `COROUTINE_YIELD()` or
-  `COROUTINE_AWAIT()`
+  `COROUTINE_AWAIT()`. This is also the initial state of a new coroutine,
+  or an old coroutine after `reset()`.
 * `kStatusDelaying`: coroutine returned using `COROUTINE_DELAY()`
 * `kStatusRunning`: coroutine is currently running
 * `kStatusEnding`: coroutine returned using `COROUTINE_END()`
@@ -773,13 +774,13 @@ A coroutine has several internal states:
 
 The finite state diagram looks like this:
 ```
-                     ----------------------------
-         Suspended                              ^
+                     <--------------------------+
+         Suspended                              |
          ^       ^                              |
         /         \                             |
        /           \                            |
-      v             \       --------            |
-Yielding          Delaying         ^            |
+      v             \       <------+            |
+Yielding          Delaying         |            |
      ^               ^             |            |
       \             /              |        accessible
        \           /               |        using
@@ -790,12 +791,12 @@ Yielding          Delaying         ^            |
              |              directly            |
              |                     |            |
              v                     |            |
-          Ending                   v            |
-             |              --------            |
+          Ending                   |            |
+             |              <------+            |
              |                                  |
              v                                  |
-        Terminated                              v
-                    -----------------------------
+        Terminated                              |
+                    <---------------------------+
 ```
 
 You can query these internal states using the following methods on the

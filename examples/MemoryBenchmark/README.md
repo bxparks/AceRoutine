@@ -1,4 +1,4 @@
-# Memory Benchmarks
+# Memory Benchmark
 
 The `MemoryBenchmark.ino` program compiles example code snippets using the
 AceRoutine library. The `FEATURE` macro flag controls which feature is compiled.
@@ -11,6 +11,8 @@ difficult to separate out the code size of the library from the overhead imposed
 by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
+
+**NOTE**: This file was auto-generated using `make README.md`. DO NOT EDIT.
 
 **Version**: AceRoutine v1.2
 
@@ -44,7 +46,7 @@ micro.txt
 samd.txt
 esp8266.txt
 esp32.txt
-teensy.txt
+teensy32.txt
 ```
 
 The `generate_table.awk` program reads one of `*.txt` files and prints out an
@@ -55,11 +57,18 @@ the following command produces the table in the Nano section below:
 $ ./generate_table.awk < nano.txt
 ```
 
+Fortunately, we no longer need to run `generate_table.awk` for each `*.txt`
+file. The process has been automated using the `generate_readme.py` script which
+will be invoked by the following command:
+```
+$ make README.md
+```
+
 ## Functionality
 
 * Baseline: A program that does (almost) nothing
 * Coroutine (bare): A single `COROUTINE()` macro that does nothing.
-* Coroutine (LOOP,DELAY): A `COROUTINE()` macro that uses `COROUTINE_LOOP()` 
+* Coroutine (LOOP,DELAY): A `COROUTINE()` macro that uses `COROUTINE_LOOP()`
   and `COROUTINE_DELAY()` which are expected to used in the common case.
 * CoroutineScheduler (bare): A single `Coroutine` instance with a
 * `CoroutineScheduler`.
@@ -84,6 +93,7 @@ $ ./generate_table.awk < nano.txt
 | Scheduler, One Coroutine        |   1844/   64 |  1238/   53 |
 | Scheduler, Two Coroutines       |   1994/   79 |  1388/   68 |
 +--------------------------------------------------------------+
+
 ```
 
 ## Sparkfun Pro Micro
@@ -103,6 +113,7 @@ $ ./generate_table.awk < nano.txt
 | Scheduler, One Coroutine        |   4732/  204 |  1178/   53 |
 | Scheduler, Two Coroutines       |   4888/  219 |  1334/   68 |
 +--------------------------------------------------------------+
+
 ```
 
 ## SAMD21 M0 Mini
@@ -122,6 +133,7 @@ $ ./generate_table.awk < nano.txt
 | Scheduler, One Coroutine        |  11604/ 2424 |   500/   56 |
 | Scheduler, Two Coroutines       |  11684/ 2452 |   580/   84 |
 +--------------------------------------------------------------+
+
 ```
 
 ## ESP8266
@@ -141,6 +153,7 @@ $ ./generate_table.awk < nano.txt
 | Scheduler, One Coroutine        | 257732/26848 |   808/   48 |
 | Scheduler, Two Coroutines       | 257832/26880 |   908/   80 |
 +--------------------------------------------------------------+
+
 ```
 
 ## ESP32
@@ -160,6 +173,7 @@ $ ./generate_table.awk < nano.txt
 | Scheduler, One Coroutine        | 208745/14660 |  1652/   72 |
 | Scheduler, Two Coroutines       | 208857/14684 |  1764/   96 |
 +--------------------------------------------------------------+
+
 ```
 
 ## Teensy 3.2
@@ -180,4 +194,6 @@ $ ./generate_table.awk < nano.txt
 | Scheduler, One Coroutine        |  11464/ 4196 |   632/   48 |
 | Scheduler, Two Coroutines       |  11548/ 4224 |   716/   76 |
 +--------------------------------------------------------------+
+
 ```
+

@@ -1,4 +1,4 @@
-# User Guide
+# AceRoutine Library User Guide
 
 See the [README.md](README.md) for installation instructions and other
 background information. This document describes how to use the library once it

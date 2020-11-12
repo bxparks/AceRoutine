@@ -9,7 +9,7 @@ is installed.
 **Table of Contents**
 
 * [Coroutine Setup](#Setup)
-    * [Include Header and Namespace](#Include)
+    * [Include Header and Namespace](#IncludeHeader)
     * [Macros](#Macros)
     * [Overall Structure](#OverallStructure)
     * [Coroutine Class](#CoroutineClass)
@@ -26,10 +26,7 @@ is installed.
     * [While Loops](#WhileLoops)
     * [Forever Loops](#ForeverLoops)
     * [Macros As Statements](#MacrosAsStatements)
-* [Coroutine Interactions](#CoroutineInteractions)
-    * [No Nested Loop Macro](#NoNestedLoop)
-    * [No Delegation to Regular Functions](#NoDelegation)
-    * [Chaining Coroutines](#Chaining)
+    * [Chaining Coroutines](#ChainingCoroutines)
 * [Running and Scheduling](#RunningAndScheduling)
     * [Manual Scheduling](#ManualScheduling)
     * [CoroutineScheduler](#CoroutineScheduler)
@@ -38,19 +35,22 @@ is installed.
     * [Reset Coroutine](#Reset)
     * [Coroutine States](#States)
 * [Customizing](#Customizing)
-    * [Custom Coroutines](#Custom)
-    * [Manual Coroutines](#Manual)
+    * [Custom Coroutines](#CustomCoroutines)
+    * [Manual Coroutines](#ManualCoroutines)
 * [Coroutine Communication](#Communication)
     * [Instance Variables](#InstanceVariables)
     * [Channels (Experimental)](#Channels)
 * [Miscellaneous](#Miscellaneous)
     * [External Coroutines](#External)
     * [Functors](#Functors)
+* [Bugs and Limitations](#BugsAndLimitations)
+    * [No Nested LOOP Macro](#NoNestedLoop)
+    * [No Delegation to Regular Functions](#NoDelegation)
 
 <a name="Setup"></a>
 ## Coroutine Setup
 
-<a name="Include"></a>
+<a name="IncludeHeader"></a>
 ### Include Header and Namespace
 
 Only a single header file `AceRoutine.h` is required to use this library.
@@ -191,7 +191,7 @@ subclasses. There are 2 recommended ways of creating coroutines:
 * Manually subclassing the `Coroutine` class.
 
 (The third option is useful mostly for unit testing purposes, and is explained
-later in the [Custom Coroutines](#Custom) section below.)
+later in the [Custom Coroutines](#CustomCoroutines) section below.)
 
 **Using COROUTINE() Macro**
 
@@ -260,7 +260,7 @@ Since we are creating 2 instances of the `MyCoroutine` class, we call the
 the constructor.
 
 For more details on manual Coroutine instances, see the
-[Manual Coroutines](#Manual) section below.
+[Manual Coroutines](#ManualCoroutines) section below.
 
 <a name="CoroutineBody"></a>
 ## Coroutine Body
@@ -622,68 +622,14 @@ example, the following is allowed:
   ...
 ```
 
-<a name="CoroutineInteractions"></a>
-## Coroutine Interactions
-
-Here are some potentially surprising ways that certain macros or Coroutine
-features interact with each other inside the `runCoroutine()` method.
-
-<a name="NoNestedLoop"></a>
-### No Nested Loop Macro
-
-The `COROUTINE_LOOP()` macro cannot be nested. In other words, the following is
-**not** allowed:
-
-```C++
-COROUTINE(routine) {
-  COROUTINE_LOOP() {
-    ...
-    if (condition) {
-      COROUTINE_LOOP() { // <----- NOT ALLOWED
-        ...
-        COROUTINE_YIELD();
-      }
-    }
-    COROUTINE_YIELD();
-  }
-}
-```
-
-<a name="NoDelegation"></a>
-### No Delegation to Regular Functions
-
-Coroutines macros inside the `runCoroutine()` **cannot** be delegated to another
-C/C++ function, even though this becomes tempting when the `runCoroutine()`
-implementation becomes complex. In other words, if you call another function
-from within the `runCoroutine()`, you cannot use the various `COROUTINE_XXX()`
-macros inside the delegated function. The macros were designed to trigger a
-compiler error in most cases, but this is not guaranteed:
-
-```C++
-void doSomething() {
-  ...
-  COROUTINE_YIELD(); // <--- ***compiler error***
-  ...
-}
-
-COROUTINE(cannotUseNestedMacros) {
-  COROUTINE_LOOP() {
-    if (condition) {
-      doSomething(); // <--- doesn't work
-    } else {
-      COROUTINE_YIELD();
-    }
-  }
-}
-```
-
-<a name="Chaining"></a>
+<a name="ChainingCoroutines"></a>
 ### Chaining Coroutines
 
 Coroutines can be chained, in other words, the `runCoroutine()` of one coroutine
 *can* explicitly call the `runCoroutine()` of another coroutine.
 
-I have found it useful to chain coroutines when using the **Manual Coroutines**
+I have found it useful to chain coroutines when using the [Manual
+Coroutines](#ManualCoroutines)
 described in the section below. The ability to chain coroutines allows us to
 implement a [Decorator
 Pattern](https://en.wikipedia.org/wiki/Decorator_pattern), also known as "a
@@ -784,6 +730,7 @@ in the global `loop()` method, like this:
 ```C++
 void setup() {
   ...
+  myRoutine.setupCoroutine(F("myRoutine"));
   CoroutineScheduler::setup();
 }
 
@@ -796,6 +743,11 @@ The `CoroutineScheduler::setup()` method creates an internal list of active
 coroutines that are managed by the scheduler. Each call to
 `CoroutineScheduler::loop()` executes one coroutine in that list in a simple
 round-robin scheduling algorithm.
+
+If you are manually subclassing the `Coroutine` class to create your own
+[Manual Coroutines](#ManualCoroutines), you must call the
+`Coroutine::setupCoroutine()` method in the global `setup()` so that the
+coroutine instance is added to the `CoroutineScheduler`.
 
 Prior to v1.2, the initial ordering was sorted by the `Coroutine::getName()`.
 And calling `suspend()` would remove the coroutine from the internal list
@@ -966,7 +918,7 @@ COROUTINE(doSomethingElse) {
 <a name="Customizing"></a>
 ## Customizing
 
-<a name="Custom"></a>
+<a name="CustomCoroutines"></a>
 ### Custom Coroutines (Not Recommended)
 
 All coroutines are instances of the `Coroutine` class, or one of its subclasses.
@@ -1003,7 +955,7 @@ where I have found this feature to be useful is in writing the
 situation, I suspect that the **Manual Coroutines** section described in
 below will be more useful and easier to understand.
 
-<a name="Manual"></a>
+<a name="ManualCoroutines"></a>
 ### Manual Coroutines (Recommended)
 
 A manual coroutine is a custom coroutine whose body of the coroutine (i.e
@@ -1083,6 +1035,8 @@ Some examples of manual coroutines:
   [BlinkSlowFastRoutine](examples/BlinkSlowFastRoutine)
 * [HelloManualCoroutine](examples/HelloManualCoroutine) which shows the same
   functionality as [HelloCoroutine](examples/HelloCoroutine).
+* [SoundManager](examples/SoundManager) which uses both the automatic coroutine
+  defined by `COROUTINE()` macro and an explicitly subclasses manual coroutine.
 
 <a name="Communication"></a>
 ## Coroutine Communication
@@ -1393,3 +1347,55 @@ C++ allows the creation of objects that look syntactically like functions.
 by defining the `operator()` method on the class. I have not defined this method
 in the `Coroutine` class because I have not found a use-case for it. However, if
 someone can demonstrate a compelling use-case, then I would be happy to add it.
+
+<a name="BugsAndLimitations"></a>
+## Bugs and Limitations
+
+<a name="NoNestedLoop"></a>
+### No Nested LOOP Macro
+
+The `COROUTINE_LOOP()` macro cannot be nested. In other words, the following is
+**not** allowed:
+
+```C++
+COROUTINE(routine) {
+  COROUTINE_LOOP() {
+    ...
+    if (condition) {
+      COROUTINE_LOOP() { // <----- NOT ALLOWED
+        ...
+        COROUTINE_YIELD();
+      }
+    }
+    COROUTINE_YIELD();
+  }
+}
+```
+
+<a name="NoDelegation"></a>
+### No Delegation to Regular Functions
+
+Coroutines macros inside the `runCoroutine()` **cannot** be delegated to another
+C/C++ function, even though this becomes tempting when the `runCoroutine()`
+implementation becomes complex. In other words, if you call another function
+from within the `runCoroutine()`, you cannot use the various `COROUTINE_XXX()`
+macros inside the delegated function. The macros were designed to trigger a
+compiler error in most cases, but this is not guaranteed:
+
+```C++
+void doSomething() {
+  ...
+  COROUTINE_YIELD(); // <--- ***compiler error***
+  ...
+}
+
+COROUTINE(cannotUseNestedMacros) {
+  COROUTINE_LOOP() {
+    if (condition) {
+      doSomething(); // <--- doesn't work
+    } else {
+      COROUTINE_YIELD();
+    }
+  }
+}
+```

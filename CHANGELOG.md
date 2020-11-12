@@ -1,7 +1,10 @@
 # Changelog
 
 * Unreleased
-    * Add `DEVELOPER.md` notes to myself.
+    * Add `DEVELOPER.md` notes to myself. 
+    * Add python script to generate the README.md in
+      [examples/MemoryBenchmarks](examples/MemoryBenchmarks) to automatically
+      regenerate the embedded ascii tables. Regenerate README.md for v1.2.
 * 1.2 (2020-11-10)
     * Fix an infinite loop in the internal singly-linked list of coroutines when
       `resume()` is called immediately after `suspend()`, without waiting for

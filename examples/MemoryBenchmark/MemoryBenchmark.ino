@@ -4,8 +4,7 @@
  * compile different parts of the AceButton library.
  */
 
-#include <AceRoutine.h>
-using namespace ace_routine;
+#include <Arduino.h>
 
 // Set this to [0..n] to extract the flash and static memory usage.
 // 0 - baseline
@@ -14,6 +13,11 @@ using namespace ace_routine;
 // 3 - CoroutineScheduler, One Coroutine
 // 4 - CoroutineScheduler, Two Coroutines
 #define FEATURE 0
+
+#if FEATURE != FEATURE_BASELINE
+  #include <AceRoutine.h>
+  using namespace ace_routine;
+#endif
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.

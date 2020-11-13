@@ -52,7 +52,7 @@ others (in my opinion of course):
 * uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
   feature of the GCC compiler (also supported by Clang) to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
-    * allows `switch` statemens in the coroutines
+    * allows `switch` statements in the coroutines
 * C/C++ macros eliminate boilerplate code and make the code easy to read
 * the base `Coroutine` class is easy to subclass to add additional variables and
   functions
@@ -80,7 +80,7 @@ Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
 
-**Version**: 1.2 (2020-11-10)
+**Version**: 1.2.1 (2020-11-12)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 

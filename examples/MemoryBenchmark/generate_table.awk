@@ -6,14 +6,15 @@
 # table that can be inserted into the README.md.
 #
 
-{
+BEGIN {
     num_features = 4
     labels[0] = "Baseline"
     labels[1] = "One Coroutine"
     labels[2] = "Two Coroutines"
     labels[3] = "Scheduler, One Coroutine"
     labels[4] = "Scheduler, Two Coroutines"
-
+}
+{
     feature = NR-1
     u[feature]["flash"] = $2
     u[feature]["ram"] = $4

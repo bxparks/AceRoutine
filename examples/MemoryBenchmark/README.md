@@ -1,4 +1,4 @@
-# Memory Benchmarks
+# Memory Benchmark
 
 The `MemoryBenchmark.ino` program compiles example code snippets using the
 AceRoutine library. The `FEATURE` macro flag controls which feature is compiled.
@@ -11,6 +11,8 @@ difficult to separate out the code size of the library from the overhead imposed
 by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
+
+**NOTE**: This file was auto-generated using `make README.md`. DO NOT EDIT.
 
 **Version**: AceRoutine v1.2
 
@@ -44,7 +46,7 @@ micro.txt
 samd.txt
 esp8266.txt
 esp32.txt
-teensy.txt
+teensy32.txt
 ```
 
 The `generate_table.awk` program reads one of `*.txt` files and prints out an
@@ -55,11 +57,18 @@ the following command produces the table in the Nano section below:
 $ ./generate_table.awk < nano.txt
 ```
 
+Fortunately, we no longer need to run `generate_table.awk` for each `*.txt`
+file. The process has been automated using the `generate_readme.py` script which
+will be invoked by the following command:
+```
+$ make README.md
+```
+
 ## Functionality
 
 * Baseline: A program that does (almost) nothing
 * Coroutine (bare): A single `COROUTINE()` macro that does nothing.
-* Coroutine (LOOP,DELAY): A `COROUTINE()` macro that uses `COROUTINE_LOOP()` 
+* Coroutine (LOOP,DELAY): A `COROUTINE()` macro that uses `COROUTINE_LOOP()`
   and `COROUTINE_DELAY()` which are expected to used in the common case.
 * CoroutineScheduler (bare): A single `Coroutine` instance with a
 * `CoroutineScheduler`.
@@ -81,9 +90,10 @@ $ ./generate_table.awk < nano.txt
 |---------------------------------+--------------+-------------|
 | One Coroutine                   |   1704/   54 |  1098/   43 |
 | Two Coroutines                  |   1932/   85 |  1326/   74 |
-| Scheduler, One Coroutine        |   1844/   64 |  1238/   53 |
-| Scheduler, Two Coroutines       |   1994/   79 |  1388/   68 |
+| Scheduler, One Coroutine        |   1846/   64 |  1240/   53 |
+| Scheduler, Two Coroutines       |   1996/   79 |  1390/   68 |
 +--------------------------------------------------------------+
+
 ```
 
 ## Sparkfun Pro Micro
@@ -100,9 +110,10 @@ $ ./generate_table.awk < nano.txt
 |---------------------------------+--------------+-------------|
 | One Coroutine                   |   4592/  194 |  1038/   43 |
 | Two Coroutines                  |   4820/  225 |  1266/   74 |
-| Scheduler, One Coroutine        |   4732/  204 |  1178/   53 |
-| Scheduler, Two Coroutines       |   4888/  219 |  1334/   68 |
+| Scheduler, One Coroutine        |   4734/  204 |  1180/   53 |
+| Scheduler, Two Coroutines       |   4890/  219 |  1336/   68 |
 +--------------------------------------------------------------+
+
 ```
 
 ## SAMD21 M0 Mini
@@ -117,11 +128,12 @@ $ ./generate_table.awk < nano.txt
 |---------------------------------+--------------+-------------|
 | Baseline                        |  11104/ 2368 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  11540/ 2416 |   436/   48 |
-| Two Coroutines                  |  11728/ 2444 |   624/   76 |
+| One Coroutine                   |  11544/ 2416 |   440/   48 |
+| Two Coroutines                  |  11736/ 2444 |   632/   76 |
 | Scheduler, One Coroutine        |  11604/ 2424 |   500/   56 |
-| Scheduler, Two Coroutines       |  11684/ 2452 |   580/   84 |
+| Scheduler, Two Coroutines       |  11688/ 2452 |   584/   84 |
 +--------------------------------------------------------------+
+
 ```
 
 ## ESP8266
@@ -141,6 +153,7 @@ $ ./generate_table.awk < nano.txt
 | Scheduler, One Coroutine        | 257732/26848 |   808/   48 |
 | Scheduler, Two Coroutines       | 257832/26880 |   908/   80 |
 +--------------------------------------------------------------+
+
 ```
 
 ## ESP32
@@ -153,13 +166,14 @@ $ ./generate_table.awk < nano.txt
 +--------------------------------------------------------------+
 | functionality                   |    flash/ram |       delta |
 |---------------------------------+--------------+-------------|
-| Baseline                        | 207093/14588 |     0/    0 |
+| Baseline                        | 206621/14564 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   | 207709/14620 |   616/   32 |
-| Two Coroutines                  | 207953/14652 |   860/   64 |
-| Scheduler, One Coroutine        | 208745/14660 |  1652/   72 |
-| Scheduler, Two Coroutines       | 208857/14684 |  1764/   96 |
+| One Coroutine                   | 207709/14620 |  1088/   56 |
+| Two Coroutines                  | 207953/14652 |  1332/   88 |
+| Scheduler, One Coroutine        | 208749/14660 |  2128/   96 |
+| Scheduler, Two Coroutines       | 208857/14684 |  2236/  120 |
 +--------------------------------------------------------------+
+
 ```
 
 ## Teensy 3.2
@@ -173,11 +187,13 @@ $ ./generate_table.awk < nano.txt
 +--------------------------------------------------------------+
 | functionality                   |    flash/ram |       delta |
 |---------------------------------+--------------+-------------|
-| Baseline                        |  10832/ 4148 |     0/    0 |
+| Baseline                        |   7628/ 3048 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  11324/ 4188 |   492/   40 |
-| Two Coroutines                  |  11512/ 4216 |   680/   68 |
-| Scheduler, One Coroutine        |  11464/ 4196 |   632/   48 |
-| Scheduler, Two Coroutines       |  11548/ 4224 |   716/   76 |
+| One Coroutine                   |  11292/ 4188 |  3664/ 1140 |
+| Two Coroutines                  |  11488/ 4216 |  3860/ 1168 |
+| Scheduler, One Coroutine        |  11436/ 4196 |  3808/ 1148 |
+| Scheduler, Two Coroutines       |  11520/ 4224 |  3892/ 1176 |
 +--------------------------------------------------------------+
+
 ```
+

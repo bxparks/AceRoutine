@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 1.2.1 (2020-11-12)
     * Add `DEVELOPER.md` notes to myself. 
     * Add python script to generate the README.md in
       [examples/MemoryBenchmarks](examples/MemoryBenchmarks) to automatically

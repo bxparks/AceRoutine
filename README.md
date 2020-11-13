@@ -80,7 +80,7 @@ Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
 
-**Version**: 1.2 (2020-11-10)
+**Version**: 1.2.1 (2020-11-12)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 

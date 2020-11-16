@@ -41,6 +41,7 @@
  * @endverbatim
  */
 
+#include <Arduino.h>
 #include <AceRoutine.h>
 
 using namespace ace_routine;

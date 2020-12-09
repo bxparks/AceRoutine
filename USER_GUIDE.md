@@ -6,7 +6,7 @@ is installed.
 
 **Version**: 1.2.1 (2020-11-12)
 
-**Table of Contents**
+## Table of Contents
 
 * [Coroutine Setup](#Setup)
     * [Include Header and Namespace](#IncludeHeader)

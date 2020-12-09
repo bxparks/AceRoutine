@@ -1,5 +1,7 @@
 # AceRoutine
 
+![AUnit Tests](https://github.com/bxparks/AceRoutine/workflows/AUnit%20Tests/badge.svg)
+
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
 
@@ -79,7 +81,6 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-
 **Version**: 1.2.1 (2020-11-12)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
@@ -87,14 +88,12 @@ additional macros that can reduce boilerplate code.
 **Important Change in v1.1**: This library now depends on the AceCommon library
 (https://github.com/bxparks/AceCommon). See the *Installation* section below.
 
-![AUnit Tests](https://github.com/bxparks/AceRoutine/workflows/AUnit%20Tests/badge.svg)
-
-**Table of Contents**
+## Table of Contents
 
 * [Hello Coroutines](#HelloCoroutines)
 * [Installation](#Installation)
     * [Source Code](#SourceCode)
-    * [Docs](#Docs)
+* [Documentation](#Documentation)
     * [Examples](#Examples)
 * [User Guide](#UserGuide)
 * [Comparisons](#Comparisons)
@@ -281,11 +280,13 @@ The source files are organized as follows:
   [AUnit](https://github.com/bxparks/AUnit)
 * `examples/` - example programs
 
-<a name="Docs"></a>
-### Docs
+<a name="Documentation"></a>
+## Documentation
 
-The [docs/](docs/) directory contains the
-[Doxygen docs published on GitHub Pages](https://bxparks.github.io/AceRoutine/html).
+* [README.md](README.md) - this file
+* [Doxygen docs](https://bxparks.github.io/AceRoutine/html) published on GitHub
+  Pages
+* [USER_GUIDE.md](USER_GUIDE.md)
 
 <a name="Examples"></a>
 ### Examples
@@ -330,11 +331,6 @@ The following programs are provided under the `examples` directory:
     * [ChannelBenchmark.ino](examples/ChannelBenchmark): determines the amount
       of CPU overhead of a `Channel` by using 2 coroutines to ping-pong an
       integer across 2 channels
-
-<a name="UserGuide"></a>
-## User Guide
-
-**The user guide has been moved to [USER_GUIDE.md](USER_GUIDE.md).**
 
 <a name="Comparisons"></a>
 ## Comparisons to Other Multitasking Libraries

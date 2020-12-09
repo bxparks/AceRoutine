@@ -72,6 +72,9 @@ class __FlashStringHelper;
 
 #else
   #warning Untested platform, AceRoutine may still work...
+  #ifndef FPSTR
+    #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
+  #endif
   #include <avr/pgmspace.h>
 
 #endif

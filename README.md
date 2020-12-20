@@ -95,9 +95,11 @@ additional macros that can reduce boilerplate code.
     * [Source Code](#SourceCode)
 * [Documentation](#Documentation)
     * [Examples](#Examples)
-* [User Guide](#UserGuide)
 * [Comparisons](#Comparisons)
 * [Resource Consumption](#ResourceConsumption)
+    * [Static Memory](#StaticMemory)
+    * [Flash Memory](#FlashMemory)
+    * [CPU](#CPU)
 * [System Requirements](#SystemRequirements)
 * [License](#LicenseSystemRequirements)
 * [Feedback](#Feedback)
@@ -417,6 +419,7 @@ advantages:
 <a name="ResourceConsumption"></a>
 ## Resource Consumption
 
+<a name="StaticMemory"></a>
 ### Static Memory
 
 All objects are statically allocated (i.e. not heap or stack).
@@ -442,6 +445,7 @@ The `Channel` object requires 2 copies of the parameterized `<T>` type so its
 size is equal to `1 + 2 * sizeof(T)`, rounded to the nearest memory alignment
 boundary (i.e. a total of 12 bytes for a 32-bit processor).
 
+<a name="FlashMemory"></a>
 ### Flash Memory
 
 The [examples/MemoryBenchmark](examples/MemoryBenchmark) program gathers
@@ -459,6 +463,7 @@ etc) for a handful of AceRoutine features. Here are some highlights:
     * `CoroutineScheduler()` + 1 Coroutine: 808 bytes
     * `CoroutineScheduler()` + 2 Coroutines: 908 bytes
 
+<a name="CPU"></a>
 ### CPU
 
 See [examples/AutoBenchmark](examples/AutoBenchmark).

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">1.2.1</span>
+   &#160;<span id="projectnumber">1.2.2</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -67,6 +67,8 @@ $(function() {
 </div>
 </div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#define-members">Macros</a>  </div>
   <div class="headertitle">
 <div class="title">compat.h File Reference</div>  </div>
 </div><!--header-->
@@ -92,11 +94,19 @@ This graph shows which files directly or indirectly include this file:</div>
 </div>
 </div>
 <p><a href="compat_8h_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
+Macros</h2></td></tr>
+<tr class="memitem:aaa60649c7ffe7ed1fbe16dc20ed7e8c3"><td class="memItemLeft" align="right" valign="top"><a id="aaa60649c7ffe7ed1fbe16dc20ed7e8c3"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(p)&#160;&#160;&#160;(reinterpret_cast&lt;const __FlashStringHelper *&gt;(p))</td></tr>
+<tr class="memdesc:aaa60649c7ffe7ed1fbe16dc20ed7e8c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">A macro that converts a <code>const char*</code> that already points to a PROGMEM string to a <code>const __FlashStringHelper*</code> which can be passed to overloaded functions and methods. <br /></td></tr>
+<tr class="separator:aaa60649c7ffe7ed1fbe16dc20ed7e8c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Various macros to smooth over the differences among the various platforms with regards to their support for flash strings and the various macros used to create and access them.</p>
 <p>Copied from AUnit/src/aunit/Flash.h and AceTime/src/ace_time/common/compat.h.</p>
 <p>We support flash strings (F() macro) for AVR because those MCUs have very small static RAM (1-2kB). Prior to v1.0, we disabled F() for ESP8266 because those implementations were buggy. But it seems that recent ESP8266 cores (v2.5 and higher) seems to have fixed the problems with F(), so I have reactivated it. The F() is automatically a no-op for Teensy and ESP32.</p>
-<p>The FPSTR() macro is a useful macro that was originally created on the ESP8266. But it was incorrectly implemented on the ESP32, until <a href="https://github.com/espressif/arduino-esp32/issues/1371">https://github.com/espressif/arduino-esp32/issues/1371</a> is fixed (hopefully by v1.0.3). </p>
+<p>The <a class="el" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3" title="A macro that converts a const char* that already points to a PROGMEM string to a const __FlashStringH...">FPSTR()</a> macro is a useful macro that was originally created on the ESP8266. But it was incorrectly implemented on the ESP32, until <a href="https://github.com/espressif/arduino-esp32/issues/1371">https://github.com/espressif/arduino-esp32/issues/1371</a> is fixed (hopefully by v1.0.3). </p>
 
 <p class="definition">Definition in file <a class="el" href="compat_8h_source.html">compat.h</a>.</p>
 </div></div><!-- contents -->

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">1.2.1</span>
+   &#160;<span id="projectnumber">1.2.2</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -216,12 +216,12 @@ $(function() {
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusTerminatedString[] PROGMEM = <span class="stringliteral">&quot;Terminated&quot;</span>;</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160; </div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;<span class="keyword">const</span> __FlashStringHelper* <span class="keyword">const</span> Coroutine::sStatusStrings[] = {</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  FPSTR(kStatusSuspendedString),</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  FPSTR(kStatusYieldingString),</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  FPSTR(kStatusDelayingString),</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  FPSTR(kStatusRunningString),</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  FPSTR(kStatusEndingString),</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  FPSTR(kStatusTerminatedString),</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusSuspendedString),</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusYieldingString),</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusDelayingString),</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusRunningString),</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusEndingString),</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusTerminatedString),</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;};</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;}</div>
@@ -229,6 +229,7 @@ $(function() {
 <div class="ttc" id="aclassace__routine_1_1Coroutine_html_a79844c12576ff2fd2065c5f5e4b422c8"><div class="ttname"><a href="classace__routine_1_1Coroutine.html#a79844c12576ff2fd2065c5f5e4b422c8">ace_routine::Coroutine::kDelayTypeSeconds</a></div><div class="ttdeci">static const uint8_t kDelayTypeSeconds</div><div class="ttdoc">Delay using units of seconds.</div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00503">Coroutine.h:503</a></div></div>
 <div class="ttc" id="aclassace__routine_1_1Coroutine_html_ad29d0f43128b49c48a71a167331dac51"><div class="ttname"><a href="classace__routine_1_1Coroutine.html#ad29d0f43128b49c48a71a167331dac51">ace_routine::Coroutine::resume</a></div><div class="ttdeci">void resume()</div><div class="ttdoc">Add a Suspended coroutine into the head of the scheduler linked list, and change the state to Yieldin...</div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8cpp_source.html#l00103">Coroutine.cpp:103</a></div></div>
 <div class="ttc" id="aclassace__routine_1_1Coroutine_html_a668e339557964dc092540bad162056a7"><div class="ttname"><a href="classace__routine_1_1Coroutine.html#a668e339557964dc092540bad162056a7">ace_routine::Coroutine::kDelayTypeMillis</a></div><div class="ttdeci">static const uint8_t kDelayTypeMillis</div><div class="ttdoc">Delay using units of millis.</div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00497">Coroutine.h:497</a></div></div>
+<div class="ttc" id="acompat_8h_html_aaa60649c7ffe7ed1fbe16dc20ed7e8c3"><div class="ttname"><a href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a></div><div class="ttdeci">#define FPSTR(p)</div><div class="ttdoc">A macro that converts a const char* that already points to a PROGMEM string to a const __FlashStringH...</div><div class="ttdef"><b>Definition:</b> <a href="compat_8h_source.html#l00081">compat.h:81</a></div></div>
 <div class="ttc" id="aclassace__routine_1_1Coroutine_html_a826df2b7d3db16170a13ba4b2756c853"><div class="ttname"><a href="classace__routine_1_1Coroutine.html#a826df2b7d3db16170a13ba4b2756c853">ace_routine::Coroutine::coroutineMicros</a></div><div class="ttdeci">virtual unsigned long coroutineMicros() const</div><div class="ttdoc">Returns the current millisecond clock.</div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8cpp_source.html#l00118">Coroutine.cpp:118</a></div></div>
 <div class="ttc" id="aclassace__routine_1_1Coroutine_html_a397f0d87d99b538189353fa47e918022"><div class="ttname"><a href="classace__routine_1_1Coroutine.html#a397f0d87d99b538189353fa47e918022">ace_routine::Coroutine::kStatusSuspended</a></div><div class="ttdeci">static const Status kStatusSuspended</div><div class="ttdoc">Coroutine has been suspended using suspend() and the scheduler should remove it from the queue upon t...</div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00479">Coroutine.h:479</a></div></div>
 <div class="ttc" id="acompat_8h_html"><div class="ttname"><a href="compat_8h.html">compat.h</a></div></div>

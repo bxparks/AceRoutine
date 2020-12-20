@@ -1,11 +1,19 @@
 # Changelog
 
 * Unreleased
+* 1.2.2 (2020-12-20)
+    * Add generic definition of `FPSTR()` macro for unrecognized platforms.
+      Allows code with `ARDUINO_ARCH_STM32` dependencies to compile. I will
+      support it officially after I get hardware to perform actual validation.
+    * Clean up MemoryBenchmark scripts for consistency with other `Ace*`
+      libraries.
+    * No functional change in this release.
 * 1.2.1 (2020-11-12)
     * Add `DEVELOPER.md` notes to myself. 
     * Add python script to generate the README.md in
       [examples/MemoryBenchmarks](examples/MemoryBenchmarks) to automatically
       regenerate the embedded ascii tables. Regenerate README.md for v1.2.
+    * No functional change in this release.
 * 1.2 (2020-11-10)
     * Fix an infinite loop in the internal singly-linked list of coroutines when
       `resume()` is called immediately after `suspend()`, without waiting for

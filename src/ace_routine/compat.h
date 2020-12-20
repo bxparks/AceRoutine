@@ -73,6 +73,11 @@ class __FlashStringHelper;
 #else
   #warning Untested platform, AceRoutine may still work...
   #ifndef FPSTR
+    /**
+     * A macro that converts a `const char*` that already points to a PROGMEM
+     * string to a `const __FlashStringHelper*` which can be passed to
+     * overloaded functions and methods.
+     */
     #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
   #endif
   #include <avr/pgmspace.h>

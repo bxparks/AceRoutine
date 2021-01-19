@@ -57,6 +57,10 @@ class __FlashStringHelper;
   #include <avr/pgmspace.h>
   #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
 
+#elif defined(ARDUINO_ARCH_STM32)
+  #include <avr/pgmspace.h>
+  #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
+
 #elif defined(TEENSYDUINO)
   #include <avr/pgmspace.h>
   #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
@@ -72,6 +76,8 @@ class __FlashStringHelper;
 
 #else
   #warning Untested platform, AceRoutine may still work...
+
+  #include <avr/pgmspace.h>
   #ifndef FPSTR
     /**
      * A macro that converts a `const char*` that already points to a PROGMEM
@@ -80,7 +86,6 @@ class __FlashStringHelper;
      */
     #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
   #endif
-  #include <avr/pgmspace.h>
 
 #endif
 

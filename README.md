@@ -46,11 +46,12 @@ others (in my opinion of course):
     * the `CoroutineScheduler` consumes only 2 bytes (8-bit) or 4 bytes (32-bit)
       no matter how many coroutines are active
 * extremely fast context switching
-    * ~6 microseconds on a 16 MHz ATmega328P
-    * ~2.9 microseconds on a 48 MHz SAMD21
-    * ~1.7 microseconds on a 80 MHz ESP8266
+    * ~5.3 microseconds on a 16 MHz ATmega328P
+    * ~2.5 microseconds on a 48 MHz SAMD21
+    * ~1.8 microseconds on a 72 MHz STM32
+    * ~1.5 microseconds on a 80 MHz ESP8266
     * ~0.4 microseconds on a 240 MHz ESP32
-    * 0.7-1.1 microseconds on 96 MHz Teensy 3.2 (depending on compiler settings)
+    * ~1.0 microseconds on 96 MHz Teensy 3.2 (depending on compiler settings)
 * uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
   feature of the GCC compiler (also supported by Clang) to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
@@ -81,7 +82,7 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.2.2 (2020-12-20)
+**Version**: 1.2.3 (2021-01-19)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -455,8 +456,8 @@ etc) for a handful of AceRoutine features. Here are some highlights:
 * AVR (e.g. Nano)
     * 1 Coroutine: 1098 bytes
     * 2 Coroutines: 1326 bytes
-    * `CoroutineScheduler()` + 1 Coroutine: 1238 bytes
-    * `CoroutineScheduler()` + 2 Coroutines: 1388 bytes
+    * `CoroutineScheduler()` + 1 Coroutine: 1240 bytes
+    * `CoroutineScheduler()` + 2 Coroutines: 1390 bytes
 * ESP8266
     * 1 Coroutine: 680 bytes
     * 2 Coroutines: 908 bytes
@@ -466,21 +467,45 @@ etc) for a handful of AceRoutine features. Here are some highlights:
 <a name="CPU"></a>
 ### CPU
 
-See [examples/AutoBenchmark](examples/AutoBenchmark).
+See [examples/AutoBenchmark](examples/AutoBenchmark). In summary, the overhead
+of AceRoutine context switching is about 5 micros on an 8-bit AVR, to as low as
+0.41 micros on a 32-bit ESP32.
 
 <a name="SystemRequirements"></a>
 ## System Requirements
+
+### Hardware
+
+The library has been extensively tested on the following boards:
+
+* Arduino Nano clone (16 MHz ATmega328P)
+* SparkFun Pro Micro clone (16 MHz ATmega32U4)
+* SAMD21 M0 Mini (48 MHz ARM Cortex-M0+)
+* STM32 Blue Pill (STM32F103C8, 72 MHz ARM Cortex-M3)
+* NodeMCU 1.0 (ESP-12E module, 80 MHz ESP8266)
+* WeMos D1 Mini (ESP-12E module, 80 MHz ESP8266)
+* ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
+* Teensy 3.2 (96 MHz ARM Cortex-M4)
+
+I will occasionally test on the following hardware as a sanity check:
+
+* Arduino Pro Mini clone (16 MHz ATmega328P)
+* Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
+* Teensy LC (48 MHz ARM Cortex-M0+)
 
 ### Tool Chain
 
 This library was developed and tested using:
 * [Arduino IDE 1.8.13](https://www.arduino.cc/en/Main/Software)
+* [Arduino CLI 0.14.0](https://arduino.github.io/arduino-cli)
 * [Arduino AVR Boards 1.8.3](https://github.com/arduino/ArduinoCore-avr)
-* [Arduino SAMD Boards 1.8.6](https://github.com/arduino/ArduinoCore-samd)
+* [Arduino SAMD Boards 1.8.9](https://github.com/arduino/ArduinoCore-samd)
 * [SparkFun AVR Boards 1.1.13](https://github.com/sparkfun/Arduino_Boards)
+* [SparkFun SAMD Boards 1.8.1](https://github.com/sparkfun/Arduino_Boards)
+* [STM32duino 1.9.0](https://github.com/stm32duino/Arduino_Core_STM32)
 * [ESP8266 Arduino 2.7.4](https://github.com/esp8266/Arduino)
 * [ESP32 Arduino 1.0.4](https://github.com/espressif/arduino-esp32)
-* [Teensydino 1.53.beta](https://www.pjrc.com/teensy/td_download.html)
+* [Teensydino 1.53](https://www.pjrc.com/teensy/td_download.html)
 
 It should work with [PlatformIO](https://platformio.org/) but I have
 not tested it.
@@ -493,23 +518,6 @@ the [UnixHostDuino](https://github.com/bxparks/UnixHostDuino) emulation layer.
 I use Ubuntu 18.04 and 20.04 for most of my development and sometimes do sanity
 checks on MacOS 10.14.5.
 
-### Hardware
-
-The library has been extensively tested on the following boards:
-
-* Arduino Nano clone (16 MHz ATmega328P)
-* Arduino Pro Mini clone (16 MHz ATmega328P)
-* Arduino Pro Micro clone (16 MHz ATmega32U4)
-* SAMD21 M0 Mini (48 MHz ARM Cortex-M0+) (compatible with Arduino Zero)
-* NodeMCU 1.0 clone (ESP-12E module, 80 MHz ESP8266)
-* ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
-* Teensy 3.2 (72 MHz ARM Cortex-M4)
-
-I will occasionally test on the following hardware as a sanity check:
-
-* Teensy LC (48 MHz ARM Cortex-M0+)
-* Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
-
 <a name="License"></a>
 ## License
 
@@ -517,6 +525,10 @@ I will occasionally test on the following hardware as a sanity check:
 
 <a name="Feedback"></a>
 ## Feedback and Support
+
+If you find this library useful, consider starring this project on GitHub. The
+stars will let me prioritize the more popular libraries over the less popular
+ones.
 
 If you have any questions, comments, bug reports, or feature requests, please
 file a GitHub ticket instead of emailing me unless the content is sensitive.

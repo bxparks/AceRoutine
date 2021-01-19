@@ -1,3 +1,29 @@
+#!/usr/bin/python3
+#
+# Python script that regenerates the README.md from the embedded template. Uses
+# ./generate_table.awk to regenerate the ASCII tables from the various *.txt
+# files.
+
+from subprocess import check_output
+
+nano_results = check_output(
+    "./generate_table.awk < nano.txt", shell=True, text=True)
+micro_results = check_output(
+    "./generate_table.awk < micro.txt", shell=True, text=True)
+samd_results = check_output(
+    "./generate_table.awk < samd.txt", shell=True, text=True)
+stm32_results = check_output(
+    "./generate_table.awk < stm32.txt", shell=True, text=True)
+esp8266_results = check_output(
+    "./generate_table.awk < esp8266.txt", shell=True, text=True)
+stm32_results = check_output(
+    "./generate_table.awk < stm32.txt", shell=True, text=True)
+esp32_results = check_output(
+    "./generate_table.awk < esp32.txt", shell=True, text=True)
+teensy32_results = check_output(
+    "./generate_table.awk < teensy32.txt", shell=True, text=True)
+
+print(f"""\
 # AutoBenchmark
 
 The `AutoBenchmark` tries to measure the amount of overhead caused by the
@@ -70,18 +96,7 @@ Version 1.2.3 adds benchmarks for STM32.
 * `micros()` has a resolution of 4 microseconds
 
 ```
-Sizes of Objects:
-sizeof(Coroutine): 15
-sizeof(CoroutineScheduler): 2
-sizeof(Channel<int>): 5
-
-CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       8.43 | 3.14 | 5.28 |
-+------------+------+------+
-
+{nano_results}
 ```
 
 ## Sparkfun Pro Micro
@@ -92,18 +107,7 @@ CPU:
 * `micros()` has a resolution of 4 microseconds
 
 ```
-Sizes of Objects:
-sizeof(Coroutine): 15
-sizeof(CoroutineScheduler): 2
-sizeof(Channel<int>): 5
-
-CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       8.47 | 3.16 | 5.31 |
-+------------+------+------+
-
+{micro_results}
 ```
 
 ## SAMD21 M0 Mini
@@ -113,18 +117,7 @@ CPU:
 * Sparkfun SAMD Core 1.8.1
 
 ```
-Sizes of Objects:
-sizeof(Coroutine): 28
-sizeof(CoroutineScheduler): 4
-sizeof(Channel<int>): 12
-
-CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       2.90 | 0.44 | 2.46 |
-+------------+------+------+
-
+{samd_results}
 ```
 
 ## STM32
@@ -134,18 +127,7 @@ CPU:
 * STM32duino 1.9.0
 
 ```
-Sizes of Objects:
-sizeof(Coroutine): 28
-sizeof(CoroutineScheduler): 4
-sizeof(Channel<int>): 12
-
-CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       2.40 | 0.64 | 1.76 |
-+------------+------+------+
-
+{stm32_results}
 ```
 
 ## ESP8266
@@ -155,18 +137,7 @@ CPU:
 * ESP8266 Boards 2.7.4
 
 ```
-Sizes of Objects:
-sizeof(Coroutine): 28
-sizeof(CoroutineScheduler): 4
-sizeof(Channel<int>): 12
-
-CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       5.99 | 4.52 | 1.47 |
-+------------+------+------+
-
+{esp8266_results}
 ```
 
 ## ESP32
@@ -176,18 +147,7 @@ CPU:
 * ESP32 Boards 1.0.4
 
 ```
-Sizes of Objects:
-sizeof(Coroutine): 28
-sizeof(CoroutineScheduler): 4
-sizeof(Channel<int>): 12
-
-CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       1.61 | 1.20 | 0.41 |
-+------------+------+------+
-
+{esp32_results}
 ```
 
 ## Teensy 3.2
@@ -198,17 +158,6 @@ CPU:
 * Compiler options: "Faster"
 
 ```
-Sizes of Objects:
-sizeof(Coroutine): 28
-sizeof(CoroutineScheduler): 4
-sizeof(Channel<int>): 12
-
-CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       1.17 | 0.16 | 1.01 |
-+------------+------+------+
-
+{teensy32_results}
 ```
-
+""")

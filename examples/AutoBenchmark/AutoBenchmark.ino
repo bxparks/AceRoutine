@@ -16,7 +16,7 @@ using namespace ace_routine;
 	const unsigned long DURATION = 3000;
 #endif
 
-#if defined(ESP32) && ! defined(SERIAL_PORT_MONITOR)
+#if ! defined(SERIAL_PORT_MONITOR)
 	#define SERIAL_PORT_MONITOR Serial
 #endif
 
@@ -56,22 +56,24 @@ void doAceRoutine() {
   yield();
 }
 
-void printStats(float baseline, float aceCoroutine) {
-  char buf[100];
-  float diff = aceCoroutine - baseline;
-  sprintf(buf, "      %2d.%02d |%2d.%02d |%2d.%02d |",
-      (int)aceCoroutine, (int)(aceCoroutine*100)%100,
-      (int)baseline, (int)(baseline*100)%100,
-      (int)diff, (int)(diff*100)%100);
-  SERIAL_PORT_MONITOR.println(buf);
+void printStats(float baselineMicros, float coroutineMicros) {
+  float diff = coroutineMicros - baselineMicros;
+  SERIAL_PORT_MONITOR.print(coroutineMicros);
+  SERIAL_PORT_MONITOR.print(' ');
+  SERIAL_PORT_MONITOR.print(baselineMicros);
+  SERIAL_PORT_MONITOR.print(' ');
+  SERIAL_PORT_MONITOR.println(diff);
 }
 
 void setup() {
 #if ! defined(UNIX_HOST_DUINO)
   delay(1000);
 #endif
+
   SERIAL_PORT_MONITOR.begin(115200);
   while (!SERIAL_PORT_MONITOR); // Leonardo/Micro
+
+  SERIAL_PORT_MONITOR.println(F("SIZEOF"));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(Coroutine): "));
   SERIAL_PORT_MONITOR.println(sizeof(Coroutine));
@@ -81,24 +83,17 @@ void setup() {
   SERIAL_PORT_MONITOR.println(sizeof(Channel<int>));
 
   CoroutineScheduler::setup();
-  CoroutineScheduler::list(SERIAL_PORT_MONITOR);
+  //CoroutineScheduler::list(SERIAL_PORT_MONITOR);
 
-  SERIAL_PORT_MONITOR.println(
-      F("------------+------+------+"));
-  SERIAL_PORT_MONITOR.println(
-      F(" AceRoutine | base | diff |"));
-  SERIAL_PORT_MONITOR.println(
-      F("------------+------+------+"));
+  SERIAL_PORT_MONITOR.println(F("BENCHMARKS"));
 
   doBaseline();
-  float baseline = DURATION * 1000.0 / counter;
-
+  float baselineMicros = DURATION * 1000.0 / counter;
   doAceRoutine();
-  float aceCoroutine = DURATION * 1000.0 / counter;
+  float coroutineMicros = DURATION * 1000.0 / counter;
+  printStats(baselineMicros, coroutineMicros);
 
-  printStats(baseline, aceCoroutine);
-  SERIAL_PORT_MONITOR.println(
-      F("------------+------+------+"));
+  SERIAL_PORT_MONITOR.println(F("END"));
 
 #if defined(UNIX_HOST_DUINO)
   exit(0);

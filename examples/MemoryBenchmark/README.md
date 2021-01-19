@@ -44,6 +44,7 @@ produces the following files:
 nano.txt
 micro.txt
 samd.txt
+stm32.txt
 esp8266.txt
 esp32.txt
 teensy32.txt
@@ -120,18 +121,38 @@ $ make README.md
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* Arduino SAMD Core 1.8.6
+* Sparkfun SAMD Core 1.8.1
 
 ```
 +--------------------------------------------------------------+
 | functionality                   |  flash/  ram |       delta |
 |---------------------------------+--------------+-------------|
-| Baseline                        |  11104/ 2368 |     0/    0 |
+| Baseline                        |  10072/    0 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  11544/ 2416 |   440/   48 |
-| Two Coroutines                  |  11736/ 2444 |   632/   76 |
-| Scheduler, One Coroutine        |  11604/ 2424 |   500/   56 |
-| Scheduler, Two Coroutines       |  11688/ 2452 |   584/   84 |
+| One Coroutine                   |  10856/    0 |   784/    0 |
+| Two Coroutines                  |  11072/    0 |  1000/    0 |
+| Scheduler, One Coroutine        |  10920/    0 |   848/    0 |
+| Scheduler, Two Coroutines       |  11008/    0 |   936/    0 |
++--------------------------------------------------------------+
+
+```
+
+## STM32 Blue Pill
+
+* STM32F103C8, 72 MHz ARM Cortex-M3
+* Arduino IDE 1.8.13
+* STM32duino 1.9.0
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| Baseline                        |  19140/ 3788 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   |  19484/ 3820 |   344/   32 |
+| Two Coroutines                  |  19664/ 3848 |   524/   60 |
+| Scheduler, One Coroutine        |  19576/ 3828 |   436/   40 |
+| Scheduler, Two Coroutines       |  19640/ 3856 |   500/   68 |
 +--------------------------------------------------------------+
 
 ```
@@ -140,7 +161,7 @@ $ make README.md
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
 * Arduino IDE 1.8.13
-* ESP8266 Boards 2.7.1
+* ESP8266 Boards 2.7.4
 
 ```
 +--------------------------------------------------------------+
@@ -180,7 +201,7 @@ $ make README.md
 
 * 96 MHz ARM Cortex-M4
 * Arduino IDE 1.8.13
-* Teensyduino 1.53.beta
+* Teensyduino 1.53
 * Compiler options: "Faster"
 
 ```

@@ -8,9 +8,10 @@ include ../../../UnixHostDuino/UnixHostDuino.mk
 
 .PHONY: benchmarks
 
-TARGETS := nano.txt micro.txt samd.txt esp8266.txt esp32.txt teensy32.txt
+TARGETS := nano.txt micro.txt samd.txt stm32.txt esp8266.txt esp32.txt \
+teensy32.txt
 
-README.md: generate_readme.py generate_table.awk
+README.md: generate_readme.py generate_table.awk $(TARGETS)
 	./generate_readme.py > $@
 
 benchmarks: $(TARGETS)
@@ -22,7 +23,10 @@ micro.txt:
 	./collect.sh micro $@
 
 samd.txt:
-	./collect.sh mkrzero $@
+	./collect.sh samd $@
+
+stm32.txt:
+	./collect.sh stm32 $@
 
 esp8266.txt:
 	./collect.sh esp8266 $@

@@ -1,6 +1,10 @@
 # Changelog
 
 * Unreleased
+    * Add scripts to `AutoBenchmark` to automate data collection.
+    * Add official support for STM32 by validating on a Blue Pill board.
+    * Update `MemoryBenchmark` and `AutoBenchmark` tables with STM32; re-add
+      Teensy 3.2 benchmarks now that I'm able to upload again.
 * 1.2.2 (2020-12-20)
     * Add generic definition of `FPSTR()` macro for unrecognized platforms.
       Allows code with `ARDUINO_ARCH_STM32` dependencies to compile. I will

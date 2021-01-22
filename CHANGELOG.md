@@ -1,6 +1,9 @@
 # Changelog
 
 * Unreleased
+* 1.2.4 (2021-01-22)
+    * Update UnixHostDuino 0.4 to EpoxyDuino 0.5.
+    * No functional change in this release.
 * 1.2.3 (2021-01-19)
     * Add official support for STM32 by validating on a Blue Pill board.
     * Add scripts to `AutoBenchmark` to automate data collection.

@@ -66,7 +66,7 @@ void printStats(float baselineMicros, float coroutineMicros) {
 }
 
 void setup() {
-#if ! defined(UNIX_HOST_DUINO)
+#if ! defined(EPOXY_DUINO)
   delay(1000);
 #endif
 
@@ -95,7 +95,7 @@ void setup() {
 
   SERIAL_PORT_MONITOR.println(F("END"));
 
-#if defined(UNIX_HOST_DUINO)
+#if defined(EPOXY_DUINO)
   exit(0);
 #endif
 }

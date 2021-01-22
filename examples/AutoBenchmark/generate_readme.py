@@ -40,7 +40,7 @@ is the overhead caused by the `Coroutine` context switch.
 
 All times in below are in microseconds.
 
-**Version**: AceRoutine v1.2.3
+**Version**: AceRoutine v1.2.4
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 

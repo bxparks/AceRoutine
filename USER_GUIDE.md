@@ -4,7 +4,7 @@ See the [README.md](README.md) for installation instructions and other
 background information. This document describes how to use the library once it
 is installed.
 
-**Version**: 1.2.3 (2021-01-19)
+**Version**: 1.2.4 (2021-01-22)
 
 ## Table of Contents
 

@@ -37,7 +37,7 @@ COROUTINE(printHelloWorld) {
 }
 
 void setup() {
-#if ! defined(UNIX_HOST_DUINO)
+#if ! defined(EPOXY_DUINO)
   delay(1000);
 #endif
   Serial.begin(115200);

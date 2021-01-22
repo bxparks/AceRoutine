@@ -100,7 +100,7 @@ COROUTINE(countWithDelaySeconds) {
 }
 
 void setup() {
-#if ! defined(UNIX_HOST_DUINO)
+#if ! defined(EPOXY_DUINO)
   delay(1000);
 #endif
   SERIAL_PORT_MONITOR.begin(115200);

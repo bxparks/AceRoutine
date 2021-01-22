@@ -71,7 +71,7 @@ class __FlashStringHelper;
 #elif defined(ESP32)
   #include <pgmspace.h>
 
-#elif defined(UNIX_HOST_DUINO)
+#elif defined(EPOXY_DUINO)
   #include <pgmspace.h>
 
 #else

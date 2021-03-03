@@ -1,6 +1,6 @@
 # AceRoutine
 
-![AUnit Tests](https://github.com/bxparks/AceRoutine/workflows/AUnit%20Tests/badge.svg)
+[![AUnit Tests](https://github.com/bxparks/AceRoutine/actions/workflows/aunit_tests.yml/badge.svg)](https://github.com/bxparks/AceRoutine/actions/workflows/aunit_tests.yml)
 
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.

@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+    * Activate GitHub Discussions for the project.
 * 1.2.4 (2021-01-22)
     * Update UnixHostDuino 0.4 to EpoxyDuino 0.5.
     * No functional change in this release.

@@ -87,7 +87,7 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.2.4 (2021-01-22)
+**Version**: 1.3 (2021-05-27)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -459,22 +459,22 @@ flash and memory consumption numbers for various boards (AVR, ESP8266, ESP32,
 etc) for a handful of AceRoutine features. Here are some highlights:
 
 * AVR (e.g. Nano)
-    * 1 Coroutine: 1098 bytes
-    * 2 Coroutines: 1326 bytes
-    * `CoroutineScheduler()` + 1 Coroutine: 1240 bytes
-    * `CoroutineScheduler()` + 2 Coroutines: 1390 bytes
+    * 1 Coroutine: 500 bytes
+    * 2 Coroutines: 700 bytes
+    * `CoroutineScheduler()` + 1 Coroutine: 600 bytes
+    * `CoroutineScheduler()` + 2 Coroutines: 750 bytes
 * ESP8266
-    * 1 Coroutine: 680 bytes
-    * 2 Coroutines: 908 bytes
-    * `CoroutineScheduler()` + 1 Coroutine: 808 bytes
-    * `CoroutineScheduler()` + 2 Coroutines: 908 bytes
+    * 1 Coroutine: 350 bytes
+    * 2 Coroutines: 600 bytes
+    * `CoroutineScheduler()` + 1 Coroutine: 640 bytes
+    * `CoroutineScheduler()` + 2 Coroutines: 760 bytes
 
 <a name="CPU"></a>
 ### CPU
 
 See [examples/AutoBenchmark](examples/AutoBenchmark). In summary, the overhead
-of AceRoutine context switching is about 5 micros on an 8-bit AVR, to as low as
-0.41 micros on a 32-bit ESP32.
+of AceRoutine context switching is about 6 micros on an 8-bit AVR, to as low as
+0.33 micros on a 32-bit ESP32.
 
 <a name="SystemRequirements"></a>
 ## System Requirements

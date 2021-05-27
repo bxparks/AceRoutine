@@ -2,6 +2,37 @@
 
 * Unreleased
     * Activate GitHub Discussions for the project.
+    * **Potentiall Breaking**: Change `Coroutine` destructor from virtual to
+      non-virtual.
+        * Saves 500-600 bytes on AVR processors, 350 bytes on SAMD21, and 50-150
+          bytes on other 32-bit processors. 
+        * Coroutines can now be created only statically, not dynamically on the
+          heap.
+    * **Potentiall Breaking**: Lift `Coroutine` into `CoroutineTemplate` class.
+      Lift `CoroutineScheduler` into `CoroutineSchedulerTemplate` class.
+        * Define `Coroutine` to be `CoroutineTemplate<ClockInterface>`, almost
+        * fully backwards compatible with previous implementation.
+        * Define `CoroutineScheduler` to be
+          `CoroutineSchedulerTemplate<Coroutine>`, almost fully backwards
+          compatible with previous implementation.
+        * All macros (e.g. `COROUTINE()`, `COROUTINE_DELAY()`,
+          `COROUTINE_YIELD()`, etc) should work as before.
+        * Replace the 3 clock virtual methods on
+          `Coroutine` (`coroutineMicros()`, `coroutineMillis()`,
+          `coroutineSeconds()`) with a injectable `ClockInterface` template
+          parameter.
+        * **Breaking**: Convert `Coroutine::coroutineMicros()`,
+          `Coroutine::coroutineMillis()`, and `Coroutine::coroutineSeconds()`
+          into `private static` functions which delegate to
+          `ClockInterface::micros()`, `ClockInterface::millis()`, and
+          `ClockInterface::sesconds()`.
+        * Create `TestableClockInterface` for testing.
+        * Create `TestableCoroutine` for testing.
+        * Create `TestableCoroutineScheduler` for testing.
+        * Only 0-40 bytes of flash memory reduction on AVR processors, to my
+          surprise.
+        * But 100-1500 bytes of flash memory reduction on various 32-bit
+          processors.
 * 1.2.4 (2021-01-22)
     * Update UnixHostDuino 0.4 to EpoxyDuino 0.5.
     * No functional change in this release.

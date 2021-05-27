@@ -25,16 +25,21 @@ SOFTWARE.
 #ifndef ACE_ROUTINE_COROUTINE_SCHEDULER_H
 #define ACE_ROUTINE_COROUTINE_SCHEDULER_H
 
-#include <Print.h>
+#if ACE_ROUTINE_DEBUG == 1
+  #include <Arduino.h> // Serial, Print
+#endif
 #include "Coroutine.h"
+
+class Print;
 
 namespace ace_routine {
 
 /**
  * Class that manages instances of the `Coroutine` class, and executes them
- * in a round-robin fashion.
+ * in a round-robin fashion. This is expected to be used as a singleton.
  */
-class CoroutineScheduler {
+template <typename T_COROUTINE>
+class CoroutineSchedulerTemplate {
   public:
     /** Set up the scheduler. Should be called from the global setup(). */
     static void setup() { getScheduler()->setupScheduler(); }
@@ -59,29 +64,102 @@ class CoroutineScheduler {
 
   private:
     // Disable copy-constructor and assignment operator
-    CoroutineScheduler(const CoroutineScheduler&) = delete;
-    CoroutineScheduler& operator=(const CoroutineScheduler&) = delete;
+    CoroutineSchedulerTemplate(const CoroutineSchedulerTemplate&) = delete;
+    CoroutineSchedulerTemplate& operator=(const CoroutineSchedulerTemplate&) =
+        delete;
 
     /** Return the singleton CoroutineScheduler. */
-    static CoroutineScheduler* getScheduler();
+    static CoroutineSchedulerTemplate* getScheduler() {
+      static CoroutineSchedulerTemplate singletonScheduler;
+      return &singletonScheduler;
+    }
 
     /** Constructor. */
-    CoroutineScheduler() {}
+    CoroutineSchedulerTemplate() = default;
 
-    /** Set up the Scheduler. */
-    void setupScheduler();
+    /**
+     * Set up the Scheduler.
+     *
+     * Prior to v1.2, this would perform a pre-scan through the linked list to
+     * remove coroutines which were Suspended. But this caused a cycle in the
+     * list if resume() was called immediately after the suspend(). For v1.2 and
+     * onwards, we keep all coroutines in the linked list no matter the state,
+     * which makes the state management and linked-list management a lot
+     * simpler.
+     */
+    void setupScheduler() {
+      mCurrent = T_COROUTINE::getRoot();
+    }
 
     /** Run the current coroutine. */
-    void runCoroutine();
+    void runCoroutine() {
+      // If reached the end, start from the beginning again.
+      if (*mCurrent == nullptr) {
+        mCurrent = T_COROUTINE::getRoot();
+        // Return if the list is empty. Checking for a null getRoot() inside the
+        // if-statement is deliberate, since it optimizes the common case where
+        // the linked list is not empty.
+        if (*mCurrent == nullptr) {
+          return;
+        }
+      }
+
+    #if ACE_ROUTINE_DEBUG == 1
+      Serial.print(F("Processing "));
+      (*mCurrent)->getName().printTo(Serial);
+      Serial.println();
+    #endif
+
+      // Handle the coroutine's dispatch back to the last known internal status.
+      switch ((*mCurrent)->getStatus()) {
+        case T_COROUTINE::kStatusYielding:
+          (*mCurrent)->runCoroutine();
+          break;
+
+        case T_COROUTINE::kStatusDelaying:
+          // Check isDelayExpired() here to optimize away an extra call into the
+          // Coroutine::runCoroutine(). Everything would still work if we just
+          // dispatched into the Coroutine::runCoroutine() because that method
+          // checks isDelayExpired() as well.
+          if ((*mCurrent)->isDelayExpired()) {
+            (*mCurrent)->runCoroutine();
+          }
+          break;
+
+        case T_COROUTINE::kStatusEnding:
+          // mark it terminated
+          (*mCurrent)->setTerminated();
+          break;
+
+        default:
+          // For all other cases, just skip to the next coroutine.
+          break;
+      }
+
+      // Go to the next coroutine
+      mCurrent = (*mCurrent)->getNext();
+    }
+
 
     /** List all the routines in the linked list to the printer. */
-    void listCoroutines(Print& printer);
+    void listCoroutines(Print& printer) {
+      for (T_COROUTINE** p = T_COROUTINE::getRoot(); (*p) != nullptr;
+          p = (*p)->getNext()) {
+        printer.print(F("Coroutine "));
+        (*p)->getName().printTo(printer);
+        printer.print(F("; status: "));
+        (*p)->statusPrintTo(printer);
+        printer.println();
+      }
+    }
 
     // The current coroutine is represented by a pointer to a pointer. This
     // allows the root node to be treated the same as all the other nodes, and
     // simplifies the code that traverses the singly-linked list.
-    Coroutine** mCurrent = nullptr;
+    T_COROUTINE** mCurrent = nullptr;
 };
+
+using CoroutineScheduler = CoroutineSchedulerTemplate<Coroutine>;
 
 }
 

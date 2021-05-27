@@ -22,112 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <stdint.h> // uintptr_t
-#include <Arduino.h> // millis(), micros()
-#include <AceCommon.h> // udiv1000()
 #include "Coroutine.h"
 #include "compat.h" // FPSTR()
 
 namespace ace_routine {
-
-bool Coroutine::isDelayExpired() const {
-  switch (mDelayType) {
-    case kDelayTypeMillis: {
-      uint16_t elapsedMillis = coroutineMillis() - mDelayStart;
-      return elapsedMillis >= mDelayDuration;
-    }
-    case kDelayTypeMicros: {
-      uint16_t elapsedMicros = coroutineMicros() -  mDelayStart;
-      return elapsedMicros >= mDelayDuration;
-    }
-    case kDelayTypeSeconds: {
-      uint16_t elapsedSeconds = coroutineSeconds() -  mDelayStart;
-      return elapsedSeconds >= mDelayDuration;
-    }
-    default:
-      // This should never happen.
-      return true;
-  }
-}
-
-void Coroutine::setupCoroutine(const char* name) {
-  mName = ace_common::FCString(name);
-  mStatus = kStatusYielding;
-  insertAtRoot();
-}
-
-void Coroutine::setupCoroutine(const __FlashStringHelper* name) {
-  mName = ace_common::FCString(name);
-  mStatus = kStatusYielding;
-  insertAtRoot();
-}
-
-void Coroutine::setupCoroutineOrderedByName(const char* name) {
-  mName = ace_common::FCString(name);
-  mStatus = kStatusYielding;
-  insertSorted();
-}
-
-void Coroutine::setupCoroutineOrderedByName(const __FlashStringHelper* name) {
-  mName = ace_common::FCString(name);
-  mStatus = kStatusYielding;
-  insertSorted();
-}
-
-// Use a static variable inside a function to solve the static initialization
-// ordering problem.
-Coroutine** Coroutine::getRoot() {
-  static Coroutine* root;
-  return &root;
-}
-
-void Coroutine::insertSorted() {
-  Coroutine** p = getRoot();
-
-  // O(N^2) insertion, good enough for small (O(100)?) number of coroutines.
-  while (*p != nullptr) {
-    if (getName().compareTo((*p)->getName()) <= 0) break;
-    p = &(*p)->mNext;
-  }
-
-  mNext = *p;
-  *p = this;
-}
-
-void Coroutine::insertAtRoot() {
-  Coroutine** root = getRoot();
-  mNext = *root;
-  *root = this;
-}
-
-void Coroutine::resume() {
-  if (mStatus != kStatusSuspended) return;
-
-  // We lost the original state of the coroutine when suspend() was called but
-  // the coroutine will automatically go back into the original state when
-  // Coroutine::runCoroutine() is called because COROUTINE_YIELD(),
-  // COROUTINE_DELAY() and COROUTINE_AWAIT() are written to restore their
-  // status.
-  mStatus = kStatusYielding;
-}
-
-unsigned long Coroutine::coroutineMillis() const {
-  return ::millis();
-}
-
-unsigned long Coroutine::coroutineMicros() const {
-  return ::micros();
-}
-
-unsigned long Coroutine::coroutineSeconds() const {
-  unsigned long m = ::millis();
-#if defined(ARDUINO_ARCH_AVR) || defined(ARDUINO_ARCH_SAMD) || defined(ESP8266)
-  // No hardware division so the udiv1000() approximation is faster
-  return ace_common::udiv1000(m);
-#else
-  return m / 1000;
-#endif
-}
 
 // Create the sStatusStrings lookup table to translate Status integer to a
 // human-readable string. When it is used, it increases flash memory by 86
@@ -142,7 +40,7 @@ static const char kStatusRunningString[] PROGMEM = "Running";
 static const char kStatusEndingString[] PROGMEM = "Ending";
 static const char kStatusTerminatedString[] PROGMEM = "Terminated";
 
-const __FlashStringHelper* const Coroutine::sStatusStrings[] = {
+const __FlashStringHelper* const sStatusStrings[] = {
   FPSTR(kStatusSuspendedString),
   FPSTR(kStatusYieldingString),
   FPSTR(kStatusDelayingString),

@@ -22,22 +22,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_ROUTINE_TESTABLE_COROUTINE_H
-#define ACE_ROUTINE_TESTABLE_COROUTINE_H
-
-#include "../Coroutine.h"
-#include "TestableClockInterface.h"
+#ifndef ACE_ROUTINE_TESTABLE_CLOCK_INTERFACE_H
+#define ACE_ROUTINE_TESTABLE_CLOCK_INTERFACE_H
 
 namespace ace_routine {
 namespace testing {
 
-/**
- * A version of Coroutine that uses the TestableClockInterface to provide the
- * clock can for unit testing purposes.
- */
-using TestableCoroutine = CoroutineTemplate<TestableClockInterface>;
+class TestableClockInterface {
+  public:
+    static unsigned long micros() { return sMicros; }
 
-}
-}
+    static unsigned long millis() { return sMillis; }
+
+    static unsigned long seconds() { return sSeconds; }
+
+    static void setMicros(unsigned long micros) { sMicros = micros; }
+
+    static void setMillis(unsigned long millis) { sMillis = millis; }
+
+    static void setSeconds(unsigned long seconds) { sSeconds = seconds; }
+
+  public:
+    static unsigned long sMillis;
+    static unsigned long sMicros;
+    static unsigned long sSeconds;
+};
+
+} // namespace testing
+} // namespace ace_routine
 
 #endif

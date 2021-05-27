@@ -22,20 +22,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_ROUTINE_TESTABLE_COROUTINE_H
-#define ACE_ROUTINE_TESTABLE_COROUTINE_H
+#ifndef ACE_ROUTINE_TESTABLE_COROUTINE_SCHEDULER_H
+#define ACE_ROUTINE_TESTABLE_COROUTINE_SCHEDULER_H
 
-#include "../Coroutine.h"
-#include "TestableClockInterface.h"
+#include "../CoroutineScheduler.h"
+#include "TestableCoroutine.h"
 
 namespace ace_routine {
 namespace testing {
 
 /**
- * A version of Coroutine that uses the TestableClockInterface to provide the
- * clock can for unit testing purposes.
+ * A version of CoroutineScheduler that is associated with the
+ * TestableCoroutine for unit testing purposes.
  */
-using TestableCoroutine = CoroutineTemplate<TestableClockInterface>;
+using TestableCoroutineScheduler =
+    CoroutineSchedulerTemplate<TestableCoroutine>;
 
 }
 }

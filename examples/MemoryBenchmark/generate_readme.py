@@ -61,6 +61,14 @@ calculated flash size can jump around in unexpected ways.
       delegate to `ClockInterface` which is a template parameter. Saves only
       0-40 bytes of flash on on AVR processors, but 100-1500 bytes of flash on
       32-bit processors.
+    * Add benchmark for 'Manual Delay Loop' which uses a simple function
+      to implement the functionality of a `COROUTINE()` that loops every 10
+      milliseconds.
+        * Illustrates clearly that AceRoutine should rarely be used on 8-bit
+          processors because it consumes 450 extra bytes for the 1st coroutine,
+          and another 300 bytes for each additional coroutine.
+        * On 32-bit processors with large amount of flash memory, the flash
+          consumption overhead is not as limiting.
 
 ## How to Generate
 

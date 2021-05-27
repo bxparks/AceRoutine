@@ -37,6 +37,14 @@ calculated flash size can jump around in unexpected ways.
       delegate to `ClockInterface` which is a template parameter. Saves only
       0-40 bytes of flash on on AVR processors, but 100-1500 bytes of flash on
       32-bit processors.
+    * Add benchmark for 'Manual Delay Loop' which uses a simple function
+      to implement the functionality of a `COROUTINE()` that loops every 10
+      milliseconds.
+        * Illustrates clearly that AceRoutine should rarely be used on 8-bit
+          processors because it consumes 450 extra bytes for the 1st coroutine,
+          and another 300 bytes for each additional coroutine.
+        * On 32-bit processors with large amount of flash memory, the flash
+          consumption overhead is not as limiting.
 
 ## How to Generate
 
@@ -99,6 +107,7 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |    606/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
+| Manual Delay Loop               |    654/   13 |    48/    2 |
 | One Coroutine                   |   1104/   34 |   498/   23 |
 | Two Coroutines                  |   1310/   55 |   704/   44 |
 | Scheduler, One Coroutine        |   1192/   36 |   586/   25 |
@@ -119,6 +128,7 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |   3554/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
+| Manual Delay Loop               |   3602/  153 |    48/    2 |
 | One Coroutine                   |   3992/  174 |   438/   23 |
 | Two Coroutines                  |   4198/  195 |   644/   44 |
 | Scheduler, One Coroutine        |   4080/  176 |   526/   25 |
@@ -139,6 +149,7 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |  10072/    0 |     0/    0 |
 |---------------------------------+--------------+-------------|
+| Manual Delay Loop               |  10112/    0 |    40/    0 |
 | One Coroutine                   |  10416/    0 |   344/    0 |
 | Two Coroutines                  |  10592/    0 |   520/    0 |
 | Scheduler, One Coroutine        |  10464/    0 |   392/    0 |
@@ -159,6 +170,7 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |  19140/ 3788 |     0/    0 |
 |---------------------------------+--------------+-------------|
+| Manual Delay Loop               |  19164/ 3792 |    24/    4 |
 | One Coroutine                   |  19380/ 3820 |   240/   32 |
 | Two Coroutines                  |  19540/ 3848 |   400/   60 |
 | Scheduler, One Coroutine        |  19456/ 3824 |   316/   36 |
@@ -179,6 +191,7 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        | 256924/26800 |     0/    0 |
 |---------------------------------+--------------+-------------|
+| Manual Delay Loop               | 256988/26808 |    64/    8 |
 | One Coroutine                   | 257268/26828 |   344/   28 |
 | Two Coroutines                  | 257496/26860 |   572/   60 |
 | Scheduler, One Coroutine        | 257316/26836 |   392/   36 |
@@ -199,6 +212,7 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        | 197910/13092 |     0/    0 |
 |---------------------------------+--------------+-------------|
+| Manual Delay Loop               | 198258/13124 |   348/   32 |
 | One Coroutine                   | 198498/13148 |   588/   56 |
 | Two Coroutines                  | 198738/13180 |   828/   88 |
 | Scheduler, One Coroutine        | 198550/13156 |   640/   64 |
@@ -220,6 +234,7 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |   7628/ 3048 |     0/    0 |
 |---------------------------------+--------------+-------------|
+| Manual Delay Loop               |  10836/ 4152 |  3208/ 1104 |
 | One Coroutine                   |  11108/ 4180 |  3480/ 1132 |
 | Two Coroutines                  |  11336/ 4208 |  3708/ 1160 |
 | Scheduler, One Coroutine        |  11176/ 4184 |  3548/ 1136 |

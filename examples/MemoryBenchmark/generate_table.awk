@@ -6,12 +6,12 @@
 # table that can be inserted into the README.md.
 
 BEGIN {
-  NUM_FEATURES = 4
   labels[0] = "Baseline"
-  labels[1] = "One Coroutine"
-  labels[2] = "Two Coroutines"
-  labels[3] = "Scheduler, One Coroutine"
-  labels[4] = "Scheduler, Two Coroutines"
+  labels[1] = "Manual Delay Loop"
+  labels[2] = "One Coroutine"
+  labels[3] = "Two Coroutines"
+  labels[4] = "Scheduler, One Coroutine"
+  labels[5] = "Scheduler, Two Coroutines"
   record_index = 0
 }
 {
@@ -20,6 +20,8 @@ BEGIN {
   record_index++
 }
 END {
+  NUM_ENTRIES = record_index
+
   base_flash = u[0]["flash"]
   base_ram = u[0]["ram"]
   for (i = 0; i < NR; i++) {
@@ -33,7 +35,7 @@ END {
   printf("| %-31s | %6d/%5d | %5d/%5d |\n",
       labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
   printf("|---------------------------------+--------------+-------------|\n")
-  for (i = 1; i <= NUM_FEATURES; i++) {
+  for (i = 1; i < NUM_ENTRIES; i++) {
     printf("| %-31s | %6d/%5d | %5d/%5d |\n",
         labels[i], u[i]["flash"], u[i]["ram"], u[i]["d_flash"], u[i]["d_ram"])
   }

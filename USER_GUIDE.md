@@ -4,7 +4,7 @@ See the [README.md](README.md) for installation instructions and other
 background information. This document describes how to use the library once it
 is installed.
 
-**Version**: 1.2.4 (2021-01-22)
+**Version**: 1.3 (2021-05-27)
 
 ## Table of Contents
 
@@ -46,6 +46,7 @@ is installed.
 * [Bugs and Limitations](#BugsAndLimitations)
     * [No Nested LOOP Macro](#NoNestedLoop)
     * [No Delegation to Regular Functions](#NoDelegation)
+    * [No Creation on Heap](#NoCreationOnHeap)
 
 <a name="Setup"></a>
 ## Coroutine Setup
@@ -1343,7 +1344,7 @@ extern MyCoroutine myCoroutine;
 <a name="Functors"></a>
 ### Functors
 
-C++ allows the creation of objects that look syntactically like functions.
+C++ allows the creation of objects that look syntactically like functions
 by defining the `operator()` method on the class. I have not defined this method
 in the `Coroutine` class because I have not found a use-case for it. However, if
 someone can demonstrate a compelling use-case, then I would be happy to add it.
@@ -1399,3 +1400,20 @@ COROUTINE(cannotUseNestedMacros) {
   }
 }
 ```
+
+<a name="NoCreationOnHeap"></a>
+### No Creation on Heap
+
+Prior to v1.3, the `Coroutine` class contained a virtual destructor, because I
+thought that I would extend this library in the future to support dynamic
+creation of coroutines. However, a virtual destructor increases flash memory
+usage by 500-600 bytes on 8-bit AVR processors, because it pulls in the
+`malloc()` and `free()` functions. On the 32-bit SAMD21 (using the SparkFun
+SAMD21 Core), the flash memory increases by ~350 bytes. On other 32-bit
+processors (STM32, ESP8266, ESP32, Teensy 3.2), the flash memory increases
+modestly, between 50-150 bytes. These flahs memory savings, especially on the
+AVR processors, is significant, so starting from v1.3, the destructor is now
+non-virtual.
+
+If dynamic coroutine on the heap is desired in the future, I think a new class
+(e.g. `DynamicCoroutine`) can be created.

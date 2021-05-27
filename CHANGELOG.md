@@ -2,6 +2,10 @@
 
 * Unreleased
     * Activate GitHub Discussions for the project.
+    * Change `Coroutine` destructor from virtual to non-virtual. Saves 500-600
+      bytes on AVR processors, 350 bytes on SAMD21, and 50-150 bytes on other
+      32-bit processors. This means that Coroutines can only be created
+      statically, not dynamically on the heap.
 * 1.2.4 (2021-01-22)
     * Update UnixHostDuino 0.4 to EpoxyDuino 0.5.
     * No functional change in this release.

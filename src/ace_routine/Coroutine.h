@@ -514,8 +514,19 @@ class Coroutine {
      */
     Coroutine() {}
 
-    /** Destructor. */
-    virtual ~Coroutine() {}
+    /**
+     * Destructor. Non-virtual.
+     *
+     * A virtual destructor increases the flash memory consumption on 8-bit AVR
+     * processors by 500-600 bytes because it pulls in the free() and malloc()
+     * functions. On the 32-bit SAMD21, the flash memory increases by by about
+     * 350 bytes. On other 32-bit processors (STM32, ESP8266, ESP32, Teensy
+     * 3.2), the flash memory increase is modest, about 50-150 bytes.
+     *
+     * Since a Coroutine is expected to be created statically, instead of the
+     * heap, a non-virtual destructor is good enough.
+     */
+    ~Coroutine() = default;
 
     /** Return the status of the coroutine. Used by the CoroutineScheduler. */
     Status getStatus() const { return mStatus; }

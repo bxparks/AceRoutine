@@ -14,7 +14,7 @@ is the overhead caused by the `Coroutine` context switch.
 
 All times in below are in microseconds.
 
-**Version**: AceRoutine v1.2.4
+**Version**: AceRoutine v1.3
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -60,7 +60,26 @@ $ make README.md
 
 ## CPU Time Changes
 
-Version 1.2.3 adds benchmarks for STM32.
+* v1.2.3
+    * Add benchmarks for STM32.
+* v1.3
+    * Replace floating point calculation in AutoBenchmark with fixed point
+      calculations in micros and nanos, with the final printing done in
+      micros to 3 decimal places (without using floating point ops).
+    * Replace looping over a fixed elapsed time, with looping over fixed number
+      of iterations for better accuracy.
+        * If the elapsed time is kept constant, then the number of iteration
+          of `doBaseline()` is different than the number of iterations
+          of doAceRoutine()`. When we subtract, the overhead of the loop
+          (e.g. `millis() - start`) are NOT canceld out correctly.
+        * New numbers
+            * Nano: 5.28 -> 6.500 micros
+            * Micro: 5.31 -> 6.500 micros
+            * SAMD: 2.46 -> 2.333 micros
+            * STM32: 1.76 -> 1.767 micros
+            * ESP8266: 1.67 -> 1.500 micros
+            * ESP32: 0.41 -> 0.400 micros
+            * Teensy 3.2: 1.01 -> 1.000 micros
 
 ## Arduino Nano
 
@@ -76,11 +95,11 @@ sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
 
 CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       8.43 | 3.14 | 5.28 |
-+------------+------+------+
++------------+-------+-------+
+| AceRoutine |  base |  diff |
+|------------+-------+-------|
+|      7.600 | 1.100 | 6.500 |
++------------+-------+-------+
 
 ```
 
@@ -98,11 +117,11 @@ sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
 
 CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       8.47 | 3.16 | 5.31 |
-+------------+------+------+
++------------+-------+-------+
+| AceRoutine |  base |  diff |
+|------------+-------+-------|
+|      7.600 | 1.100 | 6.500 |
++------------+-------+-------+
 
 ```
 
@@ -119,11 +138,11 @@ sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
 CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       2.90 | 0.44 | 2.46 |
-+------------+------+------+
++------------+-------+-------+
+| AceRoutine |  base |  diff |
+|------------+-------+-------|
+|      2.566 | 0.233 | 2.333 |
++------------+-------+-------+
 
 ```
 
@@ -140,11 +159,11 @@ sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
 CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       2.40 | 0.64 | 1.76 |
-+------------+------+------+
++------------+-------+-------+
+| AceRoutine |  base |  diff |
+|------------+-------+-------|
+|      1.933 | 0.166 | 1.767 |
++------------+-------+-------+
 
 ```
 
@@ -161,11 +180,11 @@ sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
 CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       5.99 | 4.52 | 1.47 |
-+------------+------+------+
++------------+-------+-------+
+| AceRoutine |  base |  diff |
+|------------+-------+-------|
+|      1.600 | 0.100 | 1.500 |
++------------+-------+-------+
 
 ```
 
@@ -182,11 +201,11 @@ sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
 CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       1.61 | 1.20 | 0.41 |
-+------------+------+------+
++------------+-------+-------+
+| AceRoutine |  base |  diff |
+|------------+-------+-------|
+|      0.466 | 0.066 | 0.400 |
++------------+-------+-------+
 
 ```
 
@@ -204,11 +223,11 @@ sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
 CPU:
-+------------+------+------+
-| AceRoutine | base | diff |
-|------------+------+------|
-|       1.17 | 0.16 | 1.01 |
-+------------+------+------+
++------------+-------+-------+
+| AceRoutine |  base |  diff |
+|------------+-------+-------|
+|      1.066 | 0.066 | 1.000 |
++------------+-------+-------+
 
 ```
 

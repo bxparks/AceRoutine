@@ -54,12 +54,12 @@ END {
   print ""
   print "CPU:"
 
-  printf("+------------+------+------+\n")
-  printf("| AceRoutine | base | diff |\n")
-  printf("|------------+------+------|\n")
+  printf("+------------+-------+-------+\n")
+  printf("| AceRoutine |  base |  diff |\n")
+  printf("|------------+-------+-------|\n")
   for (i = 0; i < TOTAL_BENCHMARKS; i++) {
-    printf("| %10.2f | %4.2f | %4.2f |\n",
+    printf("| %10.3f | %5.3f | %5.3f |\n",
       u[i]["aceroutine"], u[i]["baseline"], u[i]["diff"])
   }
-  printf("+------------+------+------+\n")
+  printf("+------------+-------+-------+\n")
 }

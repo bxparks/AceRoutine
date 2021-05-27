@@ -12,6 +12,8 @@
 using namespace ace_routine;
 using ace_common::printPad3To;
 
+// NUM_ITERATIONS must be in multiples of 1000, due to the algorithm used to
+// convert to nanos below.
 #if defined(EPOXY_DUINO)
 	const uint32_t NUM_ITERATIONS = 300000;
 #elif defined(ARDUINO_ARCH_AVR)
@@ -74,9 +76,9 @@ void printNanosAsMicros(Print& printer, uint16_t nanos) {
 
 void printStats(uint16_t baselineMillis, uint16_t coroutineMillis) {
   uint16_t baseNanosPerIteration =
-      (uint32_t) baselineMillis * 1000 * 1000 / NUM_ITERATIONS;
+      (uint32_t) baselineMillis * 1000 / (NUM_ITERATIONS / 1000);
   uint16_t coroutineNanosPerIteration =
-      (uint32_t) coroutineMillis * 1000 * 1000 / NUM_ITERATIONS;
+      (uint32_t) coroutineMillis * 1000 / (NUM_ITERATIONS / 1000);
   uint16_t diffNanos = coroutineNanosPerIteration - baseNanosPerIteration;
   printNanosAsMicros(SERIAL_PORT_MONITOR, coroutineNanosPerIteration);
   SERIAL_PORT_MONITOR.print(' ');

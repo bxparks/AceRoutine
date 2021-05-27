@@ -106,6 +106,10 @@ $ make README.md
             * ESP8266: 1.67 -> 1.500 micros
             * ESP32: 0.41 -> 0.400 micros
             * Teensy 3.2: 1.01 -> 1.000 micros
+    * Replace virtual clock ticking methods (`Coroutine::coroutineMillis()`,
+      `Coroutine::coroutineMicros()`, `Coroutine::coroutineSeconds()`) with
+      static calls to `ClockInterface` template class.
+        * 10-40% performance improvement of `CoroutineScheduler::loop()`.
 
 ## Arduino Nano
 

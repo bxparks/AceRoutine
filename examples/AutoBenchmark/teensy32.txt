@@ -3,5 +3,5 @@ sizeof(Coroutine): 28
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 BENCHMARKS
-1.066 0.066 1.000
+0.600 0.066 0.534
 END

@@ -14,7 +14,7 @@ calculated flash size can jump around in unexpected ways.
 
 **NOTE**: This file was auto-generated using `make README.md`. DO NOT EDIT.
 
-**Version**: AceRoutine v1.2
+**Version**: AceRoutine v1.3
 
 **Changes**:
 
@@ -27,6 +27,11 @@ calculated flash size can jump around in unexpected ways.
       linked list
     * `CoroutineScheduler::setupScheduler()` simplified due to immutable linked
       list
+* v1.3
+    * Remove virtual destructor on `Coroutine` class. Reduces flash memory
+      consumption by 500-600 bytes on AVR processors, 350 bytes on SAMD21, and
+      50-150 bytes on other 32-bit processors. The static memory is also reduced
+      by 14 bytes on AVR processors.
 
 ## How to Generate
 
@@ -89,10 +94,10 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |    606/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |   1704/   54 |  1098/   43 |
-| Two Coroutines                  |   1932/   85 |  1326/   74 |
-| Scheduler, One Coroutine        |   1846/   64 |  1240/   53 |
-| Scheduler, Two Coroutines       |   1996/   79 |  1390/   68 |
+| One Coroutine                   |   1102/   40 |   496/   29 |
+| Two Coroutines                  |   1322/   67 |   716/   56 |
+| Scheduler, One Coroutine        |   1244/   50 |   638/   39 |
+| Scheduler, Two Coroutines       |   1394/   65 |   788/   54 |
 +--------------------------------------------------------------+
 
 ```
@@ -109,10 +114,10 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |   3554/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |   4592/  194 |  1038/   43 |
-| Two Coroutines                  |   4820/  225 |  1266/   74 |
-| Scheduler, One Coroutine        |   4734/  204 |  1180/   53 |
-| Scheduler, Two Coroutines       |   4890/  219 |  1336/   68 |
+| One Coroutine                   |   3990/  180 |   436/   29 |
+| Two Coroutines                  |   4210/  207 |   656/   56 |
+| Scheduler, One Coroutine        |   4132/  190 |   578/   39 |
+| Scheduler, Two Coroutines       |   4288/  205 |   734/   54 |
 +--------------------------------------------------------------+
 
 ```
@@ -129,10 +134,10 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |  10072/    0 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  10856/    0 |   784/    0 |
-| Two Coroutines                  |  11072/    0 |  1000/    0 |
-| Scheduler, One Coroutine        |  10920/    0 |   848/    0 |
-| Scheduler, Two Coroutines       |  11008/    0 |   936/    0 |
+| One Coroutine                   |  10512/    0 |   440/    0 |
+| Two Coroutines                  |  10664/    0 |   592/    0 |
+| Scheduler, One Coroutine        |  10576/    0 |   504/    0 |
+| Scheduler, Two Coroutines       |  10648/    0 |   576/    0 |
 +--------------------------------------------------------------+
 
 ```
@@ -149,10 +154,10 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |  19140/ 3788 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  19484/ 3820 |   344/   32 |
-| Two Coroutines                  |  19664/ 3848 |   524/   60 |
-| Scheduler, One Coroutine        |  19576/ 3828 |   436/   40 |
-| Scheduler, Two Coroutines       |  19640/ 3856 |   500/   68 |
+| One Coroutine                   |  19452/ 3820 |   312/   32 |
+| Two Coroutines                  |  19612/ 3848 |   472/   60 |
+| Scheduler, One Coroutine        |  19548/ 3828 |   408/   40 |
+| Scheduler, Two Coroutines       |  19612/ 3856 |   472/   68 |
 +--------------------------------------------------------------+
 
 ```
@@ -169,10 +174,10 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        | 256924/26800 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   | 257604/26832 |   680/   32 |
-| Two Coroutines                  | 257832/26864 |   908/   64 |
-| Scheduler, One Coroutine        | 257732/26848 |   808/   48 |
-| Scheduler, Two Coroutines       | 257832/26880 |   908/   80 |
+| One Coroutine                   | 257428/26828 |   504/   28 |
+| Two Coroutines                  | 257608/26860 |   684/   60 |
+| Scheduler, One Coroutine        | 257556/26844 |   632/   44 |
+| Scheduler, Two Coroutines       | 257656/26876 |   732/   76 |
 +--------------------------------------------------------------+
 
 ```
@@ -187,12 +192,12 @@ $ make README.md
 +--------------------------------------------------------------+
 | functionality                   |  flash/  ram |       delta |
 |---------------------------------+--------------+-------------|
-| Baseline                        | 206621/14564 |     0/    0 |
+| Baseline                        | 197910/13092 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   | 207709/14620 |  1088/   56 |
-| Two Coroutines                  | 207953/14652 |  1332/   88 |
-| Scheduler, One Coroutine        | 208749/14660 |  2128/   96 |
-| Scheduler, Two Coroutines       | 208857/14684 |  2236/  120 |
+| One Coroutine                   | 198950/13156 |  1040/   64 |
+| Two Coroutines                  | 199174/13188 |  1264/   96 |
+| Scheduler, One Coroutine        | 199970/13188 |  2060/   96 |
+| Scheduler, Two Coroutines       | 200078/13220 |  2168/  128 |
 +--------------------------------------------------------------+
 
 ```
@@ -210,10 +215,10 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |   7628/ 3048 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  11292/ 4188 |  3664/ 1140 |
-| Two Coroutines                  |  11488/ 4216 |  3860/ 1168 |
-| Scheduler, One Coroutine        |  11436/ 4196 |  3808/ 1148 |
-| Scheduler, Two Coroutines       |  11520/ 4224 |  3892/ 1176 |
+| One Coroutine                   |  11192/ 4180 |  3564/ 1132 |
+| Two Coroutines                  |  11340/ 4208 |  3712/ 1160 |
+| Scheduler, One Coroutine        |  11336/ 4188 |  3708/ 1140 |
+| Scheduler, Two Coroutines       |  11404/ 4216 |  3776/ 1168 |
 +--------------------------------------------------------------+
 
 ```

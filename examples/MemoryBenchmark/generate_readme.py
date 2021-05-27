@@ -38,7 +38,7 @@ calculated flash size can jump around in unexpected ways.
 
 **NOTE**: This file was auto-generated using `make README.md`. DO NOT EDIT.
 
-**Version**: AceRoutine v1.2
+**Version**: AceRoutine v1.3
 
 **Changes**:
 
@@ -51,6 +51,11 @@ calculated flash size can jump around in unexpected ways.
       linked list
     * `CoroutineScheduler::setupScheduler()` simplified due to immutable linked
       list
+* v1.3
+    * Remove virtual destructor on `Coroutine` class. Reduces flash memory
+      consumption by 500-600 bytes on AVR processors, 350 bytes on SAMD21, and
+      50-150 bytes on other 32-bit processors. The static memory is also reduced
+      by 14 bytes on AVR processors.
 
 ## How to Generate
 

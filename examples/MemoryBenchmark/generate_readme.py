@@ -56,6 +56,11 @@ calculated flash size can jump around in unexpected ways.
       consumption by 500-600 bytes on AVR processors, 350 bytes on SAMD21, and
       50-150 bytes on other 32-bit processors. The static memory is also reduced
       by 14 bytes on AVR processors.
+    * Replace clock ticking virtual methods (`coroutineMicros()`,
+      `coroutineMillis()`, and `coroutineSeconds()`) with static functions that
+      delegate to `ClockInterface` which is a template parameter. Saves only
+      0-40 bytes of flash on on AVR processors, but 100-1500 bytes of flash on
+      32-bit processors.
 
 ## How to Generate
 

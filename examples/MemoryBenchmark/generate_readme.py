@@ -64,6 +64,10 @@ calculated flash size can jump around in unexpected ways.
     * Add benchmark for 'One Delay Function' and 'Two Delay Functions` which use
       functions with a non-blocking if-statement to implement the functionality
       of a `COROUTINE()` that loops every 10 milliseconds.
+    * Remove `COROUTINE_DELAY_SECONDS()` functionality. Saves about 200 bytes on
+      AVR processors, mostly from the removal of `udiv1000()` which takes almost
+      180 bytes. Replacing with native `/1000` does not help much because native
+      long division consumes about 130 bytes and is 3X slower on AVR processors.
 
 ## How to Generate
 

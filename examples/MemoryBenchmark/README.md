@@ -42,8 +42,8 @@ calculated flash size can jump around in unexpected ways.
       of a `COROUTINE()` that loops every 10 milliseconds.
     * Remove `COROUTINE_DELAY_SECONDS()` functionality. Saves about 200 bytes on
       AVR processors, mostly from the removal of `udiv1000()` which takes almost
-      180 bytes. Replacing with native `/1000` does not help that much because
-      that consumes about 130 bytes and is 3X slower on AVR processors.
+      180 bytes. Replacing with native `/1000` does not help much because native
+      long division consumes about 130 bytes and is 3X slower on AVR processors.
 
 ## How to Generate
 
@@ -109,11 +109,11 @@ $ make README.md
 | One Delay Function              |    654/   13 |    48/    2 |
 | Two Delay Functions             |    714/   15 |   108/    4 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |    872/   34 |   266/   23 |
-| Two Coroutines                  |   1070/   55 |   464/   44 |
+| One Coroutine                   |    880/   34 |   274/   23 |
+| Two Coroutines                  |   1078/   55 |   472/   44 |
 |---------------------------------+--------------+-------------|
-| Scheduler, One Coroutine        |    990/   36 |   384/   25 |
-| Scheduler, Two Coroutines       |   1116/   51 |   510/   40 |
+| Scheduler, One Coroutine        |   1000/   36 |   394/   25 |
+| Scheduler, Two Coroutines       |   1124/   51 |   518/   40 |
 +--------------------------------------------------------------+
 
 ```
@@ -133,11 +133,11 @@ $ make README.md
 | One Delay Function              |   3602/  153 |    48/    2 |
 | Two Delay Functions             |   3662/  155 |   108/    4 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |   3760/  174 |   206/   23 |
-| Two Coroutines                  |   3958/  195 |   404/   44 |
+| One Coroutine                   |   3768/  174 |   214/   23 |
+| Two Coroutines                  |   3966/  195 |   412/   44 |
 |---------------------------------+--------------+-------------|
-| Scheduler, One Coroutine        |   3878/  176 |   324/   25 |
-| Scheduler, Two Coroutines       |   4008/  191 |   454/   40 |
+| Scheduler, One Coroutine        |   3888/  176 |   334/   25 |
+| Scheduler, Two Coroutines       |   4016/  191 |   462/   40 |
 +--------------------------------------------------------------+
 
 ```
@@ -158,10 +158,10 @@ $ make README.md
 | Two Delay Functions             |  10152/    0 |    80/    0 |
 |---------------------------------+--------------+-------------|
 | One Coroutine                   |  10368/    0 |   296/    0 |
-| Two Coroutines                  |  10544/    0 |   472/    0 |
+| Two Coroutines                  |  10552/    0 |   480/    0 |
 |---------------------------------+--------------+-------------|
-| Scheduler, One Coroutine        |  10416/    0 |   344/    0 |
-| Scheduler, Two Coroutines       |  10504/    0 |   432/    0 |
+| Scheduler, One Coroutine        |  10424/    0 |   352/    0 |
+| Scheduler, Two Coroutines       |  10512/    0 |   440/    0 |
 +--------------------------------------------------------------+
 
 ```
@@ -181,11 +181,11 @@ $ make README.md
 | One Delay Function              |  19164/ 3792 |    24/    4 |
 | Two Delay Functions             |  19212/ 3792 |    72/    4 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  19348/ 3820 |   208/   32 |
-| Two Coroutines                  |  19512/ 3848 |   372/   60 |
+| One Coroutine                   |  19356/ 3820 |   216/   32 |
+| Two Coroutines                  |  19520/ 3848 |   380/   60 |
 |---------------------------------+--------------+-------------|
-| Scheduler, One Coroutine        |  19428/ 3824 |   288/   36 |
-| Scheduler, Two Coroutines       |  19504/ 3852 |   364/   64 |
+| Scheduler, One Coroutine        |  19432/ 3824 |   292/   36 |
+| Scheduler, Two Coroutines       |  19512/ 3852 |   372/   64 |
 +--------------------------------------------------------------+
 
 ```
@@ -229,11 +229,11 @@ $ make README.md
 | One Delay Function              | 198258/13124 |   348/   32 |
 | Two Delay Functions             | 198330/13124 |   420/   32 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   | 198426/13148 |   516/   56 |
-| Two Coroutines                  | 198682/13180 |   772/   88 |
+| One Coroutine                   | 198434/13148 |   524/   56 |
+| Two Coroutines                  | 198690/13180 |   780/   88 |
 |---------------------------------+--------------+-------------|
-| Scheduler, One Coroutine        | 198470/13156 |   560/   64 |
-| Scheduler, Two Coroutines       | 198618/13180 |   708/   88 |
+| Scheduler, One Coroutine        | 198482/13156 |   572/   64 |
+| Scheduler, Two Coroutines       | 198626/13180 |   716/   88 |
 +--------------------------------------------------------------+
 
 ```
@@ -254,11 +254,11 @@ $ make README.md
 | One Delay Function              |  10836/ 4152 |  3208/ 1104 |
 | Two Delay Functions             |  10868/ 4152 |  3240/ 1104 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  11032/ 4180 |  3404/ 1132 |
-| Two Coroutines                  |  11184/ 4208 |  3556/ 1160 |
+| One Coroutine                   |  11040/ 4180 |  3412/ 1132 |
+| Two Coroutines                  |  11200/ 4208 |  3572/ 1160 |
 |---------------------------------+--------------+-------------|
-| Scheduler, One Coroutine        |  11100/ 4184 |  3472/ 1136 |
-| Scheduler, Two Coroutines       |  11200/ 4212 |  3572/ 1164 |
+| Scheduler, One Coroutine        |  11108/ 4184 |  3480/ 1136 |
+| Scheduler, Two Coroutines       |  11216/ 4212 |  3588/ 1164 |
 +--------------------------------------------------------------+
 
 ```

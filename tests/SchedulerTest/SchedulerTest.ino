@@ -16,6 +16,20 @@ using ace_common::PrintStr;
 
 // ---------------------------------------------------------------------------
 
+// Create the coroutines in the reverse order to the order desired, because each
+// coroutine is inserted at the head of the singly-linked list.
+
+class CoroutineExtra : public TestableCoroutine {
+  public:
+    int runCoroutine() override {
+      COROUTINE_BEGIN();
+      COROUTINE_END();
+    }
+};
+
+// An extra coroutine, initially suspended using extra.suspend().
+CoroutineExtra extra;
+
 class CoroutineC : public TestableCoroutine {
   public:
     int runCoroutine() override {
@@ -56,31 +70,19 @@ class CoroutineA : public TestableCoroutine {
 // dependency, just like any other normal objects.
 CoroutineA a;
 
-class CoroutineExtra : public TestableCoroutine {
-  public:
-    int runCoroutine() override {
-      COROUTINE_BEGIN();
-      COROUTINE_END();
-    }
-};
-
-// An extra coroutine, initially suspended using extra.suspend().
-CoroutineExtra extra;
-
 // Only 3 coroutines are initially active: a, b, c
 test(AceRoutineTest, scheduler) {
   // Validate the initial states of various coroutines.
-  PrintStr<256> output;
+  PrintStr<200> output;
   TestableCoroutineScheduler::list(output);
-  assertEqual(
-    F(
-      "Coroutine a; status: Yielding\r\n"
-      "Coroutine b; status: Yielding\r\n"
-      "Coroutine c; status: Yielding\r\n"
-      "Coroutine extra; status: Suspended\r\n"
-    ),
-    output.cstr()
-  );
+
+  PrintStr<200> expected;
+  printfTo(expected, "Coroutine %ld; status: Yielding\r\n", (uintptr_t) &a);
+  printfTo(expected, "Coroutine %ld; status: Yielding\r\n", (uintptr_t) &b);
+  printfTo(expected, "Coroutine %ld; status: Yielding\r\n", (uintptr_t) &c);
+  printfTo(expected, "Coroutine %ld; status: Suspended\r\n",
+      (uintptr_t) &extra);
+  assertEqual(expected.cstr(), output.cstr());
 
   // initially everything (except 'extra') is enabled
   assertTrue(a.isYielding());
@@ -403,11 +405,6 @@ void setup() {
 
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
-
-  a.setupCoroutineOrderedByName("a");
-  b.setupCoroutineOrderedByName("b");
-  c.setupCoroutineOrderedByName("c");
-  extra.setupCoroutineOrderedByName("extra");
 
   // Start the 'extra' coroutine in suspended state. Starting v1.2, a
   // suspended coroutine will be retained in the linked list of coroutines.

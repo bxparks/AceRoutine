@@ -181,13 +181,6 @@ volatile int disableCompilerOptimization = 0;
 
 void setup() {
   delay(1000);
-
-#if FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE
-  a.setupCoroutine(F("a"));
-#elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES
-  a.setupCoroutine(F("a"));
-  b.setupCoroutine(F("b"));
-#endif
 }
 
 void loop() {

@@ -51,6 +51,16 @@ class SuspendTest_suspendAndResume;
  * to hurt.
  */
 
+// https://stackoverflow.com/questions/295120
+#if defined(__GNUC__) || defined(__clang__)
+  #define ACE_ROUTINE_DEPRECATED __attribute__((deprecated))
+#elif defined(_MSC_VER)
+  #define ACE_ROUTINE_DEPRECATED __declspec(deprecated)
+#else
+  #pragma message("WARNING: Implement ACE_ROUTINE_DEPRECATED for this compiler")
+  #define ACE_ROUTINE_DEPRECATED
+#endif
+
 /**
  * Create a Coroutine instance named 'name'. Two forms are supported
  *
@@ -77,7 +87,6 @@ struct Coroutine_##name : ace_routine::Coroutine { \
   int runCoroutine() override; \
 } name; \
 Coroutine_##name :: Coroutine_##name() { \
-  setupCoroutine(F(#name)); \
 } \
 int Coroutine_##name :: runCoroutine()
 
@@ -88,7 +97,6 @@ struct className##_##name : className { \
   int runCoroutine() override; \
 } name; \
 className##_##name :: className##_##name() { \
-  setupCoroutine(F(#name)); \
 } \
 int className##_##name :: runCoroutine()
 
@@ -236,9 +244,6 @@ class CoroutineTemplate {
   friend class ::SuspendTest_suspendAndResume;
 
   public:
-    /** Human-readable name of the coroutine. */
-    const ace_common::FCString& getName() const { return mName; }
-
     /**
      * The body of the coroutine. The COROUTINE macro creates a subclass of
      * this class and puts the body of the coroutine into this method.
@@ -345,74 +350,21 @@ class CoroutineTemplate {
     }
 
     /**
-     * Initialize the coroutine for the CoroutineScheduler, set it to Yielding
-     * state, and add it to the linked list of coroutines. This method is
-     * called automatically by the COROUTINE() macro. It needs to be called
-     * manually when using coroutines which were manually created without using
-     * that COROUTINE() macro.
-     *
-     * This method could have been named init() or setup() but since this class
-     * expected to be used as a mix-in class to create more complex classes
-     * which could have its own setup() methods, the longer name seemed more
-     * clear.
-     *
-     * @param name The name of the coroutine as a human-readable string.
+     * Deprecated method that does nothing. Starting v1.3, the setup into the
+     * singly-linked list is automatically performed by the constructor and
+     * this method no longer needs to be called manually. This method is
+     * retained for backwards compatibility.
      */
-    void setupCoroutine(const char* name) {
-      mName = ace_common::FCString(name);
-      mStatus = kStatusYielding;
-      insertAtRoot();
-    }
+    void setupCoroutine(const char* /*name*/) ACE_ROUTINE_DEPRECATED {}
 
     /**
-     * Same as setupCoroutine(const char*) except using flash string type.
-     *
-     * Normally, the name would be passed from the subclass into this parent
-     * class through constructor chaining. But if we try to do that with the
-     * F() string, the compiler complains because F() macros work only inside a
-     * function. Therefore, the COROUTINE() macro uses the setupCoroutine()
-     * method to pass the name of the coroutine.
-     *
-     * The problem doesn't exist for a (const char*) but for consistency, I
-     * made both types of strings pass through the setupCoroutine() method
-     * instead of chaining the constructor.
-     *
-     * @param name The name of the coroutine as a human-readable string.
+     * Deprecated method that does nothing. Starting v1.3, the setup into the
+     * singly-linked list is automatically performed by the constructor and
+     * this method no longer needs to be called manually. This method is
+     * retained for backwards compatibility.
      */
-    void setupCoroutine(const __FlashStringHelper* name) {
-      mName = ace_common::FCString(name);
-      mStatus = kStatusYielding;
-      insertAtRoot();
-    }
-
-    /**
-     * A version of setupCoroutine(const char*) where the ordering of the
-     * coroutines executed by CoroutineScheduler is ordered by the name. This
-     * was the default behavior of setupCoroutine() before v1.2. This method
-     * recreates the previous behavior, but it exists only for testing purposes
-     * where a deterministic ordering is required. The stability of this method
-     * is not guaranteed and client code should **not** use this method.
-     */
-    void setupCoroutineOrderedByName(const char* name) {
-      mName = ace_common::FCString(name);
-      mStatus = kStatusYielding;
-      insertSorted();
-    }
-
-    /**
-     * A version of setupCoroutine(const __FlashStringHelper*) where the
-     * ordering of the coroutines executed by CoroutineScheduler is ordered by
-     * the name. This was the default behavior of setupCoroutine() before v1.2.
-     * This method recreates the previous behavior, but it exists only for
-     * testing purposes where a deterministic ordering is required. The
-     * stability of this method is not guaranteed and client code should
-     * **not** use this method.
-     */
-    void setupCoroutineOrderedByName(const __FlashStringHelper* name) {
-      mName = ace_common::FCString(name);
-      mStatus = kStatusYielding;
-      insertSorted();
-    }
+    void setupCoroutine(const __FlashStringHelper* /*name*/)
+        ACE_ROUTINE_DEPRECATED {}
 
   protected:
     /**
@@ -470,17 +422,10 @@ class CoroutineTemplate {
     /** Coroutine has ended and no longer in the scheduler queue. */
     static const Status kStatusTerminated = 5;
 
-    /**
-     * Constructor. All subclasses are expected to call either
-     * setupCoroutine(const char*) or setupCoroutine(const
-     * __FlashStringHelper*) before the CoroutineScheduler is used. The
-     * COROUTINE() macro will automatically call setupCoroutine().
-     *
-     * See comment in setupCoroutine(const __FlashStringHelper*) for reason why
-     * the setupCoroutine() function is used instead of chaining the name
-     * through the constructor.
-     */
-    CoroutineTemplate() = default;
+    /** Constructor. Automatically insert self into singly-linked list. */
+    CoroutineTemplate() {
+      insertAtRoot();
+    }
 
     /**
      * Destructor. Non-virtual.
@@ -580,31 +525,6 @@ class CoroutineTemplate {
     CoroutineTemplate** getNext() { return &mNext; }
 
     /**
-     * Insert the current coroutine into the singly linked list. The order of
-     * C++ static initialization is undefined, but if getName() is not null
-     * (which will normally be the case when using the COROUTINE() macro), the
-     * coroutine will be inserted using getName() as the sorting key. This makes
-     * the ordering deterministic, which is required for unit tests.
-     *
-     * The insertion algorithm is O(N) per insertion, for a total complexity
-     * of O(N^2). That's probably good enough for a "small" number of
-     * coroutines, where small is around O(100). If a large number of
-     * coroutines are inserted, then this method needs to be optimized.
-     */
-    void insertSorted() {
-      CoroutineTemplate** p = getRoot();
-
-      // O(N^2) insertion, good enough for small (O(100)?) number of coroutines.
-      while (*p != nullptr) {
-        if (getName().compareTo((*p)->getName()) <= 0) break;
-        p = &(*p)->mNext;
-      }
-
-      mNext = *p;
-      *p = this;
-    }
-
-    /**
      * Insert the current coroutine at the root of the singly linked list. This
      * is the most efficient and becomes the default with v1.2 because the
      * ordering of the coroutines in the CoroutineScheduler is no longer an
@@ -625,7 +545,6 @@ class CoroutineTemplate {
     }
 
   protected:
-    ace_common::FCString mName;
     CoroutineTemplate* mNext = nullptr;
     void* mJumpPoint = nullptr;
     Status mStatus = kStatusYielding;

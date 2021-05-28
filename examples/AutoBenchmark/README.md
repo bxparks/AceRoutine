@@ -84,6 +84,10 @@ $ make README.md
       `Coroutine::coroutineMicros()`, `Coroutine::coroutineSeconds()`) with
       static calls to `ClockInterface` template class.
         * 10-40% performance improvement of `CoroutineScheduler::loop()`.
+    * Remove `COROUTINE_DELAY_SECONDS()` and `COROUTINE_DELAY_MICROS()` which
+      eliminates the `mDelayType` discriminator, saving 1 byte on AVR.
+    * Remove `Coroutine::mName` (type `ace_common::FCString`) which saves
+      3 bytes on AVR, and 8 bytes on 32-bit processors.
 
 ## Arduino Nano
 
@@ -94,7 +98,7 @@ $ make README.md
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 15
+sizeof(Coroutine): 11
 sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
 
@@ -116,7 +120,7 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 15
+sizeof(Coroutine): 11
 sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
 
@@ -124,7 +128,7 @@ CPU:
 +------------+-------+-------+
 | AceRoutine |  base |  diff |
 |------------+-------+-------|
-|      7.200 | 1.100 | 6.100 |
+|      7.000 | 1.200 | 5.800 |
 +------------+-------+-------+
 
 ```
@@ -137,7 +141,7 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 28
+sizeof(Coroutine): 20
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
@@ -158,7 +162,7 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 28
+sizeof(Coroutine): 20
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
@@ -166,7 +170,7 @@ CPU:
 +------------+-------+-------+
 | AceRoutine |  base |  diff |
 |------------+-------+-------|
-|      1.533 | 0.166 | 1.367 |
+|      1.466 | 0.166 | 1.300 |
 +------------+-------+-------+
 
 ```
@@ -179,7 +183,7 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 28
+sizeof(Coroutine): 20
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
@@ -200,7 +204,7 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 28
+sizeof(Coroutine): 20
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
@@ -208,7 +212,7 @@ CPU:
 +------------+-------+-------+
 | AceRoutine |  base |  diff |
 |------------+-------+-------|
-|      0.400 | 0.066 | 0.334 |
+|      0.366 | 0.066 | 0.300 |
 +------------+-------+-------+
 
 ```
@@ -222,7 +226,7 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 28
+sizeof(Coroutine): 20
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 

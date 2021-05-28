@@ -88,14 +88,20 @@ $ make README.md
 ## Functionality
 
 * Baseline: A program that does (almost) nothing
-* Coroutine (bare): A single `COROUTINE()` macro that does nothing.
-* Coroutine (LOOP,DELAY): A `COROUTINE()` macro that uses `COROUTINE_LOOP()`
-  and `COROUTINE_DELAY()` which are expected to used in the common case.
-* CoroutineScheduler (bare): A single `Coroutine` instance with a
-* `CoroutineScheduler`.
-* CoroutineScheduler (LOOP,DELAY): A single `Coroutine` instance that
-  uses `COROUTINE_LOOP()` and `COROUTINE_DELAY()` managed by a
+* One Delay Function: A single non-blocking delay function that waits 10 millis.
+* Two Delay Functions: Two non-blocking delay functions.
+* One Coroutine: One instance of `Coroutine` that waits 10 millis, executed
+  directly through `runCoroutine()`.
+* Two Coroutines: Two instances of `Coroutine` that wait 10 millis, executed
+  directly through `runCoroutine()`.
+* Scheduler, One Coroutine: One instance of `Coroutine` executed through the
   `CoroutineScheduler`.
+* Scheduler, Two Coroutines: Two instances of `Coroutine` executed through the
+  `CoroutineScheduler`.
+* Blink Function: A function that blinks the LED asymmetrically, with HIGH
+  lasting a different duration than LOW.
+* Blink Coroutine: A `Coroutine` that blinks asymmetrically, exactly the same as
+  the `blink()` function.
 
 ## Arduino Nano
 
@@ -124,7 +130,7 @@ $ make README.md
 
 ```
 
-## Sparkfun Pro Micro
+## SparkFun Pro Micro
 
 * 16 MHz ATmega32U4
 * Arduino IDE 1.8.13
@@ -155,7 +161,7 @@ $ make README.md
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.1
+* SparkFun SAMD Core 1.8.1
 
 ```
 +--------------------------------------------------------------+

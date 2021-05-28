@@ -74,6 +74,11 @@ calculated flash size can jump around in unexpected ways.
     * Add `Blink Function` and `Blink Coroutine`, 2 implementations of the same
       asymmetric blink functionality where the HIGH level lasts for a different
       duration than the LOW level.
+    * Remove `Coroutine::getName()`, `Coroutine::mName()`, and
+      `Coroutine::setupCoroutine()`. The human-readable name is no longer
+      retained. Saves 10-30 bytes of flash and 3 bytes of static memory per
+      coroutine instance for AVR; 10-40 bytes and 8 bytes of static memory per
+      instance on 32-bit processors.
 
 ## How to Generate
 

@@ -16,11 +16,12 @@
 
 // List of features to gather memory statistics.
 #define FEATURE_BASELINE 0
-#define FEATURE_MANUAL_DELAY_LOOP 1
-#define FEATURE_ONE_COROUTINE 2
-#define FEATURE_TWO_COROUTINES 3
-#define FEATURE_SCHEDULER_ONE_COROUTINE 4
-#define FEATURE_SCHEDULER_TWO_COROUTINES 5
+#define FEATURE_ONE_DELAY_FUNCTION 1
+#define FEATURE_TWO_DELAY_FUNCTIONS 2
+#define FEATURE_ONE_COROUTINE 3
+#define FEATURE_TWO_COROUTINES 4
+#define FEATURE_SCHEDULER_ONE_COROUTINE 5
+#define FEATURE_SCHEDULER_TWO_COROUTINES 6
 
 #if FEATURE != FEATURE_BASELINE
   #include <AceRoutine.h>
@@ -31,11 +32,37 @@
 // program.
 volatile int disableCompilerOptimization = 0;
 
-#if FEATURE == FEATURE_MANUAL_DELAY_LOOP
+#if FEATURE == FEATURE_ONE_DELAY_FUNCTION
 
   // Hand-rolled alternative to using a COROUTINE() that executes every 10
   // milliseconds.
-  void manualDelayLoop() {
+  void delayFunction() {
+    static uint16_t prevMillis;
+
+    uint16_t nowMillis = millis();
+    if ((uint16_t) nowMillis - prevMillis >= 10) {
+      prevMillis = nowMillis;
+
+      disableCompilerOptimization = 1;
+    }
+  }
+
+#elif FEATURE == FEATURE_TWO_DELAY_FUNCTIONS
+
+  // Hand-rolled alternative to using a COROUTINE() that executes every 10
+  // milliseconds.
+  void delayFunctionA() {
+    static uint16_t prevMillis;
+
+    uint16_t nowMillis = millis();
+    if ((uint16_t) nowMillis - prevMillis >= 10) {
+      prevMillis = nowMillis;
+
+      disableCompilerOptimization = 1;
+    }
+  }
+
+  void delayFunctionB() {
     static uint16_t prevMillis;
 
     uint16_t nowMillis = millis();
@@ -115,8 +142,11 @@ void setup() {
 void loop() {
 #if FEATURE == FEATURE_BASELINE
   disableCompilerOptimization = 1;
-#elif FEATURE == FEATURE_MANUAL_DELAY_LOOP
-  manualDelayLoop();
+#elif FEATURE == FEATURE_ONE_DELAY_FUNCTION
+  delayFunction();
+#elif FEATURE == FEATURE_TWO_DELAY_FUNCTIONS
+  delayFunctionA();
+  delayFunctionB();
 #elif FEATURE == FEATURE_ONE_COROUTINE
   a.runCoroutine();
 #elif FEATURE == FEATURE_TWO_COROUTINES

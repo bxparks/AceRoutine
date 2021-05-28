@@ -37,14 +37,13 @@ calculated flash size can jump around in unexpected ways.
       delegate to `ClockInterface` which is a template parameter. Saves only
       0-40 bytes of flash on on AVR processors, but 100-1500 bytes of flash on
       32-bit processors.
-    * Add benchmark for 'Manual Delay Loop' which uses a simple function
-      to implement the functionality of a `COROUTINE()` that loops every 10
-      milliseconds.
-        * Illustrates clearly that AceRoutine should rarely be used on 8-bit
-          processors because it consumes 450 extra bytes for the 1st coroutine,
-          and another 300 bytes for each additional coroutine.
-        * On 32-bit processors with large amount of flash memory, the flash
-          consumption overhead is not as limiting.
+    * Add benchmark for 'One Delay Function' and 'Two Delay Functions` which use
+      functions with a non-blocking if-statement to implement the functionality
+      of a `COROUTINE()` that loops every 10 milliseconds.
+    * Remove `COROUTINE_DELAY_SECONDS()` functionality. Saves about 200 bytes on
+      AVR processors, mostly from the removal of `udiv1000()` which takes almost
+      180 bytes. Replacing with native `/1000` does not help that much because
+      that consumes about 130 bytes and is 3X slower on AVR processors.
 
 ## How to Generate
 
@@ -107,9 +106,12 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |    606/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Manual Delay Loop               |    654/   13 |    48/    2 |
+| One Delay Function              |    654/   13 |    48/    2 |
+| Two Delay Functions             |    714/   15 |   108/    4 |
+|---------------------------------+--------------+-------------|
 | One Coroutine                   |    872/   34 |   266/   23 |
 | Two Coroutines                  |   1070/   55 |   464/   44 |
+|---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        |    990/   36 |   384/   25 |
 | Scheduler, Two Coroutines       |   1116/   51 |   510/   40 |
 +--------------------------------------------------------------+
@@ -128,9 +130,12 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |   3554/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Manual Delay Loop               |   3602/  153 |    48/    2 |
+| One Delay Function              |   3602/  153 |    48/    2 |
+| Two Delay Functions             |   3662/  155 |   108/    4 |
+|---------------------------------+--------------+-------------|
 | One Coroutine                   |   3760/  174 |   206/   23 |
 | Two Coroutines                  |   3958/  195 |   404/   44 |
+|---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        |   3878/  176 |   324/   25 |
 | Scheduler, Two Coroutines       |   4008/  191 |   454/   40 |
 +--------------------------------------------------------------+
@@ -149,9 +154,12 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |  10072/    0 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Manual Delay Loop               |  10112/    0 |    40/    0 |
+| One Delay Function              |  10112/    0 |    40/    0 |
+| Two Delay Functions             |  10152/    0 |    80/    0 |
+|---------------------------------+--------------+-------------|
 | One Coroutine                   |  10368/    0 |   296/    0 |
 | Two Coroutines                  |  10544/    0 |   472/    0 |
+|---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        |  10416/    0 |   344/    0 |
 | Scheduler, Two Coroutines       |  10504/    0 |   432/    0 |
 +--------------------------------------------------------------+
@@ -170,9 +178,12 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |  19140/ 3788 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Manual Delay Loop               |  19164/ 3792 |    24/    4 |
+| One Delay Function              |  19164/ 3792 |    24/    4 |
+| Two Delay Functions             |  19212/ 3792 |    72/    4 |
+|---------------------------------+--------------+-------------|
 | One Coroutine                   |  19348/ 3820 |   208/   32 |
 | Two Coroutines                  |  19512/ 3848 |   372/   60 |
+|---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        |  19428/ 3824 |   288/   36 |
 | Scheduler, Two Coroutines       |  19504/ 3852 |   364/   64 |
 +--------------------------------------------------------------+
@@ -191,9 +202,12 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        | 256924/26800 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Manual Delay Loop               | 256988/26808 |    64/    8 |
+| One Delay Function              | 256988/26808 |    64/    8 |
+| Two Delay Functions             | 257052/26808 |   128/    8 |
+|---------------------------------+--------------+-------------|
 | One Coroutine                   | 257188/26828 |   264/   28 |
 | Two Coroutines                  | 257416/26860 |   492/   60 |
+|---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        | 257220/26836 |   296/   36 |
 | Scheduler, Two Coroutines       | 257352/26860 |   428/   60 |
 +--------------------------------------------------------------+
@@ -212,9 +226,12 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        | 197910/13092 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Manual Delay Loop               | 198258/13124 |   348/   32 |
+| One Delay Function              | 198258/13124 |   348/   32 |
+| Two Delay Functions             | 198330/13124 |   420/   32 |
+|---------------------------------+--------------+-------------|
 | One Coroutine                   | 198426/13148 |   516/   56 |
 | Two Coroutines                  | 198682/13180 |   772/   88 |
+|---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        | 198470/13156 |   560/   64 |
 | Scheduler, Two Coroutines       | 198618/13180 |   708/   88 |
 +--------------------------------------------------------------+
@@ -234,9 +251,12 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |   7628/ 3048 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Manual Delay Loop               |  10836/ 4152 |  3208/ 1104 |
+| One Delay Function              |  10836/ 4152 |  3208/ 1104 |
+| Two Delay Functions             |  10868/ 4152 |  3240/ 1104 |
+|---------------------------------+--------------+-------------|
 | One Coroutine                   |  11032/ 4180 |  3404/ 1132 |
 | Two Coroutines                  |  11184/ 4208 |  3556/ 1160 |
+|---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        |  11100/ 4184 |  3472/ 1136 |
 | Scheduler, Two Coroutines       |  11200/ 4212 |  3572/ 1164 |
 +--------------------------------------------------------------+

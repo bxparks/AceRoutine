@@ -314,18 +314,18 @@ class CoroutineTemplate {
 
     /** Check if delay time is over. */
     bool isDelayExpired() const {
-      uint16_t elapsed;
+      uint16_t now;
       switch (mDelayType) {
         case kDelayTypeMillis:
-          elapsed = coroutineMillis();
+          now = coroutineMillis();
           break;
         case kDelayTypeMicros:
-          elapsed = coroutineMicros();
+          now = coroutineMicros();
           break;
         default: // This should never happen.
           return true;
       }
-
+      uint16_t elapsed = now - mDelayStart;
       return elapsed >= mDelayDuration;
     }
 

@@ -88,8 +88,6 @@ The following macros are available to hide a lot of boilerplate code:
   allowable delay is 32767 milliseconds.
 * `COROUTINE_DELAY_MICROS(micros)`: yields back execution for `micros`. The
   maximum allowable delay is 32767 microseconds.
-* `COROUTINE_DELAY_SECONDS(seconds)`: yields back execution for `seconds`. The
-  maximum allowable delay is 32767 seconds.
 * `COROUTINE_LOOP()`: convenience macro that loops forever, replaces
   `COROUTINE_BEGIN()` and `COROUTINE_END()`
 * `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`
@@ -330,20 +328,6 @@ conceivable situation. In practice, coroutines should complete their work within
 several milliseconds and yield control to the other coroutines as soon as
 possible.
 
-To delay for longer period of time, we can use the
-`COROUTINE_DELAY_SECONDS(seconds)` convenience macro. The following example
-waits for 200 seconds:
-```C++
-COROUTINE(waitSeconds) {
-  COROUTINE_BEGIN();
-  ...
-  COROUTINE_DELAY_SECONDS(200);
-  ...
-  COROUTINE_END();
-}
-```
-The maximum number of seconds is 32767 seconds.
-
 On faster microcontrollers, it might be useful to yield for microseconds using
 the `COROUTINE_DELAY_MICROS(delayMicros)`.  The following example waits for 300
 microseconds:
@@ -368,15 +352,15 @@ This macro has a number constraints:
   consume a significant portion of the requested delay in microseconds.
 
 If the above convenience macros are not sufficient, you can choose to write an
-explicit for-loop. For example, to delay for 100,000 seconds, instead of using
-the `COROUTINE_DELAY_SECONDS()`, we can do this:
+explicit for-loop. For example, to delay for 100,000 seconds, we can do this:
 
 ```C++
 COROUTINE(waitThousandSeconds) {
+  static uint16_t i;
+
   COROUTINE_BEGIN();
-  static uint32_t i;
-  for (i = 0; i < 100000; i++) {
-    COROUTINE_DELAY(1000);
+  for (i = 0; i < 10000; i++) {
+    COROUTINE_DELAY(10000); // 10 seconds
   }
   ...
   COROUTINE_END();

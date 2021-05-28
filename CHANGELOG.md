@@ -33,6 +33,11 @@
           surprise.
         * But 100-1500 bytes of flash memory reduction on various 32-bit
           processors.
+    * **Breaking**: Remove `COROUTINE_DELAY_SECONDS()`.
+        * Saves ~200 bytes on AVR processors, about 40%.
+        * Saves about 20-30 bytes on 32-bit processors.
+        * The replacement is a for-loop around a `COROUTINE_DELAY()`,
+          as shown in [USER_GUIDE.md#Delay](USER_GUIDE.md#Delay).
 * 1.2.4 (2021-01-22)
     * Update UnixHostDuino 0.4 to EpoxyDuino 0.5.
     * No functional change in this release.

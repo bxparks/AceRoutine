@@ -1,5 +1,5 @@
 /*
- * Validate the actual delays of DELAY_SECONDS(), DELAY() and DELAY_MICROS() by
+ * Validate the actual delays of DELAY() and DELAY_MICROS() by
  * incrementing a counter for TEST_DURATION_MILLIS, then printing the actual
  * count versus the expected count.
  *
@@ -7,23 +7,18 @@
  *    * 16 MHz ATmega328P
  *      * countWithDelayMicros(): count=103349; expected=200000; elapsed=10000
  *      * countWithDelayMillis(): count=1993; expected=2000; elapsed=10004
- *      * countWithDelaySeconds(): count=11; expected=10; elapsed=10265
  *    * 48 MHz SAMD21
  *      * countWithDelayMillis(): count=2000; expected=2000; elapsed=10000
  *      * countWithDelayMicros(): count=161394; expected=200000; elapsed=10000
- *      * countWithDelaySeconds(): count=11; expected=10; elapsed=10253
  *    * ESP8266
  *      * countWithDelayMicros(): count=160897; expected=200000; elapsed=10000
  *      * countWithDelayMillis(): count=2000; expected=2000; elapsed=10001
- *      * countWithDelaySeconds(): count=10; expected=10; elapsed=10191
  *    * ESP32
  *      * countWithDelayMicros(): count=184164; expected=200000; elapsed=10000
  *      * countWithDelayMillis(): count=2000; expected=2000; elapsed=10000
- *      * countWithDelaySeconds(): count=11; expected=10; elapsed=10965
  *    * Teensy 3.2
  *      * countWithDelayMillis(): count=2000; expected=2000; elapsed=10000
  *      * countWithDelayMicros(): count=184460; expected=200000; elapsed=10000
- *      * countWithDelaySeconds(): count=11; expected=10; elapsed=10700
  */
 
 #include <Arduino.h>
@@ -37,7 +32,6 @@ using namespace ace_routine;
 static const unsigned long TEST_DURATION_MILLIS = 10000;
 static const unsigned long DELAY_MICROS = 50; // 50 micros
 static const unsigned long DELAY_MILLIS = 5; // 5 millis
-static const unsigned long DELAY_SECONDS = 1; // 1 seconds
 
 static unsigned long startMillis;
 
@@ -83,22 +77,6 @@ COROUTINE(countWithDelayMillis) {
   }
 }
 
-COROUTINE(countWithDelaySeconds) {
-  static volatile unsigned long counter = 0;
-  static unsigned long elapsed;
-  COROUTINE_LOOP() {
-    counter++;
-    COROUTINE_DELAY_SECONDS(DELAY_SECONDS);
-    elapsed = millis() - startMillis;
-    if (elapsed >= TEST_DURATION_MILLIS) {
-      SERIAL_PORT_MONITOR.print("countWithDelaySeconds(): ");
-      printResults(counter, TEST_DURATION_MILLIS / (DELAY_SECONDS * 1000),
-          elapsed);
-      COROUTINE_END();
-    }
-  }
-}
-
 void setup() {
 #if ! defined(EPOXY_DUINO)
   delay(1000);
@@ -114,5 +92,4 @@ void setup() {
 void loop() {
   countWithDelayMicros.runCoroutine();
   countWithDelayMillis.runCoroutine();
-  countWithDelaySeconds.runCoroutine();
 }

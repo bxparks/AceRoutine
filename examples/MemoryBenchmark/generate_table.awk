@@ -9,11 +9,9 @@ BEGIN {
   labels[0] = "Baseline"
   labels[1] = "Manual Delay Loop"
   labels[2] = "One Coroutine"
-  labels[3] = "One Coroutine, Delay Seconds"
-  labels[4] = "Two Coroutines"
-  labels[5] = "Two Coroutine, Delay Seconds"
-  labels[6] = "Scheduler, One Coroutine"
-  labels[7] = "Scheduler, Two Coroutines"
+  labels[3] = "Two Coroutines"
+  labels[4] = "Scheduler, One Coroutine"
+  labels[5] = "Scheduler, Two Coroutines"
   record_index = 0
 }
 {

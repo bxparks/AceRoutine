@@ -37,8 +37,6 @@ their life cycle:
   parameter is defined as a `uint16_t`.
 * `COROUTINE_DELAY_MICROS(micros)`: yields back execution for `micros`. The
   `micros` parameter is defined as a `uint16_t`.
-* `COROUTINE_DELAY_SECONDS(seconds)`: yields back execution for
-  `seconds`. The `seconds` parameter is defined as a `uint16_t`.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
 * `COROUTINE_CHANNEL_WRITE(channel, value)`: writes a value to a `Channel`
 * `COROUTINE_CHANNEL_READ(channel, value)`: reads a value from a `Channel`
@@ -144,7 +142,7 @@ COROUTINE(printHelloWorld) {
     Serial.flush();
     COROUTINE_DELAY(1000);
     Serial.println(F("World"));
-    COROUTINE_DELAY_SECONDS(4);
+    COROUTINE_DELAY(4000);
   }
 }
 
@@ -316,9 +314,8 @@ The following programs are provided under the `examples` directory:
       same as BlinkSlowFastRoutine but using manual `Coroutine` subclasses
     * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same
       time
-    * [Delay.ino](examples/Delay): validate the various delay macros
-      (`COROUTINE_DELAY()`, `COROUTINE_DELAY_MICROS()` and
-      `COROUTINE_DELAY_SECONDS()`)
+    * [Delay.ino](examples/Delay): validate the delay macros
+      `COROUTINE_DELAY()` and `COROUTINE_DELAY_MICROS()`
 * Advanced Examples
     * [SoundManager](examples/SoundManager): Use a sound manager coroutine to
       control the sounds made by a sound generator coroutine, using the

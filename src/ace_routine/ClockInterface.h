@@ -45,25 +45,6 @@ class ClockInterface {
 
     /** Get the current millis. */
     static unsigned long millis() { return ::millis(); }
-
-    /**
-     * Get the current seconds. When the 32-bit 'unsigned long' rolls over at
-     * 4294967296 millis, this function will return the next integer second too
-     * early, more precisely, 0.704 seconds too early. Fortunately, this happens
-     * only once every 4294967 seconds, i.e. 49.7 days. For the purposes of
-     * COROUTINE_DELAY_SECONDS(), I think this is good enough.
-     */
-    static unsigned long seconds() {
-      unsigned long m = ::millis();
-    #if defined(ARDUINO_ARCH_AVR) \
-        || defined(ARDUINO_ARCH_SAMD) \
-        || defined(ESP8266)
-      // No hardware division so the udiv1000() approximation is faster
-      return ace_common::udiv1000(m);
-    #else
-      return m / 1000;
-    #endif
-    }
 };
 
 }

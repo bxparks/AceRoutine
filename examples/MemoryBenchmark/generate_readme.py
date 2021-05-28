@@ -68,6 +68,9 @@ calculated flash size can jump around in unexpected ways.
       AVR processors, mostly from the removal of `udiv1000()` which takes almost
       180 bytes. Replacing with native `/1000` does not help much because native
       long division consumes about 130 bytes and is 3X slower on AVR processors.
+    * Add `Blink Function` and `Blink Coroutine`, 2 implementations of the same
+      asymmetric blink functionality where the HIGH level lasts for a different
+      duration than the LOW level.
 
 ## How to Generate
 

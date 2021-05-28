@@ -44,6 +44,9 @@ calculated flash size can jump around in unexpected ways.
       AVR processors, mostly from the removal of `udiv1000()` which takes almost
       180 bytes. Replacing with native `/1000` does not help much because native
       long division consumes about 130 bytes and is 3X slower on AVR processors.
+    * Add `Blink Function` and `Blink Coroutine`, 2 implementations of the same
+      asymmetric blink functionality where the HIGH level lasts for a different
+      duration than the LOW level.
 
 ## How to Generate
 
@@ -114,6 +117,9 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        |   1000/   36 |   394/   25 |
 | Scheduler, Two Coroutines       |   1124/   51 |   518/   40 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |    938/   14 |   332/    3 |
+| Blink Coroutine                 |   1182/   34 |   576/   23 |
 +--------------------------------------------------------------+
 
 ```
@@ -138,6 +144,9 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        |   3888/  176 |   334/   25 |
 | Scheduler, Two Coroutines       |   4016/  191 |   462/   40 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |   3994/  154 |   440/    3 |
+| Blink Coroutine                 |   4178/  174 |   624/   23 |
 +--------------------------------------------------------------+
 
 ```
@@ -162,6 +171,9 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        |  10424/    0 |   352/    0 |
 | Scheduler, Two Coroutines       |  10512/    0 |   440/    0 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |  10160/    0 |    88/    0 |
+| Blink Coroutine                 |  10440/    0 |   368/    0 |
 +--------------------------------------------------------------+
 
 ```
@@ -186,6 +198,9 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        |  19432/ 3824 |   292/   36 |
 | Scheduler, Two Coroutines       |  19512/ 3852 |   372/   64 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |  19280/ 3788 |   140/    0 |
+| Blink Coroutine                 |  19504/ 3816 |   364/   28 |
 +--------------------------------------------------------------+
 
 ```
@@ -210,6 +225,9 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        | 257220/26836 |   296/   36 |
 | Scheduler, Two Coroutines       | 257352/26860 |   428/   60 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  | 257424/26816 |   500/   16 |
+| Blink Coroutine                 | 257676/26844 |   752/   44 |
 +--------------------------------------------------------------+
 
 ```
@@ -234,6 +252,9 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        | 198482/13156 |   572/   64 |
 | Scheduler, Two Coroutines       | 198626/13180 |   716/   88 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  | 198602/13120 |   692/   28 |
+| Blink Coroutine                 | 198830/13144 |   920/   52 |
 +--------------------------------------------------------------+
 
 ```
@@ -259,6 +280,9 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Scheduler, One Coroutine        |  11108/ 4184 |  3480/ 1136 |
 | Scheduler, Two Coroutines       |  11216/ 4212 |  3588/ 1164 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |  11244/ 4148 |  3616/ 1100 |
+| Blink Coroutine                 |  11496/ 4176 |  3868/ 1128 |
 +--------------------------------------------------------------+
 
 ```

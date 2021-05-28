@@ -13,6 +13,8 @@ BEGIN {
   labels[4] = "Two Coroutines"
   labels[5] = "Scheduler, One Coroutine"
   labels[6] = "Scheduler, Two Coroutines"
+  labels[7] = "Blink Function"
+  labels[8] = "Blink Coroutine"
   record_index = 0
 }
 {
@@ -37,6 +39,7 @@ END {
       || labels[i] ~ /One Delay Function/ \
       || labels[i] ~ /One Coroutine/ \
       || labels[i] ~ /Scheduler, One Coroutine/ \
+      || labels[i] ~ /Blink Function/ \
     ) {
       printf("|---------------------------------+--------------+-------------|\n")
     }

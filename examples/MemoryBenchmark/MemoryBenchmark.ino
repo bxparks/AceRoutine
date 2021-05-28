@@ -22,6 +22,8 @@
 #define FEATURE_TWO_COROUTINES 4
 #define FEATURE_SCHEDULER_ONE_COROUTINE 5
 #define FEATURE_SCHEDULER_TWO_COROUTINES 6
+#define FEATURE_BLINK_FUNCTION 7
+#define FEATURE_BLINK_COROUTINE 8
 
 #if FEATURE != FEATURE_BASELINE
   #include <AceRoutine.h>
@@ -126,6 +128,55 @@ volatile int disableCompilerOptimization = 0;
   MyCoroutine a;
   MyCoroutine b;
 
+#elif FEATURE == FEATURE_BLINK_FUNCTION
+
+  #ifndef LED_BUILTIN
+    #define LED_BUILTIN 2
+  #endif
+
+  // Asymmetric blink, same functionality as COROUTINE(blink) below, but using
+  // a delay function and a finite state machine. The logic is a lot harder to
+  // follow than a coroutine.
+  void blink() {
+    static uint16_t prevMillis;
+    static uint8_t blinkState;
+    const uint8_t kBlinkStateLow = 0;
+    const uint8_t kBlinkStateHigh = 1;
+
+    if (blinkState == kBlinkStateHigh) {
+      uint16_t nowMillis = millis();
+      if (nowMillis - prevMillis >= 100) {
+        prevMillis = nowMillis;
+        digitalWrite(LED_BUILTIN, LOW);
+        blinkState = kBlinkStateLow;
+      }
+    } else {
+      uint16_t nowMillis = millis();
+      if (nowMillis - prevMillis >= 500) {
+        prevMillis = nowMillis;
+        digitalWrite(LED_BUILTIN, HIGH);
+        blinkState = kBlinkStateHigh;
+      }
+    }
+  }
+
+#elif FEATURE == FEATURE_BLINK_COROUTINE
+
+  #ifndef LED_BUILTIN
+    #define LED_BUILTIN 2
+  #endif
+
+  // Asymmetric blink, same functionality as blink() function above. HIGH is
+  // different than LOW.
+  COROUTINE(blink) {
+    COROUTINE_LOOP() {
+      digitalWrite(LED_BUILTIN, HIGH);
+      COROUTINE_DELAY(100);
+      digitalWrite(LED_BUILTIN, LOW);
+      COROUTINE_DELAY(500);
+    }
+  }
+
 #endif
 
 void setup() {
@@ -156,5 +207,9 @@ void loop() {
   CoroutineScheduler::loop();
 #elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES
   CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_BLINK_COROUTINE
+  blink.runCoroutine();
+#elif FEATURE == FEATURE_BLINK_FUNCTION
+  blink();
 #endif
 }

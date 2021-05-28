@@ -2,13 +2,13 @@
 
 * Unreleased
     * Activate GitHub Discussions for the project.
-    * **Potentiall Breaking**: Change `Coroutine` destructor from virtual to
+    * **Potentially Breaking**: Change `Coroutine` destructor from virtual to
       non-virtual.
         * Saves 500-600 bytes on AVR processors, 350 bytes on SAMD21, and 50-150
           bytes on other 32-bit processors. 
         * Coroutines can now be created only statically, not dynamically on the
           heap.
-    * **Potentiall Breaking**: Lift `Coroutine` into `CoroutineTemplate` class.
+    * **Potentially Breaking**: Lift `Coroutine` into `CoroutineTemplate` class.
       Lift `CoroutineScheduler` into `CoroutineSchedulerTemplate` class.
         * Define `Coroutine` to be `CoroutineTemplate<ClockInterface>`, almost
         * fully backwards compatible with previous implementation.
@@ -38,6 +38,16 @@
         * Saves about 20-30 bytes on 32-bit processors.
         * The replacement is a for-loop around a `COROUTINE_DELAY()`,
           as shown in [USER_GUIDE.md#Delay](USER_GUIDE.md#Delay).
+    * **Breaking**: Remove `COROUTINE_DELAY_MICROS()`.
+        * Saves about 15-20 bytes of flash and 1 byte of static memory
+          per coroutine on AVR processors.
+        * Saves about 80-100 bytes of flash on 32-bit processors, plus an
+          additional 20-30 bytes of flash per coroutine on 32-bit processors.
+        * The `COROUTINE_DELAY_MICROS()` was never reliable because it depended
+          on other coroutines to release control of execution faster than the
+          value of the delay microseconds. This is very difficult to guarantee
+          in a cooperative multitasking environment.
+        * Removing this simplifies the code a fair amount.
 * 1.2.4 (2021-01-22)
     * Update UnixHostDuino 0.4 to EpoxyDuino 0.5.
     * No functional change in this release.

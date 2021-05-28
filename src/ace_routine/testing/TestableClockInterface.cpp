@@ -28,8 +28,6 @@ namespace ace_routine {
 namespace testing {
 
 unsigned long TestableClockInterface::sMillis;
-unsigned long TestableClockInterface::sMicros;
-unsigned long TestableClockInterface::sSeconds;
 
 }
 }

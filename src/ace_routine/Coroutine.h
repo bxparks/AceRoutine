@@ -142,7 +142,7 @@ extern className##_##name name
 
 /**
  * Implement the common logic for COROUTINE_YIELD(), COROUTINE_AWAIT(),
- * COROUTINE_DELAY(), COROUTINE_DELAY_SECONDS(), and COROUTINE_DELAY_MICROS().
+ * COROUTINE_DELAY(), and COROUTINE_DELAY_MICROS().
  */
 #define COROUTINE_YIELD_INTERNAL() \
     do { \
@@ -186,8 +186,7 @@ extern className##_##name name
  * setDelayMillis() for the reason for this limitation.
  *
  * If you need to wait for longer than that, use a for-loop to call
- * COROUTINE_DELAY() as many times as necessary or use
- * COROUTINE_DELAY_SECONDS().
+ * COROUTINE_DELAY() as many times as necessary.
  *
  * This could have been implemented using COROUTINE_AWAIT() but this macro
  * matches the global delay(millis) function already provided by the Arduino
@@ -209,34 +208,6 @@ extern className##_##name name
 #define COROUTINE_DELAY_MICROS(delayMicros) \
     do { \
       setDelayMicros(delayMicros); \
-      setDelaying(); \
-      do { \
-        COROUTINE_YIELD_INTERNAL(); \
-      } while (!isDelayExpired()); \
-      setRunning(); \
-    } while (false)
-
-/**
- * Yield for delaySeconds. Similar to COROUTINE_DELAY(delayMillis).
- *
- * The accuracy of the delay interval in units of seconds has at least 2
- * sources of errors, so you should not depend on this for perfectly accurate
- * delays:
- *
- * 1) The current implementation uses the builtin millis() to infer the
- * "seconds". The millis() function returns a value that overflows after
- * 4,294,967.296 seconds. Therefore, the last inferred second just before
- * overflowing contains only 0.296 seconds instead of a full second. A delay
- * which straddles this overflow will return 0.704 seconds earlier than it
- * should.
- * 2) On microcontrollers without support for fast hardware integer division,
- * (i.e. AVR, SAMD21, ESP8266), the division by 1000 is approximated using
- * integer multiplications. The calculated value is off by a fraction of a
- * percent from the correct value.
- */
-#define COROUTINE_DELAY_SECONDS(delaySeconds) \
-    do { \
-      setDelaySeconds(delaySeconds); \
       setDelaying(); \
       do { \
         COROUTINE_YIELD_INTERNAL(); \
@@ -350,9 +321,6 @@ class CoroutineTemplate {
           break;
         case kDelayTypeMicros:
           elapsed = coroutineMicros();
-          break;
-        case kDelayTypeSeconds:
-          elapsed = coroutineSeconds();
           break;
         default: // This should never happen.
           return true;
@@ -529,9 +497,6 @@ class CoroutineTemplate {
     /** Delay using units of micros. */
     static const uint8_t kDelayTypeMicros = 1;
 
-    /** Delay using units of seconds. */
-    static const uint8_t kDelayTypeSeconds = 2;
-
     /**
      * Constructor. All subclasses are expected to call either
      * setupCoroutine(const char*) or setupCoroutine(const
@@ -629,18 +594,6 @@ class CoroutineTemplate {
           : delayMicros;
     }
 
-    /**
-     * Configure the delay timer for delaySeconds. Similar to seDelayMillis(),
-     * the maximum delay is 32767 seconds.
-     */
-    void setDelaySeconds(uint16_t delaySeconds) {
-      mDelayType = kDelayTypeSeconds;
-      mDelayStart = coroutineSeconds();
-      mDelayDuration = (delaySeconds >= UINT16_MAX / 2)
-          ? UINT16_MAX / 2
-          : delaySeconds;
-    }
-
   private:
     // Disable copy-constructor and assignment operator
     CoroutineTemplate(const CoroutineTemplate&) = delete;
@@ -717,16 +670,6 @@ class CoroutineTemplate {
      */
     static unsigned long coroutineMicros() {
       return T_CLOCK::micros();
-    }
-
-    /**
-     * Returns the current clock in unit of seconds, truncated to the lower
-     * 16-bits. This is an approximation of (millis / 1000). It does not need
-     * to be perfectly accurate because COROUTINE_DELAY_SECONS() is not
-     * guaranteed to be precise.
-     */
-    static unsigned long coroutineSeconds() {
-      return T_CLOCK::seconds();
     }
 
   protected:

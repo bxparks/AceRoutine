@@ -7,13 +7,12 @@
 
 BEGIN {
   labels[0] = "Baseline"
-  labels[1] = "Manual Delay Loop"
-  labels[2] = "One Coroutine"
-  labels[3] = "One Coroutine, Delay Seconds"
+  labels[1] = "One Delay Function"
+  labels[2] = "Two Delay Functions"
+  labels[3] = "One Coroutine"
   labels[4] = "Two Coroutines"
-  labels[5] = "Two Coroutine, Delay Seconds"
-  labels[6] = "Scheduler, One Coroutine"
-  labels[7] = "Scheduler, Two Coroutines"
+  labels[5] = "Scheduler, One Coroutine"
+  labels[6] = "Scheduler, Two Coroutines"
   record_index = 0
 }
 {
@@ -33,11 +32,14 @@ END {
 
   printf("+--------------------------------------------------------------+\n")
   printf("| functionality                   |  flash/  ram |       delta |\n")
-  printf("|---------------------------------+--------------+-------------|\n")
-  printf("| %-31s | %6d/%5d | %5d/%5d |\n",
-      labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
-  printf("|---------------------------------+--------------+-------------|\n")
-  for (i = 1; i < NUM_ENTRIES; i++) {
+  for (i = 0; i < NUM_ENTRIES; i++) {
+    if (labels[i] ~ /Baseline/ \
+      || labels[i] ~ /One Delay Function/ \
+      || labels[i] ~ /One Coroutine/ \
+      || labels[i] ~ /Scheduler, One Coroutine/ \
+    ) {
+      printf("|---------------------------------+--------------+-------------|\n")
+    }
     printf("| %-31s | %6d/%5d | %5d/%5d |\n",
         labels[i], u[i]["flash"], u[i]["ram"], u[i]["d_flash"], u[i]["d_ram"])
   }

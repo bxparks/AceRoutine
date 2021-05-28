@@ -108,10 +108,12 @@ $ make README.md
 | Baseline                        |    606/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | Manual Delay Loop               |    654/   13 |    48/    2 |
-| One Coroutine                   |   1104/   34 |   498/   23 |
-| Two Coroutines                  |   1310/   55 |   704/   44 |
-| Scheduler, One Coroutine        |   1192/   36 |   586/   25 |
-| Scheduler, Two Coroutines       |   1356/   51 |   750/   40 |
+| One Coroutine                   |   1060/   34 |   454/   23 |
+| One Coroutine, Delay Seconds    |   1050/   34 |   444/   23 |
+| Two Coroutines                  |   1258/   55 |   652/   44 |
+| Two Coroutine, Delay Seconds    |   1234/   55 |   628/   44 |
+| Scheduler, One Coroutine        |   1146/   36 |   540/   25 |
+| Scheduler, Two Coroutines       |   1304/   51 |   698/   40 |
 +--------------------------------------------------------------+
 
 ```
@@ -129,10 +131,12 @@ $ make README.md
 | Baseline                        |   3554/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | Manual Delay Loop               |   3602/  153 |    48/    2 |
-| One Coroutine                   |   3992/  174 |   438/   23 |
-| Two Coroutines                  |   4198/  195 |   644/   44 |
-| Scheduler, One Coroutine        |   4080/  176 |   526/   25 |
-| Scheduler, Two Coroutines       |   4248/  191 |   694/   40 |
+| One Coroutine                   |   3948/  174 |   394/   23 |
+| One Coroutine, Delay Seconds    |   3938/  174 |   384/   23 |
+| Two Coroutines                  |   4146/  195 |   592/   44 |
+| Two Coroutine, Delay Seconds    |   4122/  195 |   568/   44 |
+| Scheduler, One Coroutine        |   4034/  176 |   480/   25 |
+| Scheduler, Two Coroutines       |   4196/  191 |   642/   40 |
 +--------------------------------------------------------------+
 
 ```
@@ -150,10 +154,12 @@ $ make README.md
 | Baseline                        |  10072/    0 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | Manual Delay Loop               |  10112/    0 |    40/    0 |
-| One Coroutine                   |  10416/    0 |   344/    0 |
-| Two Coroutines                  |  10592/    0 |   520/    0 |
-| Scheduler, One Coroutine        |  10464/    0 |   392/    0 |
-| Scheduler, Two Coroutines       |  10552/    0 |   480/    0 |
+| One Coroutine                   |  10392/    0 |   320/    0 |
+| One Coroutine, Delay Seconds    |  10400/    0 |   328/    0 |
+| Two Coroutines                  |  10576/    0 |   504/    0 |
+| Two Coroutine, Delay Seconds    |  10576/    0 |   504/    0 |
+| Scheduler, One Coroutine        |  10440/    0 |   368/    0 |
+| Scheduler, Two Coroutines       |  10536/    0 |   464/    0 |
 +--------------------------------------------------------------+
 
 ```
@@ -171,10 +177,12 @@ $ make README.md
 | Baseline                        |  19140/ 3788 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | Manual Delay Loop               |  19164/ 3792 |    24/    4 |
-| One Coroutine                   |  19380/ 3820 |   240/   32 |
-| Two Coroutines                  |  19540/ 3848 |   400/   60 |
-| Scheduler, One Coroutine        |  19456/ 3824 |   316/   36 |
-| Scheduler, Two Coroutines       |  19532/ 3852 |   392/   64 |
+| One Coroutine                   |  19364/ 3820 |   224/   32 |
+| One Coroutine, Delay Seconds    |  19372/ 3820 |   232/   32 |
+| Two Coroutines                  |  19532/ 3848 |   392/   60 |
+| Two Coroutine, Delay Seconds    |  19540/ 3848 |   400/   60 |
+| Scheduler, One Coroutine        |  19444/ 3824 |   304/   36 |
+| Scheduler, Two Coroutines       |  19524/ 3852 |   384/   64 |
 +--------------------------------------------------------------+
 
 ```
@@ -192,10 +200,12 @@ $ make README.md
 | Baseline                        | 256924/26800 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | Manual Delay Loop               | 256988/26808 |    64/    8 |
-| One Coroutine                   | 257268/26828 |   344/   28 |
-| Two Coroutines                  | 257496/26860 |   572/   60 |
-| Scheduler, One Coroutine        | 257316/26836 |   392/   36 |
-| Scheduler, Two Coroutines       | 257432/26860 |   508/   60 |
+| One Coroutine                   | 257220/26828 |   296/   28 |
+| One Coroutine, Delay Seconds    | 257236/26828 |   312/   28 |
+| Two Coroutines                  | 257448/26860 |   524/   60 |
+| Two Coroutine, Delay Seconds    | 257464/26860 |   540/   60 |
+| Scheduler, One Coroutine        | 257252/26836 |   328/   36 |
+| Scheduler, Two Coroutines       | 257384/26860 |   460/   60 |
 +--------------------------------------------------------------+
 
 ```
@@ -213,10 +223,12 @@ $ make README.md
 | Baseline                        | 197910/13092 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | Manual Delay Loop               | 198258/13124 |   348/   32 |
-| One Coroutine                   | 198498/13148 |   588/   56 |
-| Two Coroutines                  | 198738/13180 |   828/   88 |
-| Scheduler, One Coroutine        | 198550/13156 |   640/   64 |
-| Scheduler, Two Coroutines       | 198674/13180 |   764/   88 |
+| One Coroutine                   | 198446/13148 |   536/   56 |
+| One Coroutine, Delay Seconds    | 198454/13148 |   544/   56 |
+| Two Coroutines                  | 198698/13180 |   788/   88 |
+| Two Coroutine, Delay Seconds    | 198714/13180 |   804/   88 |
+| Scheduler, One Coroutine        | 198494/13156 |   584/   64 |
+| Scheduler, Two Coroutines       | 198634/13180 |   724/   88 |
 +--------------------------------------------------------------+
 
 ```
@@ -235,10 +247,12 @@ $ make README.md
 | Baseline                        |   7628/ 3048 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | Manual Delay Loop               |  10836/ 4152 |  3208/ 1104 |
-| One Coroutine                   |  11108/ 4180 |  3480/ 1132 |
-| Two Coroutines                  |  11336/ 4208 |  3708/ 1160 |
-| Scheduler, One Coroutine        |  11176/ 4184 |  3548/ 1136 |
-| Scheduler, Two Coroutines       |  11352/ 4212 |  3724/ 1164 |
+| One Coroutine                   |  11060/ 4180 |  3432/ 1132 |
+| One Coroutine, Delay Seconds    |  11068/ 4180 |  3440/ 1132 |
+| Two Coroutines                  |  11240/ 4208 |  3612/ 1160 |
+| Two Coroutine, Delay Seconds    |  11256/ 4208 |  3628/ 1160 |
+| Scheduler, One Coroutine        |  11132/ 4184 |  3504/ 1136 |
+| Scheduler, Two Coroutines       |  11260/ 4212 |  3632/ 1164 |
 +--------------------------------------------------------------+
 
 ```

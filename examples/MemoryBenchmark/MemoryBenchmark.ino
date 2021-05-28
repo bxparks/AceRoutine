@@ -18,9 +18,11 @@
 #define FEATURE_BASELINE 0
 #define FEATURE_MANUAL_DELAY_LOOP 1
 #define FEATURE_ONE_COROUTINE 2
-#define FEATURE_TWO_COROUTINES 3
-#define FEATURE_SCHEDULER_ONE_COROUTINE 4
-#define FEATURE_SCHEDULER_TWO_COROUTINES 5
+#define FEATURE_ONE_COROUTINE_DELAY_SECONDS 3
+#define FEATURE_TWO_COROUTINES 4
+#define FEATURE_TWO_COROUTINES_DELAY_SECONDS 5
+#define FEATURE_SCHEDULER_ONE_COROUTINE 6
+#define FEATURE_SCHEDULER_TWO_COROUTINES 7
 
 #if FEATURE != FEATURE_BASELINE
   #include <AceRoutine.h>
@@ -55,6 +57,15 @@ volatile int disableCompilerOptimization = 0;
     }
   }
 
+#elif FEATURE == FEATURE_ONE_COROUTINE_DELAY_SECONDS
+
+  COROUTINE(a) {
+    COROUTINE_LOOP() {
+      disableCompilerOptimization = 1;
+      COROUTINE_DELAY_SECONDS(10);
+    }
+  }
+
 #elif FEATURE == FEATURE_TWO_COROUTINES
 
   COROUTINE(a) {
@@ -68,6 +79,22 @@ volatile int disableCompilerOptimization = 0;
     COROUTINE_LOOP() {
       disableCompilerOptimization = 1;
       COROUTINE_DELAY(10);
+    }
+  }
+
+#elif FEATURE == FEATURE_TWO_COROUTINES_DELAY_SECONDS
+
+  COROUTINE(a) {
+    COROUTINE_LOOP() {
+      disableCompilerOptimization = 1;
+      COROUTINE_DELAY_SECONDS(10);
+    }
+  }
+
+  COROUTINE(b) {
+    COROUTINE_LOOP() {
+      disableCompilerOptimization = 1;
+      COROUTINE_DELAY_SECONDS(10);
     }
   }
 
@@ -119,7 +146,12 @@ void loop() {
   manualDelayLoop();
 #elif FEATURE == FEATURE_ONE_COROUTINE
   a.runCoroutine();
+#elif FEATURE == FEATURE_ONE_COROUTINE_DELAY_SECONDS
+  a.runCoroutine();
 #elif FEATURE == FEATURE_TWO_COROUTINES
+  a.runCoroutine();
+  b.runCoroutine();
+#elif FEATURE == FEATURE_TWO_COROUTINES_DELAY_SECONDS
   a.runCoroutine();
   b.runCoroutine();
 #elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE

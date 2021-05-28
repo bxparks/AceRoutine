@@ -40,9 +40,6 @@ namespace ace_routine {
  */
 class ClockInterface {
   public:
-    /** Get the current micros. */
-    static unsigned long micros() { return ::micros(); }
-
     /** Get the current millis. */
     static unsigned long millis() { return ::millis(); }
 };

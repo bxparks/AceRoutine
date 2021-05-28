@@ -86,8 +86,6 @@ The following macros are available to hide a lot of boilerplate code:
 * `COROUTINE_AWAIT(condition)`: yields until `condition` become `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The maximum
   allowable delay is 32767 milliseconds.
-* `COROUTINE_DELAY_MICROS(micros)`: yields back execution for `micros`. The
-  maximum allowable delay is 32767 microseconds.
 * `COROUTINE_LOOP()`: convenience macro that loops forever, replaces
   `COROUTINE_BEGIN()` and `COROUTINE_END()`
 * `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`
@@ -147,12 +145,6 @@ class Coroutine {
     const ace_common::FCString& getName() const;
 
     virtual int runCoroutine() = 0;
-
-    virtual unsigned long coroutineMillis() const;
-
-    virtual unsigned long coroutineMicros() const;
-
-    virtual unsigned long coroutineSeconds() const;
 
     void suspend();
 
@@ -328,31 +320,8 @@ conceivable situation. In practice, coroutines should complete their work within
 several milliseconds and yield control to the other coroutines as soon as
 possible.
 
-On faster microcontrollers, it might be useful to yield for microseconds using
-the `COROUTINE_DELAY_MICROS(delayMicros)`.  The following example waits for 300
-microseconds:
-
-```C++
-COROUTINE(waitMicros) {
-  COROUTINE_BEGIN();
-  ...
-  COROUTINE_DELAY_MICROS(300);
-  ...
-  COROUTINE_END();
-}
-```
-This macro has a number constraints:
-
-* The maximum delay is 32767 micros.
-* All other coroutines in the program *must* yield within 32767 microsecond,
-  otherwise the internal timing variable will overflow and an incorrect delay
-  will occur.
-* The accuracy of `COROUTINE_DELAY_MICROS()` is not guaranteed because the
-  overhead of context switching and checking the delay's expiration may
-  consume a significant portion of the requested delay in microseconds.
-
-If the above convenience macros are not sufficient, you can choose to write an
-explicit for-loop. For example, to delay for 100,000 seconds, we can do this:
+For delays longer than 32767 milliseconds, we can use an explicit for-loop. For
+example, to delay for 100,000 seconds, we can do this:
 
 ```C++
 COROUTINE(waitThousandSeconds) {
@@ -597,9 +566,9 @@ surprised to find that it actually worked.
 ### Macros As Statements
 
 The various macros (`COROUTINE_YIELD()`, `COROUTINE_DELAY()`,
-`COROUTINE_DELAY_MICROS()`, `COROUTINE_AWAIT()`, etc.) have been designed to
-allow them to be used almost everywhere a valid C/C++ statement is allowed. For
-example, the following is allowed:
+`COROUTINE_AWAIT()`, etc.) have been designed to allow them to be used almost
+everywhere a valid C/C++ statement is allowed. For example, the following is
+allowed:
 
 ```C++
   ...

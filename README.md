@@ -35,8 +35,6 @@ their life cycle:
 * `COROUTINE_AWAIT(condition)`: yield until `condition` becomes `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
-* `COROUTINE_DELAY_MICROS(micros)`: yields back execution for `micros`. The
-  `micros` parameter is defined as a `uint16_t`.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
 * `COROUTINE_CHANNEL_WRITE(channel, value)`: writes a value to a `Channel`
 * `COROUTINE_CHANNEL_READ(channel, value)`: reads a value from a `Channel`
@@ -314,8 +312,7 @@ The following programs are provided under the `examples` directory:
       same as BlinkSlowFastRoutine but using manual `Coroutine` subclasses
     * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same
       time
-    * [Delay.ino](examples/Delay): validate the delay macros
-      `COROUTINE_DELAY()` and `COROUTINE_DELAY_MICROS()`
+    * [Delay.ino](examples/Delay): validate the `COROUTINE_DELAY()` macro
 * Advanced Examples
     * [SoundManager](examples/SoundManager): Use a sound manager coroutine to
       control the sounds made by a sound generator coroutine, using the

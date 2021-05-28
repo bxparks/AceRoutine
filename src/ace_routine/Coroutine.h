@@ -142,7 +142,7 @@ extern className##_##name name
 
 /**
  * Implement the common logic for COROUTINE_YIELD(), COROUTINE_AWAIT(),
- * COROUTINE_DELAY(), and COROUTINE_DELAY_MICROS().
+ * COROUTINE_DELAY().
  */
 #define COROUTINE_YIELD_INTERNAL() \
     do { \
@@ -197,17 +197,6 @@ extern className##_##name name
 #define COROUTINE_DELAY(delayMillis) \
     do { \
       setDelayMillis(delayMillis); \
-      setDelaying(); \
-      do { \
-        COROUTINE_YIELD_INTERNAL(); \
-      } while (!isDelayExpired()); \
-      setRunning(); \
-    } while (false)
-
-/** Yield for delayMicros. Similiar to COROUTINE_DELAY(delayMillis). */
-#define COROUTINE_DELAY_MICROS(delayMicros) \
-    do { \
-      setDelayMicros(delayMicros); \
       setDelaying(); \
       do { \
         COROUTINE_YIELD_INTERNAL(); \
@@ -314,17 +303,7 @@ class CoroutineTemplate {
 
     /** Check if delay time is over. */
     bool isDelayExpired() const {
-      uint16_t now;
-      switch (mDelayType) {
-        case kDelayTypeMillis:
-          now = coroutineMillis();
-          break;
-        case kDelayTypeMicros:
-          now = coroutineMicros();
-          break;
-        default: // This should never happen.
-          return true;
-      }
+      uint16_t now = coroutineMillis();
       uint16_t elapsed = now - mDelayStart;
       return elapsed >= mDelayDuration;
     }
@@ -491,12 +470,6 @@ class CoroutineTemplate {
     /** Coroutine has ended and no longer in the scheduler queue. */
     static const Status kStatusTerminated = 5;
 
-    /** Delay using units of millis. */
-    static const uint8_t kDelayTypeMillis = 0;
-
-    /** Delay using units of micros. */
-    static const uint8_t kDelayTypeMicros = 1;
-
     /**
      * Constructor. All subclasses are expected to call either
      * setupCoroutine(const char*) or setupCoroutine(const
@@ -575,23 +548,10 @@ class CoroutineTemplate {
      * clock increments by 1 millisecond.)
      */
     void setDelayMillis(uint16_t delayMillis) {
-      mDelayType = kDelayTypeMillis;
       mDelayStart = coroutineMillis();
       mDelayDuration = (delayMillis >= UINT16_MAX / 2)
           ? UINT16_MAX / 2
           : delayMillis;
-    }
-
-    /**
-     * Configure the delay timer for delayMicros. Similar to seDelayMillis(),
-     * the maximum delay is 32767 micros.
-     */
-    void setDelayMicros(uint16_t delayMicros) {
-      mDelayType = kDelayTypeMicros;
-      mDelayStart = coroutineMicros();
-      mDelayDuration = (delayMicros >= UINT16_MAX / 2)
-          ? UINT16_MAX / 2
-          : delayMicros;
     }
 
   private:
@@ -664,22 +624,13 @@ class CoroutineTemplate {
       return T_CLOCK::millis();
     }
 
-    /**
-     * Returns the current millisecond clock. By default it returns the global
-     * micros() function from Arduino but can be overridden for testing.
-     */
-    static unsigned long coroutineMicros() {
-      return T_CLOCK::micros();
-    }
-
   protected:
     ace_common::FCString mName;
     CoroutineTemplate* mNext = nullptr;
     void* mJumpPoint = nullptr;
     Status mStatus = kStatusYielding;
-    uint8_t mDelayType;
-    uint16_t mDelayStart; // millis or micros
-    uint16_t mDelayDuration; // millis or micros
+    uint16_t mDelayStart; // millis
+    uint16_t mDelayDuration; // millis
 };
 
 using Coroutine = CoroutineTemplate<ClockInterface>;

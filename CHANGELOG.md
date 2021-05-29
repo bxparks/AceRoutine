@@ -66,6 +66,9 @@
           instance on AVR.
         * Saves 10-40 bytes of flash and 8 bytes of static memory per coroutine
           instance on 32-bit processors.
+    * Blacklist platforms using the https://github.com/arduino/ArduinoCore-api
+      to give a user-friendly message instead of pages and pages of compiler
+      errors.
 * 1.2.4 (2021-01-22)
     * Update UnixHostDuino 0.4 to EpoxyDuino 0.5.
     * No functional change in this release.

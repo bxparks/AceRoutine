@@ -1394,7 +1394,7 @@ usage by 500-600 bytes on 8-bit AVR processors, because it pulls in the
 `malloc()` and `free()` functions. On the 32-bit SAMD21 (using the SparkFun
 SAMD21 Core), the flash memory increases by ~350 bytes. On other 32-bit
 processors (STM32, ESP8266, ESP32, Teensy 3.2), the flash memory increases
-modestly, between 50-150 bytes. These flahs memory savings, especially on the
+modestly, between 50-150 bytes. These flash memory savings, especially on the
 AVR processors, is significant, so starting from v1.3, the destructor is now
 non-virtual.
 

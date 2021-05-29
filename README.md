@@ -559,7 +559,7 @@ This library was developed and tested using:
 * [SparkFun SAMD Boards 1.8.1](https://github.com/sparkfun/Arduino_Boards)
 * [STM32duino 1.9.0](https://github.com/stm32duino/Arduino_Core_STM32)
 * [ESP8266 Arduino 2.7.4](https://github.com/esp8266/Arduino)
-* [ESP32 Arduino 1.0.4](https://github.com/espressif/arduino-esp32)
+* [ESP32 Arduino 1.0.6](https://github.com/espressif/arduino-esp32)
 * [Teensydino 1.53](https://www.pjrc.com/teensy/td_download.html)
 
 It should work with [PlatformIO](https://platformio.org/) but I have

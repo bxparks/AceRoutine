@@ -42,10 +42,19 @@ their life cycle:
 Here are some of the compelling features of this library compared to
 others (in my opinion of course):
 * low memory usage
-    * each coroutine consumes only 11 bytes of static RAM on 8-bit processors
-      (AVR) and 20 bytes on 32-bit processors (ARM, ESP8266, ESP32)
-    * the `CoroutineScheduler` consumes only 2 bytes (8-bit) or 4 bytes (32-bit)
-      of static memory no matter how many coroutines are active
+    * 8-bit (e.g. AVR) processors:
+        * the first `Coroutine` consumes about 230 bytes of flash
+        * each additional `Coroutine` consumes 170 bytes of flash
+        * each `Coroutine` consumes 11 bytes of static RAM
+        * `CoroutineScheduler` consumes only about 40 bytes of flash and
+          2 bytes of RAM independent of the number of coroutines
+    * 32-bit (e.g. STM32, ESP8266, ESP32) processors
+        * the first `Coroutine` consumes between 120-450 bytes of flash (except
+          on the Teensy 3.2 where the first instance brings in 3200 bytes)
+        * each additional `Coroutine` consumes about 130-160 bytes of flash,
+        * each `Coroutine` consumes 20 bytes of static RAM
+        * `CoroutineScheduler` consumes only about 40-60 bytes of flash
+          and 4 bytes of static RAM independent of the number of coroutines
 * extremely fast context switching
     * ~6.0 microseconds on a 16 MHz ATmega328P
     * ~1.9 microseconds on a 48 MHz SAMD21
@@ -424,7 +433,7 @@ advantages:
 
 All objects are statically allocated (i.e. not heap or stack).
 
-* 8-bit processors (AVR Nano, UNO, etc):
+* 8-bit processors (AVR Nano, Uno, etc):
     * `sizeof(Coroutine)`: 11
     * `sizeof(CoroutineScheduler)`: 2
     * `sizeof(Channel<int>)`: 5
@@ -454,7 +463,7 @@ The [examples/MemoryBenchmark](examples/MemoryBenchmark) program gathers
 flash and memory consumption numbers for various boards (AVR, ESP8266, ESP32,
 etc) for a handful of AceRoutine features. Here are some highlights:
 
-**AVR (e.g. Nano)**
+**Arduino Nano (8-bits)**
 
 ```
 +--------------------------------------------------------------+
@@ -476,7 +485,7 @@ etc) for a handful of AceRoutine features. Here are some highlights:
 +--------------------------------------------------------------+
 ```
 
-**ESP8266**
+**ESP8266 (32-bits)**
 
 ```
 +--------------------------------------------------------------+
@@ -499,13 +508,16 @@ etc) for a handful of AceRoutine features. Here are some highlights:
 ```
 
 Comparing `Blink Function` and `Blink Coroutine` is probably the most
-fair comparison, because they implement the exact same functionality. The `Blink
-Function` implements the asymmetric blink (HIGH and LOW having different
-durations) functionality using a simple, non-blocking function with an internal
-`prevMillis` static variable. The `Blink Coroutine` implements the exact same
-logic using an AceRoutine `Coroutine`. The `Coroutine` version is far more
-readable and maintainable, with only about 220 additional bytes of flash on AVR,
-and 130 bytes on an ESP8266.
+fair comparison, because they implement the exact same functionality. The code
+is given in
+[Comparison To NonBlocking Function](USER_GUIDE.md#ComparisonToNonBlockingFunction).
+The `Blink Function` implements the asymmetric blink (HIGH and LOW having
+different durations) functionality using a simple, non-blocking function with an
+internal `prevMillis` static variable. The `Blink Coroutine` implements the
+same logic using a `Coroutine`. The `Coroutine` version is far more readable and
+maintainable, with only about 220 additional bytes of flash on AVR, and 130
+bytes on an ESP8266. In many situations, the increase in flash memory size may
+be worth ease of code maintenance.
 
 <a name="CPU"></a>
 ### CPU

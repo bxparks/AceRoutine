@@ -48,6 +48,23 @@
           value of the delay microseconds. This is very difficult to guarantee
           in a cooperative multitasking environment.
         * Removing this simplifies the code a fair amount.
+    * **Breaking**: Remove `Coroutine::getName()` and `Coroutine::mName`. The
+      human-readable name of the coroutine is no longer retained, to reduce
+      flash and static memory consumption.
+        * Remove `setupCoroutineOrderedByName()`, since it is no longer possible
+          to sort by name.
+        * Since we don't need to capture the name of the coroutine, we can
+          move `setupCoroutine()` functionality directly into
+          `Coroutine::Coroutine()` constructor.
+        * Deprecate `setupCoroutine(const char*)` and `setupCoroutine(const
+          __FlashStringHelper*)` into no-ops. They are retained for backwards
+          compatibility.
+        * Print the coroutine pointer address instead of its name in
+          `CoroutineScheduler::list()`, since the name is no longer retained.
+        * Saves 10-30 bytes of flash and 3 bytes of static memory per coroutine
+          instance on AVR.
+        * Saves 10-40 bytes of flash and 8 bytes of static memory per coroutine
+          instance on 32-bit processors.
 * 1.2.4 (2021-01-22)
     * Update UnixHostDuino 0.4 to EpoxyDuino 0.5.
     * No functional change in this release.

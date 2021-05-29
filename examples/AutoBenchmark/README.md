@@ -72,14 +72,20 @@ $ make README.md
           of `doBaseline()` is different than the number of iterations
           of doAceRoutine()`. When we subtract, the overhead of the loop
           (e.g. `millis() - start`) are NOT canceld out correctly.
-        * New numbers
-            * Nano: 5.28 -> 6.500 micros
-            * Micro: 5.31 -> 6.500 micros
-            * SAMD: 2.46 -> 2.333 micros
-            * STM32: 1.76 -> 1.767 micros
-            * ESP8266: 1.67 -> 1.500 micros
-            * ESP32: 0.41 -> 0.400 micros
-            * Teensy 3.2: 1.01 -> 1.000 micros
+        * New numbers for `CoroutineScheduler`:
+            * Nano: 5.28 -> 5.200 micros
+            * Micro: 5.31 -> 5.000 micros
+            * SAMD: 2.46 -> 1.933 micros
+            * STM32: 1.76 -> 1.367 micros
+            * ESP8266: 1.67 -> 1.100 micros
+            * ESP32: 0.41 -> 0.300 micros
+            * Teensy 3.2: 1.01 -> 0.500 micros
+    * Add benchmark numbers for "DirectScheduling".
+        * Calls `Coroutine::runCoroutine()` directly, instead of using the
+          `CoroutineScheduler` to avoid the virtual dispatch.
+        * Avoids overhead of cycling through the linked list.
+        * Context switching using `DirectScheduling` is 3-9X faster compared to
+          using `CoroutineScheduler` class.
     * Replace virtual clock ticking methods (`Coroutine::coroutineMillis()`,
       `Coroutine::coroutineMicros()`, `Coroutine::coroutineSeconds()`) with
       static calls to `ClockInterface` template class.
@@ -103,15 +109,17 @@ sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
 
 CPU:
-+------------+-------+-------+
-| AceRoutine |  base |  diff |
-|------------+-------+-------|
-|      7.100 | 1.100 | 6.000 |
-+------------+-------+-------+
++---------------------+--------+-------------+--------+
+| Functionality       |  iters | micros/iter |   diff |
+|---------------------+--------+-------------+--------|
+| EmptyLoop           |  10000 |       1.700 |  0.000 |
+| DirectScheduling    |  10000 |       2.900 |  1.200 |
+| CoroutineScheduling |  10000 |       6.900 |  5.200 |
++---------------------+--------+-------------+--------+
 
 ```
 
-## Sparkfun Pro Micro
+## SparkFun Pro Micro
 
 * 16 MHz ATmega32U4
 * Arduino IDE 1.8.13
@@ -125,11 +133,13 @@ sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
 
 CPU:
-+------------+-------+-------+
-| AceRoutine |  base |  diff |
-|------------+-------+-------|
-|      7.000 | 1.200 | 5.800 |
-+------------+-------+-------+
++---------------------+--------+-------------+--------+
+| Functionality       |  iters | micros/iter |   diff |
+|---------------------+--------+-------------+--------|
+| EmptyLoop           |  10000 |       1.800 |  0.000 |
+| DirectScheduling    |  10000 |       2.800 |  1.000 |
+| CoroutineScheduling |  10000 |       6.800 |  5.000 |
++---------------------+--------+-------------+--------+
 
 ```
 
@@ -137,7 +147,7 @@ CPU:
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.1
+* SparkFun SAMD Core 1.8.1
 
 ```
 Sizes of Objects:
@@ -146,11 +156,13 @@ sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
 CPU:
-+------------+-------+-------+
-| AceRoutine |  base |  diff |
-|------------+-------+-------|
-|      2.133 | 0.233 | 1.900 |
-+------------+-------+-------+
++---------------------+--------+-------------+--------+
+| Functionality       |  iters | micros/iter |   diff |
+|---------------------+--------+-------------+--------|
+| EmptyLoop           |  30000 |       0.200 |  0.000 |
+| DirectScheduling    |  30000 |       0.633 |  0.433 |
+| CoroutineScheduling |  30000 |       2.133 |  1.933 |
++---------------------+--------+-------------+--------+
 
 ```
 
@@ -167,11 +179,13 @@ sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
 CPU:
-+------------+-------+-------+
-| AceRoutine |  base |  diff |
-|------------+-------+-------|
-|      1.466 | 0.166 | 1.300 |
-+------------+-------+-------+
++---------------------+--------+-------------+--------+
+| Functionality       |  iters | micros/iter |   diff |
+|---------------------+--------+-------------+--------|
+| EmptyLoop           |  30000 |       0.166 |  0.000 |
+| DirectScheduling    |  30000 |       0.500 |  0.334 |
+| CoroutineScheduling |  30000 |       1.533 |  1.367 |
++---------------------+--------+-------------+--------+
 
 ```
 
@@ -188,11 +202,13 @@ sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
 CPU:
-+------------+-------+-------+
-| AceRoutine |  base |  diff |
-|------------+-------+-------|
-|      1.300 | 0.100 | 1.200 |
-+------------+-------+-------+
++---------------------+--------+-------------+--------+
+| Functionality       |  iters | micros/iter |   diff |
+|---------------------+--------+-------------+--------|
+| EmptyLoop           |  10000 |       0.100 |  0.000 |
+| DirectScheduling    |  10000 |       0.500 |  0.400 |
+| CoroutineScheduling |  10000 |       1.200 |  1.100 |
++---------------------+--------+-------------+--------+
 
 ```
 
@@ -209,11 +225,13 @@ sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
 CPU:
-+------------+-------+-------+
-| AceRoutine |  base |  diff |
-|------------+-------+-------|
-|      0.366 | 0.066 | 0.300 |
-+------------+-------+-------+
++---------------------+--------+-------------+--------+
+| Functionality       |  iters | micros/iter |   diff |
+|---------------------+--------+-------------+--------|
+| EmptyLoop           |  30000 |       0.066 |  0.000 |
+| DirectScheduling    |  30000 |       0.100 |  0.034 |
+| CoroutineScheduling |  30000 |       0.366 |  0.300 |
++---------------------+--------+-------------+--------+
 
 ```
 
@@ -231,11 +249,13 @@ sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
 CPU:
-+------------+-------+-------+
-| AceRoutine |  base |  diff |
-|------------+-------+-------|
-|      0.600 | 0.066 | 0.534 |
-+------------+-------+-------+
++---------------------+--------+-------------+--------+
+| Functionality       |  iters | micros/iter |   diff |
+|---------------------+--------+-------------+--------|
+| EmptyLoop           |  30000 |       0.066 |  0.000 |
+| DirectScheduling    |  30000 |       0.233 |  0.167 |
+| CoroutineScheduling |  30000 |       0.566 |  0.500 |
++---------------------+--------+-------------+--------+
 
 ```
 

@@ -3,5 +3,7 @@ sizeof(Coroutine): 11
 sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
 BENCHMARKS
-7.000 1.200 5.800
+EmptyLoop 1.800 10000
+DirectScheduling 2.800 10000
+CoroutineScheduling 6.800 10000
 END

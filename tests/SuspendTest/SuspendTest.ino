@@ -8,6 +8,7 @@ using ace_routine::Coroutine;
 using ace_routine::CoroutineScheduler;
 using aunit::TestRunner;
 using ace_common::PrintStr;
+using ace_common::printfTo;
 
 // ---------------------------------------------------------------------------
 // Test Coroutine.suspend() and resume() methods. Before v1.2, calling
@@ -23,37 +24,40 @@ class TestRoutine : public Coroutine {
     }
 };
 
-TestRoutine routine1;
+// Must be defined in reverse order to the order expected below.
 TestRoutine routine2;
+TestRoutine routine1;
 
 test(suspendAndResume) {
-  PrintStr<256> output;
-
+  PrintStr<100> output;
   CoroutineScheduler::list(output);
-  assertEqual(
-    F("Coroutine routine1; status: Yielding\r\n"
-      "Coroutine routine2; status: Yielding\r\n"),
-    output.getCstr()
-  );
+
+  PrintStr<100> expected;
+  printfTo(expected, "Coroutine %ld; status: Yielding\r\n",
+      (uintptr_t) &routine1);
+  printfTo(expected, "Coroutine %ld; status: Yielding\r\n",
+      (uintptr_t) &routine2);
+  assertEqual(expected.cstr(), output.cstr());
 
   output.flush();
+  expected.flush();
   routine2.suspend();
   CoroutineScheduler::list(output);
-  assertEqual(
-    F("Coroutine routine1; status: Yielding\r\n"
-      "Coroutine routine2; status: Suspended\r\n"),
-    output.getCstr()
-  );
+  printfTo(expected, "Coroutine %ld; status: Yielding\r\n",
+      (uintptr_t) &routine1);
+  printfTo(expected, "Coroutine %ld; status: Suspended\r\n",
+      (uintptr_t) &routine2);
+  assertEqual(expected.cstr(), output.cstr());
 
   output.flush();
+  expected.flush();
   routine2.resume();
   CoroutineScheduler::list(output);
-  assertEqual(
-    F("Coroutine routine1; status: Yielding\r\n"
-      "Coroutine routine2; status: Yielding\r\n"),
-    output.getCstr()
-  );
-
+  printfTo(expected, "Coroutine %ld; status: Yielding\r\n",
+      (uintptr_t) &routine1);
+  printfTo(expected, "Coroutine %ld; status: Yielding\r\n",
+      (uintptr_t) &routine2);
+  assertEqual(expected.cstr(), output.cstr());
 }
 
 // ---------------------------------------------------------------------------
@@ -65,12 +69,6 @@ void setup() {
 
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
-
-  // Use setupCoroutineOrderedByName() to get a deterministic ordering of
-  // coroutines, so that the output of CoroutineScheduler::list() is
-  // predictable.
-  routine1.setupCoroutineOrderedByName("routine1");
-  routine2.setupCoroutineOrderedByName("routine2");
 }
 
 void loop() {

@@ -106,7 +106,7 @@ class CoroutineSchedulerTemplate {
 
     #if ACE_ROUTINE_DEBUG == 1
       Serial.print(F("Processing "));
-      (*mCurrent)->getName().printTo(Serial);
+      Serial.print((uintptr_t) (*mCurrent));
       Serial.println();
     #endif
 
@@ -146,7 +146,7 @@ class CoroutineSchedulerTemplate {
       for (T_COROUTINE** p = T_COROUTINE::getRoot(); (*p) != nullptr;
           p = (*p)->getNext()) {
         printer.print(F("Coroutine "));
-        (*p)->getName().printTo(printer);
+        printer.print((uintptr_t) *p);
         printer.print(F("; status: "));
         (*p)->statusPrintTo(printer);
         printer.println();

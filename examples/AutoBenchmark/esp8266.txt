@@ -1,5 +1,5 @@
 SIZEOF
-sizeof(Coroutine): 28
+sizeof(Coroutine): 20
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 BENCHMARKS

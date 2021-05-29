@@ -129,8 +129,6 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
 
-  master.setupCoroutine("master");
-  slave.setupCoroutine("slave");
   CoroutineScheduler::setup();
 
   Serial.println(

@@ -110,6 +110,10 @@ $ make README.md
       `Coroutine::coroutineMicros()`, `Coroutine::coroutineSeconds()`) with
       static calls to `ClockInterface` template class.
         * 10-40% performance improvement of `CoroutineScheduler::loop()`.
+    * Remove `COROUTINE_DELAY_SECONDS()` and `COROUTINE_DELAY_MICROS()` which
+      eliminates the `mDelayType` discriminator, saving 1 byte on AVR.
+    * Remove `Coroutine::mName` (type `ace_common::FCString`) which saves
+      3 bytes on AVR, and 8 bytes on 32-bit processors.
 
 ## Arduino Nano
 

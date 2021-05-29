@@ -127,7 +127,6 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // needed for Leonardo/Micro
 
-  soundRoutine.setupCoroutine("soundRoutine");
   CoroutineScheduler::setup();
 }
 

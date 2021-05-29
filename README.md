@@ -42,17 +42,17 @@ their life cycle:
 Here are some of the compelling features of this library compared to
 others (in my opinion of course):
 * low memory usage
-    * each coroutine consumes only 15 bytes of RAM on 8-bit processors (AVR) and
-      28 bytes on 32-bit processors (ARM, ESP8266, ESP32)
+    * each coroutine consumes only 11 bytes of static RAM on 8-bit processors
+      (AVR) and 20 bytes on 32-bit processors (ARM, ESP8266, ESP32)
     * the `CoroutineScheduler` consumes only 2 bytes (8-bit) or 4 bytes (32-bit)
-      no matter how many coroutines are active
+      of static memory no matter how many coroutines are active
 * extremely fast context switching
-    * ~5.3 microseconds on a 16 MHz ATmega328P
-    * ~2.5 microseconds on a 48 MHz SAMD21
-    * ~1.8 microseconds on a 72 MHz STM32
-    * ~1.5 microseconds on a 80 MHz ESP8266
-    * ~0.4 microseconds on a 240 MHz ESP32
-    * ~1.0 microseconds on 96 MHz Teensy 3.2 (depending on compiler settings)
+    * ~6.0 microseconds on a 16 MHz ATmega328P
+    * ~1.9 microseconds on a 48 MHz SAMD21
+    * ~1.3 microseconds on a 72 MHz STM32
+    * ~1.2 microseconds on a 80 MHz ESP8266
+    * ~0.3 microseconds on a 240 MHz ESP32
+    * ~0.5 microseconds on 96 MHz Teensy 3.2 (depending on compiler settings)
 * uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
   feature of the GCC compiler (also supported by Clang) to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
@@ -425,11 +425,11 @@ advantages:
 All objects are statically allocated (i.e. not heap or stack).
 
 * 8-bit processors (AVR Nano, UNO, etc):
-    * `sizeof(Coroutine)`: 15
+    * `sizeof(Coroutine)`: 11
     * `sizeof(CoroutineScheduler)`: 2
     * `sizeof(Channel<int>)`: 5
 * 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32)
-    * `sizeof(Coroutine)`: 28
+    * `sizeof(Coroutine)`: 20
     * `sizeof(CoroutineScheduler)`: 4
     * `sizeof(Channel<int>)`: 12
 
@@ -439,7 +439,9 @@ In other words, you can create 100 `Coroutine` instances and they would use only
 The `CoroutineScheduler` consumes only 2 bytes of memory no matter how many
 coroutines are created. That's because it depends on a singly-linked list whose
 pointers live on the `Coroutine` object, not in the `CoroutineScheduler`. But
-the code for the class increases flash memory usage by about 150 bytes.
+using the `CoroutineScheduler::loop()` instead of calling
+`Coroutine::runCoroutine()` manually increases flash memory usage by about 110
+bytes.
 
 The `Channel` object requires 2 copies of the parameterized `<T>` type so its
 size is equal to `1 + 2 * sizeof(T)`, rounded to the nearest memory alignment
@@ -452,16 +454,58 @@ The [examples/MemoryBenchmark](examples/MemoryBenchmark) program gathers
 flash and memory consumption numbers for various boards (AVR, ESP8266, ESP32,
 etc) for a handful of AceRoutine features. Here are some highlights:
 
-* AVR (e.g. Nano)
-    * 1 Coroutine: 500 bytes
-    * 2 Coroutines: 700 bytes
-    * `CoroutineScheduler()` + 1 Coroutine: 600 bytes
-    * `CoroutineScheduler()` + 2 Coroutines: 750 bytes
-* ESP8266
-    * 1 Coroutine: 350 bytes
-    * 2 Coroutines: 600 bytes
-    * `CoroutineScheduler()` + 1 Coroutine: 640 bytes
-    * `CoroutineScheduler()` + 2 Coroutines: 760 bytes
+**AVR (e.g. Nano)**
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| Baseline                        |    606/   11 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| One Delay Function              |    654/   13 |    48/    2 |
+| Two Delay Functions             |    714/   15 |   108/    4 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   |    840/   30 |   234/   19 |
+| Two Coroutines                  |   1010/   47 |   404/   36 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        |    946/   32 |   340/   21 |
+| Scheduler, Two Coroutines       |   1058/   43 |   452/   32 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |    938/   14 |   332/    3 |
+| Blink Coroutine                 |   1154/   30 |   548/   19 |
++--------------------------------------------------------------+
+```
+
+**ESP8266**
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| Baseline                        | 256924/26800 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| One Delay Function              | 256988/26808 |    64/    8 |
+| Two Delay Functions             | 257052/26808 |   128/    8 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   | 257104/26820 |   180/   20 |
+| Two Coroutines                  | 257264/26844 |   340/   44 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        | 257152/26828 |   228/   28 |
+| Scheduler, Two Coroutines       | 257232/26844 |   308/   44 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  | 257424/26816 |   500/   16 |
+| Blink Coroutine                 | 257556/26836 |   632/   36 |
++--------------------------------------------------------------+
+```
+
+Comparing `Blink Function` and `Blink Coroutine` is probably the most
+fair comparison, because they implement the exact same functionality. The `Blink
+Function` implements the asymmetric blink (HIGH and LOW having different
+durations) functionality using a simple, non-blocking function with an internal
+`prevMillis` static variable. The `Blink Coroutine` implements the exact same
+logic using an AceRoutine `Coroutine`. The `Coroutine` version is far more
+readable and maintainable, with only about 220 additional bytes of flash on AVR,
+and 130 bytes on an ESP8266.
 
 <a name="CPU"></a>
 ### CPU
@@ -524,10 +568,6 @@ checks on MacOS 10.14.5.
 
 <a name="FeedbackAndSupport"></a>
 ## Feedback and Support
-
-If you find this library useful, consider starring this project on GitHub. The
-stars will let me prioritize the more popular libraries over the less popular
-ones.
 
 If you have any questions, comments and other support questions about how to
 use this library, please use the

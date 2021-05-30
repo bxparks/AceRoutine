@@ -499,6 +499,14 @@ class CoroutineTemplate {
           : delayMillis;
     }
 
+    /**
+     * Returns the current millisecond clock. By default it returns the global
+     * millis() function from Arduino but can be overridden for testing.
+     */
+    static unsigned long coroutineMillis() {
+      return T_CLOCK::millis();
+    }
+
   private:
     // Disable copy-constructor and assignment operator
     CoroutineTemplate(const CoroutineTemplate&) = delete;
@@ -534,14 +542,6 @@ class CoroutineTemplate {
       CoroutineTemplate** root = getRoot();
       mNext = *root;
       *root = this;
-    }
-
-    /**
-     * Returns the current millisecond clock. By default it returns the global
-     * millis() function from Arduino but can be overridden for testing.
-     */
-    static unsigned long coroutineMillis() {
-      return T_CLOCK::millis();
     }
 
   protected:

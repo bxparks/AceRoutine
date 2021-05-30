@@ -115,7 +115,7 @@ volatile int disableCompilerOptimization = 0;
 
 #elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES
 
-  class MyCoroutine : public Coroutine {
+  class MyCoroutineA : public Coroutine {
     public:
       int runCoroutine() override {
         COROUTINE_LOOP() {
@@ -125,8 +125,18 @@ volatile int disableCompilerOptimization = 0;
       }
   };
 
-  MyCoroutine a;
-  MyCoroutine b;
+  class MyCoroutineB : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY(10);
+        }
+      }
+  };
+
+  MyCoroutineA a;
+  MyCoroutineB b;
 
 #elif FEATURE == FEATURE_BLINK_FUNCTION
 

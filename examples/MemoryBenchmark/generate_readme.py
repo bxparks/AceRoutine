@@ -79,6 +79,11 @@ calculated flash size can jump around in unexpected ways.
       retained. Saves 10-30 bytes of flash and 3 bytes of static memory per
       coroutine instance for AVR; 10-40 bytes and 8 bytes of static memory per
       instance on 32-bit processors.
+    * Use 2 different `Coroutine` subclasses, instead of 2 instances of the same
+      `Coroutine` subclass, for the "Scheduler, Two Coroutines" benchmark . This
+      makes it more functionally equal to the "Two Coroutines" benchmark which
+      automatically creates 2 different subclasses through the `COROUTINE()`
+      macro. Increases flash memory by 80-130 bytes across the board.
 
 ## How to Generate
 

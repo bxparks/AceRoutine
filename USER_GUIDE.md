@@ -4,7 +4,7 @@ See the [README.md](README.md) for installation instructions and other
 background information. This document describes how to use the library once it
 is installed.
 
-**Version**: 1.3 (2021-05-27)
+**Version**: 1.3 (2021-05-29)
 
 ## Table of Contents
 
@@ -28,9 +28,9 @@ is installed.
     * [Macros As Statements](#MacrosAsStatements)
     * [Chaining Coroutines](#ChainingCoroutines)
 * [Running and Scheduling](#RunningAndScheduling)
-    * [Manual Scheduling](#ManualScheduling)
+    * [Direct Scheduling](#DirectScheduling)
     * [CoroutineScheduler](#CoroutineScheduler)
-    * [Manual Scheduling or CoroutineScheduler](#ManualOrAutomatic)
+    * [Direct Scheduling or CoroutineScheduler](#DirectOrAutomatic)
     * [Suspend and Resume](#SuspendAndResume)
     * [Reset Coroutine](#Reset)
     * [Coroutine States](#States)
@@ -641,12 +641,14 @@ There are 2 ways to run the coroutines:
 * manually calling the coroutines in the `loop()` method, or
 * automatically scheduling and running them using the `CoroutineScheduler`.
 
-<a name="ManualScheduling"></a>
-### Manual Scheduling
+<a name="DirectScheduling"></a>
+### Direct Scheduling
 
-If you have only a small number of coroutines, the manual method may be the
-easiest. This requires you to explicitly call the `runCoroutine()` method of all
-the coroutines that you wish to run in the `loop()` method, like this:
+If you have only a small number of coroutines, the manual method is the
+easiest and fastest way. This requires you to explicitly call the
+`runCoroutine()` method of all the coroutines that you wish to run in the
+`loop()` method, like this:
+
 ```C++
 void loop() {
   blinkLed.runCoroutine();
@@ -654,6 +656,10 @@ void loop() {
   printWorld.runCoroutine();
 }
 ```
+
+Because the `runCoroutine()` method is called directly, instead of through the
+`Coroutine` pointer, the call does *not* suffer the overhead of the `virtual`
+dispatch. It is as if the `virtual` keyword did not exist.
 
 <a name="CoroutineScheduler"></a>
 ### CoroutineScheduler
@@ -663,6 +669,7 @@ defined in multiple `.cpp` files, then the `CoroutineScheduler` will
 make things easy. You just need to call `CoroutineScheduler::setup()`
 in the global `setup()` method, and `CoroutineScheduler::loop()`
 in the global `loop()` method, like this:
+
 ```C++
 void setup() {
   ...
@@ -679,13 +686,7 @@ coroutines that are managed by the scheduler. Each call to
 `CoroutineScheduler::loop()` executes one coroutine in that list in a simple
 round-robin scheduling algorithm.
 
-Prior to v1.3, if you manually subclass the `Coroutine` class to create your own
-[Manual Coroutines](#ManualCoroutines), the `Coroutine::setupCoroutine()` method
-must be called in the global `setup()` so that the coroutine instance is added
-to the `CoroutineScheduler`. In v1.3, calling `setupCoroutine()` is no longer
-necessary because the `Coroutine::Coroutine()` constructor automatically inserts
-itself into the internal singly-linked list. The `setupCoroutine()` is retained
-for backwards compatibility, but is now marked deprecated.
+**Historical Notes**:
 
 Prior to v1.2, the initial ordering was sorted by the `Coroutine::getName()`.
 And calling `suspend()` would remove the coroutine from the internal list
@@ -699,35 +700,54 @@ also considered to be an internal implementation detail that may change in the
 future. Client code should not depend on the implementation details of this
 internal list.
 
+Prior to v1.3, if you manually subclass the `Coroutine` class to create your own
+[Manual Coroutines](#ManualCoroutines), the `Coroutine::setupCoroutine()` method
+must be called in the global `setup()` so that the coroutine instance is added
+to the `CoroutineScheduler`. In v1.3, calling `setupCoroutine()` is no longer
+necessary because the `Coroutine::Coroutine()` constructor automatically inserts
+itself into the internal singly-linked list. The `setupCoroutine()` is retained
+for backwards compatibility, but is now marked deprecated.
+
 Starting with v1.3, the name of the coroutine is no longer saved, and
 `Coroutine::getName()` does not exist anymore. `CoroutineScheduler::list()`
 prints the integer value of the coroutine instance instead of the name of the
 coroutine.
 
-<a name="ManualOrAutomatic"></a> ### Manual Scheduling or CoroutineScheduler
+<a name="DirectOrAutomatic"></a>
+### Direct Scheduling or CoroutineScheduler
 
-Manual scheduling has the smallest context switching overhead between
-coroutines. However, it is not possible to `suspend()` or `resume()` a coroutine
-because those methods affect how the `CoroutineScheduler` chooses to run a
-particular coroutine. Similarly, the list of coroutines in the global `loop()`
-is fixed by the code at compile-time. So when a coroutine finishes with the
-`COROUTINE_END()` macro, it will continue to be called by the `loop()` method.
+Direct scheduling has the smallest context switching overhead between
+coroutines. However, it is not possible to use `Coroutine::suspend()` or
+`Coroutine::resume()` (see below) because those methods change states which are
+used only by the `CoroutineScheduler`. Each time you create a new coroutine, you
+must remember to call its `runCoroutine()` method from the global `loop()`
+function.
 
-The `CoroutineScheduler` is easier to use because it automatically keeps track
-of all coroutines defined by the `COROUTINE()` macro, even if they are
-defined in multiple files. It allows coroutines to be suspended and resumed (see
-below). However, there is a small overhead in switching between coroutines
-because the scheduler needs to walk down the list of active coroutines to find
-the next one.
+Using the `CoroutineScheduler` to call `Coroutine::runCoroutine()` is easier
+because the `CoroutineScheduler` automatically keeps track of all coroutines
+defined by the `COROUTINE()` macro, even if they are defined in multiple files.
+The `CoroutineScheduler` also allows coroutines to be suspended and resumed
+using the `Coroutine::suspend()` and `Coroutine::resume()` methods. However,
+using the `CoroutineScheduler` consumes more memory resources and CPU overhead:
 
-The scheduler may choose to remove coroutines which are not running from the
-active list. If there are a significant number of these inactive coroutines,
-then the `CoroutineScheduler` can be more efficient than manually calling the
-coroutines through the global `loop()` method. However, as of v1.2, suspended
-coroutines are *not* removed from the scheduling list (see
-[Issue #19](https://github.com/bxparks/AceRoutine/issues/19)
-for reasons), so the `CoroutineScheduler` is actually slightly less efficient,
-but the difference is probably not worth worrying about for almost all cases.
+* The `CoroutineScheduler` needs to walk down a linked list of `Coroutine`
+  instances to find the next one.
+* The `CoroutineScheduler` calls `Coroutine::runCoroutine()` through the
+  `Coroutine` pointer, which causes the `virtual` method dispatch to be used.
+  That consumes several extra cycles of CPU (a few microseconds) and extra
+  memory (probably in the 20-40 byte range).
+
+The [MemoryBenchmark](examples/MemoryBenchmark) results show that using a
+`CoroutineScheduler` consumes about 30-70 extra bytes of flash memory per
+`Coroutine` instance, compared to directly calling the
+`Coroutine::runRoutine()`.
+
+My recommendation is that on 8-bit processors (e.g. Arduino Nano, Uno, SparkFun
+ProMicro) with limited memory, the Direct Scheduling should be used where
+`Coroutine::runCoroutine()` is directly called from the global `loop()`. On
+32-bit processors with enough flash memory, the `CoroutineScheduler` can be used
+if you want the convenience and extra flexibility that `CoroutineScheduler`, and
+you don't mind the extra flash memory and CPU overhead.
 
 <a name="SuspendAndResume"></a>
 ### Suspend and Resume
@@ -823,8 +843,8 @@ You can query these internal states using the following methods on the
 * `Coroutine::isEnding()`
 * `Coroutine::isTerminated()`
 * `Coroutine::isDone()`: same as `isEnding() || isTerminated()`. This method
-  is preferred because it works when the `Coroutine` is executed manually or
-  through the `CoroutineScheduler`.
+  is preferred because it works when the `Coroutine::runCoroutine()` is executed
+  directly or through the `CoroutineScheduler`.
 
 Prior to v1.2, there was a small operational difference between `kStatusEnding`
 and `kStatusTerminated`. A terminated coroutine was removed from the internal

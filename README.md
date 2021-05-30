@@ -56,12 +56,22 @@ others (in my opinion of course):
         * `CoroutineScheduler` consumes only about 40-60 bytes of flash
           and 4 bytes of static RAM independent of the number of coroutines
 * extremely fast context switching
-    * ~6.0 microseconds on a 16 MHz ATmega328P
-    * ~1.9 microseconds on a 48 MHz SAMD21
-    * ~1.3 microseconds on a 72 MHz STM32
-    * ~1.2 microseconds on a 80 MHz ESP8266
-    * ~0.3 microseconds on a 240 MHz ESP32
-    * ~0.5 microseconds on 96 MHz Teensy 3.2 (depending on compiler settings)
+    * Direct Scheduling (call `Coroutine::runCoroutine()` directly)
+        * ~1.2 microseconds on a 16 MHz ATmega328P
+        * ~0.4 microseconds on a 48 MHz SAMD21
+        * ~0.3 microseconds on a 72 MHz STM32
+        * ~0.4 microseconds on a 80 MHz ESP8266
+        * ~0.03 microseconds on a 240 MHz ESP32
+        * ~0.17 microseconds on 96 MHz Teensy 3.2 (depending on compiler
+          settings)
+    * Coroutine Scheduling (use `CoroutineScheduler::loop()`):
+        * ~5.2 microseconds on a 16 MHz ATmega328P
+        * ~1.9 microseconds on a 48 MHz SAMD21
+        * ~1.4 microseconds on a 72 MHz STM32
+        * ~1.1 microseconds on a 80 MHz ESP8266
+        * ~0.3 microseconds on a 240 MHz ESP32
+        * ~0.5 microseconds on 96 MHz Teensy 3.2 (depending on compiler
+          settings)
 * uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
   feature of the GCC compiler (also supported by Clang) to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
@@ -92,7 +102,7 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.3 (2021-05-27)
+**Version**: 1.3 (2021-05-29)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 

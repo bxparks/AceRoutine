@@ -1,7 +1,7 @@
 # Changelog
 
 * Unreleased
-* 1.3.0 (2021-05-28)
+* 1.3.0 (2021-05-29)
     * Activate GitHub Discussions for the project.
     * **Potentially Breaking**: Change `Coroutine` destructor from virtual to
       non-virtual.
@@ -69,6 +69,11 @@
     * Blacklist platforms using the https://github.com/arduino/ArduinoCore-api
       to give a user-friendly message instead of pages and pages of compiler
       errors.
+    * Update
+      [Direct Scheduling or CoroutineScheduler](USER_GUIDE.md#DirectOrAutomatic)
+      section to recommend direct calls to `Coroutine::runCoroutine()` on 8-bit
+      processors, and limit the `CoroutineScheduler` to 32-bit processors with
+      sufficient flash memory.
 * 1.2.4 (2021-01-22)
     * Update UnixHostDuino 0.4 to EpoxyDuino 0.5.
     * No functional change in this release.

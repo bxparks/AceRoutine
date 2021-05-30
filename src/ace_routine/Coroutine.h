@@ -135,7 +135,7 @@ extern className##_##name name
 
 /** Mark the beginning of a coroutine. */
 #define COROUTINE_BEGIN() \
-    void* p = getJump(); \
+    void* p = this->getJump(); \
     if (p != nullptr) { \
       goto *p; \
     }
@@ -155,7 +155,7 @@ extern className##_##name name
 #define COROUTINE_YIELD_INTERNAL() \
     do { \
       __label__ jumpLabel; \
-      setJump(&& jumpLabel); \
+      this->setJump(&& jumpLabel); \
       return 0; \
       jumpLabel: ; \
     } while (false)
@@ -163,9 +163,9 @@ extern className##_##name name
 /** Yield execution to another coroutine. */
 #define COROUTINE_YIELD() \
     do { \
-      setYielding(); \
+      this->setYielding(); \
       COROUTINE_YIELD_INTERNAL(); \
-      setRunning(); \
+      this->setRunning(); \
     } while (false)
 
 /**
@@ -204,12 +204,12 @@ extern className##_##name name
  */
 #define COROUTINE_DELAY(delayMillis) \
     do { \
-      setDelayMillis(delayMillis); \
-      setDelaying(); \
+      this->setDelayMillis(delayMillis); \
+      this->setDelaying(); \
       do { \
         COROUTINE_YIELD_INTERNAL(); \
-      } while (!isDelayExpired()); \
-      setRunning(); \
+      } while (!this->isDelayExpired()); \
+      this->setRunning(); \
     } while (false)
 
 /**
@@ -219,8 +219,8 @@ extern className##_##name name
 #define COROUTINE_END() \
     do { \
       __label__ jumpLabel; \
-      setEnding(); \
-      setJump(&& jumpLabel); \
+      this->setEnding(); \
+      this->setJump(&& jumpLabel); \
       jumpLabel: ; \
       return 0; \
     } while (false)

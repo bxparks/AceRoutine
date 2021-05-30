@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <Arduino.h>
-#include <AceCommon.h> // udiv1000()
 
 namespace ace_routine {
 

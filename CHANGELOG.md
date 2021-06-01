@@ -1,7 +1,7 @@
 # Changelog
 
 * Unreleased
-* 1.3.0 (2021-05-29)
+* 1.3.0 (2021-06-01)
     * Activate GitHub Discussions for the project.
     * **Potentially Breaking**: Change `Coroutine` destructor from virtual to
       non-virtual.

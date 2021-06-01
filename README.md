@@ -7,6 +7,10 @@ for this project is now active! Let's use that for general support questions,
 and reserve the [GitHub Issues](https://github.com/bxparks/AceRoutine/issues)
 section for bugs and feature requests.
 
+**Breaking Changes in v1.3**: Breaking changes were made in v1.3 to reduce the
+flash memory consumption of `Coroutine` instances by 800-1000 bytes. See the
+[CHANGELOG.md](CHANGELOG.md) for a complete list.
+
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
 
@@ -86,11 +90,11 @@ Some limitations are:
 * A `Coroutine` is stackless and therefore cannot preserve local stack variables
   across multiple calls. Often the class member variables or function static
   variables are reasonable substitutes.
-* Coroutines are currently designed to be statically allocated, not dynamically
-  created and destroyed. This is mostly because dynamic memory allocation
-  on an 8-bit microcontroller with 2kB of RAM should probably be avoided.
-  Dynamically created coroutines may be added in the future for 32-bit
-  microcontrollers which have far more memory.
+* Coroutines are designed to be statically allocated, not dynamically created
+  and destroyed on the heap. Dynamic memory allocation on an 8-bit
+  microcontroller with 2kB of RAM would cause too much heap fragmentation. And
+  the virtual destructor pulls in `malloc()` and `free()` which increases flash
+  memory by 600 bytes on AVR processors.
 * A `Channel` is an experimental feature and has limited features. It is
   currently an unbuffered, synchronized channel. It can be used by only one
   reader and one writer.
@@ -102,12 +106,9 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.3 (2021-05-29)
+**Version**: 1.3 (2021-06-01)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
-
-**Important Change in v1.1**: This library now depends on the AceCommon library
-(https://github.com/bxparks/AceCommon). See the *Installation* section below.
 
 ## Table of Contents
 

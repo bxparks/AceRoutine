@@ -52,6 +52,7 @@ class SuspendTest_suspendAndResume;
  */
 
 // https://stackoverflow.com/questions/295120
+/** Macro that indicates a deprecation. */
 #if defined(__GNUC__) || defined(__clang__)
   #define ACE_ROUTINE_DEPRECATED __attribute__((deprecated))
 #elif defined(_MSC_VER)
@@ -545,13 +546,28 @@ class CoroutineTemplate {
     }
 
   protected:
+    /** Pointer to the next coroutine in a singly-linked list. */
     CoroutineTemplate* mNext = nullptr;
+
+    /** Address of the label used by the computed-goto. */
     void* mJumpPoint = nullptr;
+
+    /** Run-state of the coroutine. */
     Status mStatus = kStatusYielding;
-    uint16_t mDelayStart; // millis
-    uint16_t mDelayDuration; // millis
+
+    /** Start time the COROUTINE_DELAY() macro in milliseconds. */
+    uint16_t mDelayStart;
+
+    /** Delay time specified by the COROUTINE_DELAY() macro in milliseconds. */
+    uint16_t mDelayDuration;
 };
 
+/**
+ * A concrete template instance of CoroutineTemplate that uses the built-in
+ * millis() function. This becomes the base class of all user-defined coroutines
+ * created using the COROUTINE() macro or through manual subclassing of this
+ * class.
+ */
 using Coroutine = CoroutineTemplate<ClockInterface>;
 
 }

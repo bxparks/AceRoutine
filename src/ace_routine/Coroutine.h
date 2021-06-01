@@ -495,6 +495,9 @@ class CoroutineTemplate {
      */
     void setDelayMillis(uint16_t delayMillis) {
       mDelayStart = coroutineMillis();
+
+      // If delayMillis is a compile-time constant, the compiler seems to
+      // completely optimize away this bounds checking code.
       mDelayDuration = (delayMillis >= UINT16_MAX / 2)
           ? UINT16_MAX / 2
           : delayMillis;

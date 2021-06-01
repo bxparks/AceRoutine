@@ -1,4 +1,15 @@
 var searchData=
 [
-  ['write_112',['write',['../classace__routine_1_1Channel.html#ad7fa46d27162b4ec9ffa257f3881931d',1,'ace_routine::Channel::write()'],['../classace__routine_1_1Channel.html#a1134e9c905c7c0bb7255f208534355d8',1,'ace_routine::Channel::write(const T &amp;value)']]]
+  ['setdelaying_94',['setDelaying',['../classace__routine_1_1CoroutineTemplate.html#a7a8d70181ccc338b1290d42515fd38df',1,'ace_routine::CoroutineTemplate']]],
+  ['setdelaymillis_95',['setDelayMillis',['../classace__routine_1_1CoroutineTemplate.html#a93165b1090754d1d62f8816dfdfe05b4',1,'ace_routine::CoroutineTemplate']]],
+  ['setending_96',['setEnding',['../classace__routine_1_1CoroutineTemplate.html#aa62660adbbd4dd79b1534c98b997f11f',1,'ace_routine::CoroutineTemplate']]],
+  ['setjump_97',['setJump',['../classace__routine_1_1CoroutineTemplate.html#ad2f9173ec47abb7bc44356376b84310b',1,'ace_routine::CoroutineTemplate']]],
+  ['setrunning_98',['setRunning',['../classace__routine_1_1CoroutineTemplate.html#a4e4cf5b9c25b340e040578a57382a70c',1,'ace_routine::CoroutineTemplate']]],
+  ['setterminated_99',['setTerminated',['../classace__routine_1_1CoroutineTemplate.html#a76bbbd068a1a8a4e762e7834d28f38ed',1,'ace_routine::CoroutineTemplate']]],
+  ['setup_100',['setup',['../classace__routine_1_1CoroutineSchedulerTemplate.html#ac792080cdec6db9f6539a446d7af587c',1,'ace_routine::CoroutineSchedulerTemplate']]],
+  ['setupcoroutine_101',['setupCoroutine',['../classace__routine_1_1CoroutineTemplate.html#ab386f5cb35ee03f927c72c281fe3518b',1,'ace_routine::CoroutineTemplate::setupCoroutine(const char *) ACE_ROUTINE_DEPRECATED'],['../classace__routine_1_1CoroutineTemplate.html#ab24d05e1a1c581a40cce8d4a85695aee',1,'ace_routine::CoroutineTemplate::setupCoroutine(const __FlashStringHelper *) ACE_ROUTINE_DEPRECATED']]],
+  ['setvalue_102',['setValue',['../classace__routine_1_1Channel.html#ab950ccdf77fdfaeea67ac19031733229',1,'ace_routine::Channel']]],
+  ['setyielding_103',['setYielding',['../classace__routine_1_1CoroutineTemplate.html#adf41ef1dfedfb5bb2fcd3ff1285bc100',1,'ace_routine::CoroutineTemplate']]],
+  ['statusprintto_104',['statusPrintTo',['../classace__routine_1_1CoroutineTemplate.html#a4429565a460dd3fe53a61ecf60557a76',1,'ace_routine::CoroutineTemplate']]],
+  ['suspend_105',['suspend',['../classace__routine_1_1CoroutineTemplate.html#af106a49c67a4c2920bdc1ac527bad7d5',1,'ace_routine::CoroutineTemplate']]]
 ];

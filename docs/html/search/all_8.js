@@ -1,7 +1,9 @@
 var searchData=
 [
-  ['read_48',['read',['../classace__routine_1_1Channel.html#a931ce2344667a4b36e76bb4f8f3b70a0',1,'ace_routine::Channel']]],
-  ['reset_49',['reset',['../classace__routine_1_1Coroutine.html#aa6e334380f6a057b3487a930c52ae96a',1,'ace_routine::Coroutine']]],
-  ['resume_50',['resume',['../classace__routine_1_1Coroutine.html#ad29d0f43128b49c48a71a167331dac51',1,'ace_routine::Coroutine']]],
-  ['runcoroutine_51',['runCoroutine',['../classace__routine_1_1Coroutine.html#a08a2c559cf86917aac8b702354ab61e4',1,'ace_routine::Coroutine']]]
+  ['mdelayduration_43',['mDelayDuration',['../classace__routine_1_1CoroutineTemplate.html#ac1180a32fdf2953c758f864ce775301f',1,'ace_routine::CoroutineTemplate']]],
+  ['mdelaystart_44',['mDelayStart',['../classace__routine_1_1CoroutineTemplate.html#a1b61128fe005b2f4bbeb7f647c367dfa',1,'ace_routine::CoroutineTemplate']]],
+  ['millis_45',['millis',['../classace__routine_1_1ClockInterface.html#aeb6701bd63ee8fb7dbb81efaf0ac02bf',1,'ace_routine::ClockInterface']]],
+  ['mjumppoint_46',['mJumpPoint',['../classace__routine_1_1CoroutineTemplate.html#acfd2bb74feb52ea24de73339a9c97b4d',1,'ace_routine::CoroutineTemplate']]],
+  ['mnext_47',['mNext',['../classace__routine_1_1CoroutineTemplate.html#a3a7f50c509463e57ac5ece39992a8ae5',1,'ace_routine::CoroutineTemplate']]],
+  ['mstatus_48',['mStatus',['../classace__routine_1_1CoroutineTemplate.html#a9e60528d72bf9887c7d9102028b46665',1,'ace_routine::CoroutineTemplate']]]
 ];

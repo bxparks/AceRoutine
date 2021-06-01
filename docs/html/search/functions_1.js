@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['getjump_80',['getJump',['../classace__routine_1_1Coroutine.html#aefae39030b3e5ee90eb1099d818f4d7d',1,'ace_routine::Coroutine']]],
-  ['getname_81',['getName',['../classace__routine_1_1Coroutine.html#a6ee1f35bacffebf86c79c22a62fa8891',1,'ace_routine::Coroutine']]],
-  ['getstatus_82',['getStatus',['../classace__routine_1_1Coroutine.html#a5418ff8930ad549fff574ff40c9bdaee',1,'ace_routine::Coroutine']]]
+  ['getjump_77',['getJump',['../classace__routine_1_1CoroutineTemplate.html#a84d4aaee5d3ba3750e78574908f2ba11',1,'ace_routine::CoroutineTemplate']]],
+  ['getstatus_78',['getStatus',['../classace__routine_1_1CoroutineTemplate.html#ae849b9399fefd59231c31c96c3ee19cf',1,'ace_routine::CoroutineTemplate']]]
 ];

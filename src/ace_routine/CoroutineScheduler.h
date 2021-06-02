@@ -113,17 +113,12 @@ class CoroutineSchedulerTemplate {
       // Handle the coroutine's dispatch back to the last known internal status.
       switch ((*mCurrent)->getStatus()) {
         case T_COROUTINE::kStatusYielding:
-          (*mCurrent)->runCoroutine();
-          break;
-
         case T_COROUTINE::kStatusDelaying:
-          // Check isDelayExpired() here to optimize away an extra call into the
-          // Coroutine::runCoroutine(). Everything would still work if we just
-          // dispatched into the Coroutine::runCoroutine() because that method
-          // checks isDelayExpired() as well.
-          if ((*mCurrent)->isDelayExpired()) {
-            (*mCurrent)->runCoroutine();
-          }
+          // The coroutine itself knows whether it is yielding or delaying, and
+          // its continuation context determines whether to call
+          // Coroutine::isDelayExpired(), Coroutine::isDelayMicrosExpired(), or
+          // Coroutine::isDelaySecondsExpired().
+          (*mCurrent)->runCoroutine();
           break;
 
         case T_COROUTINE::kStatusEnding:

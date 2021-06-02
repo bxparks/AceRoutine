@@ -5,5 +5,5 @@ sizeof(Channel<int>): 12
 BENCHMARKS
 EmptyLoop 0.166 30000
 DirectScheduling 0.500 30000
-CoroutineScheduling 1.533 30000
+CoroutineScheduling 1.100 30000
 END

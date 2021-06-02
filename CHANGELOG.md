@@ -1,6 +1,19 @@
 # Changelog
 
 * Unreleased
+    * Bring back `COROUTINE_DELAY_MICROS()` and `COROUTINE_DELAY_SECONDS(),
+      with an alternate implemenation that increases flash and static memory
+      *only* if they are used.
+        * The `Coroutine` itself knows whether it is delaying in units of
+          milliseconds, microseconds, or seconds, based on its continuation
+          point.
+        * Make `CoroutineScheduler::runCoroutine()` always call into
+          `Coroutine::runCoroutine()` when the `Coroutine::mStatus` is delaying,
+          instead of preemptively trying to figure out if the delay has expired.
+        * `Coroutine` does not need a runtime `mDelayType` descriminator.
+        * The result is that the code to support `COROUTINE_DELAY_MICROS()` and
+          `COROUTINE_DELAY_SECONDS()` is not pulled into the program if they are
+          not used.
 * 1.3.0 (2021-06-02)
     * Activate GitHub Discussions for the project.
     * **Potentially Breaking**: Change `Coroutine` destructor from virtual to
@@ -12,7 +25,7 @@
     * **Potentially Breaking**: Lift `Coroutine` into `CoroutineTemplate` class.
       Lift `CoroutineScheduler` into `CoroutineSchedulerTemplate` class.
         * Define `Coroutine` to be `CoroutineTemplate<ClockInterface>`, almost
-        * fully backwards compatible with previous implementation.
+          fully backwards compatible with previous implementation.
         * Define `CoroutineScheduler` to be
           `CoroutineSchedulerTemplate<Coroutine>`, almost fully backwards
           compatible with previous implementation.

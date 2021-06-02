@@ -39,6 +39,10 @@ their life cycle:
 * `COROUTINE_AWAIT(condition)`: yield until `condition` becomes `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
+* `COROUTINE_DELAY_MICROS(micros)`: yields back execution for `micros`. The
+  `micros` parameter is defined as a `uint16_t`.
+* `COROUTINE_DELAY_SECONDS(seconds)`: yields back execution for
+  `seconds`. The `seconds` parameter is defined as a `uint16_t`.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
 * `COROUTINE_CHANNEL_WRITE(channel, value)`: writes a value to a `Channel`
 * `COROUTINE_CHANNEL_READ(channel, value)`: reads a value from a `Channel`
@@ -64,16 +68,16 @@ others (in my opinion of course):
         * ~1.2 microseconds on a 16 MHz ATmega328P
         * ~0.4 microseconds on a 48 MHz SAMD21
         * ~0.3 microseconds on a 72 MHz STM32
-        * ~0.4 microseconds on a 80 MHz ESP8266
-        * ~0.03 microseconds on a 240 MHz ESP32
+        * ~0.3 microseconds on a 80 MHz ESP8266
+        * ~0.1 microseconds on a 240 MHz ESP32
         * ~0.17 microseconds on 96 MHz Teensy 3.2 (depending on compiler
           settings)
     * Coroutine Scheduling (use `CoroutineScheduler::loop()`):
-        * ~5.2 microseconds on a 16 MHz ATmega328P
-        * ~1.9 microseconds on a 48 MHz SAMD21
-        * ~1.4 microseconds on a 72 MHz STM32
-        * ~1.1 microseconds on a 80 MHz ESP8266
-        * ~0.3 microseconds on a 240 MHz ESP32
+        * ~5.5 microseconds on a 16 MHz ATmega328P
+        * ~1.3 microseconds on a 48 MHz SAMD21
+        * ~0.9 microseconds on a 72 MHz STM32
+        * ~0.6 microseconds on a 80 MHz ESP8266
+        * ~0.2 microseconds on a 240 MHz ESP32
         * ~0.5 microseconds on 96 MHz Teensy 3.2 (depending on compiler
           settings)
 * uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
@@ -501,45 +505,69 @@ etc) for a handful of AceRoutine features. Here are some highlights:
 **Arduino Nano (8-bits)**
 
 ```
-+--------------------------------------------------------------+
-| functionality                   |  flash/  ram |       delta |
-|---------------------------------+--------------+-------------|
-| Baseline                        |    606/   11 |     0/    0 |
-|---------------------------------+--------------+-------------|
-| One Delay Function              |    654/   13 |    48/    2 |
-| Two Delay Functions             |    714/   15 |   108/    4 |
-|---------------------------------+--------------+-------------|
-| One Coroutine                   |    840/   30 |   234/   19 |
-| Two Coroutines                  |   1010/   47 |   404/   36 |
-|---------------------------------+--------------+-------------|
-| Scheduler, One Coroutine        |    946/   32 |   340/   21 |
-| Scheduler, Two Coroutines       |   1058/   43 |   452/   32 |
-|---------------------------------+--------------+-------------|
-| Blink Function                  |    938/   14 |   332/    3 |
-| Blink Coroutine                 |   1154/   30 |   548/   19 |
-+--------------------------------------------------------------+
++------------------------------------------------------------------+
+| functionality                       |  flash/  ram |       delta |
+|-------------------------------------+--------------+-------------|
+| Baseline                            |    400/   11 |     0/    0 |
+|-------------------------------------+--------------+-------------|
+| One Delay Function                  |    450/   13 |    50/    2 |
+| Two Delay Functions                 |    508/   15 |   108/    4 |
+|-------------------------------------+--------------+-------------|
+| One Coroutine                       |    628/   30 |   228/   19 |
+| Two Coroutines                      |    796/   47 |   396/   36 |
+|-------------------------------------+--------------+-------------|
+| One Coroutine (micros)              |    596/   30 |   196/   19 |
+| Two Coroutines (micros)             |    732/   47 |   332/   36 |
+|-------------------------------------+--------------+-------------|
+| One Coroutine (seconds)             |    724/   30 |   324/   19 |
+| Two Coroutines (seconds)            |    920/   47 |   520/   36 |
+|-------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine            |    742/   32 |   342/   21 |
+| Scheduler, Two Coroutines           |    904/   49 |   504/   38 |
+|-------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine (micros)   |    710/   32 |   310/   21 |
+| Scheduler, Two Coroutines (micros)  |    840/   49 |   440/   38 |
+|-------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine (seconds)  |    838/   32 |   438/   21 |
+| Scheduler, Two Coroutines (seconds) |   1028/   49 |   628/   38 |
+|-------------------------------------+--------------+-------------|
+| Blink Function                      |    546/   14 |   146/    3 |
+| Blink Coroutine                     |    752/   30 |   352/   19 |
++------------------------------------------------------------------+
 ```
 
 **ESP8266 (32-bits)**
 
 ```
-+--------------------------------------------------------------+
-| functionality                   |  flash/  ram |       delta |
-|---------------------------------+--------------+-------------|
-| Baseline                        | 256924/26800 |     0/    0 |
-|---------------------------------+--------------+-------------|
-| One Delay Function              | 256988/26808 |    64/    8 |
-| Two Delay Functions             | 257052/26808 |   128/    8 |
-|---------------------------------+--------------+-------------|
-| One Coroutine                   | 257104/26820 |   180/   20 |
-| Two Coroutines                  | 257264/26844 |   340/   44 |
-|---------------------------------+--------------+-------------|
-| Scheduler, One Coroutine        | 257152/26828 |   228/   28 |
-| Scheduler, Two Coroutines       | 257232/26844 |   308/   44 |
-|---------------------------------+--------------+-------------|
-| Blink Function                  | 257424/26816 |   500/   16 |
-| Blink Coroutine                 | 257556/26836 |   632/   36 |
-+--------------------------------------------------------------+
++------------------------------------------------------------------+
+| functionality                       |  flash/  ram |       delta |
+|-------------------------------------+--------------+-------------|
+| Baseline                            | 256924/26800 |     0/    0 |
+|-------------------------------------+--------------+-------------|
+| One Delay Function                  | 256988/26808 |    64/    8 |
+| Two Delay Functions                 | 257052/26808 |   128/    8 |
+|-------------------------------------+--------------+-------------|
+| One Coroutine                       | 257104/26820 |   180/   20 |
+| Two Coroutines                      | 257264/26844 |   340/   44 |
+|-------------------------------------+--------------+-------------|
+| One Coroutine (micros)              | 257136/26820 |   212/   20 |
+| Two Coroutines (micros)             | 257296/26844 |   372/   44 |
+|-------------------------------------+--------------+-------------|
+| One Coroutine (seconds)             | 257136/26820 |   212/   20 |
+| Two Coroutines (seconds)            | 257312/26844 |   388/   44 |
+|-------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine            | 257152/26828 |   228/   28 |
+| Scheduler, Two Coroutines           | 257280/26844 |   356/   44 |
+|-------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine (micros)   | 257168/26828 |   244/   28 |
+| Scheduler, Two Coroutines (micros)  | 257312/26844 |   388/   44 |
+|-------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine (seconds)  | 257168/26828 |   244/   28 |
+| Scheduler, Two Coroutines (seconds) | 257328/26844 |   404/   44 |
+|-------------------------------------+--------------+-------------|
+| Blink Function                      | 257424/26816 |   500/   16 |
+| Blink Coroutine                     | 257556/26836 |   632/   36 |
++------------------------------------------------------------------+
 ```
 
 Comparing `Blink Function` and `Blink Coroutine` is probably the most
@@ -567,7 +595,7 @@ Arduino Nano:
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  10000 |       1.700 |  0.000 |
 | DirectScheduling    |  10000 |       2.900 |  1.200 |
-| CoroutineScheduling |  10000 |       6.900 |  5.200 |
+| CoroutineScheduling |  10000 |       7.200 |  5.500 |
 +---------------------+--------+-------------+--------+
 ```
 
@@ -577,9 +605,9 @@ ESP8266:
 +---------------------+--------+-------------+--------+
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       0.100 |  0.000 |
-| DirectScheduling    |  10000 |       0.500 |  0.400 |
-| CoroutineScheduling |  10000 |       1.200 |  1.100 |
+| EmptyLoop           |  10000 |       0.200 |  0.000 |
+| DirectScheduling    |  10000 |       0.500 |  0.300 |
+| CoroutineScheduling |  10000 |       0.800 |  0.600 |
 +---------------------+--------+-------------+--------+
 ```
 

@@ -181,11 +181,11 @@ extern className##_##name name
  */
 #define COROUTINE_AWAIT(condition) \
     do { \
-      setYielding(); \
+      this->setYielding(); \
       do { \
         COROUTINE_YIELD_INTERNAL(); \
       } while (!(condition)); \
-      setRunning(); \
+      this->setRunning(); \
     } while (false)
 
 /**
@@ -210,6 +210,42 @@ extern className##_##name name
       do { \
         COROUTINE_YIELD_INTERNAL(); \
       } while (!this->isDelayExpired()); \
+      this->setRunning(); \
+    } while (false)
+
+/** Yield for delayMicros. Similiar to COROUTINE_DELAY(delayMillis). */
+#define COROUTINE_DELAY_MICROS(delayMicros) \
+    do { \
+      this->setDelayMicros(delayMicros); \
+      this->setDelaying(); \
+      do { \
+        COROUTINE_YIELD_INTERNAL(); \
+      } while (!this->isDelayMicrosExpired()); \
+      this->setRunning(); \
+    } while (false)
+
+/**
+ * Yield for delaySeconds. Similar to COROUTINE_DELAY(delayMillis).
+ *
+ * The accuracy of the delay interval in units of seconds is not perfectly
+ * accurate. The current implementation uses the builtin millis() to infer the
+ * "seconds". The millis() function returns a value that overflows after
+ * 4,294,967.296 seconds. Therefore, the last inferred second just before
+ * overflowing contains only 0.296 seconds instead of a full second. A delay
+ * which straddles this overflow will return 0.704 seconds earlier than it
+ * should.
+ *
+ * On microcontrollers without hardware integer division instruction, (i.e. AVR,
+ * SAMD21, ESP8266), the division by 1000 is relatively slow and consumes
+ * significant amount of flash memory (100-150 bytes on AVR).
+ */
+#define COROUTINE_DELAY_SECONDS(delaySeconds) \
+    do { \
+      this->setDelaySeconds(delaySeconds); \
+      this->setDelaying(); \
+      do { \
+        COROUTINE_YIELD_INTERNAL(); \
+      } while (!this->isDelaySecondsExpired()); \
       this->setRunning(); \
     } while (false)
 
@@ -307,10 +343,24 @@ class CoroutineTemplate {
       mJumpPoint = nullptr;
     }
 
-    /** Check if delay time is over. */
+    /** Check if delay millis time is over. */
     bool isDelayExpired() const {
-      uint16_t now = coroutineMillis();
-      uint16_t elapsed = now - mDelayStart;
+      uint16_t nowMillis = coroutineMillis();
+      uint16_t elapsed = nowMillis - mDelayStart;
+      return elapsed >= mDelayDuration;
+    }
+
+    /** Check if delay micros time is over. */
+    bool isDelayMicrosExpired() const {
+      uint16_t nowMicros = coroutineMicros();
+      uint16_t elapsed = nowMicros - mDelayStart;
+      return elapsed >= mDelayDuration;
+    }
+
+    /** Check if delay seconds time is over. */
+    bool isDelaySecondsExpired() const {
+      uint16_t nowSeconds = coroutineSeconds();
+      uint16_t elapsed = nowSeconds - mDelayStart;
       return elapsed >= mDelayDuration;
     }
 
@@ -504,11 +554,59 @@ class CoroutineTemplate {
     }
 
     /**
+     * Configure the delay timer for delayMicros. Similar to seDelayMillis(),
+     * the maximum delay is 32767 micros.
+     */
+    void setDelayMicros(uint16_t delayMicros) {
+      mDelayStart = coroutineMicros();
+
+      // If delayMicros is a compile-time constant, the compiler seems to
+      // completely optimize away this bounds checking code.
+      mDelayDuration = (delayMicros >= UINT16_MAX / 2)
+          ? UINT16_MAX / 2
+          : delayMicros;
+    }
+
+    /**
+     * Configure the delay timer for delaySeconds. Similar to seDelayMillis(),
+     * the maximum delay is 32767 seconds.
+     */
+    void setDelaySeconds(uint16_t delaySeconds) {
+      mDelayStart = coroutineSeconds();
+
+      // If delaySeconds is a compile-time constant, the compiler seems to
+      // completely optimize away this bounds checking code.
+      mDelayDuration = (delaySeconds >= UINT16_MAX / 2)
+          ? UINT16_MAX / 2
+          : delaySeconds;
+    }
+
+    /**
      * Returns the current millisecond clock. By default it returns the global
-     * millis() function from Arduino but can be overridden for testing.
+     * millis() function from Arduino but can be overridden by providing a
+     * different T_CLOCK template parameter.
      */
     static unsigned long coroutineMillis() {
       return T_CLOCK::millis();
+    }
+
+    /**
+     * Returns the current microseconds clock. By default it returns the global
+     * micros() function from Arduino but can be overridden by providing a
+     * different T_CLOCK template parameter.
+     */
+    static unsigned long coroutineMicros() {
+      return T_CLOCK::micros();
+    }
+
+    /**
+     * Returns the current clock in unit of seconds, truncated to the lower
+     * 16-bits. This is an approximation of (millis / 1000). It does not need
+     * to be perfectly accurate because COROUTINE_DELAY_SECONDS() is not
+     * guaranteed to be precise.
+     */
+    static unsigned long coroutineSeconds() {
+      return T_CLOCK::seconds();
     }
 
   private:
@@ -558,18 +656,26 @@ class CoroutineTemplate {
     /** Run-state of the coroutine. */
     Status mStatus = kStatusYielding;
 
-    /** Start time the COROUTINE_DELAY() macro in milliseconds. */
+    /**
+     * Start time provided by COROUTINE_DELAY(), COROUTINE_DELAY_MICROS(), or
+     * COROUTINE_DELAY_SECONDS(). The unit of this number is context dependent,
+     * milliseconds, microseconds, or seconds.
+     */
     uint16_t mDelayStart;
 
-    /** Delay time specified by the COROUTINE_DELAY() macro in milliseconds. */
+    /**
+     * Delay time specified by COROUTINE_DELAY(), COROUTINE_DELAY_MICROS() or,
+     * COROUTINE_DELAY_SECONDS(). The unit of this number is context dependent,
+     * milliseconds, microseconds, or seconds.
+     */
     uint16_t mDelayDuration;
 };
 
 /**
- * A concrete template instance of CoroutineTemplate that uses the built-in
- * millis() function. This becomes the base class of all user-defined coroutines
- * created using the COROUTINE() macro or through manual subclassing of this
- * class.
+ * A concrete template instance of CoroutineTemplate that uses ClockInterface
+ * which uses the built-in millis() or micros() function. This becomes the base
+ * class of all user-defined coroutines created using the COROUTINE() macro or
+ * through manual subclassing of this class.
  */
 using Coroutine = CoroutineTemplate<ClockInterface>;
 

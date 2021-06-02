@@ -120,6 +120,17 @@ $ make README.md
       eliminates the `mDelayType` discriminator, saving 1 byte on AVR.
     * Remove `Coroutine::mName` (type `ace_common::FCString`) which saves
       3 bytes on AVR, and 8 bytes on 32-bit processors.
+* v1.3.1
+    * Bring back `COROUTINE_DELAY_MICROS()` and `COROUTINE_DELAY_SECONDS()`,
+      using an alternate implementation that increases flash and static memory
+      consumption *only* if they are used.
+    * `CoroutineScheduler::runCoroutine()` now always calls
+      `Coroutine::runCoroutine()` when in Delaying state, without trying to
+      optimize the test for `isDelayXxxExpired()`.
+        * Makes `CoroutineScheduler` slightly smaller in flash size.
+        * Makes `CoroutineScheduler` slightly slower on AVR processors (e.g. 5.2
+          -> 5.5 micros on AVR) , but is actually *faster* on 32-bit processors
+          (e.g. 1.100 -> 0.600 micros on ESP8266).
 
 ## Arduino Nano
 

@@ -106,7 +106,7 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.3 (2021-06-01)
+**Version**: 1.3 (2021-06-02)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 

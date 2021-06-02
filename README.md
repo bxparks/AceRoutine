@@ -123,6 +123,9 @@ additional macros that can reduce boilerplate code.
     * [Flash Memory](#FlashMemory)
     * [CPU](#CPU)
 * [System Requirements](#SystemRequirements)
+    * [Hardware](#Hardware)
+    * [Tool Chain](#ToolChain)
+    * [Operating System](#OperatingSystem)
 * [License](#LicenseSystemRequirements)
 * [Feedback and Support](#FeedbackAndSupport)
 * [Authors](#Authors)
@@ -540,12 +543,13 @@ of AceRoutine context switching is about 6 micros on an 8-bit AVR, to as low as
 <a name="SystemRequirements"></a>
 ## System Requirements
 
+<a name="Hardware"></a>
 ### Hardware
 
-The library has been extensively tested on the following boards:
+The library has Tier 1 support on the following boards:
 
-* Arduino Nano clone (16 MHz ATmega328P)
-* SparkFun Pro Micro clone (16 MHz ATmega32U4)
+* Arduino Nano (16 MHz ATmega328P)
+* SparkFun Pro Micro (16 MHz ATmega32U4)
 * SAMD21 M0 Mini (48 MHz ARM Cortex-M0+)
 * STM32 Blue Pill (STM32F103C8, 72 MHz ARM Cortex-M3)
 * NodeMCU 1.0 (ESP-12E module, 80 MHz ESP8266)
@@ -553,12 +557,23 @@ The library has been extensively tested on the following boards:
 * ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
 * Teensy 3.2 (96 MHz ARM Cortex-M4)
 
-I will occasionally test on the following hardware as a sanity check:
+Tier 2 support can be expected on the following boards, mostly because I don't
+test these as often:
 
-* Arduino Pro Mini clone (16 MHz ATmega328P)
+* ATtiny85 (8 MHz ATtiny85)
+* Arduino Pro Mini (16 MHz ATmega328P)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 * Teensy LC (48 MHz ARM Cortex-M0+)
 
+The following boards are **not** supported:
+
+* Any platform using the ArduinoCore-API
+  (https://github.com/arduino/ArduinoCore-api). For example:
+    * Nano Every
+    * MKRZero
+    * Raspberry Pi Pico RP2040
+
+<a name="ToolChain"></a>
 ### Tool Chain
 
 This library was developed and tested using:
@@ -579,6 +594,7 @@ not tested it.
 The library works on Linux or MacOS (using both g++ and clang++ compilers) using
 the [EpoxyDuino](https://github.com/bxparks/EpoxyDuino) emulation layer.
 
+<a name="OperatingSystem"></a>
 ### Operating System
 
 I use Ubuntu 18.04 and 20.04 for most of my development and sometimes do sanity

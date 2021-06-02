@@ -2,7 +2,7 @@
 
 * Unreleased
 * 1.3.1 (2021-06-02)
-    * Bring back `COROUTINE_DELAY_MICROS()` and `COROUTINE_DELAY_SECONDS(),
+    * Bring back `COROUTINE_DELAY_MICROS()` and `COROUTINE_DELAY_SECONDS()`
       with an alternate implemenation that increases flash and static memory
       *only* if they are used.
         * The `Coroutine` itself knows whether it is delaying in units of
@@ -11,7 +11,7 @@
         * Make `CoroutineScheduler::runCoroutine()` always call into
           `Coroutine::runCoroutine()` when the `Coroutine::mStatus` is delaying,
           instead of preemptively trying to figure out if the delay has expired.
-        * `Coroutine` does not need a runtime `mDelayType` descriminator.
+        * `Coroutine` no longer needs a runtime `mDelayType` descriminator.
         * The result is that the code to support `COROUTINE_DELAY_MICROS()` and
           `COROUTINE_DELAY_SECONDS()` is not pulled into the program if they are
           not used.

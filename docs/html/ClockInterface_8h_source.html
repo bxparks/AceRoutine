@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">1.3.0</span>
+   &#160;<span id="projectnumber">1.3.1</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -106,14 +106,20 @@ $(function() {
 <div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classace__routine_1_1ClockInterface.html">   40</a></span>&#160;<span class="keyword">class </span><a class="code" href="classace__routine_1_1ClockInterface.html">ClockInterface</a> {</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="classace__routine_1_1ClockInterface.html#aeb6701bd63ee8fb7dbb81efaf0ac02bf">   43</a></span>&#160;    <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code" href="classace__routine_1_1ClockInterface.html#aeb6701bd63ee8fb7dbb81efaf0ac02bf">millis</a>() { return ::millis(); }</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;};</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;}</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="classace__routine_1_1ClockInterface.html#ab8963dc53edb04d3ab800eac7c3b358e">   46</a></span>&#160;    <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code" href="classace__routine_1_1ClockInterface.html#ab8963dc53edb04d3ab800eac7c3b358e">micros</a>() { return ::micros(); }</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno"><a class="line" href="classace__routine_1_1ClockInterface.html#a03c0d39e0167f8a8e7c41f09d19d2861">   63</a></span>&#160;    <span class="keyword">static</span> <span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <a class="code" href="classace__routine_1_1ClockInterface.html#a03c0d39e0167f8a8e7c41f09d19d2861">seconds</a>() { return ::millis() / 1000; }</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;};</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;}</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="aclassace__routine_1_1ClockInterface_html_aeb6701bd63ee8fb7dbb81efaf0ac02bf"><div class="ttname"><a href="classace__routine_1_1ClockInterface.html#aeb6701bd63ee8fb7dbb81efaf0ac02bf">ace_routine::ClockInterface::millis</a></div><div class="ttdeci">static unsigned long millis()</div><div class="ttdoc">Get the current millis.</div><div class="ttdef"><b>Definition:</b> <a href="ClockInterface_8h_source.html#l00043">ClockInterface.h:43</a></div></div>
+<div class="ttc" id="aclassace__routine_1_1ClockInterface_html_a03c0d39e0167f8a8e7c41f09d19d2861"><div class="ttname"><a href="classace__routine_1_1ClockInterface.html#a03c0d39e0167f8a8e7c41f09d19d2861">ace_routine::ClockInterface::seconds</a></div><div class="ttdeci">static unsigned long seconds()</div><div class="ttdoc">Get the current seconds.</div><div class="ttdef"><b>Definition:</b> <a href="ClockInterface_8h_source.html#l00063">ClockInterface.h:63</a></div></div>
 <div class="ttc" id="aclassace__routine_1_1ClockInterface_html"><div class="ttname"><a href="classace__routine_1_1ClockInterface.html">ace_routine::ClockInterface</a></div><div class="ttdoc">A utility class (all methods are static) that provides a layer of indirection to Arduino clock functi...</div><div class="ttdef"><b>Definition:</b> <a href="ClockInterface_8h_source.html#l00040">ClockInterface.h:40</a></div></div>
+<div class="ttc" id="aclassace__routine_1_1ClockInterface_html_ab8963dc53edb04d3ab800eac7c3b358e"><div class="ttname"><a href="classace__routine_1_1ClockInterface.html#ab8963dc53edb04d3ab800eac7c3b358e">ace_routine::ClockInterface::micros</a></div><div class="ttdeci">static unsigned long micros()</div><div class="ttdoc">Get the current micros.</div><div class="ttdef"><b>Definition:</b> <a href="ClockInterface_8h_source.html#l00046">ClockInterface.h:46</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

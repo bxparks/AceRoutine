@@ -86,6 +86,19 @@ calculated flash size can jump around in unexpected ways.
       makes it more functionally equal to the "Two Coroutines" benchmark which
       automatically creates 2 different subclasses through the `COROUTINE()`
       macro. Increases flash memory by 80-130 bytes across the board.
+* v1.3.1
+    * Bring back `COROUTINE_DELAY_MICROS()` and `COROUTINE_DELAY_SECONDS()`
+      using an implementation that increases flash and static memory *only* if
+      they are used.
+        * `COROUTINE_DELAY_MICROS()` actually consumes about 30 bytes fewer
+          flash memory (on AVR) than `COROUTINE_DELAY()`, probably because there
+          is additional overhead in the Arduino `millis()` function compared to
+          `micros()`.
+        * `COROUTINE_DELAY_SECONDS()` consumes about 100 bytes more flash memory
+          (on AVR) compared to `COROUTINE_DELAY()` because of the division by
+          1000 which must be done in software on 8-bit processors.
+        * The `CoroutineScheduler` is forced to become simpler  which reduces
+          flash usage by 10-20 bytes.
 
 ## How to Generate
 
@@ -100,6 +113,7 @@ $ make benchmarks
 produces the following files:
 
 ```
+attiny.txt
 nano.txt
 micro.txt
 samd.txt

@@ -41,6 +41,26 @@ class ClockInterface {
   public:
     /** Get the current millis. */
     static unsigned long millis() { return ::millis(); }
+
+    /** Get the current micros. */
+    static unsigned long micros() { return ::micros(); }
+
+    /**
+     * Get the current seconds. This is derived by dividing millis() by 1000,
+     * which works pretty well until the `unsigned long` rolls over at
+     * 4294967296 milliseconds. At that last second (4294967), this function
+     * returns the next second (0) a little bit too early. More precisely, it
+     * rolls over to 0 seconds 704 milliseconds too early. If the
+     * COROUTINE_DELAY_SECONDS() is large enough, this inaccuracy should not
+     * matter too much.
+     *
+     * The other problem with this function is that on 8-bit processors without
+     * a hardware division instruction, the software long division by 1000 is
+     * very expensive in both memory and CPU. The flash memory increases by
+     * about 150 bytes on AVR processors. Therefore, the
+     * COROUTINE_DELAY_SECONDS() should be used sparingly.
+     */
+    static unsigned long seconds() { return ::millis() / 1000; }
 };
 
 }

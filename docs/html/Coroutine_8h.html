@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">1.3.0</span>
+   &#160;<span id="projectnumber">1.3.1</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -166,6 +166,12 @@ Macros</h2></td></tr>
 <tr class="memitem:a1391503960a4b0c48f8200f1ffa0e305"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Coroutine_8h.html#a1391503960a4b0c48f8200f1ffa0e305">COROUTINE_DELAY</a>(delayMillis)</td></tr>
 <tr class="memdesc:a1391503960a4b0c48f8200f1ffa0e305"><td class="mdescLeft">&#160;</td><td class="mdescRight">Yield for delayMillis.  <a href="Coroutine_8h.html#a1391503960a4b0c48f8200f1ffa0e305">More...</a><br /></td></tr>
 <tr class="separator:a1391503960a4b0c48f8200f1ffa0e305"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b620a90274d05b92509c1c5eb4666f2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Coroutine_8h.html#a4b620a90274d05b92509c1c5eb4666f2">COROUTINE_DELAY_MICROS</a>(delayMicros)</td></tr>
+<tr class="memdesc:a4b620a90274d05b92509c1c5eb4666f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Yield for delayMicros.  <a href="Coroutine_8h.html#a4b620a90274d05b92509c1c5eb4666f2">More...</a><br /></td></tr>
+<tr class="separator:a4b620a90274d05b92509c1c5eb4666f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80fbf69742a91980a58f719edc8920db"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Coroutine_8h.html#a80fbf69742a91980a58f719edc8920db">COROUTINE_DELAY_SECONDS</a>(delaySeconds)</td></tr>
+<tr class="memdesc:a80fbf69742a91980a58f719edc8920db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Yield for delaySeconds.  <a href="Coroutine_8h.html#a80fbf69742a91980a58f719edc8920db">More...</a><br /></td></tr>
+<tr class="separator:a80fbf69742a91980a58f719edc8920db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e326a8df652c46c42a8d713ddc67bd7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Coroutine_8h.html#a7e326a8df652c46c42a8d713ddc67bd7">COROUTINE_END</a>()</td></tr>
 <tr class="memdesc:a7e326a8df652c46c42a8d713ddc67bd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark the end of a coroutine.  <a href="Coroutine_8h.html#a7e326a8df652c46c42a8d713ddc67bd7">More...</a><br /></td></tr>
 <tr class="separator:a7e326a8df652c46c42a8d713ddc67bd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -173,7 +179,7 @@ Macros</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:a9971a0ed5c7ba49921d0aa2dbc8f83b0"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="Coroutine_8h.html#a9971a0ed5c7ba49921d0aa2dbc8f83b0">ace_routine::Coroutine</a> = CoroutineTemplate&lt; ClockInterface &gt;</td></tr>
-<tr class="memdesc:a9971a0ed5c7ba49921d0aa2dbc8f83b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A concrete template instance of <a class="el" href="classace__routine_1_1CoroutineTemplate.html" title="Base class of all coroutines.">CoroutineTemplate</a> that uses the built-in millis() function.  <a href="Coroutine_8h.html#a9971a0ed5c7ba49921d0aa2dbc8f83b0">More...</a><br /></td></tr>
+<tr class="memdesc:a9971a0ed5c7ba49921d0aa2dbc8f83b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">A concrete template instance of <a class="el" href="classace__routine_1_1CoroutineTemplate.html" title="Base class of all coroutines.">CoroutineTemplate</a> that uses <a class="el" href="classace__routine_1_1ClockInterface.html" title="A utility class (all methods are static) that provides a layer of indirection to Arduino clock functi...">ClockInterface</a> which uses the built-in millis() or micros() function.  <a href="Coroutine_8h.html#a9971a0ed5c7ba49921d0aa2dbc8f83b0">More...</a><br /></td></tr>
 <tr class="separator:a9971a0ed5c7ba49921d0aa2dbc8f83b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -296,11 +302,11 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> { \</div>
-<div class="line">      setYielding(); \</div>
+<div class="line">      this-&gt;setYielding(); \</div>
 <div class="line">      do { \</div>
 <div class="line">        COROUTINE_YIELD_INTERNAL(); \</div>
 <div class="line">      } <span class="keywordflow">while</span> (!(condition)); \</div>
-<div class="line">      setRunning(); \</div>
+<div class="line">      this-&gt;setRunning(); \</div>
 <div class="line">    } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
 </div><!-- fragment -->
 <p>Yield until condition is true, then execution continues. </p>
@@ -370,6 +376,70 @@ Typedefs</h2></td></tr>
 
 </div>
 </div>
+<a id="a4b620a90274d05b92509c1c5eb4666f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b620a90274d05b92509c1c5eb4666f2">&#9670;&nbsp;</a></span>COROUTINE_DELAY_MICROS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define COROUTINE_DELAY_MICROS</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">delayMicros</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> { \</div>
+<div class="line">      this-&gt;setDelayMicros(delayMicros); \</div>
+<div class="line">      this-&gt;setDelaying(); \</div>
+<div class="line">      do { \</div>
+<div class="line">        COROUTINE_YIELD_INTERNAL(); \</div>
+<div class="line">      } <span class="keywordflow">while</span> (!this-&gt;isDelayMicrosExpired()); \</div>
+<div class="line">      this-&gt;setRunning(); \</div>
+<div class="line">    } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
+</div><!-- fragment -->
+<p>Yield for delayMicros. </p>
+<p>Similiar to <a class="el" href="Coroutine_8h.html#a1391503960a4b0c48f8200f1ffa0e305" title="Yield for delayMillis.">COROUTINE_DELAY(delayMillis)</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00217">217</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+
+</div>
+</div>
+<a id="a80fbf69742a91980a58f719edc8920db"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a80fbf69742a91980a58f719edc8920db">&#9670;&nbsp;</a></span>COROUTINE_DELAY_SECONDS</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define COROUTINE_DELAY_SECONDS</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">delaySeconds</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">    <span class="keywordflow">do</span> { \</div>
+<div class="line">      this-&gt;setDelaySeconds(delaySeconds); \</div>
+<div class="line">      this-&gt;setDelaying(); \</div>
+<div class="line">      do { \</div>
+<div class="line">        COROUTINE_YIELD_INTERNAL(); \</div>
+<div class="line">      } <span class="keywordflow">while</span> (!this-&gt;isDelaySecondsExpired()); \</div>
+<div class="line">      this-&gt;setRunning(); \</div>
+<div class="line">    } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
+</div><!-- fragment -->
+<p>Yield for delaySeconds. </p>
+<p>Similar to <a class="el" href="Coroutine_8h.html#a1391503960a4b0c48f8200f1ffa0e305" title="Yield for delayMillis.">COROUTINE_DELAY(delayMillis)</a>.</p>
+<p>The accuracy of the delay interval in units of seconds is not perfectly accurate. The current implementation uses the builtin millis() to infer the "seconds". The millis() function returns a value that overflows after 4,294,967.296 seconds. Therefore, the last inferred second just before overflowing contains only 0.296 seconds instead of a full second. A delay which straddles this overflow will return 0.704 seconds earlier than it should.</p>
+<p>On microcontrollers without hardware integer division instruction, (i.e. AVR, SAMD21, ESP8266), the division by 1000 is relatively slow and consumes significant amount of flash memory (100-150 bytes on AVR). </p>
+
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00242">242</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+
+</div>
+</div>
 <a id="a7e326a8df652c46c42a8d713ddc67bd7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7e326a8df652c46c42a8d713ddc67bd7">&#9670;&nbsp;</a></span>COROUTINE_END</h2>
 
@@ -395,7 +465,7 @@ Typedefs</h2></td></tr>
 <p>Mark the end of a coroutine. </p>
 <p>Subsequent calls to Coroutine::runCoroutine() will do nothing. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00220">220</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00256">256</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -582,10 +652,10 @@ Typedefs</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>A concrete template instance of CoroutineTemplate that uses the built-in millis() function. </p>
+<p>A concrete template instance of CoroutineTemplate that uses ClockInterface which uses the built-in millis() or micros() function. </p>
 <p>This becomes the base class of all user-defined coroutines created using the <a class="el" href="Coroutine_8h.html#ab22e58ab24b1908a7280f13603248ce3" title="Create a Coroutine instance named &#39;name&#39;.">COROUTINE()</a> macro or through manual subclassing of this class. </p>
 
-<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00571">571</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00680">680</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 
 </div>
 </div>
@@ -593,7 +663,7 @@ Typedefs</h2></td></tr>
 <div class="ttc" id="aCoroutine_8h_html_a7b7dc05639a37cb3f51bf348c68db283"><div class="ttname"><a href="Coroutine_8h.html#a7b7dc05639a37cb3f51bf348c68db283">COROUTINE_BEGIN</a></div><div class="ttdeci">#define COROUTINE_BEGIN()</div><div class="ttdoc">Mark the beginning of a coroutine.</div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00138">Coroutine.h:138</a></div></div>
 <div class="ttc" id="aCoroutine_8h_html_af52549e71d4a6f7bd18c4688042776b6"><div class="ttname"><a href="Coroutine_8h.html#af52549e71d4a6f7bd18c4688042776b6">EXTERN_COROUTINE2</a></div><div class="ttdeci">#define EXTERN_COROUTINE2(className, name)</div><div class="ttdoc">Implement the 2-argument EXTERN_COROUTINE() macro.</div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00130">Coroutine.h:130</a></div></div>
 <div class="ttc" id="aCoroutine_8h_html_a682abe1669f9fe28af63d11da5421cbf"><div class="ttname"><a href="Coroutine_8h.html#a682abe1669f9fe28af63d11da5421cbf">COROUTINE_YIELD</a></div><div class="ttdeci">#define COROUTINE_YIELD()</div><div class="ttdoc">Yield execution to another coroutine.</div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00165">Coroutine.h:165</a></div></div>
-<div class="ttc" id="aclassace__routine_1_1CoroutineTemplate_html"><div class="ttname"><a href="classace__routine_1_1CoroutineTemplate.html">ace_routine::CoroutineTemplate</a></div><div class="ttdoc">Base class of all coroutines.</div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00242">Coroutine.h:242</a></div></div>
+<div class="ttc" id="aclassace__routine_1_1CoroutineTemplate_html"><div class="ttname"><a href="classace__routine_1_1CoroutineTemplate.html">ace_routine::CoroutineTemplate</a></div><div class="ttdoc">Base class of all coroutines.</div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00278">Coroutine.h:278</a></div></div>
 <div class="ttc" id="aclassace__routine_1_1CoroutineTemplate_html_a3da6aa3220b54203f050dc97d51b7070"><div class="ttname"><a href="classace__routine_1_1CoroutineTemplate.html#a3da6aa3220b54203f050dc97d51b7070">ace_routine::CoroutineTemplate::runCoroutine</a></div><div class="ttdeci">virtual int runCoroutine()=0</div><div class="ttdoc">The body of the coroutine.</div></div>
 <div class="ttc" id="aCoroutine_8h_html_ab92199c3991124cbb6e5e48e27827dae"><div class="ttname"><a href="Coroutine_8h.html#ab92199c3991124cbb6e5e48e27827dae">EXTERN_COROUTINE1</a></div><div class="ttdeci">#define EXTERN_COROUTINE1(name)</div><div class="ttdoc">Implement the 1-argument EXTERN_COROUTINE() macro.</div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00122">Coroutine.h:122</a></div></div>
 <div class="ttc" id="aCoroutine_8h_html_ab7a5384c8d2a434781a52a7e9b45c24d"><div class="ttname"><a href="Coroutine_8h.html#ab7a5384c8d2a434781a52a7e9b45c24d">GET_EXTERN_COROUTINE</a></div><div class="ttdeci">#define GET_EXTERN_COROUTINE(_1, _2, NAME,...)</div><div class="ttdoc">Internal helper macro to allow overloading of the EXTERN_COROUTINE() macro.</div><div class="ttdef"><b>Definition:</b> <a href="Coroutine_8h_source.html#l00119">Coroutine.h:119</a></div></div>

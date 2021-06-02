@@ -31,11 +31,17 @@ namespace testing {
 class TestableClockInterface {
   public:
     static unsigned long millis() { return sMillis; }
+    static unsigned long micros() { return sMicros; }
+    static unsigned long seconds() { return sSeconds; }
 
     static void setMillis(unsigned long millis) { sMillis = millis; }
+    static void setMicros(unsigned long micros) { sMicros = micros; }
+    static void setSeconds(unsigned long seconds) { sSeconds = seconds; }
 
   public:
     static unsigned long sMillis;
+    static unsigned long sMicros;
+    static unsigned long sSeconds;
 };
 
 } // namespace testing

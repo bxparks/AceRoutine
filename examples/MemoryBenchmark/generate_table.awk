@@ -11,10 +11,18 @@ BEGIN {
   labels[2] = "Two Delay Functions"
   labels[3] = "One Coroutine"
   labels[4] = "Two Coroutines"
-  labels[5] = "Scheduler, One Coroutine"
-  labels[6] = "Scheduler, Two Coroutines"
-  labels[7] = "Blink Function"
-  labels[8] = "Blink Coroutine"
+  labels[5] = "One Coroutine (micros)"
+  labels[6] = "Two Coroutines (micros)"
+  labels[7] = "One Coroutine (seconds)"
+  labels[8] = "Two Coroutines (seconds)"
+  labels[9] = "Scheduler, One Coroutine"
+  labels[10] = "Scheduler, Two Coroutines"
+  labels[11] = "Scheduler, One Coroutine (micros)"
+  labels[12] = "Scheduler, Two Coroutines (micros)"
+  labels[13] = "Scheduler, One Coroutine (seconds)"
+  labels[14] = "Scheduler, Two Coroutines (seconds)"
+  labels[15] = "Blink Function"
+  labels[16] = "Blink Coroutine"
   record_index = 0
 }
 {
@@ -32,19 +40,23 @@ END {
     u[i]["d_ram"] = u[i]["ram"] - base_ram
   }
 
-  printf("+--------------------------------------------------------------+\n")
-  printf("| functionality                   |  flash/  ram |       delta |\n")
+  printf("+------------------------------------------------------------------+\n")
+  printf("| functionality                       |  flash/  ram |       delta |\n")
   for (i = 0; i < NUM_ENTRIES; i++) {
-    if (labels[i] ~ /Baseline/ \
-      || labels[i] ~ /One Delay Function/ \
-      || labels[i] ~ /One Coroutine/ \
-      || labels[i] ~ /Scheduler, One Coroutine/ \
-      || labels[i] ~ /Blink Function/ \
+    if (labels[i] ~ /^Baseline$/ \
+      || labels[i] ~ /^One Delay Function$/ \
+      || labels[i] ~ /^One Coroutine$/ \
+      || labels[i] ~ /^One Coroutine \(micros\)$/ \
+      || labels[i] ~ /^One Coroutine \(seconds\)$/ \
+      || labels[i] ~ /^Scheduler, One Coroutine$/ \
+      || labels[i] ~ /^Scheduler, One Coroutine \(micros\)$/ \
+      || labels[i] ~ /^Scheduler, One Coroutine \(seconds\)$/ \
+      || labels[i] ~ /^Blink Function$/ \
     ) {
-      printf("|---------------------------------+--------------+-------------|\n")
+      printf("|-------------------------------------+--------------+-------------|\n")
     }
-    printf("| %-31s | %6d/%5d | %5d/%5d |\n",
+    printf("| %-35s | %6d/%5d | %5d/%5d |\n",
         labels[i], u[i]["flash"], u[i]["ram"], u[i]["d_flash"], u[i]["d_ram"])
   }
-  printf("+--------------------------------------------------------------+\n")
+  printf("+------------------------------------------------------------------+\n")
 }

@@ -94,6 +94,17 @@ $ make README.md
       eliminates the `mDelayType` discriminator, saving 1 byte on AVR.
     * Remove `Coroutine::mName` (type `ace_common::FCString`) which saves
       3 bytes on AVR, and 8 bytes on 32-bit processors.
+* v1.3.1
+    * Bring back `COROUTINE_DELAY_MICROS()` and `COROUTINE_DELAY_SECONDS()`,
+      using an alternate implementation that increases flash and static memory
+      consumption *only* if they are used.
+    * `CoroutineScheduler::runCoroutine()` now always calls
+      `Coroutine::runCoroutine()` when in Delaying state, without trying to
+      optimize the test for `isDelayXxxExpired()`.
+        * Makes `CoroutineScheduler` slightly smaller in flash size.
+        * Makes `CoroutineScheduler` slightly slower on AVR processors (e.g. 5.2
+          -> 5.5 micros on AVR) , but is actually *faster* on 32-bit processors
+          (e.g. 1.100 -> 0.600 micros on ESP8266).
 
 ## Arduino Nano
 
@@ -114,7 +125,7 @@ CPU:
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  10000 |       1.700 |  0.000 |
 | DirectScheduling    |  10000 |       2.900 |  1.200 |
-| CoroutineScheduling |  10000 |       6.900 |  5.200 |
+| CoroutineScheduling |  10000 |       7.200 |  5.500 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -136,9 +147,9 @@ CPU:
 +---------------------+--------+-------------+--------+
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       1.800 |  0.000 |
-| DirectScheduling    |  10000 |       2.800 |  1.000 |
-| CoroutineScheduling |  10000 |       6.800 |  5.000 |
+| EmptyLoop           |  10000 |       1.700 |  0.000 |
+| DirectScheduling    |  10000 |       2.900 |  1.200 |
+| CoroutineScheduling |  10000 |       7.300 |  5.600 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -161,7 +172,7 @@ CPU:
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  30000 |       0.200 |  0.000 |
 | DirectScheduling    |  30000 |       0.633 |  0.433 |
-| CoroutineScheduling |  30000 |       2.133 |  1.933 |
+| CoroutineScheduling |  30000 |       1.500 |  1.300 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -184,7 +195,7 @@ CPU:
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  30000 |       0.166 |  0.000 |
 | DirectScheduling    |  30000 |       0.500 |  0.334 |
-| CoroutineScheduling |  30000 |       1.533 |  1.367 |
+| CoroutineScheduling |  30000 |       1.100 |  0.934 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -205,9 +216,9 @@ CPU:
 +---------------------+--------+-------------+--------+
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       0.100 |  0.000 |
-| DirectScheduling    |  10000 |       0.500 |  0.400 |
-| CoroutineScheduling |  10000 |       1.200 |  1.100 |
+| EmptyLoop           |  10000 |       0.200 |  0.000 |
+| DirectScheduling    |  10000 |       0.500 |  0.300 |
+| CoroutineScheduling |  10000 |       0.800 |  0.600 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -229,8 +240,8 @@ CPU:
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  30000 |       0.066 |  0.000 |
-| DirectScheduling    |  30000 |       0.100 |  0.034 |
-| CoroutineScheduling |  30000 |       0.366 |  0.300 |
+| DirectScheduling    |  30000 |       0.133 |  0.067 |
+| CoroutineScheduling |  30000 |       0.300 |  0.234 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -254,7 +265,7 @@ CPU:
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  30000 |       0.066 |  0.000 |
 | DirectScheduling    |  30000 |       0.233 |  0.167 |
-| CoroutineScheduling |  30000 |       0.566 |  0.500 |
+| CoroutineScheduling |  30000 |       0.533 |  0.467 |
 +---------------------+--------+-------------+--------+
 
 ```

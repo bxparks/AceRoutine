@@ -20,10 +20,18 @@
 #define FEATURE_TWO_DELAY_FUNCTIONS 2
 #define FEATURE_ONE_COROUTINE 3
 #define FEATURE_TWO_COROUTINES 4
-#define FEATURE_SCHEDULER_ONE_COROUTINE 5
-#define FEATURE_SCHEDULER_TWO_COROUTINES 6
-#define FEATURE_BLINK_FUNCTION 7
-#define FEATURE_BLINK_COROUTINE 8
+#define FEATURE_ONE_COROUTINE_MICROS 5
+#define FEATURE_TWO_COROUTINES_MICROS 6
+#define FEATURE_ONE_COROUTINE_SECONDS 7
+#define FEATURE_TWO_COROUTINES_SECONDS 8
+#define FEATURE_SCHEDULER_ONE_COROUTINE 9
+#define FEATURE_SCHEDULER_TWO_COROUTINES 10
+#define FEATURE_SCHEDULER_ONE_COROUTINE_MICROS 11
+#define FEATURE_SCHEDULER_TWO_COROUTINES_MICROS 12
+#define FEATURE_SCHEDULER_ONE_COROUTINE_SECONDS 13
+#define FEATURE_SCHEDULER_TWO_COROUTINES_SECONDS 14
+#define FEATURE_BLINK_FUNCTION 15
+#define FEATURE_BLINK_COROUTINE 16
 
 #if FEATURE != FEATURE_BASELINE
   #include <AceRoutine.h>
@@ -100,14 +108,65 @@ volatile int disableCompilerOptimization = 0;
     }
   }
 
+#elif FEATURE == FEATURE_ONE_COROUTINE_MICROS
+
+  COROUTINE(a) {
+    COROUTINE_LOOP() {
+      disableCompilerOptimization = 1;
+      COROUTINE_DELAY_MICROS(10);
+    }
+  }
+
+#elif FEATURE == FEATURE_TWO_COROUTINES_MICROS
+
+  COROUTINE(a) {
+    COROUTINE_LOOP() {
+      disableCompilerOptimization = 1;
+      COROUTINE_DELAY_MICROS(10);
+    }
+  }
+
+  COROUTINE(b) {
+    COROUTINE_LOOP() {
+      disableCompilerOptimization = 1;
+      COROUTINE_DELAY_MICROS(10);
+    }
+  }
+
+#elif FEATURE == FEATURE_ONE_COROUTINE_SECONDS
+
+  COROUTINE(a) {
+    COROUTINE_LOOP() {
+      disableCompilerOptimization = 1;
+      COROUTINE_DELAY_SECONDS(10);
+    }
+  }
+
+#elif FEATURE == FEATURE_TWO_COROUTINES_SECONDS
+
+  COROUTINE(a) {
+    COROUTINE_LOOP() {
+      disableCompilerOptimization = 1;
+      COROUTINE_DELAY_SECONDS(10);
+    }
+  }
+
+  COROUTINE(b) {
+    COROUTINE_LOOP() {
+      disableCompilerOptimization = 1;
+      COROUTINE_DELAY_SECONDS(10);
+    }
+  }
+
 #elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE
 
   class MyCoroutine : public Coroutine {
     public:
       int runCoroutine() override {
-        COROUTINE_BEGIN();
-        disableCompilerOptimization = 1;
-        COROUTINE_END();
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY(10);
+        }
       }
   };
 
@@ -131,6 +190,84 @@ volatile int disableCompilerOptimization = 0;
         COROUTINE_LOOP() {
           disableCompilerOptimization = 1;
           COROUTINE_DELAY(10);
+        }
+      }
+  };
+
+  MyCoroutineA a;
+  MyCoroutineB b;
+
+#elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE_MICROS
+
+  class MyCoroutine : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY_MICROS(10);
+        }
+      }
+  };
+
+  MyCoroutine a;
+
+#elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES_MICROS
+
+  class MyCoroutineA : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY_MICROS(10);
+        }
+      }
+  };
+
+  class MyCoroutineB : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY_MICROS(10);
+        }
+      }
+  };
+
+  MyCoroutineA a;
+  MyCoroutineB b;
+
+#elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE_SECONDS
+
+  class MyCoroutine : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY_SECONDS(10);
+        }
+      }
+  };
+
+  MyCoroutine a;
+
+#elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES_SECONDS
+
+  class MyCoroutineA : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY_SECONDS(10);
+        }
+      }
+  };
+
+  class MyCoroutineB : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY_SECONDS(10);
         }
       }
   };
@@ -206,9 +343,27 @@ void loop() {
 #elif FEATURE == FEATURE_TWO_COROUTINES
   a.runCoroutine();
   b.runCoroutine();
+#elif FEATURE == FEATURE_ONE_COROUTINE_MICROS
+  a.runCoroutine();
+#elif FEATURE == FEATURE_TWO_COROUTINES_MICROS
+  a.runCoroutine();
+  b.runCoroutine();
+#elif FEATURE == FEATURE_ONE_COROUTINE_SECONDS
+  a.runCoroutine();
+#elif FEATURE == FEATURE_TWO_COROUTINES_SECONDS
+  a.runCoroutine();
+  b.runCoroutine();
 #elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE
   CoroutineScheduler::loop();
 #elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES
+  CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE_MICROS
+  CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES_MICROS
+  CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE_SECONDS
+  CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES_SECONDS
   CoroutineScheduler::loop();
 #elif FEATURE == FEATURE_BLINK_COROUTINE
   blink.runCoroutine();

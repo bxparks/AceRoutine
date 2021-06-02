@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2018 Brian T. Park
+Copyright (c) 2021 Brian T. Park
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,27 +26,16 @@ SOFTWARE.
 #define ACE_ROUTINE_TESTABLE_COROUTINE_H
 
 #include "../Coroutine.h"
+#include "TestableClockInterface.h"
 
 namespace ace_routine {
 namespace testing {
 
 /**
- * A Coroutine that overrides the coroutineMillis() clock for unit testing
- * purposes.
+ * A version of Coroutine that uses the TestableClockInterface to provide the
+ * clock can for unit testing purposes.
  */
-class TestableCoroutine: public Coroutine {
-  public:
-    unsigned long coroutineMillis() const override { return mMillis; }
-    unsigned long coroutineMicros() const override { return mMicros; }
-    unsigned long coroutineSeconds() const override { return mMillis / 1000; }
-
-    void coroutineMillis(unsigned long millis) { mMillis = millis; }
-    void coroutineMicros(unsigned long micros) { mMicros = micros; }
-
-  private:
-    unsigned long mMillis = 0;
-    unsigned long mMicros = 0;
-};
+using TestableCoroutine = CoroutineTemplate<TestableClockInterface>;
 
 }
 }

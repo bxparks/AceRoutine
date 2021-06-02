@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['list_46',['list',['../classace__routine_1_1CoroutineScheduler.html#ae7ab10e2190115d3d934514965acbade',1,'ace_routine::CoroutineScheduler']]],
-  ['loop_47',['loop',['../classace__routine_1_1CoroutineScheduler.html#a2dd0d1ca2b8fe39bebc1c9b275d7893b',1,'ace_routine::CoroutineScheduler']]]
+  ['list_41',['list',['../classace__routine_1_1CoroutineSchedulerTemplate.html#adfe184942d2691e1b4c8774623722d8e',1,'ace_routine::CoroutineSchedulerTemplate']]],
+  ['loop_42',['loop',['../classace__routine_1_1CoroutineSchedulerTemplate.html#abf192f6066f9a7cc80219461966cba2f',1,'ace_routine::CoroutineSchedulerTemplate']]]
 ];

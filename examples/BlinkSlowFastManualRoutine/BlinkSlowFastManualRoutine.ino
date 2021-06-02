@@ -175,11 +175,6 @@ void setup() {
   pinMode(LED, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
-  // Insert coroutines into the scheduler.
-  blinkFast.setupCoroutine("blinkFast");
-  blinkSlow.setupCoroutine("blinkSlow");
-  buttonCoroutine.setupCoroutine("buttonCoroutine");
-
   CoroutineScheduler::setup();
 }
 

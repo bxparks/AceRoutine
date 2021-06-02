@@ -1,6 +1,15 @@
 # AceRoutine
 
-![AUnit Tests](https://github.com/bxparks/AceRoutine/workflows/AUnit%20Tests/badge.svg)
+[![AUnit Tests](https://github.com/bxparks/AceRoutine/actions/workflows/aunit_tests.yml/badge.svg)](https://github.com/bxparks/AceRoutine/actions/workflows/aunit_tests.yml)
+
+**New**: [GitHub Discussions](https://github.com/bxparks/AceRoutine/discussions)
+for this project is now active! Let's use that for general support questions,
+and reserve the [GitHub Issues](https://github.com/bxparks/AceRoutine/issues)
+section for bugs and feature requests.
+
+**Breaking Changes in v1.3**: Breaking changes were made in v1.3 to reduce the
+flash memory consumption of `Coroutine` instances by 800-1000 bytes. See the
+[CHANGELOG.md](CHANGELOG.md) for a complete list.
 
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
@@ -30,10 +39,6 @@ their life cycle:
 * `COROUTINE_AWAIT(condition)`: yield until `condition` becomes `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The `millis`
   parameter is defined as a `uint16_t`.
-* `COROUTINE_DELAY_MICROS(micros)`: yields back execution for `micros`. The
-  `micros` parameter is defined as a `uint16_t`.
-* `COROUTINE_DELAY_SECONDS(seconds)`: yields back execution for
-  `seconds`. The `seconds` parameter is defined as a `uint16_t`.
 * `COROUTINE_LOOP()`: convenience macro that loops forever
 * `COROUTINE_CHANNEL_WRITE(channel, value)`: writes a value to a `Channel`
 * `COROUTINE_CHANNEL_READ(channel, value)`: reads a value from a `Channel`
@@ -41,17 +46,36 @@ their life cycle:
 Here are some of the compelling features of this library compared to
 others (in my opinion of course):
 * low memory usage
-    * each coroutine consumes only 15 bytes of RAM on 8-bit processors (AVR) and
-      28 bytes on 32-bit processors (ARM, ESP8266, ESP32)
-    * the `CoroutineScheduler` consumes only 2 bytes (8-bit) or 4 bytes (32-bit)
-      no matter how many coroutines are active
+    * 8-bit (e.g. AVR) processors:
+        * the first `Coroutine` consumes about 230 bytes of flash
+        * each additional `Coroutine` consumes 170 bytes of flash
+        * each `Coroutine` consumes 11 bytes of static RAM
+        * `CoroutineScheduler` consumes only about 40 bytes of flash and
+          2 bytes of RAM independent of the number of coroutines
+    * 32-bit (e.g. STM32, ESP8266, ESP32) processors
+        * the first `Coroutine` consumes between 120-450 bytes of flash (except
+          on the Teensy 3.2 where the first instance brings in 3200 bytes)
+        * each additional `Coroutine` consumes about 130-160 bytes of flash,
+        * each `Coroutine` consumes 20 bytes of static RAM
+        * `CoroutineScheduler` consumes only about 40-60 bytes of flash
+          and 4 bytes of static RAM independent of the number of coroutines
 * extremely fast context switching
-    * ~5.3 microseconds on a 16 MHz ATmega328P
-    * ~2.5 microseconds on a 48 MHz SAMD21
-    * ~1.8 microseconds on a 72 MHz STM32
-    * ~1.5 microseconds on a 80 MHz ESP8266
-    * ~0.4 microseconds on a 240 MHz ESP32
-    * ~1.0 microseconds on 96 MHz Teensy 3.2 (depending on compiler settings)
+    * Direct Scheduling (call `Coroutine::runCoroutine()` directly)
+        * ~1.2 microseconds on a 16 MHz ATmega328P
+        * ~0.4 microseconds on a 48 MHz SAMD21
+        * ~0.3 microseconds on a 72 MHz STM32
+        * ~0.4 microseconds on a 80 MHz ESP8266
+        * ~0.03 microseconds on a 240 MHz ESP32
+        * ~0.17 microseconds on 96 MHz Teensy 3.2 (depending on compiler
+          settings)
+    * Coroutine Scheduling (use `CoroutineScheduler::loop()`):
+        * ~5.2 microseconds on a 16 MHz ATmega328P
+        * ~1.9 microseconds on a 48 MHz SAMD21
+        * ~1.4 microseconds on a 72 MHz STM32
+        * ~1.1 microseconds on a 80 MHz ESP8266
+        * ~0.3 microseconds on a 240 MHz ESP32
+        * ~0.5 microseconds on 96 MHz Teensy 3.2 (depending on compiler
+          settings)
 * uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
   feature of the GCC compiler (also supported by Clang) to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
@@ -66,11 +90,11 @@ Some limitations are:
 * A `Coroutine` is stackless and therefore cannot preserve local stack variables
   across multiple calls. Often the class member variables or function static
   variables are reasonable substitutes.
-* Coroutines are currently designed to be statically allocated, not dynamically
-  created and destroyed. This is mostly because dynamic memory allocation
-  on an 8-bit microcontroller with 2kB of RAM should probably be avoided.
-  Dynamically created coroutines may be added in the future for 32-bit
-  microcontrollers which have far more memory.
+* Coroutines are designed to be statically allocated, not dynamically created
+  and destroyed on the heap. Dynamic memory allocation on an 8-bit
+  microcontroller with 2kB of RAM would cause too much heap fragmentation. And
+  the virtual destructor pulls in `malloc()` and `free()` which increases flash
+  memory by 600 bytes on AVR processors.
 * A `Channel` is an experimental feature and has limited features. It is
   currently an unbuffered, synchronized channel. It can be used by only one
   reader and one writer.
@@ -82,16 +106,16 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.2.4 (2021-01-22)
+**Version**: 1.3 (2021-06-02)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
-
-**Important Change in v1.1**: This library now depends on the AceCommon library
-(https://github.com/bxparks/AceCommon). See the *Installation* section below.
 
 ## Table of Contents
 
 * [Hello Coroutines](#HelloCoroutines)
+    * [Hello Coroutine](#HelloCoroutine)
+    * [Hello Scheduler](#HelloScheduler)
+    * [Hello Manual Coroutine](#HelloManualCoroutine)
 * [Installation](#Installation)
     * [Source Code](#SourceCode)
 * [Documentation](#Documentation)
@@ -102,13 +126,17 @@ additional macros that can reduce boilerplate code.
     * [Flash Memory](#FlashMemory)
     * [CPU](#CPU)
 * [System Requirements](#SystemRequirements)
+    * [Hardware](#Hardware)
+    * [Tool Chain](#ToolChain)
+    * [Operating System](#OperatingSystem)
 * [License](#LicenseSystemRequirements)
-* [Feedback](#Feedback)
+* [Feedback and Support](#FeedbackAndSupport)
 * [Authors](#Authors)
 
 <a name="HelloCoroutines"></a>
 ## Hello Coroutines
 
+<a name="HelloCoroutine"></a>
 ### HelloCoroutine
 
 This is the [HelloCoroutine.ino](examples/HelloCoroutine) sample sketch which
@@ -139,7 +167,7 @@ COROUTINE(printHelloWorld) {
     Serial.flush();
     COROUTINE_DELAY(1000);
     Serial.println(F("World"));
-    COROUTINE_DELAY_SECONDS(4);
+    COROUTINE_DELAY(4000);
   }
 }
 
@@ -161,6 +189,7 @@ The `printHelloWorld` coroutine prints "Hello, ", waits 1 second, then prints
 time, the `blinkLed` coroutine blinks the builtin LED on and off, on for 100 ms
 and off for 500 ms.
 
+<a name="HelloScheduler"></a>
 ### HelloScheduler
 
 The [HelloScheduler.ino](examples/HelloScheduler) sketch implements the same
@@ -187,9 +216,24 @@ void loop() {
 ```
 
 The `CoroutineScheduler` can automatically manage all coroutines defined by the
-`COROUTINE()` macro, which eliminates the need to itemize your coroutines in
-the `loop()` method manually.
+`COROUTINE()` macro, which eliminates the need to itemize your coroutines in the
+`loop()` method manually. Unfortunately, this convenience is not free (see
+[MemoryBenchmark](examples/MemoryBenchmark)):
 
+* The `CoroutineScheduler` singleton instance increases the flash memory by
+  about 110 bytes.
+* The `CoroutineScheduler::loop()` method calls the `Coroutine::runCoroutine()`
+  method through the `virtual` dispatch instead of directly, which is slower and
+  takes more flash memory.
+* Each `Coroutine` instance consumes an additional ~70 bytes of flash
+  when using the `CoroutineScheduler`.
+
+On 8-bit processors with limited memory, the additional resource consumption can
+be important. On 32-bit processors with far more memory, these additional
+resources are often inconsequential. Therefore the `CoroutineScheduler` is
+recommended mostly on 32-bit processors.
+
+<a name="HelloManualCoroutine"></a>
 ### HelloManualCoroutine
 
 The [HelloManualCoroutine.ino](examples/HelloManualCoroutine) program shows what
@@ -239,14 +283,11 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
   pinMode(LED, OUTPUT);
-
-  blinkLed.setupCoroutine(F("blinkLed"));
-  printHelloWorld.setupCoroutine(F("printHelloWorld"));
-  CoroutineScheduler::setup();
 }
 
 void loop() {
-  CoroutineScheduler::loop();
+  blinkLed.runCoroutine();
+  printHelloWorld.runCoroutine();
 }
 ```
 
@@ -311,14 +352,12 @@ The following programs are provided under the `examples` directory:
       same as BlinkSlowFastRoutine but using manual `Coroutine` subclasses
     * [CountAndBlink.ino](examples/CountAndBlink): count and blink at the same
       time
-    * [Delay.ino](examples/Delay): validate the various delay macros
-      (`COROUTINE_DELAY()`, `COROUTINE_DELAY_MICROS()` and
-      `COROUTINE_DELAY_SECONDS()`)
+    * [Delay.ino](examples/Delay): validate the `COROUTINE_DELAY()` macro
 * Advanced Examples
     * [SoundManager](examples/SoundManager): Use a sound manager coroutine to
       control the sounds made by a sound generator coroutine, using the
       `reset()` function to interrupt the sound generator.
-* Channels
+* Channels (experimental)
     * [Pipe.ino](examples/Pipe): uses a `Channel` to allow a Writer to send
       messages to a Reader through a "pipe" (unfinished)
     * [Task.ino](examples/Pipe): uses a `Channel` to allow a Writer to send
@@ -425,22 +464,28 @@ advantages:
 
 All objects are statically allocated (i.e. not heap or stack).
 
-* 8-bit processors (AVR Nano, UNO, etc):
-    * `sizeof(Coroutine)`: 15
-    * `sizeof(CoroutineScheduler)`: 2
-    * `sizeof(Channel<int>)`: 5
-* 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32)
-    * `sizeof(Coroutine)`: 28
-    * `sizeof(CoroutineScheduler)`: 4
-    * `sizeof(Channel<int>)`: 12
+On 8-bit processors (AVR Nano, Uno, etc):
 
-In other words, you can create 100 `Coroutine` instances and they would use only
-1400 bytes of static RAM on an 8-bit AVR processor.
+```
+sizeof(Coroutine): 11
+sizeof(CoroutineScheduler): 2
+sizeof(Channel<int>): 5
+```
+
+On 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32):
+
+```
+sizeof(Coroutine): 20
+sizeof(CoroutineScheduler): 4
+sizeof(Channel<int>): 12
+```
 
 The `CoroutineScheduler` consumes only 2 bytes of memory no matter how many
 coroutines are created. That's because it depends on a singly-linked list whose
 pointers live on the `Coroutine` object, not in the `CoroutineScheduler`. But
-the code for the class increases flash memory usage by about 150 bytes.
+using the `CoroutineScheduler::loop()` instead of calling
+`Coroutine::runCoroutine()` directly increases flash memory usage by 70-100
+bytes.
 
 The `Channel` object requires 2 copies of the parameterized `<T>` type so its
 size is equal to `1 + 2 * sizeof(T)`, rounded to the nearest memory alignment
@@ -453,33 +498,101 @@ The [examples/MemoryBenchmark](examples/MemoryBenchmark) program gathers
 flash and memory consumption numbers for various boards (AVR, ESP8266, ESP32,
 etc) for a handful of AceRoutine features. Here are some highlights:
 
-* AVR (e.g. Nano)
-    * 1 Coroutine: 1098 bytes
-    * 2 Coroutines: 1326 bytes
-    * `CoroutineScheduler()` + 1 Coroutine: 1240 bytes
-    * `CoroutineScheduler()` + 2 Coroutines: 1390 bytes
-* ESP8266
-    * 1 Coroutine: 680 bytes
-    * 2 Coroutines: 908 bytes
-    * `CoroutineScheduler()` + 1 Coroutine: 808 bytes
-    * `CoroutineScheduler()` + 2 Coroutines: 908 bytes
+**Arduino Nano (8-bits)**
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| Baseline                        |    606/   11 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| One Delay Function              |    654/   13 |    48/    2 |
+| Two Delay Functions             |    714/   15 |   108/    4 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   |    840/   30 |   234/   19 |
+| Two Coroutines                  |   1010/   47 |   404/   36 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        |    946/   32 |   340/   21 |
+| Scheduler, Two Coroutines       |   1058/   43 |   452/   32 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |    938/   14 |   332/    3 |
+| Blink Coroutine                 |   1154/   30 |   548/   19 |
++--------------------------------------------------------------+
+```
+
+**ESP8266 (32-bits)**
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| Baseline                        | 256924/26800 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| One Delay Function              | 256988/26808 |    64/    8 |
+| Two Delay Functions             | 257052/26808 |   128/    8 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   | 257104/26820 |   180/   20 |
+| Two Coroutines                  | 257264/26844 |   340/   44 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        | 257152/26828 |   228/   28 |
+| Scheduler, Two Coroutines       | 257232/26844 |   308/   44 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  | 257424/26816 |   500/   16 |
+| Blink Coroutine                 | 257556/26836 |   632/   36 |
++--------------------------------------------------------------+
+```
+
+Comparing `Blink Function` and `Blink Coroutine` is probably the most
+fair comparison, because they implement the exact same functionality. The code
+is given in
+[Comparison To NonBlocking Function](USER_GUIDE.md#ComparisonToNonBlockingFunction).
+The `Blink Function` implements the asymmetric blink (HIGH and LOW having
+different durations) functionality using a simple, non-blocking function with an
+internal `prevMillis` static variable. The `Blink Coroutine` implements the
+same logic using a `Coroutine`. The `Coroutine` version is far more readable and
+maintainable, with only about 220 additional bytes of flash on AVR, and 130
+bytes on an ESP8266. In many situations, the increase in flash memory size may
+be worth ease of code maintenance.
 
 <a name="CPU"></a>
 ### CPU
 
-See [examples/AutoBenchmark](examples/AutoBenchmark). In summary, the overhead
-of AceRoutine context switching is about 5 micros on an 8-bit AVR, to as low as
-0.41 micros on a 32-bit ESP32.
+See [examples/AutoBenchmark](examples/AutoBenchmark). Here are 2 samples:
+
+Arduino Nano:
+
+```
++---------------------+--------+-------------+--------+
+| Functionality       |  iters | micros/iter |   diff |
+|---------------------+--------+-------------+--------|
+| EmptyLoop           |  10000 |       1.700 |  0.000 |
+| DirectScheduling    |  10000 |       2.900 |  1.200 |
+| CoroutineScheduling |  10000 |       6.900 |  5.200 |
++---------------------+--------+-------------+--------+
+```
+
+ESP8266:
+
+```
++---------------------+--------+-------------+--------+
+| Functionality       |  iters | micros/iter |   diff |
+|---------------------+--------+-------------+--------|
+| EmptyLoop           |  10000 |       0.100 |  0.000 |
+| DirectScheduling    |  10000 |       0.500 |  0.400 |
+| CoroutineScheduling |  10000 |       1.200 |  1.100 |
++---------------------+--------+-------------+--------+
+```
 
 <a name="SystemRequirements"></a>
 ## System Requirements
 
+<a name="Hardware"></a>
 ### Hardware
 
-The library has been extensively tested on the following boards:
+The library has Tier 1 support on the following boards:
 
-* Arduino Nano clone (16 MHz ATmega328P)
-* SparkFun Pro Micro clone (16 MHz ATmega32U4)
+* Arduino Nano (16 MHz ATmega328P)
+* SparkFun Pro Micro (16 MHz ATmega32U4)
 * SAMD21 M0 Mini (48 MHz ARM Cortex-M0+)
 * STM32 Blue Pill (STM32F103C8, 72 MHz ARM Cortex-M3)
 * NodeMCU 1.0 (ESP-12E module, 80 MHz ESP8266)
@@ -487,12 +600,23 @@ The library has been extensively tested on the following boards:
 * ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
 * Teensy 3.2 (96 MHz ARM Cortex-M4)
 
-I will occasionally test on the following hardware as a sanity check:
+Tier 2 support can be expected on the following boards, mostly because I don't
+test these as often:
 
-* Arduino Pro Mini clone (16 MHz ATmega328P)
+* ATtiny85 (8 MHz ATtiny85)
+* Arduino Pro Mini (16 MHz ATmega328P)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 * Teensy LC (48 MHz ARM Cortex-M0+)
 
+The following boards are **not** supported:
+
+* Any platform using the ArduinoCore-API
+  (https://github.com/arduino/ArduinoCore-api). For example:
+    * Nano Every
+    * MKRZero
+    * Raspberry Pi Pico RP2040
+
+<a name="ToolChain"></a>
 ### Tool Chain
 
 This library was developed and tested using:
@@ -504,7 +628,7 @@ This library was developed and tested using:
 * [SparkFun SAMD Boards 1.8.1](https://github.com/sparkfun/Arduino_Boards)
 * [STM32duino 1.9.0](https://github.com/stm32duino/Arduino_Core_STM32)
 * [ESP8266 Arduino 2.7.4](https://github.com/esp8266/Arduino)
-* [ESP32 Arduino 1.0.4](https://github.com/espressif/arduino-esp32)
+* [ESP32 Arduino 1.0.6](https://github.com/espressif/arduino-esp32)
 * [Teensydino 1.53](https://www.pjrc.com/teensy/td_download.html)
 
 It should work with [PlatformIO](https://platformio.org/) but I have
@@ -513,6 +637,7 @@ not tested it.
 The library works on Linux or MacOS (using both g++ and clang++ compilers) using
 the [EpoxyDuino](https://github.com/bxparks/EpoxyDuino) emulation layer.
 
+<a name="OperatingSystem"></a>
 ### Operating System
 
 I use Ubuntu 18.04 and 20.04 for most of my development and sometimes do sanity
@@ -523,19 +648,21 @@ checks on MacOS 10.14.5.
 
 [MIT License](https://opensource.org/licenses/MIT)
 
-<a name="Feedback"></a>
+<a name="FeedbackAndSupport"></a>
 ## Feedback and Support
 
-If you find this library useful, consider starring this project on GitHub. The
-stars will let me prioritize the more popular libraries over the less popular
-ones.
+If you have any questions, comments and other support questions about how to
+use this library, please use the
+[GitHub Discussions](https://github.com/bxparks/AceRoutine/discussions)
+for this project. If you have bug reports or feature requests, please file a
+ticket in [GitHub Issues](https://github.com/bxparks/AceRoutine/issues).
+I'd love to hear about how this software and its documentation can be improved.
+I can't promise that I will incorporate everything, but I will give your ideas
+serious consideration.
 
-If you have any questions, comments, bug reports, or feature requests, please
-file a GitHub ticket instead of emailing me unless the content is sensitive.
-(The problem with email is that I cannot reference the email conversation when
-other people ask similar questions later.) I'd love to hear about how this
-software and its documentation can be improved. I can't promise that I will
-incorporate everything, but I will give your ideas serious consideration.
+Please refrain from emailing me directly unless the content is sensitive. The
+problem with email is that I cannot reference the email conversation when other
+people ask similar questions later.
 
 <a name="Authors"></a>
 ## Authors

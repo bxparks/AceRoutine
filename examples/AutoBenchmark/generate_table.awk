@@ -34,9 +34,9 @@ BEGIN {
     sizeof_index++
   }
   if (collect_benchmarks) {
-    u[benchmark_index]["aceroutine"] = $1
-    u[benchmark_index]["baseline"] = $2
-    u[benchmark_index]["diff"] = $3
+    u[benchmark_index]["name"] = $1
+    u[benchmark_index]["micros"] = $2
+    u[benchmark_index]["iterations"] = $3
     benchmark_index++
   }
 }
@@ -50,16 +50,25 @@ END {
     print s[i]
   }
 
+  # Calculate the diff from baseline
+  baseline = u[0]["micros"]
+  for (i = 0; i < TOTAL_BENCHMARKS; i++) {
+    u[i]["diff"] = u[i]["micros"] - baseline
+  }
 
   print ""
   print "CPU:"
 
-  printf("+------------+------+------+\n")
-  printf("| AceRoutine | base | diff |\n")
-  printf("|------------+------+------|\n")
+  printf("+---------------------+--------+-------------+--------+\n")
+  printf("| Functionality       |  iters | micros/iter |   diff |\n")
   for (i = 0; i < TOTAL_BENCHMARKS; i++) {
-    printf("| %10.2f | %4.2f | %4.2f |\n",
-      u[i]["aceroutine"], u[i]["baseline"], u[i]["diff"])
+    name = u[i]["name"]
+    if (name ~ /^EmptyLoop$/ || name ~ /^DirectScheduler$/){
+      printf("|---------------------+--------+-------------+--------|\n")
+    }
+
+    printf("| %-19s | %6d | %11.3f | %6.3f |\n",
+      u[i]["name"], u[i]["iterations"], u[i]["micros"], u[i]["diff"])
   }
-  printf("+------------+------+------+\n")
+  printf("+---------------------+--------+-------------+--------+\n")
 }

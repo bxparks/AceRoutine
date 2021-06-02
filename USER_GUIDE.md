@@ -4,7 +4,7 @@ See the [README.md](README.md) for installation instructions and other
 background information. This document describes how to use the library once it
 is installed.
 
-**Version**: 1.2.4 (2021-01-22)
+**Version**: 1.3 (2021-06-02)
 
 ## Table of Contents
 
@@ -28,9 +28,9 @@ is installed.
     * [Macros As Statements](#MacrosAsStatements)
     * [Chaining Coroutines](#ChainingCoroutines)
 * [Running and Scheduling](#RunningAndScheduling)
-    * [Manual Scheduling](#ManualScheduling)
+    * [Direct Scheduling](#DirectScheduling)
     * [CoroutineScheduler](#CoroutineScheduler)
-    * [Manual Scheduling or CoroutineScheduler](#ManualOrAutomatic)
+    * [Direct Scheduling or CoroutineScheduler](#DirectOrAutomatic)
     * [Suspend and Resume](#SuspendAndResume)
     * [Reset Coroutine](#Reset)
     * [Coroutine States](#States)
@@ -41,11 +41,13 @@ is installed.
     * [Instance Variables](#InstanceVariables)
     * [Channels (Experimental)](#Channels)
 * [Miscellaneous](#Miscellaneous)
+    * [Comparison To NonBlocking Function](#ComparisonToNonBlockingFunction)
     * [External Coroutines](#External)
     * [Functors](#Functors)
 * [Bugs and Limitations](#BugsAndLimitations)
     * [No Nested LOOP Macro](#NoNestedLoop)
     * [No Delegation to Regular Functions](#NoDelegation)
+    * [No Creation on Heap](#NoCreationOnHeap)
 
 <a name="Setup"></a>
 ## Coroutine Setup
@@ -85,10 +87,6 @@ The following macros are available to hide a lot of boilerplate code:
 * `COROUTINE_AWAIT(condition)`: yields until `condition` become `true`
 * `COROUTINE_DELAY(millis)`: yields back execution for `millis`. The maximum
   allowable delay is 32767 milliseconds.
-* `COROUTINE_DELAY_MICROS(micros)`: yields back execution for `micros`. The
-  maximum allowable delay is 32767 microseconds.
-* `COROUTINE_DELAY_SECONDS(seconds)`: yields back execution for `seconds`. The
-  maximum allowable delay is 32767 seconds.
 * `COROUTINE_LOOP()`: convenience macro that loops forever, replaces
   `COROUTINE_BEGIN()` and `COROUTINE_END()`
 * `COROUTINE_CHANNEL_WRITE()`: writes a message to a `Channel`
@@ -145,15 +143,7 @@ The `Coroutine` class looks something like this (not all public methods shown):
 ```C++
 class Coroutine {
   public:
-    const ace_common::FCString& getName() const;
-
     virtual int runCoroutine() = 0;
-
-    virtual unsigned long coroutineMillis() const;
-
-    virtual unsigned long coroutineMicros() const;
-
-    virtual unsigned long coroutineSeconds() const;
 
     void suspend();
 
@@ -174,10 +164,6 @@ class Coroutine {
     bool isTerminated() const;
 
     bool isDone() const;
-
-    void setupCoroutine(const char* name);
-
-    void setupCoroutine(const __FlashStringHelper* name);
 };
 ```
 
@@ -214,9 +200,7 @@ equivalent to writing out the following by hand:
 
 ```C++
 struct Coroutine_doSomething: Coroutine {
-  Coroutine_doSomething() {
-    setupCoroutine(F("doSomething"));
-  }
+  Coroutine_doSomething() {}
 
   int runCoroutine() override {
     COROUTINE_BEGIN();
@@ -246,18 +230,7 @@ class MyCoroutine : public Coroutine {
 
 MyCoroutine routine1;
 MyCoroutine routine2;
-
-void setup() {
-  ...
-  routine1.setupCoroutine(F("routine1"));
-  routine2.setupCoroutine(F("routine2"));
-  ...
-}
 ```
-
-Since we are creating 2 instances of the `MyCoroutine` class, we call the
-`Coroutine::setupCoroutine()` in the global `setup()` instead of calling them in
-the constructor.
 
 For more details on manual Coroutine instances, see the
 [Manual Coroutines](#ManualCoroutines) section below.
@@ -329,53 +302,16 @@ conceivable situation. In practice, coroutines should complete their work within
 several milliseconds and yield control to the other coroutines as soon as
 possible.
 
-To delay for longer period of time, we can use the
-`COROUTINE_DELAY_SECONDS(seconds)` convenience macro. The following example
-waits for 200 seconds:
-```C++
-COROUTINE(waitSeconds) {
-  COROUTINE_BEGIN();
-  ...
-  COROUTINE_DELAY_SECONDS(200);
-  ...
-  COROUTINE_END();
-}
-```
-The maximum number of seconds is 32767 seconds.
-
-On faster microcontrollers, it might be useful to yield for microseconds using
-the `COROUTINE_DELAY_MICROS(delayMicros)`.  The following example waits for 300
-microseconds:
-
-```C++
-COROUTINE(waitMicros) {
-  COROUTINE_BEGIN();
-  ...
-  COROUTINE_DELAY_MICROS(300);
-  ...
-  COROUTINE_END();
-}
-```
-This macro has a number constraints:
-
-* The maximum delay is 32767 micros.
-* All other coroutines in the program *must* yield within 32767 microsecond,
-  otherwise the internal timing variable will overflow and an incorrect delay
-  will occur.
-* The accuracy of `COROUTINE_DELAY_MICROS()` is not guaranteed because the
-  overhead of context switching and checking the delay's expiration may
-  consume a significant portion of the requested delay in microseconds.
-
-If the above convenience macros are not sufficient, you can choose to write an
-explicit for-loop. For example, to delay for 100,000 seconds, instead of using
-the `COROUTINE_DELAY_SECONDS()`, we can do this:
+For delays longer than 32767 milliseconds, we can use an explicit for-loop. For
+example, to delay for 100,000 seconds, we can do this:
 
 ```C++
 COROUTINE(waitThousandSeconds) {
+  static uint16_t i;
+
   COROUTINE_BEGIN();
-  static uint32_t i;
-  for (i = 0; i < 100000; i++) {
-    COROUTINE_DELAY(1000);
+  for (i = 0; i < 10000; i++) {
+    COROUTINE_DELAY(10000); // 10 seconds
   }
   ...
   COROUTINE_END();
@@ -612,9 +548,9 @@ surprised to find that it actually worked.
 ### Macros As Statements
 
 The various macros (`COROUTINE_YIELD()`, `COROUTINE_DELAY()`,
-`COROUTINE_DELAY_MICROS()`, `COROUTINE_AWAIT()`, etc.) have been designed to
-allow them to be used almost everywhere a valid C/C++ statement is allowed. For
-example, the following is allowed:
+`COROUTINE_AWAIT()`, etc.) have been designed to allow them to be used almost
+everywhere a valid C/C++ statement is allowed. For example, the following is
+allowed:
 
 ```C++
   ...
@@ -667,7 +603,7 @@ class OuterCoroutine: public Coroutine {
 };
 
 ```
-In situtations like this, it is likely only the `OuterCoroutine` would be
+In situations like this, it is likely only the `OuterCoroutine` would be
 registered in the `CoroutineScheduler` since we do not want to call the
 `InnerCoroutine` directly. And in the cases that I've come across, the
 `OuterCoroutine` doesn't actually use much of the Coroutine functionality (i.e.
@@ -705,12 +641,14 @@ There are 2 ways to run the coroutines:
 * manually calling the coroutines in the `loop()` method, or
 * automatically scheduling and running them using the `CoroutineScheduler`.
 
-<a name="ManualScheduling"></a>
-### Manual Scheduling
+<a name="DirectScheduling"></a>
+### Direct Scheduling
 
-If you have only a small number of coroutines, the manual method may be the
-easiest. This requires you to explicitly call the `runCoroutine()` method of all
-the coroutines that you wish to run in the `loop()` method, like this:
+If you have only a small number of coroutines, the manual method is the
+easiest and fastest way. This requires you to explicitly call the
+`runCoroutine()` method of all the coroutines that you wish to run in the
+`loop()` method, like this:
+
 ```C++
 void loop() {
   blinkLed.runCoroutine();
@@ -718,6 +656,10 @@ void loop() {
   printWorld.runCoroutine();
 }
 ```
+
+Because the `runCoroutine()` method is called directly, instead of through the
+`Coroutine` pointer, the call does *not* suffer the overhead of the `virtual`
+dispatch. It is as if the `virtual` keyword did not exist.
 
 <a name="CoroutineScheduler"></a>
 ### CoroutineScheduler
@@ -727,10 +669,10 @@ defined in multiple `.cpp` files, then the `CoroutineScheduler` will
 make things easy. You just need to call `CoroutineScheduler::setup()`
 in the global `setup()` method, and `CoroutineScheduler::loop()`
 in the global `loop()` method, like this:
+
 ```C++
 void setup() {
   ...
-  myRoutine.setupCoroutine(F("myRoutine"));
   CoroutineScheduler::setup();
 }
 
@@ -744,14 +686,11 @@ coroutines that are managed by the scheduler. Each call to
 `CoroutineScheduler::loop()` executes one coroutine in that list in a simple
 round-robin scheduling algorithm.
 
-If you are manually subclassing the `Coroutine` class to create your own
-[Manual Coroutines](#ManualCoroutines), you must call the
-`Coroutine::setupCoroutine()` method in the global `setup()` so that the
-coroutine instance is added to the `CoroutineScheduler`.
+**Historical Notes**:
 
 Prior to v1.2, the initial ordering was sorted by the `Coroutine::getName()`.
 And calling `suspend()` would remove the coroutine from the internal list
-of coroutines, and `resume()` would add the the coroutine back into the list.
+of coroutines, and `resume()` would add the coroutine back into the list.
 This behavior turned out to be
 [fatally flawed](https://github.com/bxparks/AceRoutine/issues/19)
 
@@ -761,31 +700,54 @@ also considered to be an internal implementation detail that may change in the
 future. Client code should not depend on the implementation details of this
 internal list.
 
-<a name="ManualOrAutomatic"></a>
-### Manual Scheduling or CoroutineScheduler
+Prior to v1.3, if you manually subclass the `Coroutine` class to create your own
+[Manual Coroutines](#ManualCoroutines), the `Coroutine::setupCoroutine()` method
+must be called in the global `setup()` so that the coroutine instance is added
+to the `CoroutineScheduler`. In v1.3, calling `setupCoroutine()` is no longer
+necessary because the `Coroutine::Coroutine()` constructor automatically inserts
+itself into the internal singly-linked list. The `setupCoroutine()` is retained
+for backwards compatibility, but is now marked deprecated.
 
-Manual scheduling has the smallest context switching overhead between
-coroutines. However, it is not possible to `suspend()` or `resume()` a coroutine
-because those methods affect how the `CoroutineScheduler` chooses to run a
-particular coroutine. Similarly, the list of coroutines in the global `loop()`
-is fixed by the code at compile-time. So when a coroutine finishes with the
-`COROUTINE_END()` macro, it will continue to be called by the `loop()` method.
+Starting with v1.3, the name of the coroutine is no longer saved, and
+`Coroutine::getName()` does not exist anymore. `CoroutineScheduler::list()`
+prints the integer value of the coroutine instance instead of the name of the
+coroutine.
 
-The `CoroutineScheduler` is easier to use because it automatically keeps track
-of all coroutines defined by the `COROUTINE()` macro, even if they are
-defined in multiple files. It allows coroutines to be suspended and resumed (see
-below). However, there is a small overhead in switching between coroutines
-because the scheduler needs to walk down the list of active coroutines to find
-the next one.
+<a name="DirectOrAutomatic"></a>
+### Direct Scheduling or CoroutineScheduler
 
-The scheduler may choose to remove coroutines which are not running from the
-active list. If there are a significant number of these inactive coroutines,
-then the `CoroutineScheduler` can be more efficient than manually calling the
-coroutines through the global `loop()` method. However, as of v1.2, suspended
-coroutines are *not* removed from the scheduling list (see
-[Issue #19](https://github.com/bxparks/AceRoutine/issues/19)
-for reasons), so the `CoroutineScheduler` is actually slightly less efficient,
-but the difference is probably not worth worrying about for almost all cases.
+Direct scheduling has the smallest context switching overhead between
+coroutines. However, it is not possible to use `Coroutine::suspend()` or
+`Coroutine::resume()` (see below) because those methods change states which are
+used only by the `CoroutineScheduler`. Each time you create a new coroutine, you
+must remember to call its `runCoroutine()` method from the global `loop()`
+function.
+
+Using the `CoroutineScheduler` to call `Coroutine::runCoroutine()` is easier
+because the `CoroutineScheduler` automatically keeps track of all coroutines
+defined by the `COROUTINE()` macro, even if they are defined in multiple files.
+The `CoroutineScheduler` also allows coroutines to be suspended and resumed
+using the `Coroutine::suspend()` and `Coroutine::resume()` methods. However,
+using the `CoroutineScheduler` consumes more memory resources and CPU overhead:
+
+* The `CoroutineScheduler` needs to walk down a linked list of `Coroutine`
+  instances to find the next one.
+* The `CoroutineScheduler` calls `Coroutine::runCoroutine()` through the
+  `Coroutine` pointer, which causes the `virtual` method dispatch to be used.
+  That consumes several extra cycles of CPU (a few microseconds) and extra
+  memory (probably in the 20-40 byte range).
+
+The [MemoryBenchmark](examples/MemoryBenchmark) results show that using a
+`CoroutineScheduler` consumes about 30-70 extra bytes of flash memory per
+`Coroutine` instance, compared to directly calling the
+`Coroutine::runRoutine()`.
+
+My recommendation is that on 8-bit processors (e.g. Arduino Nano, Uno, SparkFun
+ProMicro) with limited memory, the Direct Scheduling should be used where
+`Coroutine::runCoroutine()` is directly called from the global `loop()`. On
+32-bit processors with enough flash memory, the `CoroutineScheduler` can be used
+if you want the convenience and extra flexibility that `CoroutineScheduler`, and
+you don't mind the extra flash memory and CPU overhead.
 
 <a name="SuspendAndResume"></a>
 ### Suspend and Resume
@@ -795,7 +757,7 @@ The `Coroutine::suspend()` and `Coroutine::resume()` methods are available
 explicitly in the global `loop()` method, then these methods have no impact.
 
 The `Coroutine::suspend()` and `Coroutine::resume()` **should not** be called
-from inside the coroutine. Fortunately, if they are accidentially called,
+from inside the coroutine. Fortunately, if they are accidentally called,
 they will have no effect. They must be called from outside of the coroutine.
 When a coroutine is suspended,  the `CoroutineScheduler` will skip over this
 coroutine and `Coroutine::runCoroutine()` will not be called.
@@ -817,10 +779,10 @@ from the start of that method instead of the most recent continuation point
 
 If the coroutine object has any other state variables, for example, additional
 member variables of the Coroutine subclass, or static variables inside the
-`runCoroutine()` method, you may ned to manually reset those variables to their
+`runCoroutine()` method, you may need to manually reset those variables to their
 initial states as well.
 
-I have not personally needed the `reset()` functionalty so it has not been
+I have not personally needed the `reset()` functionality so it has not been
 tested as much as I would like, but it is apparently useful for some people. See
 for example:
 
@@ -881,18 +843,18 @@ You can query these internal states using the following methods on the
 * `Coroutine::isEnding()`
 * `Coroutine::isTerminated()`
 * `Coroutine::isDone()`: same as `isEnding() || isTerminated()`. This method
-  is preferred because it works when the `Coroutine` is executed manually or
-  through the `CoroutineScheduler`.
+  is preferred because it works when the `Coroutine::runCoroutine()` is executed
+  directly or through the `CoroutineScheduler`.
 
 Prior to v1.2, there was a small operational difference between `kStatusEnding`
 and `kStatusTerminated`. A terminated coroutine was removed from the internal
 linked list of "active" coroutines that was managed by the `CoroutineScheduler`.
-However, there was a serious flaw with this design ([Issue
-#19](https://github.com/bxparks/AceRoutine/issues/19)) so with v1.2, there is
-now no practical difference between these 2 states. It is possible that a future
-design change (something I am noodling over in my mind) may reintroduce a
-difference. Regardless, I recommended that the `isDone()` method should be used
-to detect a coroutine that has "finished".
+However, there was a serious flaw with this design
+([Issue #19](https://github.com/bxparks/AceRoutine/issues/19))
+so with v1.2, there is now no practical difference between these 2 states. It is
+possible that a future design change (something I am noodling over in my mind)
+may reintroduce a difference. Regardless, I recommended that the `isDone()`
+method should be used to detect a coroutine that has "finished".
 
 To call these functions on a specific coroutine, use the `Coroutine` instance
 variable that was created using the `COROUTINE()` macro:
@@ -925,6 +887,7 @@ All coroutines are instances of the `Coroutine` class, or one of its subclasses.
 You can create custom subclasses of `Coroutine` and create coroutines which are
 instances of the custom class. Use the 2-argument version of the `COROUTINE()`
 macro like this:
+
 ```C++
 class CustomCoroutine : public Coroutine {
   public:
@@ -984,49 +947,12 @@ class ManualCoroutine : public Coroutine {
 ManualCoroutine manualRoutine(params, ..., objects, ...);
 ```
 
-A manual coroutine (created without the `COROUTINE()` macro) is *not*
-automatically added to the linked list used by the `CoroutineScheduler`. If you
-wish to insert it into the scheduler, use the `setupCoroutine()` method just
-before calling `CoroutineScheduler::setup()`:
-```C++
-void setup() {
-  ...
-  manualRoutine.setupCoroutine("manualRoutine");
-  CoroutineScheduler::setup();
-  ...
-}
-
-void loop() {
-  ...
-  CoroutineScheduler::loop();
-  ...
-}
-```
-
-There are 2 versions of the `setupCoroutine()` method:
-* `setupCoroutine(const char* name)`
-* `setupCoroutine(const __FlashStringHelper* name)`
-
-Both have been designed so that they are safe to be called from the constructor
-of a `Coroutine` class, even during static initialization time. This is exactly
-what the `COROUTINE()` macro does, call the `setupCoroutine()` method from the
-generated constructor. However, a manual coroutine is often written as a library
-that is supposed to be used by an end-user, and it would be convenient for the
-name of the coroutine to be defined by the end-user. The problem is that the
-`F()` macro cannot be used outside of the function context, so it is cannot be
-passed into the constructor when the coroutine is statically created. The
-workaround is to call the `setupCoroutine()` method in the global `setup()`
-function, where the `F()` macro is allowed to be used. (The other more obscure
-reason is that the constructor of the manual coroutine class will often have a
-large number of dependency injection parameters which are required to implement
-its functionality, and it is cleaner to avoid mixing in the name of the
-`Coroutine` which is an incidental dependency. Anyway, that's my rationale right
-now, but this may change in the future if a simpler alternative is discovered.)
-
-If the coroutine is not given a name, the name is stored as a `nullptr`. When
-printed (e.g. using the `CoroutineScheduler::list()` method), the name of an
-anonymous coroutine is represented by the integer representation of the `this`
-pointer of the coroutine object.
+Prior to v1.3, a manual coroutine (created without the `COROUTINE()` macro) was
+*not* automatically added to the linked list used by the `CoroutineScheduler`.
+This was changed in v1.3 so that the `Coroutine::Coroutine()` constructor
+now automatically adds itself to the internal linked list. Calling
+`setupCoroutine()` is no longer required. The method is retained for backwards
+compatibility, but it is a no-op and is marked deprecated.
 
 Some examples of manual coroutines:
 
@@ -1098,8 +1024,6 @@ RoutineB routineB(routineA);
 
 void setup() {
   ...
-  routineA.setupCoroutine("routineA");
-  routineB.setupCoroutine("routineB");
   CoroutineScheduler::setup();
   ...
 }
@@ -1123,7 +1047,7 @@ events is guaranteed when interacting with a channel:
 
 * the writer blocks until the reader is ready,
 * the reader blocks until the writer is ready,
-* when the writer writes, the reader picks up the the message and is allowed
+* when the writer writes, the reader picks up the message and is allowed
   to continue execution *before* the writer is allowed to continue,
 * the writer then continues execution after the reader yields.
 
@@ -1235,8 +1159,6 @@ void setup() {
   while (!Serial); // micro/leonardo
 
   ...
-  writer.setupCoroutine("writer");
-  reader.setupCoroutine("reader");
   CoroutineScheduler::setup();
   ...
 }
@@ -1271,6 +1193,88 @@ use-cases and if they are easy to implement.
 
 <a name="Miscellaneous"></a>
 ## Miscellaneous
+
+<a name="ComparisonToNonBlockingFunction"></a>
+### Comparison To NonBlocking Function
+
+It is useful to compare a `Coroutine` to a normal, non-blocking delay function
+that implements the same algorithm. Here is the Coroutine for blinking the LED
+asymmetrically. The HIGH and LOW occurring for different durations:
+
+```C++
+COROUTINE(blink) {
+  COROUTINE_LOOP() {
+    digitalWrite(LED_BUILTIN, HIGH);
+    COROUTINE_DELAY(100);
+    digitalWrite(LED_BUILTIN, LOW);
+    COROUTINE_DELAY(500);
+  }
+}
+
+void loop() {
+  blink.runCoroutine();
+}
+```
+
+Here is the equivalent code using a non-blocking delay function:
+
+```C++
+void blink() {
+  static uint16_t prevMillis;
+  static uint8_t blinkState;
+  const uint8_t kBlinkStateLow = 0;
+  const uint8_t kBlinkStateHigh = 1;
+
+  if (blinkState == kBlinkStateHigh) {
+    uint16_t nowMillis = millis();
+    if (nowMillis - prevMillis >= 100) {
+      prevMillis = nowMillis;
+      digitalWrite(LED_BUILTIN, LOW);
+      blinkState = kBlinkStateLow;
+    }
+  } else {
+    uint16_t nowMillis = millis();
+    if (nowMillis - prevMillis >= 500) {
+      prevMillis = nowMillis;
+      digitalWrite(LED_BUILTIN, HIGH);
+      blinkState = kBlinkStateHigh;
+    }
+  }
+}
+
+void loop() {
+  blink();
+}
+```
+
+I think most people would agree that the coroutine version is is far easier to
+understand, maintain, and extend to more complex algorithms. According to
+[MemoryBenchmark](examples/MemoryBenchmark/), the memory consumption of these
+two versions are:
+
+**AVR**
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |    938/   14 |   332/    3 |
+| Blink Coroutine                 |   1154/   30 |   548/   19 |
++--------------------------------------------------------------+
+```
+
+**ESP8266**
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| Blink Function                  | 257424/26816 |   500/   16 |
+| Blink Coroutine                 | 257556/26836 |   632/   36 |
++--------------------------------------------------------------+
+```
+
+On the AVR, the coroutine version takes 220 additional bytes of flash which
+seems a bit high. But in some situations, it may be worth paying that memory
+cost in return for the better maintainability of the code.
 
 <a name="External"></a>
 ### External Coroutines
@@ -1343,7 +1347,7 @@ extern MyCoroutine myCoroutine;
 <a name="Functors"></a>
 ### Functors
 
-C++ allows the creation of objects that look syntactically like functions.
+C++ allows the creation of objects that look syntactically like functions
 by defining the `operator()` method on the class. I have not defined this method
 in the `Coroutine` class because I have not found a use-case for it. However, if
 someone can demonstrate a compelling use-case, then I would be happy to add it.
@@ -1399,3 +1403,20 @@ COROUTINE(cannotUseNestedMacros) {
   }
 }
 ```
+
+<a name="NoCreationOnHeap"></a>
+### No Creation on Heap
+
+Prior to v1.3, the `Coroutine` class contained a virtual destructor, because I
+thought that I would extend this library in the future to support dynamic
+creation of coroutines. However, a virtual destructor increases flash memory
+usage by 500-600 bytes on 8-bit AVR processors, because it pulls in the
+`malloc()` and `free()` functions. On the 32-bit SAMD21 (using the SparkFun
+SAMD21 Core), the flash memory increases by ~350 bytes. On other 32-bit
+processors (STM32, ESP8266, ESP32, Teensy 3.2), the flash memory increases
+modestly, between 50-150 bytes. These flash memory savings, especially on the
+AVR processors, is significant, so starting from v1.3, the destructor is now
+non-virtual.
+
+If dynamic coroutine on the heap is desired in the future, I think a new class
+(e.g. `DynamicCoroutine`) can be created.

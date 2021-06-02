@@ -40,7 +40,7 @@ is the overhead caused by the `Coroutine` context switch.
 
 All times in below are in microseconds.
 
-**Version**: AceRoutine v1.2.4
+**Version**: AceRoutine v1.3
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -86,7 +86,40 @@ $ make README.md
 
 ## CPU Time Changes
 
-Version 1.2.3 adds benchmarks for STM32.
+* v1.2.3
+    * Add benchmarks for STM32.
+* v1.3
+    * Replace floating point calculation in AutoBenchmark with fixed point
+      calculations in micros and nanos, with the final printing done in
+      micros to 3 decimal places (without using floating point ops).
+    * Replace looping over a fixed elapsed time, with looping over fixed number
+      of iterations for better accuracy.
+        * If the elapsed time is kept constant, then the number of iteration
+          of `doBaseline()` is different than the number of iterations
+          of doAceRoutine()`. When we subtract, the overhead of the loop
+          (e.g. `millis() - start`) are NOT canceld out correctly.
+        * New numbers for `CoroutineScheduler`:
+            * Nano: 5.28 -> 5.200 micros
+            * Micro: 5.31 -> 5.000 micros
+            * SAMD: 2.46 -> 1.933 micros
+            * STM32: 1.76 -> 1.367 micros
+            * ESP8266: 1.67 -> 1.100 micros
+            * ESP32: 0.41 -> 0.300 micros
+            * Teensy 3.2: 1.01 -> 0.500 micros
+    * Add benchmark numbers for "DirectScheduling".
+        * Calls `Coroutine::runCoroutine()` directly, instead of using the
+          `CoroutineScheduler` to avoid the virtual dispatch.
+        * Avoids overhead of cycling through the linked list.
+        * Context switching using `DirectScheduling` is 3-9X faster compared to
+          using `CoroutineScheduler` class.
+    * Replace virtual clock ticking methods (`Coroutine::coroutineMillis()`,
+      `Coroutine::coroutineMicros()`, `Coroutine::coroutineSeconds()`) with
+      static calls to `ClockInterface` template class.
+        * 10-40% performance improvement of `CoroutineScheduler::loop()`.
+    * Remove `COROUTINE_DELAY_SECONDS()` and `COROUTINE_DELAY_MICROS()` which
+      eliminates the `mDelayType` discriminator, saving 1 byte on AVR.
+    * Remove `Coroutine::mName` (type `ace_common::FCString`) which saves
+      3 bytes on AVR, and 8 bytes on 32-bit processors.
 
 ## Arduino Nano
 
@@ -99,7 +132,7 @@ Version 1.2.3 adds benchmarks for STM32.
 {nano_results}
 ```
 
-## Sparkfun Pro Micro
+## SparkFun Pro Micro
 
 * 16 MHz ATmega32U4
 * Arduino IDE 1.8.13
@@ -114,7 +147,7 @@ Version 1.2.3 adds benchmarks for STM32.
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.1
+* SparkFun SAMD Core 1.8.1
 
 ```
 {samd_results}

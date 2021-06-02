@@ -91,8 +91,6 @@ void setup() {
 
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
-
-  resettableCoroutine.setupCoroutine("resettableCoroutine");
 }
 
 void loop() {

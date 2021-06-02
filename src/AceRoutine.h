@@ -40,8 +40,14 @@ SOFTWARE.
 #include "ace_routine/CoroutineScheduler.h"
 #include "ace_routine/Channel.h"
 
+// Blacklist platforms using https://github.com/arduino/ArduinoCore-api due to
+// incompatibilities.
+#if defined(ARDUINO_API_VERSION)
+#error Platforms using ArduinoCore-API not supported
+#endif
+
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_ROUTINE_VERSION 10204
-#define ACE_ROUTINE_VERSION_STRING "1.2.4"
+#define ACE_ROUTINE_VERSION 10300
+#define ACE_ROUTINE_VERSION_STRING "1.3.0"
 
 #endif

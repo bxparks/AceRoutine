@@ -14,7 +14,7 @@ calculated flash size can jump around in unexpected ways.
 
 **NOTE**: This file was auto-generated using `make README.md`. DO NOT EDIT.
 
-**Version**: AceRoutine v1.2
+**Version**: AceRoutine v1.3
 
 **Changes**:
 
@@ -27,6 +27,39 @@ calculated flash size can jump around in unexpected ways.
       linked list
     * `CoroutineScheduler::setupScheduler()` simplified due to immutable linked
       list
+* v1.3
+    * Remove virtual destructor on `Coroutine` class. Reduces flash memory
+      consumption by 500-600 bytes on AVR processors, 350 bytes on SAMD21, and
+      50-150 bytes on other 32-bit processors. The static memory is also reduced
+      by 14 bytes on AVR processors.
+    * Replace clock ticking virtual methods (`coroutineMicros()`,
+      `coroutineMillis()`, and `coroutineSeconds()`) with static functions that
+      delegate to `ClockInterface` which is a template parameter. Saves only
+      0-40 bytes of flash on on AVR processors, but 100-1500 bytes of flash on
+      32-bit processors.
+    * Add benchmark for 'One Delay Function' and 'Two Delay Functions` which use
+      functions with a non-blocking if-statement to implement the functionality
+      of a `COROUTINE()` that loops every 10 milliseconds.
+    * Remove `COROUTINE_DELAY_SECONDS()` functionality. Saves about 200 bytes on
+      AVR processors, mostly from the removal of `udiv1000()` which takes almost
+      180 bytes. Replacing with native `/1000` does not help much because native
+      long division consumes about 130 bytes and is 3X slower on AVR processors.
+    * Remove `COROUTINE_DELAY_MICRO()` functionality. Saves about 15-20 bytes
+      of flash memory per coroutine on AVR. Saves 80-100 bytes plus 20-30 bytes
+      of flash per coroutine on 32-bit processors.
+    * Add `Blink Function` and `Blink Coroutine`, 2 implementations of the same
+      asymmetric blink functionality where the HIGH level lasts for a different
+      duration than the LOW level.
+    * Remove `Coroutine::getName()`, `Coroutine::mName()`, and
+      `Coroutine::setupCoroutine()`. The human-readable name is no longer
+      retained. Saves 10-30 bytes of flash and 3 bytes of static memory per
+      coroutine instance for AVR; 10-40 bytes and 8 bytes of static memory per
+      instance on 32-bit processors.
+    * Use 2 different `Coroutine` subclasses, instead of 2 instances of the same
+      `Coroutine` subclass, for the "Scheduler, Two Coroutines" benchmark . This
+      makes it more functionally equal to the "Two Coroutines" benchmark which
+      automatically creates 2 different subclasses through the `COROUTINE()`
+      macro. Increases flash memory by 80-130 bytes across the board.
 
 ## How to Generate
 
@@ -65,19 +98,52 @@ will be invoked by the following command:
 $ make README.md
 ```
 
-## Functionality
+## Results
 
 * Baseline: A program that does (almost) nothing
-* Coroutine (bare): A single `COROUTINE()` macro that does nothing.
-* Coroutine (LOOP,DELAY): A `COROUTINE()` macro that uses `COROUTINE_LOOP()`
-  and `COROUTINE_DELAY()` which are expected to used in the common case.
-* CoroutineScheduler (bare): A single `Coroutine` instance with a
-* `CoroutineScheduler`.
-* CoroutineScheduler (LOOP,DELAY): A single `Coroutine` instance that
-  uses `COROUTINE_LOOP()` and `COROUTINE_DELAY()` managed by a
+* One Delay Function: A single non-blocking delay function that waits 10 millis.
+* Two Delay Functions: Two non-blocking delay functions.
+* One Coroutine: One instance of `Coroutine` that waits 10 millis, executed
+  directly through `runCoroutine()`.
+* Two Coroutines: Two instances of `Coroutine` that wait 10 millis, executed
+  directly through `runCoroutine()`.
+* Scheduler, One Coroutine: One instance of `Coroutine` executed through the
   `CoroutineScheduler`.
+* Scheduler, Two Coroutines: Two instances of `Coroutine` executed through the
+  `CoroutineScheduler`.
+* Blink Function: A function that blinks the LED asymmetrically, with HIGH
+  lasting a different duration than LOW.
+* Blink Coroutine: A `Coroutine` that blinks asymmetrically, exactly the same as
+  the `blink()` function.
 
-## Arduino Nano
+### ATtiny85
+
+* 8MHz ATtiny85
+* Arduino IDE 1.8.13
+* SpenceKonde/ATTinyCore 1.5.2
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| Baseline                        |    400/   11 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| One Delay Function              |    450/   13 |    50/    2 |
+| Two Delay Functions             |    508/   15 |   108/    4 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   |    628/   30 |   228/   19 |
+| Two Coroutines                  |    796/   47 |   396/   36 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        |    734/   32 |   334/   21 |
+| Scheduler, Two Coroutines       |    976/   49 |   576/   38 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |    546/   14 |   146/    3 |
+| Blink Coroutine                 |    752/   30 |   352/   19 |
++--------------------------------------------------------------+
+
+```
+
+### Arduino Nano
 
 * 16MHz ATmega328P
 * Arduino IDE 1.8.13
@@ -89,15 +155,22 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |    606/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |   1704/   54 |  1098/   43 |
-| Two Coroutines                  |   1932/   85 |  1326/   74 |
-| Scheduler, One Coroutine        |   1846/   64 |  1240/   53 |
-| Scheduler, Two Coroutines       |   1996/   79 |  1390/   68 |
+| One Delay Function              |    654/   13 |    48/    2 |
+| Two Delay Functions             |    714/   15 |   108/    4 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   |    840/   30 |   234/   19 |
+| Two Coroutines                  |   1010/   47 |   404/   36 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        |    946/   32 |   340/   21 |
+| Scheduler, Two Coroutines       |   1188/   49 |   582/   38 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |    938/   14 |   332/    3 |
+| Blink Coroutine                 |   1154/   30 |   548/   19 |
 +--------------------------------------------------------------+
 
 ```
 
-## Sparkfun Pro Micro
+### SparkFun Pro Micro
 
 * 16 MHz ATmega32U4
 * Arduino IDE 1.8.13
@@ -109,19 +182,26 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |   3554/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |   4592/  194 |  1038/   43 |
-| Two Coroutines                  |   4820/  225 |  1266/   74 |
-| Scheduler, One Coroutine        |   4734/  204 |  1180/   53 |
-| Scheduler, Two Coroutines       |   4890/  219 |  1336/   68 |
+| One Delay Function              |   3602/  153 |    48/    2 |
+| Two Delay Functions             |   3662/  155 |   108/    4 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   |   3728/  170 |   174/   19 |
+| Two Coroutines                  |   3898/  187 |   344/   36 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        |   3834/  172 |   280/   21 |
+| Scheduler, Two Coroutines       |   4076/  189 |   522/   38 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |   3994/  154 |   440/    3 |
+| Blink Coroutine                 |   4150/  170 |   596/   19 |
 +--------------------------------------------------------------+
 
 ```
 
-## SAMD21 M0 Mini
+### SAMD21 M0 Mini
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.1
+* SparkFun SAMD Core 1.8.1
 
 ```
 +--------------------------------------------------------------+
@@ -129,15 +209,22 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |  10072/    0 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  10856/    0 |   784/    0 |
-| Two Coroutines                  |  11072/    0 |  1000/    0 |
-| Scheduler, One Coroutine        |  10920/    0 |   848/    0 |
-| Scheduler, Two Coroutines       |  11008/    0 |   936/    0 |
+| One Delay Function              |  10112/    0 |    40/    0 |
+| Two Delay Functions             |  10152/    0 |    80/    0 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   |  10224/    0 |   152/    0 |
+| Two Coroutines                  |  10360/    0 |   288/    0 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        |  10264/    0 |   192/    0 |
+| Scheduler, Two Coroutines       |  10416/    0 |   344/    0 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |  10160/    0 |    88/    0 |
+| Blink Coroutine                 |  10272/    0 |   200/    0 |
 +--------------------------------------------------------------+
 
 ```
 
-## STM32 Blue Pill
+### STM32 Blue Pill
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
@@ -149,15 +236,22 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |  19140/ 3788 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  19484/ 3820 |   344/   32 |
-| Two Coroutines                  |  19664/ 3848 |   524/   60 |
-| Scheduler, One Coroutine        |  19576/ 3828 |   436/   40 |
-| Scheduler, Two Coroutines       |  19640/ 3856 |   500/   68 |
+| One Delay Function              |  19164/ 3792 |    24/    4 |
+| Two Delay Functions             |  19212/ 3792 |    72/    4 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   |  19256/ 3812 |   116/   24 |
+| Two Coroutines                  |  19396/ 3832 |   256/   44 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        |  19316/ 3816 |   176/   28 |
+| Scheduler, Two Coroutines       |  19448/ 3836 |   308/   48 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |  19280/ 3788 |   140/    0 |
+| Blink Coroutine                 |  19384/ 3808 |   244/   20 |
 +--------------------------------------------------------------+
 
 ```
 
-## ESP8266
+### ESP8266
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
 * Arduino IDE 1.8.13
@@ -169,35 +263,49 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        | 256924/26800 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   | 257604/26832 |   680/   32 |
-| Two Coroutines                  | 257832/26864 |   908/   64 |
-| Scheduler, One Coroutine        | 257732/26848 |   808/   48 |
-| Scheduler, Two Coroutines       | 257832/26880 |   908/   80 |
+| One Delay Function              | 256988/26808 |    64/    8 |
+| Two Delay Functions             | 257052/26808 |   128/    8 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   | 257104/26820 |   180/   20 |
+| Two Coroutines                  | 257264/26844 |   340/   44 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        | 257152/26828 |   228/   28 |
+| Scheduler, Two Coroutines       | 257344/26844 |   420/   44 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  | 257424/26816 |   500/   16 |
+| Blink Coroutine                 | 257556/26836 |   632/   36 |
 +--------------------------------------------------------------+
 
 ```
 
-## ESP32
+### ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.13
-* ESP32 Boards 1.0.4
+* ESP32 Boards 1.0.6
 
 ```
 +--------------------------------------------------------------+
 | functionality                   |  flash/  ram |       delta |
 |---------------------------------+--------------+-------------|
-| Baseline                        | 206621/14564 |     0/    0 |
+| Baseline                        | 197910/13092 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   | 207709/14620 |  1088/   56 |
-| Two Coroutines                  | 207953/14652 |  1332/   88 |
-| Scheduler, One Coroutine        | 208749/14660 |  2128/   96 |
-| Scheduler, Two Coroutines       | 208857/14684 |  2236/  120 |
+| One Delay Function              | 198258/13124 |   348/   32 |
+| Two Delay Functions             | 198330/13124 |   420/   32 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   | 198358/13140 |   448/   48 |
+| Two Coroutines                  | 198526/13164 |   616/   72 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        | 198414/13148 |   504/   56 |
+| Scheduler, Two Coroutines       | 198626/13164 |   716/   72 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  | 198602/13120 |   692/   28 |
+| Blink Coroutine                 | 198710/13136 |   800/   44 |
 +--------------------------------------------------------------+
 
 ```
 
-## Teensy 3.2
+### Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
 * Arduino IDE 1.8.13
@@ -210,10 +318,17 @@ $ make README.md
 |---------------------------------+--------------+-------------|
 | Baseline                        |   7628/ 3048 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| One Coroutine                   |  11292/ 4188 |  3664/ 1140 |
-| Two Coroutines                  |  11488/ 4216 |  3860/ 1168 |
-| Scheduler, One Coroutine        |  11436/ 4196 |  3808/ 1148 |
-| Scheduler, Two Coroutines       |  11520/ 4224 |  3892/ 1176 |
+| One Delay Function              |  10836/ 4152 |  3208/ 1104 |
+| Two Delay Functions             |  10868/ 4152 |  3240/ 1104 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   |  10932/ 4172 |  3304/ 1124 |
+| Two Coroutines                  |  11056/ 4192 |  3428/ 1144 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        |  10980/ 4176 |  3352/ 1128 |
+| Scheduler, Two Coroutines       |  11128/ 4196 |  3500/ 1148 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |  11244/ 4148 |  3616/ 1100 |
+| Blink Coroutine                 |  11364/ 4168 |  3736/ 1120 |
 +--------------------------------------------------------------+
 
 ```

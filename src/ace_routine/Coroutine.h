@@ -28,6 +28,7 @@ SOFTWARE.
 #include <stdint.h> // UINT16_MAX
 #include <Print.h> // Print
 #include <AceCommon.h> // FCString
+#include "ClockInterface.h"
 
 class AceRoutineTest_statusStrings;
 class SuspendTest_suspendAndResume;
@@ -49,6 +50,17 @@ class SuspendTest_suspendAndResume;
  * always the same. I'm not 100% sure they are needed here, but they don't seem
  * to hurt.
  */
+
+// https://stackoverflow.com/questions/295120
+/** Macro that indicates a deprecation. */
+#if defined(__GNUC__) || defined(__clang__)
+  #define ACE_ROUTINE_DEPRECATED __attribute__((deprecated))
+#elif defined(_MSC_VER)
+  #define ACE_ROUTINE_DEPRECATED __declspec(deprecated)
+#else
+  #pragma message("WARNING: Implement ACE_ROUTINE_DEPRECATED for this compiler")
+  #define ACE_ROUTINE_DEPRECATED
+#endif
 
 /**
  * Create a Coroutine instance named 'name'. Two forms are supported
@@ -76,7 +88,6 @@ struct Coroutine_##name : ace_routine::Coroutine { \
   int runCoroutine() override; \
 } name; \
 Coroutine_##name :: Coroutine_##name() { \
-  setupCoroutine(F(#name)); \
 } \
 int Coroutine_##name :: runCoroutine()
 
@@ -87,7 +98,6 @@ struct className##_##name : className { \
   int runCoroutine() override; \
 } name; \
 className##_##name :: className##_##name() { \
-  setupCoroutine(F(#name)); \
 } \
 int className##_##name :: runCoroutine()
 
@@ -126,7 +136,7 @@ extern className##_##name name
 
 /** Mark the beginning of a coroutine. */
 #define COROUTINE_BEGIN() \
-    void* p = getJump(); \
+    void* p = this->getJump(); \
     if (p != nullptr) { \
       goto *p; \
     }
@@ -141,12 +151,12 @@ extern className##_##name name
 
 /**
  * Implement the common logic for COROUTINE_YIELD(), COROUTINE_AWAIT(),
- * COROUTINE_DELAY(), COROUTINE_DELAY_SECONDS(), and COROUTINE_DELAY_MICROS().
+ * COROUTINE_DELAY().
  */
 #define COROUTINE_YIELD_INTERNAL() \
     do { \
       __label__ jumpLabel; \
-      setJump(&& jumpLabel); \
+      this->setJump(&& jumpLabel); \
       return 0; \
       jumpLabel: ; \
     } while (false)
@@ -154,9 +164,9 @@ extern className##_##name name
 /** Yield execution to another coroutine. */
 #define COROUTINE_YIELD() \
     do { \
-      setYielding(); \
+      this->setYielding(); \
       COROUTINE_YIELD_INTERNAL(); \
-      setRunning(); \
+      this->setRunning(); \
     } while (false)
 
 /**
@@ -185,8 +195,7 @@ extern className##_##name name
  * setDelayMillis() for the reason for this limitation.
  *
  * If you need to wait for longer than that, use a for-loop to call
- * COROUTINE_DELAY() as many times as necessary or use
- * COROUTINE_DELAY_SECONDS().
+ * COROUTINE_DELAY() as many times as necessary.
  *
  * This could have been implemented using COROUTINE_AWAIT() but this macro
  * matches the global delay(millis) function already provided by the Arduino
@@ -196,51 +205,12 @@ extern className##_##name name
  */
 #define COROUTINE_DELAY(delayMillis) \
     do { \
-      setDelayMillis(delayMillis); \
-      setDelaying(); \
+      this->setDelayMillis(delayMillis); \
+      this->setDelaying(); \
       do { \
         COROUTINE_YIELD_INTERNAL(); \
-      } while (!isDelayExpired()); \
-      setRunning(); \
-    } while (false)
-
-/** Yield for delayMicros. Similiar to COROUTINE_DELAY(delayMillis). */
-#define COROUTINE_DELAY_MICROS(delayMicros) \
-    do { \
-      setDelayMicros(delayMicros); \
-      setDelaying(); \
-      do { \
-        COROUTINE_YIELD_INTERNAL(); \
-      } while (!isDelayExpired()); \
-      setRunning(); \
-    } while (false)
-
-/**
- * Yield for delaySeconds. Similar to COROUTINE_DELAY(delayMillis).
- *
- * The accuracy of the delay interval in units of seconds has at least 2
- * sources of errors, so you should not depend on this for perfectly accurate
- * delays:
- *
- * 1) The current implementation uses the builtin millis() to infer the
- * "seconds". The millis() function returns a value that overflows after
- * 4,294,967.296 seconds. Therefore, the last inferred second just before
- * overflowing contains only 0.296 seconds instead of a full second. A delay
- * which straddles this overflow will return 0.704 seconds earlier than it
- * should.
- * 2) On microcontrollers without support for fast hardware integer division,
- * (i.e. AVR, SAMD21, ESP8266), the division by 1000 is approximated using
- * integer multiplications. The calculated value is off by a fraction of a
- * percent from the correct value.
- */
-#define COROUTINE_DELAY_SECONDS(delaySeconds) \
-    do { \
-      setDelaySeconds(delaySeconds); \
-      setDelaying(); \
-      do { \
-        COROUTINE_YIELD_INTERNAL(); \
-      } while (!isDelayExpired()); \
-      setRunning(); \
+      } while (!this->isDelayExpired()); \
+      this->setRunning(); \
     } while (false)
 
 /**
@@ -250,27 +220,31 @@ extern className##_##name name
 #define COROUTINE_END() \
     do { \
       __label__ jumpLabel; \
-      setEnding(); \
-      setJump(&& jumpLabel); \
+      this->setEnding(); \
+      this->setJump(&& jumpLabel); \
       jumpLabel: ; \
       return 0; \
     } while (false)
 
 namespace ace_routine {
 
+/** A lookup table from Status integer to human-readable strings. */
+extern const __FlashStringHelper* const sStatusStrings[];
+
+// Forward declaration of CoroutineSchedulerTemplate<T>
+template <typename T> class CoroutineSchedulerTemplate;
+
 /**
  * Base class of all coroutines. The actual coroutine code is an implementation
  * of the virtual runCoroutine() method.
  */
-class Coroutine {
-  friend class CoroutineScheduler;
+template <typename T_CLOCK>
+class CoroutineTemplate {
+  friend class CoroutineSchedulerTemplate<CoroutineTemplate<T_CLOCK>>;
   friend class ::AceRoutineTest_statusStrings;
   friend class ::SuspendTest_suspendAndResume;
 
   public:
-    /** Human-readable name of the coroutine. */
-    const ace_common::FCString& getName() const { return mName; }
-
     /**
      * The body of the coroutine. The COROUTINE macro creates a subclass of
      * this class and puts the body of the coroutine into this method.
@@ -282,26 +256,6 @@ class Coroutine {
      * or COROUTINE_END()).
      */
     virtual int runCoroutine() = 0;
-
-    /**
-     * Returns the current millisecond clock. By default it returns the global
-     * millis() function from Arduino but can be overridden for testing.
-     */
-    virtual unsigned long coroutineMillis() const;
-
-    /**
-     * Returns the current millisecond clock. By default it returns the global
-     * micros() function from Arduino but can be overridden for testing.
-     */
-    virtual unsigned long coroutineMicros() const;
-
-    /**
-     * Returns the current clock in unit of seconds, truncated to the lower
-     * 16-bits. This is an approximation of (millis / 1000). It does not need
-     * to be perfectly accurate because COROUTINE_DELAY_SECONS() is not
-     * guaranteed to be precise.
-     */
-    virtual unsigned long coroutineSeconds() const;
 
     /**
      * Suspend the coroutine at the next scheduler iteration. If the coroutine
@@ -324,7 +278,16 @@ class Coroutine {
      * state, this method does nothing. This method works only if the
      * CoroutineScheduler::loop() is used.
      */
-    void resume();
+    void resume() {
+      if (mStatus != kStatusSuspended) return;
+
+      // We lost the original state of the coroutine when suspend() was called
+      // but the coroutine will automatically go back into the original state
+      // when Coroutine::runCoroutine() is called because COROUTINE_YIELD(),
+      // COROUTINE_DELAY() and COROUTINE_AWAIT() are written to restore their
+      // status.
+      mStatus = kStatusYielding;
+    }
 
     /**
      * Reset the coroutine to its initial state. Only the Coroutine base-class
@@ -345,7 +308,11 @@ class Coroutine {
     }
 
     /** Check if delay time is over. */
-    bool isDelayExpired() const;
+    bool isDelayExpired() const {
+      uint16_t now = coroutineMillis();
+      uint16_t elapsed = now - mDelayStart;
+      return elapsed >= mDelayDuration;
+    }
 
     /** The coroutine was suspended with a call to suspend(). */
     bool isSuspended() const { return mStatus == kStatusSuspended; }
@@ -384,58 +351,21 @@ class Coroutine {
     }
 
     /**
-     * Initialize the coroutine for the CoroutineScheduler, set it to Yielding
-     * state, and add it to the linked list of coroutines. This method is
-     * called automatically by the COROUTINE() macro. It needs to be called
-     * manually when using coroutines which were manually created without using
-     * that COROUTINE() macro.
-     *
-     * This method could have been named init() or setup() but since this class
-     * expected to be used as a mix-in class to create more complex classes
-     * which could have its own setup() methods, the longer name seemed more
-     * clear.
-     *
-     * @param name The name of the coroutine as a human-readable string.
+     * Deprecated method that does nothing. Starting v1.3, the setup into the
+     * singly-linked list is automatically performed by the constructor and
+     * this method no longer needs to be called manually. This method is
+     * retained for backwards compatibility.
      */
-    void setupCoroutine(const char* name);
+    void setupCoroutine(const char* /*name*/) ACE_ROUTINE_DEPRECATED {}
 
     /**
-     * Same as setupCoroutine(const char*) except using flash string type.
-     *
-     * Normally, the name would be passed from the subclass into this parent
-     * class through constructor chaining. But if we try to do that with the
-     * F() string, the compiler complains because F() macros work only inside a
-     * function. Therefore, the COROUTINE() macro uses the setupCoroutine()
-     * method to pass the name of the coroutine.
-     *
-     * The problem doesn't exist for a (const char*) but for consistency, I
-     * made both types of strings pass through the setupCoroutine() method
-     * instead of chaining the constructor.
-     *
-     * @param name The name of the coroutine as a human-readable string.
+     * Deprecated method that does nothing. Starting v1.3, the setup into the
+     * singly-linked list is automatically performed by the constructor and
+     * this method no longer needs to be called manually. This method is
+     * retained for backwards compatibility.
      */
-    void setupCoroutine(const __FlashStringHelper* name);
-
-    /**
-     * A version of setupCoroutine(const char*) where the ordering of the
-     * coroutines executed by CoroutineScheduler is ordered by the name. This
-     * was the default behavior of setupCoroutine() before v1.2. This method
-     * recreates the previous behavior, but it exists only for testing purposes
-     * where a deterministic ordering is required. The stability of this method
-     * is not guaranteed and client code should **not** use this method.
-     */
-    void setupCoroutineOrderedByName(const char* name);
-
-    /**
-     * A version of setupCoroutine(const __FlashStringHelper*) where the
-     * ordering of the coroutines executed by CoroutineScheduler is ordered by
-     * the name. This was the default behavior of setupCoroutine() before v1.2.
-     * This method recreates the previous behavior, but it exists only for
-     * testing purposes where a deterministic ordering is required. The
-     * stability of this method is not guaranteed and client code should
-     * **not** use this method.
-     */
-    void setupCoroutineOrderedByName(const __FlashStringHelper* name);
+    void setupCoroutine(const __FlashStringHelper* /*name*/)
+        ACE_ROUTINE_DEPRECATED {}
 
   protected:
     /**
@@ -493,29 +423,24 @@ class Coroutine {
     /** Coroutine has ended and no longer in the scheduler queue. */
     static const Status kStatusTerminated = 5;
 
-    /** Delay using units of millis. */
-    static const uint8_t kDelayTypeMillis = 0;
-
-    /** Delay using units of micros. */
-    static const uint8_t kDelayTypeMicros = 1;
-
-    /** Delay using units of seconds. */
-    static const uint8_t kDelayTypeSeconds = 2;
+    /** Constructor. Automatically insert self into singly-linked list. */
+    CoroutineTemplate() {
+      insertAtRoot();
+    }
 
     /**
-     * Constructor. All subclasses are expected to call either
-     * setupCoroutine(const char*) or setupCoroutine(const
-     * __FlashStringHelper*) before the CoroutineScheduler is used. The
-     * COROUTINE() macro will automatically call setupCoroutine().
+     * Destructor. Non-virtual.
      *
-     * See comment in setupCoroutine(const __FlashStringHelper*) for reason why
-     * the setupCoroutine() function is used instead of chaining the name
-     * through the constructor.
+     * A virtual destructor increases the flash memory consumption on 8-bit AVR
+     * processors by 500-600 bytes because it pulls in the free() and malloc()
+     * functions. On the 32-bit SAMD21, the flash memory increases by by about
+     * 350 bytes. On other 32-bit processors (STM32, ESP8266, ESP32, Teensy
+     * 3.2), the flash memory increase is modest, about 50-150 bytes.
+     *
+     * Since a Coroutine is expected to be created statically, instead of the
+     * heap, a non-virtual destructor is good enough.
      */
-    Coroutine() {}
-
-    /** Destructor. */
-    virtual ~Coroutine() {}
+    ~CoroutineTemplate() = default;
 
     /** Return the status of the coroutine. Used by the CoroutineScheduler. */
     Status getStatus() const { return mStatus; }
@@ -569,51 +494,39 @@ class Coroutine {
      * clock increments by 1 millisecond.)
      */
     void setDelayMillis(uint16_t delayMillis) {
-      mDelayType = kDelayTypeMillis;
       mDelayStart = coroutineMillis();
+
+      // If delayMillis is a compile-time constant, the compiler seems to
+      // completely optimize away this bounds checking code.
       mDelayDuration = (delayMillis >= UINT16_MAX / 2)
           ? UINT16_MAX / 2
           : delayMillis;
     }
 
     /**
-     * Configure the delay timer for delayMicros. Similar to seDelayMillis(),
-     * the maximum delay is 32767 micros.
+     * Returns the current millisecond clock. By default it returns the global
+     * millis() function from Arduino but can be overridden for testing.
      */
-    void setDelayMicros(uint16_t delayMicros) {
-      mDelayType = kDelayTypeMicros;
-      mDelayStart = coroutineMicros();
-      mDelayDuration = (delayMicros >= UINT16_MAX / 2)
-          ? UINT16_MAX / 2
-          : delayMicros;
-    }
-
-    /**
-     * Configure the delay timer for delaySeconds. Similar to seDelayMillis(),
-     * the maximum delay is 32767 seconds.
-     */
-    void setDelaySeconds(uint16_t delaySeconds) {
-      mDelayType = kDelayTypeSeconds;
-      mDelayStart = coroutineSeconds();
-      mDelayDuration = (delaySeconds >= UINT16_MAX / 2)
-          ? UINT16_MAX / 2
-          : delaySeconds;
+    static unsigned long coroutineMillis() {
+      return T_CLOCK::millis();
     }
 
   private:
     // Disable copy-constructor and assignment operator
-    Coroutine(const Coroutine&) = delete;
-    Coroutine& operator=(const Coroutine&) = delete;
-
-    /** A lookup table from Status integer to human-readable strings. */
-    static const __FlashStringHelper* const sStatusStrings[];
+    CoroutineTemplate(const CoroutineTemplate&) = delete;
+    CoroutineTemplate& operator=(const CoroutineTemplate&) = delete;
 
     /**
      * Get the pointer to the root pointer. Implemented as a function static to
      * fix the C++ static initialization problem, making it safe to use this in
      * other static contexts.
      */
-    static Coroutine** getRoot();
+    static CoroutineTemplate** getRoot() {
+      // Use a static variable inside a function to solve the static
+      // initialization ordering problem.
+      static CoroutineTemplate* root;
+      return &root;
+    }
 
     /**
      * Return the next pointer as a pointer to the pointer, similar to
@@ -621,21 +534,7 @@ class Coroutine {
      * Also makes setNext() method unnecessary. Should be used only by
      * CoroutineScheduler.
      */
-    Coroutine** getNext() { return &mNext; }
-
-    /**
-     * Insert the current coroutine into the singly linked list. The order of
-     * C++ static initialization is undefined, but if getName() is not null
-     * (which will normally be the case when using the COROUTINE() macro), the
-     * coroutine will be inserted using getName() as the sorting key. This makes
-     * the ordering deterministic, which is required for unit tests.
-     *
-     * The insertion algorithm is O(N) per insertion, for a total complexity
-     * of O(N^2). That's probably good enough for a "small" number of
-     * coroutines, where small is around O(100). If a large number of
-     * coroutines are inserted, then this method needs to be optimized.
-     */
-    void insertSorted();
+    CoroutineTemplate** getNext() { return &mNext; }
 
     /**
      * Insert the current coroutine at the root of the singly linked list. This
@@ -643,16 +542,36 @@ class Coroutine {
      * ordering of the coroutines in the CoroutineScheduler is no longer an
      * externally defined property.
      */
-    void insertAtRoot();
+    void insertAtRoot() {
+      CoroutineTemplate** root = getRoot();
+      mNext = *root;
+      *root = this;
+    }
 
-    ace_common::FCString mName;
-    Coroutine* mNext = nullptr;
+  protected:
+    /** Pointer to the next coroutine in a singly-linked list. */
+    CoroutineTemplate* mNext = nullptr;
+
+    /** Address of the label used by the computed-goto. */
     void* mJumpPoint = nullptr;
+
+    /** Run-state of the coroutine. */
     Status mStatus = kStatusYielding;
-    uint8_t mDelayType;
-    uint16_t mDelayStart; // millis or micros
-    uint16_t mDelayDuration; // millis or micros
+
+    /** Start time the COROUTINE_DELAY() macro in milliseconds. */
+    uint16_t mDelayStart;
+
+    /** Delay time specified by the COROUTINE_DELAY() macro in milliseconds. */
+    uint16_t mDelayDuration;
 };
+
+/**
+ * A concrete template instance of CoroutineTemplate that uses the built-in
+ * millis() function. This becomes the base class of all user-defined coroutines
+ * created using the COROUTINE() macro or through manual subclassing of this
+ * class.
+ */
+using Coroutine = CoroutineTemplate<ClockInterface>;
 
 }
 

@@ -1,7 +1,9 @@
 SIZEOF
-sizeof(Coroutine): 28
+sizeof(Coroutine): 20
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 BENCHMARKS
-1.61 1.20 0.41
+EmptyLoop 0.066 30000
+DirectScheduling 0.100 30000
+CoroutineScheduling 0.366 30000
 END

@@ -53,14 +53,9 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
   pinMode(LED, OUTPUT);
-
-  // Register the coroutines manually since we are not using COROUTINE() macro.
-  blinkLed.setupCoroutine(F("blinkLed"));
-  printHelloWorld.setupCoroutine(F("printHelloWorld"));
-
-  CoroutineScheduler::setup();
 }
 
 void loop() {
-  CoroutineScheduler::loop();
+  blinkLed.runCoroutine();
+  printHelloWorld.runCoroutine();
 }

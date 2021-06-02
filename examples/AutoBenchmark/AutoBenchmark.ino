@@ -8,19 +8,27 @@
 
 #include <Arduino.h>
 #include <AceRoutine.h>
+#include <AceCommon.h> // printPad3To()
 using namespace ace_routine;
+using ace_common::printPad3To;
 
-#if defined(ESP8266)
-	const unsigned long DURATION = 1000;
+// NUM_ITERATIONS must be in multiples of 1000, due to the algorithm used to
+// convert to nanos below.
+#if defined(EPOXY_DUINO)
+	const uint32_t NUM_ITERATIONS = 300000;
+#elif defined(ARDUINO_ARCH_AVR)
+	const uint32_t NUM_ITERATIONS = 10000;
+#elif defined(ESP8266)
+	const uint32_t NUM_ITERATIONS = 10000;
 #else
-	const unsigned long DURATION = 3000;
+	const uint32_t NUM_ITERATIONS = 30000;
 #endif
 
 #if ! defined(SERIAL_PORT_MONITOR)
 	#define SERIAL_PORT_MONITOR Serial
 #endif
 
-volatile unsigned long counter = 0;
+volatile uint32_t counter = 0;
 
 COROUTINE(counterA) {
   COROUTINE_LOOP() {
@@ -36,33 +44,80 @@ COROUTINE(counterB) {
   }
 }
 
-void doBaseline() {
-  counter = 0;
-  unsigned long start = millis();
+void checkEqual(
+    const __FlashStringHelper* msg, uint32_t expected, uint32_t observed) {
+  if (expected != observed) {
+    SERIAL_PORT_MONITOR.print(msg);
+    SERIAL_PORT_MONITOR.print(F(": check failed: "));
+    SERIAL_PORT_MONITOR.print(F("expected="));
+    SERIAL_PORT_MONITOR.print(expected);
+    SERIAL_PORT_MONITOR.print(F("; observed="));
+    SERIAL_PORT_MONITOR.print(observed);
+    SERIAL_PORT_MONITOR.println();
+  }
+}
+
+uint16_t doEmptyLoop(uint32_t iterations) {
   yield();
-  while (millis() - start < DURATION) {
+  counter = 0;
+  uint16_t start = millis();
+  for (uint32_t i = 0; i < iterations; i++) {
     counter++;
   }
+  uint16_t end = millis();
   yield();
+  checkEqual(F("doEmptyLoop(): "), counter, iterations);
+  return end - start;
 }
 
-void doAceRoutine() {
-  counter = 0;
-  unsigned long start = millis();
+uint16_t doDirectScheduling(uint32_t iterations) {
   yield();
-  while (millis() - start < DURATION) {
+  counter = 0;
+  uint16_t start = millis();
+
+  // Run for 1/2 as many iterations because each loop calls 2 coroutines.
+  for (uint32_t i = 0; i < iterations / 2; i++) {
+    counterA.runCoroutine();
+    counterB.runCoroutine();
+  }
+  uint16_t end = millis();
+  yield();
+  checkEqual(F("doDirectScheduling(): "), counter, iterations);
+  return end - start;
+}
+
+uint16_t doCoroutineScheduling(uint32_t iterations) {
+  yield();
+  counter = 0;
+  uint16_t start = millis();
+  for (uint32_t i = 0; i < iterations; i++) {
     CoroutineScheduler::loop();
   }
+  uint16_t end = millis();
   yield();
+  checkEqual(F("doCoroutineScheduling()"), counter, iterations);
+  return end - start;
 }
 
-void printStats(float baselineMicros, float coroutineMicros) {
-  float diff = coroutineMicros - baselineMicros;
-  SERIAL_PORT_MONITOR.print(coroutineMicros);
+void printNanosAsMicros(Print& printer, uint16_t nanos) {
+  uint16_t wholeMicros = nanos / 1000;
+  uint16_t fracMicros = nanos - wholeMicros * 1000;
+  printer.print(wholeMicros);
+  printer.print('.');
+  printPad3To(printer, fracMicros, '0');
+}
+
+// Print millis 'ms' as micros (to 3 decimal places) per iteration as a floating
+// point number. The number of 'iterations' must be divisible by 1000.
+void printStats(
+    const __FlashStringHelper* name, uint16_t ms, uint32_t iterations) {
+  uint16_t nanosPerIteration = (uint32_t) ms * 1000 / (iterations / 1000);
+  SERIAL_PORT_MONITOR.print(name);
   SERIAL_PORT_MONITOR.print(' ');
-  SERIAL_PORT_MONITOR.print(baselineMicros);
+  printNanosAsMicros(SERIAL_PORT_MONITOR, nanosPerIteration);
   SERIAL_PORT_MONITOR.print(' ');
-  SERIAL_PORT_MONITOR.println(diff);
+  SERIAL_PORT_MONITOR.print(iterations);
+  SERIAL_PORT_MONITOR.println();
 }
 
 void setup() {
@@ -87,11 +142,14 @@ void setup() {
 
   SERIAL_PORT_MONITOR.println(F("BENCHMARKS"));
 
-  doBaseline();
-  float baselineMicros = DURATION * 1000.0 / counter;
-  doAceRoutine();
-  float coroutineMicros = DURATION * 1000.0 / counter;
-  printStats(baselineMicros, coroutineMicros);
+  uint16_t emptyLoopMillis = doEmptyLoop(NUM_ITERATIONS);
+  printStats(F("EmptyLoop"), emptyLoopMillis, NUM_ITERATIONS);
+
+  uint16_t directMillis = doDirectScheduling(NUM_ITERATIONS);
+  printStats(F("DirectScheduling"), directMillis, NUM_ITERATIONS);
+
+  uint16_t schedulerMillis = doCoroutineScheduling(NUM_ITERATIONS);
+  printStats(F("CoroutineScheduling"), schedulerMillis, NUM_ITERATIONS);
 
   SERIAL_PORT_MONITOR.println(F("END"));
 

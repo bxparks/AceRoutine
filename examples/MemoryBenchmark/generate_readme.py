@@ -6,6 +6,8 @@
 
 from subprocess import check_output
 
+attiny_results = check_output(
+    "./generate_table.awk < attiny.txt", shell=True, text=True)
 nano_results = check_output(
     "./generate_table.awk < nano.txt", shell=True, text=True)
 micro_results = check_output(
@@ -122,7 +124,7 @@ will be invoked by the following command:
 $ make README.md
 ```
 
-## Functionality
+## Results
 
 * Baseline: A program that does (almost) nothing
 * One Delay Function: A single non-blocking delay function that waits 10 millis.
@@ -140,7 +142,17 @@ $ make README.md
 * Blink Coroutine: A `Coroutine` that blinks asymmetrically, exactly the same as
   the `blink()` function.
 
-## Arduino Nano
+### ATtiny85
+
+* 8MHz ATtiny85
+* Arduino IDE 1.8.13
+* SpenceKonde/ATTinyCore 1.5.2
+
+```
+{attiny_results}
+```
+
+### Arduino Nano
 
 * 16MHz ATmega328P
 * Arduino IDE 1.8.13
@@ -150,7 +162,7 @@ $ make README.md
 {nano_results}
 ```
 
-## SparkFun Pro Micro
+### SparkFun Pro Micro
 
 * 16 MHz ATmega32U4
 * Arduino IDE 1.8.13
@@ -160,7 +172,7 @@ $ make README.md
 {micro_results}
 ```
 
-## SAMD21 M0 Mini
+### SAMD21 M0 Mini
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
@@ -170,7 +182,7 @@ $ make README.md
 {samd_results}
 ```
 
-## STM32 Blue Pill
+### STM32 Blue Pill
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
@@ -180,7 +192,7 @@ $ make README.md
 {stm32_results}
 ```
 
-## ESP8266
+### ESP8266
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
 * Arduino IDE 1.8.13
@@ -190,17 +202,17 @@ $ make README.md
 {esp8266_results}
 ```
 
-## ESP32
+### ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.13
-* ESP32 Boards 1.0.4
+* ESP32 Boards 1.0.6
 
 ```
 {esp32_results}
 ```
 
-## Teensy 3.2
+### Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
 * Arduino IDE 1.8.13

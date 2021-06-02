@@ -98,7 +98,7 @@ will be invoked by the following command:
 $ make README.md
 ```
 
-## Functionality
+## Results
 
 * Baseline: A program that does (almost) nothing
 * One Delay Function: A single non-blocking delay function that waits 10 millis.
@@ -116,7 +116,34 @@ $ make README.md
 * Blink Coroutine: A `Coroutine` that blinks asymmetrically, exactly the same as
   the `blink()` function.
 
-## Arduino Nano
+### ATtiny85
+
+* 8MHz ATtiny85
+* Arduino IDE 1.8.13
+* SpenceKonde/ATTinyCore 1.5.2
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| Baseline                        |    400/   11 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| One Delay Function              |    450/   13 |    50/    2 |
+| Two Delay Functions             |    508/   15 |   108/    4 |
+|---------------------------------+--------------+-------------|
+| One Coroutine                   |    628/   30 |   228/   19 |
+| Two Coroutines                  |    796/   47 |   396/   36 |
+|---------------------------------+--------------+-------------|
+| Scheduler, One Coroutine        |    734/   32 |   334/   21 |
+| Scheduler, Two Coroutines       |    976/   49 |   576/   38 |
+|---------------------------------+--------------+-------------|
+| Blink Function                  |    546/   14 |   146/    3 |
+| Blink Coroutine                 |    752/   30 |   352/   19 |
++--------------------------------------------------------------+
+
+```
+
+### Arduino Nano
 
 * 16MHz ATmega328P
 * Arduino IDE 1.8.13
@@ -143,7 +170,7 @@ $ make README.md
 
 ```
 
-## SparkFun Pro Micro
+### SparkFun Pro Micro
 
 * 16 MHz ATmega32U4
 * Arduino IDE 1.8.13
@@ -170,7 +197,7 @@ $ make README.md
 
 ```
 
-## SAMD21 M0 Mini
+### SAMD21 M0 Mini
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
@@ -197,7 +224,7 @@ $ make README.md
 
 ```
 
-## STM32 Blue Pill
+### STM32 Blue Pill
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
@@ -224,7 +251,7 @@ $ make README.md
 
 ```
 
-## ESP8266
+### ESP8266
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
 * Arduino IDE 1.8.13
@@ -251,11 +278,11 @@ $ make README.md
 
 ```
 
-## ESP32
+### ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.13
-* ESP32 Boards 1.0.4
+* ESP32 Boards 1.0.6
 
 ```
 +--------------------------------------------------------------+
@@ -278,7 +305,7 @@ $ make README.md
 
 ```
 
-## Teensy 3.2
+### Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
 * Arduino IDE 1.8.13

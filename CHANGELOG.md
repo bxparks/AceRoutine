@@ -74,6 +74,7 @@
       section to recommend direct calls to `Coroutine::runCoroutine()` on 8-bit
       processors, and limit the `CoroutineScheduler` to 32-bit processors with
       sufficient flash memory.
+    * Add preliminary support for ATtiny85.
 * 1.2.4 (2021-01-22)
     * Update UnixHostDuino 0.4 to EpoxyDuino 0.5.
     * No functional change in this release.

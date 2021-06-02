@@ -8,13 +8,16 @@ include ../../../EpoxyDuino/EpoxyDuino.mk
 
 .PHONY: benchmarks
 
-TARGETS := nano.txt micro.txt samd.txt stm32.txt esp8266.txt esp32.txt \
-teensy32.txt
+TARGETS := attiny.txt nano.txt micro.txt samd.txt stm32.txt \
+	esp8266.txt esp32.txt teensy32.txt
 
 README.md: generate_readme.py generate_table.awk $(TARGETS)
 	./generate_readme.py > $@
 
 benchmarks: $(TARGETS)
+
+attiny.txt:
+	./collect.sh --cli attiny $@
 
 nano.txt:
 	./collect.sh nano $@
@@ -34,6 +37,7 @@ esp8266.txt:
 esp32.txt:
 	./collect.sh esp32 $@
 
+# Teensy does not support ArduinoCLI as far as I know.
 teensy32.txt:
 	./collect.sh --ide teensy32 $@
 

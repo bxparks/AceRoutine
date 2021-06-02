@@ -113,6 +113,9 @@ additional macros that can reduce boilerplate code.
 ## Table of Contents
 
 * [Hello Coroutines](#HelloCoroutines)
+    * [Hello Coroutine](#HelloCoroutine)
+    * [Hello Scheduler](#HelloScheduler)
+    * [Hello Manual Coroutine](#HelloManualCoroutine)
 * [Installation](#Installation)
     * [Source Code](#SourceCode)
 * [Documentation](#Documentation)
@@ -133,6 +136,7 @@ additional macros that can reduce boilerplate code.
 <a name="HelloCoroutines"></a>
 ## Hello Coroutines
 
+<a name="HelloCoroutine"></a>
 ### HelloCoroutine
 
 This is the [HelloCoroutine.ino](examples/HelloCoroutine) sample sketch which
@@ -185,6 +189,7 @@ The `printHelloWorld` coroutine prints "Hello, ", waits 1 second, then prints
 time, the `blinkLed` coroutine blinks the builtin LED on and off, on for 100 ms
 and off for 500 ms.
 
+<a name="HelloScheduler"></a>
 ### HelloScheduler
 
 The [HelloScheduler.ino](examples/HelloScheduler) sketch implements the same
@@ -230,6 +235,7 @@ be important. On 32-bit processors with far more memory, these additional
 resources are often inconsequential. Therefore the `CoroutineScheduler` is
 recommended mostly on 32-bit processors.
 
+<a name="HelloManualCoroutine"></a>
 ### HelloManualCoroutine
 
 The [HelloManualCoroutine.ino](examples/HelloManualCoroutine) program shows what
@@ -353,7 +359,7 @@ The following programs are provided under the `examples` directory:
     * [SoundManager](examples/SoundManager): Use a sound manager coroutine to
       control the sounds made by a sound generator coroutine, using the
       `reset()` function to interrupt the sound generator.
-* Channels
+* Channels (experimental)
     * [Pipe.ino](examples/Pipe): uses a `Channel` to allow a Writer to send
       messages to a Reader through a "pipe" (unfinished)
     * [Task.ino](examples/Pipe): uses a `Channel` to allow a Writer to send

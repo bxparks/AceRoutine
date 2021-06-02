@@ -217,10 +217,8 @@ void loop() {
 
 The `CoroutineScheduler` can automatically manage all coroutines defined by the
 `COROUTINE()` macro, which eliminates the need to itemize your coroutines in the
-`loop()` method manually.
-
-Unfortunately, this convenience is not free (see
-[MemoryBenchmark](examples/MemoryBenchmark):
+`loop()` method manually. Unfortunately, this convenience is not free (see
+[MemoryBenchmark](examples/MemoryBenchmark)):
 
 * The `CoroutineScheduler` singleton instance increases the flash memory by
   about 110 bytes.
@@ -466,23 +464,27 @@ advantages:
 
 All objects are statically allocated (i.e. not heap or stack).
 
-* 8-bit processors (AVR Nano, Uno, etc):
-    * `sizeof(Coroutine)`: 11
-    * `sizeof(CoroutineScheduler)`: 2
-    * `sizeof(Channel<int>)`: 5
-* 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32)
-    * `sizeof(Coroutine)`: 20
-    * `sizeof(CoroutineScheduler)`: 4
-    * `sizeof(Channel<int>)`: 12
+On 8-bit processors (AVR Nano, Uno, etc):
 
-In other words, you can create 100 `Coroutine` instances and they would use only
-1400 bytes of static RAM on an 8-bit AVR processor.
+```
+sizeof(Coroutine): 11
+sizeof(CoroutineScheduler): 2
+sizeof(Channel<int>): 5
+```
+
+On 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32):
+
+```
+sizeof(Coroutine): 20
+sizeof(CoroutineScheduler): 4
+sizeof(Channel<int>): 12
+```
 
 The `CoroutineScheduler` consumes only 2 bytes of memory no matter how many
 coroutines are created. That's because it depends on a singly-linked list whose
 pointers live on the `Coroutine` object, not in the `CoroutineScheduler`. But
 using the `CoroutineScheduler::loop()` instead of calling
-`Coroutine::runCoroutine()` manually increases flash memory usage by about 110
+`Coroutine::runCoroutine()` directly increases flash memory usage by 70-100
 bytes.
 
 The `Channel` object requires 2 copies of the parameterized `<T>` type so its
@@ -555,9 +557,31 @@ be worth ease of code maintenance.
 <a name="CPU"></a>
 ### CPU
 
-See [examples/AutoBenchmark](examples/AutoBenchmark). In summary, the overhead
-of AceRoutine context switching is about 6 micros on an 8-bit AVR, to as low as
-0.33 micros on a 32-bit ESP32.
+See [examples/AutoBenchmark](examples/AutoBenchmark). Here are 2 samples:
+
+Arduino Nano:
+
+```
++---------------------+--------+-------------+--------+
+| Functionality       |  iters | micros/iter |   diff |
+|---------------------+--------+-------------+--------|
+| EmptyLoop           |  10000 |       1.700 |  0.000 |
+| DirectScheduling    |  10000 |       2.900 |  1.200 |
+| CoroutineScheduling |  10000 |       6.900 |  5.200 |
++---------------------+--------+-------------+--------+
+```
+
+ESP8266:
+
+```
++---------------------+--------+-------------+--------+
+| Functionality       |  iters | micros/iter |   diff |
+|---------------------+--------+-------------+--------|
+| EmptyLoop           |  10000 |       0.100 |  0.000 |
+| DirectScheduling    |  10000 |       0.500 |  0.400 |
+| CoroutineScheduling |  10000 |       1.200 |  1.100 |
++---------------------+--------+-------------+--------+
+```
 
 <a name="SystemRequirements"></a>
 ## System Requirements

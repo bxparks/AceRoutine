@@ -211,8 +211,24 @@ void loop() {
 ```
 
 The `CoroutineScheduler` can automatically manage all coroutines defined by the
-`COROUTINE()` macro, which eliminates the need to itemize your coroutines in
-the `loop()` method manually.
+`COROUTINE()` macro, which eliminates the need to itemize your coroutines in the
+`loop()` method manually.
+
+Unfortunately, this convenience is not free (see
+[MemoryBenchmark](examples/MemoryBenchmark):
+
+* The `CoroutineScheduler` singleton instance increases the flash memory by
+  about 110 bytes.
+* The `CoroutineScheduler::loop()` method calls the `Coroutine::runCoroutine()`
+  method through the `virtual` dispatch instead of directly, which is slower and
+  takes more flash memory.
+* Each `Coroutine` instance consumes an additional ~70 bytes of flash
+  when using the `CoroutineScheduler`.
+
+On 8-bit processors with limited memory, the additional resource consumption can
+be important. On 32-bit processors with far more memory, these additional
+resources are often inconsequential. Therefore the `CoroutineScheduler` is
+recommended mostly on 32-bit processors.
 
 ### HelloManualCoroutine
 
@@ -263,14 +279,11 @@ void setup() {
   Serial.begin(115200);
   while (!Serial); // Leonardo/Micro
   pinMode(LED, OUTPUT);
-
-  blinkLed.setupCoroutine(F("blinkLed"));
-  printHelloWorld.setupCoroutine(F("printHelloWorld"));
-  CoroutineScheduler::setup();
 }
 
 void loop() {
-  CoroutineScheduler::loop();
+  blinkLed.runCoroutine();
+  printHelloWorld.runCoroutine();
 }
 ```
 

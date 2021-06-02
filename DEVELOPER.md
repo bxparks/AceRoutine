@@ -6,8 +6,7 @@ even I have trouble remembering.
 ## Coroutine Linked List
 
 The `COROUTINE()` macro creates an instance of `Coroutine` whose constructor
-calls `setupCoroutine(const char* name)`. The `setupCoroutine()` method inserts
-the coroutine instance into a singly linked list. This allows the
+inserts the coroutine instance into a singly linked list. This allows the
 `CoroutineScheduler` to iterate over the linked list and allow the coroutines to
 execute in a round-robin fashion.
 

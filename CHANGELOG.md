@@ -1,6 +1,13 @@
 # Changelog
 
 * Unreleased
+    * Upgrade STM32duino Core from 1.9.0 to 2.0.0.
+        * MemoryBenchmark: Flash usage increases by 2.3kB across the board, but
+          static RAM goes down by 250 bytes. Very little change to AceRoutine
+          code itself.
+        * AutoBenchmark: No change.
+    * Upgrade SparkFun SAMD Core from 1.8.1 to 1.8.3.
+        * No change observed in MemoryBenchmark or AutoBenchmark.
 * 1.3.1 (2021-06-02)
     * Bring back `COROUTINE_DELAY_MICROS()` and `COROUTINE_DELAY_SECONDS()`
       with an alternate implemenation that increases flash and static memory

@@ -99,6 +99,16 @@ calculated flash size can jump around in unexpected ways.
           1000 which must be done in software on 8-bit processors.
         * The `CoroutineScheduler` is forced to become simpler  which reduces
           flash usage by 10-20 bytes.
+* v1.3.1+
+    * Upgrade STM32duino Core to 2.0.0.
+        * Flash usage increases by 2.3kB across the board, but static RAM goes
+          down by 250 bytes.
+        * Very little change to AceRoutine code itself.
+        * "Blink Function" and "Blink Coroutine" both increase flash usage by
+          about 50 bytes, probably due to additional resource consumption of
+          `digitalWrite()` in 2.0.0.
+    * Upgrade SparkFun SAMD Core to 1.8.3.
+        * No change in memory usage.
 
 ## How to Generate
 
@@ -190,7 +200,7 @@ $ make README.md
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* SparkFun SAMD Core 1.8.1
+* SparkFun SAMD Core 1.8.3
 
 ```
 {samd_results}
@@ -200,7 +210,7 @@ $ make README.md
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
-* STM32duino 1.9.0
+* STM32duino 2.0.0
 
 ```
 {stm32_results}

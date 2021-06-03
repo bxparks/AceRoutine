@@ -73,6 +73,16 @@ calculated flash size can jump around in unexpected ways.
           1000 which must be done in software on 8-bit processors.
         * The `CoroutineScheduler` is forced to become simpler  which reduces
           flash usage by 10-20 bytes.
+* v1.3.1+
+    * Upgrade STM32duino Core to 2.0.0.
+        * Flash usage increases by 2.3kB across the board, but static RAM goes
+          down by 250 bytes.
+        * Very little change to AceRoutine code itself.
+        * "Blink Function" and "Blink Coroutine" both increase flash usage by
+          about 50 bytes, probably due to additional resource consumption of
+          `digitalWrite()` in 2.0.0.
+    * Upgrade SparkFun SAMD Core to 1.8.3.
+        * No change in memory usage.
 
 ## How to Generate
 
@@ -251,7 +261,7 @@ $ make README.md
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* SparkFun SAMD Core 1.8.1
+* SparkFun SAMD Core 1.8.3
 
 ```
 +------------------------------------------------------------------+
@@ -290,37 +300,37 @@ $ make README.md
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
-* STM32duino 1.9.0
+* STM32duino 2.0.0
 
 ```
 +------------------------------------------------------------------+
 | functionality                       |  flash/  ram |       delta |
 |-------------------------------------+--------------+-------------|
-| Baseline                            |  19140/ 3788 |     0/    0 |
+| Baseline                            |  21424/ 3536 |     0/    0 |
 |-------------------------------------+--------------+-------------|
-| One Delay Function                  |  19164/ 3792 |    24/    4 |
-| Two Delay Functions                 |  19212/ 3792 |    72/    4 |
+| One Delay Function                  |  21452/ 3540 |    28/    4 |
+| Two Delay Functions                 |  21500/ 3540 |    76/    4 |
 |-------------------------------------+--------------+-------------|
-| One Coroutine                       |  19256/ 3812 |   116/   24 |
-| Two Coroutines                      |  19396/ 3832 |   256/   44 |
+| One Coroutine                       |  21544/ 3560 |   120/   24 |
+| Two Coroutines                      |  21684/ 3580 |   260/   44 |
 |-------------------------------------+--------------+-------------|
-| One Coroutine (micros)              |  19320/ 3812 |   180/   24 |
-| Two Coroutines (micros)             |  19460/ 3832 |   320/   44 |
+| One Coroutine (micros)              |  21608/ 3560 |   184/   24 |
+| Two Coroutines (micros)             |  21748/ 3580 |   324/   44 |
 |-------------------------------------+--------------+-------------|
-| One Coroutine (seconds)             |  19272/ 3812 |   132/   24 |
-| Two Coroutines (seconds)            |  19428/ 3832 |   288/   44 |
+| One Coroutine (seconds)             |  21560/ 3560 |   136/   24 |
+| Two Coroutines (seconds)            |  21716/ 3580 |   292/   44 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine            |  19308/ 3816 |   168/   28 |
-| Scheduler, Two Coroutines           |  19408/ 3836 |   268/   48 |
+| Scheduler, One Coroutine            |  21596/ 3564 |   172/   28 |
+| Scheduler, Two Coroutines           |  21696/ 3584 |   272/   48 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   |  19372/ 3816 |   232/   28 |
-| Scheduler, Two Coroutines (micros)  |  19472/ 3836 |   332/   48 |
+| Scheduler, One Coroutine (micros)   |  21660/ 3564 |   236/   28 |
+| Scheduler, Two Coroutines (micros)  |  21760/ 3584 |   336/   48 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  |  19324/ 3816 |   184/   28 |
-| Scheduler, Two Coroutines (seconds) |  19440/ 3836 |   300/   48 |
+| Scheduler, One Coroutine (seconds)  |  21612/ 3564 |   188/   28 |
+| Scheduler, Two Coroutines (seconds) |  21728/ 3584 |   304/   48 |
 |-------------------------------------+--------------+-------------|
-| Blink Function                      |  19280/ 3788 |   140/    0 |
-| Blink Coroutine                     |  19384/ 3808 |   244/   20 |
+| Blink Function                      |  21616/ 3536 |   192/    0 |
+| Blink Coroutine                     |  21720/ 3556 |   296/   20 |
 +------------------------------------------------------------------+
 
 ```

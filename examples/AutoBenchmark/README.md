@@ -105,6 +105,10 @@ $ make README.md
         * Makes `CoroutineScheduler` slightly slower on AVR processors (e.g. 5.2
           -> 5.5 micros on AVR) , but is actually *faster* on 32-bit processors
           (e.g. 1.100 -> 0.600 micros on ESP8266).
+* v1.3.1+
+    * Upgrade STM32duino Core from 1.9.0 to 2.0.0.
+    * Upgrade SparkFun SAMD Core from 1.8.1 to 1.8.3.
+    * No changes observed.
 
 ## Arduino Nano
 
@@ -158,7 +162,7 @@ CPU:
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* SparkFun SAMD Core 1.8.1
+* SparkFun SAMD Core 1.8.3
 
 ```
 Sizes of Objects:
@@ -181,7 +185,7 @@ CPU:
 
 * STM32 "Blue Pill", STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
-* STM32duino 1.9.0
+* STM32duino 2.0.0
 
 ```
 Sizes of Objects:
@@ -227,7 +231,7 @@ CPU:
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.13
-* ESP32 Boards 1.0.4
+* ESP32 Boards 1.0.6
 
 ```
 Sizes of Objects:

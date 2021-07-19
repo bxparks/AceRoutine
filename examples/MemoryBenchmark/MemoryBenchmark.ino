@@ -292,14 +292,14 @@ volatile int disableCompilerOptimization = 0;
 
     if (blinkState == kBlinkStateHigh) {
       uint16_t nowMillis = millis();
-      if (nowMillis - prevMillis >= 100) {
+      if ((uint16_t) (nowMillis - prevMillis) >= 100) {
         prevMillis = nowMillis;
         digitalWrite(LED_BUILTIN, LOW);
         blinkState = kBlinkStateLow;
       }
     } else {
       uint16_t nowMillis = millis();
-      if (nowMillis - prevMillis >= 500) {
+      if ((uint16_t) (nowMillis - prevMillis) >= 500) {
         prevMillis = nowMillis;
         digitalWrite(LED_BUILTIN, HIGH);
         blinkState = kBlinkStateHigh;

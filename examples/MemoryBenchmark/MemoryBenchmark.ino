@@ -32,8 +32,10 @@
 #define FEATURE_SCHEDULER_TWO_COROUTINES_SECONDS 14
 #define FEATURE_SCHEDULER_SETUP_ONE_COROUTINE 15
 #define FEATURE_SCHEDULER_SETUP_TWO_COROUTINES 16
-#define FEATURE_BLINK_FUNCTION 17
-#define FEATURE_BLINK_COROUTINE 18
+#define FEATURE_SCHEDULER_MANUAL_SETUP_ONE_COROUTINE 17
+#define FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES 18
+#define FEATURE_BLINK_FUNCTION 19
+#define FEATURE_BLINK_COROUTINE 20
 
 #if FEATURE != FEATURE_BASELINE
   #include <AceRoutine.h>
@@ -328,6 +330,57 @@ volatile int disableCompilerOptimization = 0;
   MyCoroutineA a;
   MyCoroutineB b;
 
+#elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_ONE_COROUTINE
+
+  class MyCoroutine : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY(10);
+        }
+      }
+
+      void setupCoroutine() override {
+        disableCompilerOptimization = 1;
+      }
+  };
+
+  MyCoroutine a;
+
+#elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES
+
+  class MyCoroutineA : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY(10);
+        }
+      }
+
+      void setupCoroutine() override {
+        disableCompilerOptimization = 1;
+      }
+  };
+
+  class MyCoroutineB : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY_SECONDS(10);
+        }
+      }
+
+      void setupCoroutine() override {
+        disableCompilerOptimization = 1;
+      }
+  };
+
+  MyCoroutineA a;
+  MyCoroutineB b;
+
 #elif FEATURE == FEATURE_BLINK_FUNCTION
 
   #ifndef LED_BUILTIN
@@ -406,13 +459,19 @@ void setup() {
 #endif
 
 #if FEATURE >= FEATURE_SCHEDULER_ONE_COROUTINE \
-    && FEATURE <= FEATURE_SCHEDULER_SETUP_TWO_COROUTINES
+    && FEATURE <= FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES
    CoroutineScheduler::setup();
 
   #if FEATURE == FEATURE_SCHEDULER_SETUP_ONE_COROUTINE \
       || FEATURE == FEATURE_SCHEDULER_SETUP_TWO_COROUTINES
     CoroutineScheduler::setupCoroutines();
+  #elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_ONE_COROUTINE
+    a.setupCoroutine();
+  #elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES
+    a.setupCoroutine();
+    b.setupCoroutine();
   #endif
+
 #endif
 }
 
@@ -458,6 +517,10 @@ void loop() {
 #elif FEATURE == FEATURE_SCHEDULER_SETUP_ONE_COROUTINE
   CoroutineScheduler::loop();
 #elif FEATURE == FEATURE_SCHEDULER_SETUP_TWO_COROUTINES
+  CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_ONE_COROUTINE
+  CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES
   CoroutineScheduler::loop();
 #elif FEATURE == FEATURE_BLINK_COROUTINE
   blink.runCoroutine();

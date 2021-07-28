@@ -164,14 +164,14 @@ $ make README.md
 | One Coroutine (seconds)             |    724/   30 |   324/   19 |
 | Two Coroutines (seconds)            |    920/   47 |   520/   36 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine            |    742/   32 |   342/   21 |
-| Scheduler, Two Coroutines           |    904/   49 |   504/   38 |
+| Scheduler, One Coroutine            |    756/   32 |   356/   21 |
+| Scheduler, Two Coroutines           |    918/   49 |   518/   38 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   |    710/   32 |   310/   21 |
-| Scheduler, Two Coroutines (micros)  |    840/   49 |   440/   38 |
+| Scheduler, One Coroutine (micros)   |    724/   32 |   324/   21 |
+| Scheduler, Two Coroutines (micros)  |    854/   49 |   454/   38 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  |    838/   32 |   438/   21 |
-| Scheduler, Two Coroutines (seconds) |   1028/   49 |   628/   38 |
+| Scheduler, One Coroutine (seconds)  |    852/   32 |   452/   21 |
+| Scheduler, Two Coroutines (seconds) |   1042/   49 |   642/   38 |
 |-------------------------------------+--------------+-------------|
 | Blink Function                      |    546/   14 |   146/    3 |
 | Blink Coroutine                     |    752/   30 |   352/   19 |
@@ -203,14 +203,14 @@ $ make README.md
 | One Coroutine (seconds)             |    940/   30 |   334/   19 |
 | Two Coroutines (seconds)            |   1142/   47 |   536/   36 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine            |    954/   32 |   348/   21 |
-| Scheduler, Two Coroutines           |   1116/   49 |   510/   38 |
+| Scheduler, One Coroutine            |    964/   32 |   358/   21 |
+| Scheduler, Two Coroutines           |   1126/   49 |   520/   38 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   |    926/   32 |   320/   21 |
-| Scheduler, Two Coroutines (micros)  |   1060/   49 |   454/   38 |
+| Scheduler, One Coroutine (micros)   |    936/   32 |   330/   21 |
+| Scheduler, Two Coroutines (micros)  |   1070/   49 |   464/   38 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  |   1054/   32 |   448/   21 |
-| Scheduler, Two Coroutines (seconds) |   1248/   49 |   642/   38 |
+| Scheduler, One Coroutine (seconds)  |   1064/   32 |   458/   21 |
+| Scheduler, Two Coroutines (seconds) |   1258/   49 |   652/   38 |
 |-------------------------------------+--------------+-------------|
 | Blink Function                      |    938/   14 |   332/    3 |
 | Blink Coroutine                     |   1154/   30 |   548/   19 |
@@ -242,14 +242,14 @@ $ make README.md
 | One Coroutine (seconds)             |   3828/  170 |   274/   19 |
 | Two Coroutines (seconds)            |   4030/  187 |   476/   36 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine            |   3842/  172 |   288/   21 |
-| Scheduler, Two Coroutines           |   4004/  189 |   450/   38 |
+| Scheduler, One Coroutine            |   3852/  172 |   298/   21 |
+| Scheduler, Two Coroutines           |   4014/  189 |   460/   38 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   |   3814/  172 |   260/   21 |
-| Scheduler, Two Coroutines (micros)  |   3948/  189 |   394/   38 |
+| Scheduler, One Coroutine (micros)   |   3824/  172 |   270/   21 |
+| Scheduler, Two Coroutines (micros)  |   3958/  189 |   404/   38 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  |   3942/  172 |   388/   21 |
-| Scheduler, Two Coroutines (seconds) |   4136/  189 |   582/   38 |
+| Scheduler, One Coroutine (seconds)  |   3952/  172 |   398/   21 |
+| Scheduler, Two Coroutines (seconds) |   4146/  189 |   592/   38 |
 |-------------------------------------+--------------+-------------|
 | Blink Function                      |   3994/  154 |   440/    3 |
 | Blink Coroutine                     |   4150/  170 |   596/   19 |
@@ -267,31 +267,31 @@ $ make README.md
 +------------------------------------------------------------------+
 | functionality                       |  flash/  ram |       delta |
 |-------------------------------------+--------------+-------------|
-| Baseline                            |  10072/    0 |     0/    0 |
+| Baseline                            |   9948/    0 |     0/    0 |
 |-------------------------------------+--------------+-------------|
-| One Delay Function                  |  10112/    0 |    40/    0 |
-| Two Delay Functions                 |  10152/    0 |    80/    0 |
+| One Delay Function                  |   9992/    0 |    44/    0 |
+| Two Delay Functions                 |  10032/    0 |    84/    0 |
 |-------------------------------------+--------------+-------------|
-| One Coroutine                       |  10224/    0 |   152/    0 |
-| Two Coroutines                      |  10360/    0 |   288/    0 |
+| One Coroutine                       |  10092/    0 |   144/    0 |
+| Two Coroutines                      |  10220/    0 |   272/    0 |
 |-------------------------------------+--------------+-------------|
-| One Coroutine (micros)              |  10312/    0 |   240/    0 |
-| Two Coroutines (micros)             |  10448/    0 |   376/    0 |
+| One Coroutine (micros)              |  10176/    0 |   228/    0 |
+| Two Coroutines (micros)             |  10304/    0 |   356/    0 |
 |-------------------------------------+--------------+-------------|
-| One Coroutine (seconds)             |  10240/    0 |   168/    0 |
-| Two Coroutines (seconds)            |  10392/    0 |   320/    0 |
+| One Coroutine (seconds)             |  10108/    0 |   160/    0 |
+| Two Coroutines (seconds)            |  10252/    0 |   304/    0 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine            |  10264/    0 |   192/    0 |
-| Scheduler, Two Coroutines           |  10376/    0 |   304/    0 |
+| Scheduler, One Coroutine            |  10156/    0 |   208/    0 |
+| Scheduler, Two Coroutines           |  10260/    0 |   312/    0 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   |  10352/    0 |   280/    0 |
-| Scheduler, Two Coroutines (micros)  |  10464/    0 |   392/    0 |
+| Scheduler, One Coroutine (micros)   |  10240/    0 |   292/    0 |
+| Scheduler, Two Coroutines (micros)  |  10344/    0 |   396/    0 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  |  10280/    0 |   208/    0 |
-| Scheduler, Two Coroutines (seconds) |  10408/    0 |   336/    0 |
+| Scheduler, One Coroutine (seconds)  |  10172/    0 |   224/    0 |
+| Scheduler, Two Coroutines (seconds) |  10292/    0 |   344/    0 |
 |-------------------------------------+--------------+-------------|
-| Blink Function                      |  10160/    0 |    88/    0 |
-| Blink Coroutine                     |  10272/    0 |   200/    0 |
+| Blink Function                      |  10044/    0 |    96/    0 |
+| Blink Coroutine                     |  10144/    0 |   196/    0 |
 +------------------------------------------------------------------+
 
 ```
@@ -320,16 +320,16 @@ $ make README.md
 | One Coroutine (seconds)             |  21560/ 3560 |   136/   24 |
 | Two Coroutines (seconds)            |  21716/ 3580 |   292/   44 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine            |  21596/ 3564 |   172/   28 |
-| Scheduler, Two Coroutines           |  21696/ 3584 |   272/   48 |
+| Scheduler, One Coroutine            |  21616/ 3564 |   192/   28 |
+| Scheduler, Two Coroutines           |  21716/ 3584 |   292/   48 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   |  21660/ 3564 |   236/   28 |
-| Scheduler, Two Coroutines (micros)  |  21760/ 3584 |   336/   48 |
+| Scheduler, One Coroutine (micros)   |  21680/ 3564 |   256/   28 |
+| Scheduler, Two Coroutines (micros)  |  21780/ 3584 |   356/   48 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  |  21612/ 3564 |   188/   28 |
-| Scheduler, Two Coroutines (seconds) |  21728/ 3584 |   304/   48 |
+| Scheduler, One Coroutine (seconds)  |  21632/ 3564 |   208/   28 |
+| Scheduler, Two Coroutines (seconds) |  21748/ 3584 |   324/   48 |
 |-------------------------------------+--------------+-------------|
-| Blink Function                      |  21616/ 3536 |   192/    0 |
+| Blink Function                      |  21620/ 3536 |   196/    0 |
 | Blink Coroutine                     |  21720/ 3556 |   296/   20 |
 +------------------------------------------------------------------+
 
@@ -360,12 +360,12 @@ $ make README.md
 | Two Coroutines (seconds)            | 257312/26844 |   388/   44 |
 |-------------------------------------+--------------+-------------|
 | Scheduler, One Coroutine            | 257152/26828 |   228/   28 |
-| Scheduler, Two Coroutines           | 257280/26844 |   356/   44 |
+| Scheduler, Two Coroutines           | 257296/26844 |   372/   44 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   | 257168/26828 |   244/   28 |
+| Scheduler, One Coroutine (micros)   | 257184/26828 |   260/   28 |
 | Scheduler, Two Coroutines (micros)  | 257312/26844 |   388/   44 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  | 257168/26828 |   244/   28 |
+| Scheduler, One Coroutine (seconds)  | 257184/26828 |   260/   28 |
 | Scheduler, Two Coroutines (seconds) | 257328/26844 |   404/   44 |
 |-------------------------------------+--------------+-------------|
 | Blink Function                      | 257424/26816 |   500/   16 |
@@ -398,14 +398,14 @@ $ make README.md
 | One Coroutine (seconds)             | 198374/13140 |   464/   48 |
 | Two Coroutines (seconds)            | 198558/13164 |   648/   72 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine            | 198414/13148 |   504/   56 |
-| Scheduler, Two Coroutines           | 198558/13164 |   648/   72 |
+| Scheduler, One Coroutine            | 198422/13148 |   512/   56 |
+| Scheduler, Two Coroutines           | 198566/13164 |   656/   72 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   | 198402/13148 |   492/   56 |
-| Scheduler, Two Coroutines (micros)  | 198546/13164 |   636/   72 |
+| Scheduler, One Coroutine (micros)   | 198410/13148 |   500/   56 |
+| Scheduler, Two Coroutines (micros)  | 198554/13164 |   644/   72 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  | 198430/13148 |   520/   56 |
-| Scheduler, Two Coroutines (seconds) | 198590/13164 |   680/   72 |
+| Scheduler, One Coroutine (seconds)  | 198438/13148 |   528/   56 |
+| Scheduler, Two Coroutines (seconds) | 198598/13164 |   688/   72 |
 |-------------------------------------+--------------+-------------|
 | Blink Function                      | 198602/13120 |   692/   28 |
 | Blink Coroutine                     | 198710/13136 |   800/   44 |
@@ -438,16 +438,16 @@ $ make README.md
 | One Coroutine (seconds)             |  10952/ 4172 |  3324/ 1124 |
 | Two Coroutines (seconds)            |  11096/ 4192 |  3468/ 1144 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine            |  10988/ 4176 |  3360/ 1128 |
-| Scheduler, Two Coroutines           |  11096/ 4196 |  3468/ 1148 |
+| Scheduler, One Coroutine            |  11008/ 4176 |  3380/ 1128 |
+| Scheduler, Two Coroutines           |  11116/ 4196 |  3488/ 1148 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   |  11044/ 4176 |  3416/ 1128 |
-| Scheduler, Two Coroutines (micros)  |  11140/ 4196 |  3512/ 1148 |
+| Scheduler, One Coroutine (micros)   |  11064/ 4176 |  3436/ 1128 |
+| Scheduler, Two Coroutines (micros)  |  11160/ 4196 |  3532/ 1148 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  |  11008/ 4176 |  3380/ 1128 |
-| Scheduler, Two Coroutines (seconds) |  11136/ 4196 |  3508/ 1148 |
+| Scheduler, One Coroutine (seconds)  |  11028/ 4176 |  3400/ 1128 |
+| Scheduler, Two Coroutines (seconds) |  11156/ 4196 |  3528/ 1148 |
 |-------------------------------------+--------------+-------------|
-| Blink Function                      |  11244/ 4148 |  3616/ 1100 |
+| Blink Function                      |  11248/ 4148 |  3620/ 1100 |
 | Blink Coroutine                     |  11364/ 4168 |  3736/ 1120 |
 +------------------------------------------------------------------+
 

@@ -328,6 +328,12 @@ volatile int disableCompilerOptimization = 0;
 
 void setup() {
   delay(1000);
+
+#if FEATURE >= FEATURE_SCHEDULER_ONE_COROUTINE \
+    && FEATURE <= FEATURE_SCHEDULER_TWO_COROUTINES_SECONDS
+  CoroutineScheduler::setup();
+#endif
+
 }
 
 void loop() {

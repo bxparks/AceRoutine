@@ -149,6 +149,8 @@ class Coroutine {
   public:
     virtual int runCoroutine() = 0;
 
+    virtual void setupCoroutine() {}
+
     void suspend();
 
     void resume();
@@ -997,7 +999,6 @@ class ManualCoroutine : public Coroutine {
       ...
     }
 
-  private:
     int runCoroutine() override {
       COROUTINE_BEGIN();
       // insert coroutine code here
@@ -1024,6 +1025,77 @@ Some examples of manual coroutines:
   functionality as [HelloCoroutine](examples/HelloCoroutine).
 * [SoundManager](examples/SoundManager) which uses both the automatic coroutine
   defined by `COROUTINE()` macro and an explicitly subclasses manual coroutine.
+
+<a name="CoroutineSetup"></a>
+### Coroutine Setup
+
+When creating custom subclasses through the Manual Coroutine workflow (see
+above), you have the ability to override the `setupCoroutine()` method if you
+need to:
+
+```C++
+class ManualCoroutine : public Coroutine {
+  public:
+    // Inject external dependencies into the constructor.
+    ManualCoroutine(Params, ..., Objects, ...) {
+      ...
+    }
+
+    int runCoroutine() override {
+      COROUTINE_BEGIN();
+      // insert coroutine code here
+      COROUTINE_END();
+    }
+
+    void setupCoroutine() override {
+      ...
+    }
+};
+```
+
+If you have only a few coroutines that need to override the `setupCoroutine()`,
+it is probably easiest to just call it directly from the global `setup()`:
+
+```C++
+ManualCoroutine1 coroutine1;
+ManualCoroutine2 coroutine2;
+
+void setup() {
+  coroutine1.setupCoroutine();
+  coroutine2.setupCoroutine();
+  ...
+}
+```
+
+If you have significant number of coroutines, or if you have enough flash and
+static memory that you don't need to worry about memory consumption, then you
+can call the `CoroutineScheduler::setupCoroutines()`. It will loop through the
+list of coroutines, and call the `setupCoroutine()` methods of each coroutine
+automatically:
+
+```C++
+void setup() {
+  // Optional
+  CoroutineScheduler::setupCoroutines();
+
+  // Required
+  CoroutineScheduler::setup();
+  ...
+}
+```
+
+You need to call `CoroutineScheduler::setupCoroutines()` explicitly if you want
+it. The CoroutineScheduler::setup()` method does *not* call `setupCoroutines()`
+automatically.
+
+**Warning**: The `Coroutine::setupCoroutine()` can consume significant amounts
+of memory, especially on AVR processors. On AVR processors, each
+`setupCoroutine()` overridden in the subclass consumes at least 50-60 bytes of
+flash per coroutine. On 32-bit processors, it takes slightly less memory, about
+30-40 bytes per coroutine. The looping code in
+`CoroutineScheduler::setupCoroutines()` consumes about 20-30 bytes of flash on
+AVR processors. The virtual dispatch on `Coroutine::setupCoroutine()` consumes
+about 14 bytes of flash per invocation.
 
 <a name="Communication"></a>
 ## Coroutine Communication

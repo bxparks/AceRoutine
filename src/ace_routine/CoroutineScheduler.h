@@ -44,6 +44,11 @@ class CoroutineSchedulerTemplate {
     /** Set up the scheduler. Should be called from the global setup(). */
     static void setup() { getScheduler()->setupScheduler(); }
 
+    /** Set up the coroutines by calling their setupCoroutine() methods. */
+    static void setupCoroutines() {
+      getScheduler()->setupCoroutinesInternal();
+    }
+
     /**
      * Run the current coroutine using the current scheduler. This method
      * returns when the underlying Coroutine suspends execution, which allows
@@ -89,6 +94,16 @@ class CoroutineSchedulerTemplate {
      */
     void setupScheduler() {
       mCurrent = T_COROUTINE::getRoot();
+    }
+
+    /** Setup each coroutine by calling its setupCoroutine() function. */
+    void setupCoroutinesInternal() {
+      for (T_COROUTINE** p = T_COROUTINE::getRoot();
+          (*p) != nullptr;
+          p = (*p)->getNext()) {
+
+        (*p)->setupCoroutine();
+      }
     }
 
     /** Run the current coroutine. */

@@ -83,6 +83,11 @@ calculated flash size can jump around in unexpected ways.
           `digitalWrite()` in 2.0.0.
     * Upgrade SparkFun SAMD Core to 1.8.3.
         * No change in memory usage.
+    * Add a dummy `FooClass` with virtual methods for Teensy 3.2 so that
+      `FEATURE_BASELINE` becomes a useful comparison to the other benchmarks.
+      Teensyduino seems to pull in `malloc()` and `free()` functions as soon as
+      any class with virtual methods are uses, unlike AVR where they are pulled
+      in only if the destructor is virtual.
 
 ## How to Generate
 
@@ -424,31 +429,31 @@ $ make README.md
 +------------------------------------------------------------------+
 | functionality                       |  flash/  ram |       delta |
 |-------------------------------------+--------------+-------------|
-| Baseline                            |   7628/ 3048 |     0/    0 |
+| Baseline                            |  10896/ 4152 |     0/    0 |
 |-------------------------------------+--------------+-------------|
-| One Delay Function                  |  10836/ 4152 |  3208/ 1104 |
-| Two Delay Functions                 |  10868/ 4152 |  3240/ 1104 |
+| One Delay Function                  |  10928/ 4156 |    32/    4 |
+| Two Delay Functions                 |  10956/ 4156 |    60/    4 |
 |-------------------------------------+--------------+-------------|
-| One Coroutine                       |  10932/ 4172 |  3304/ 1124 |
-| Two Coroutines                      |  11056/ 4192 |  3428/ 1144 |
+| One Coroutine                       |  11036/ 4176 |   140/   24 |
+| Two Coroutines                      |  11148/ 4196 |   252/   44 |
 |-------------------------------------+--------------+-------------|
-| One Coroutine (micros)              |  10988/ 4172 |  3360/ 1124 |
-| Two Coroutines (micros)             |  11100/ 4192 |  3472/ 1144 |
+| One Coroutine (micros)              |  11092/ 4176 |   196/   24 |
+| Two Coroutines (micros)             |  11192/ 4196 |   296/   44 |
 |-------------------------------------+--------------+-------------|
-| One Coroutine (seconds)             |  10952/ 4172 |  3324/ 1124 |
-| Two Coroutines (seconds)            |  11096/ 4192 |  3468/ 1144 |
+| One Coroutine (seconds)             |  11056/ 4176 |   160/   24 |
+| Two Coroutines (seconds)            |  11188/ 4196 |   292/   44 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine            |  11008/ 4176 |  3380/ 1128 |
-| Scheduler, Two Coroutines           |  11116/ 4196 |  3488/ 1148 |
+| Scheduler, One Coroutine            |  11100/ 4180 |   204/   28 |
+| Scheduler, Two Coroutines           |  11208/ 4200 |   312/   48 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   |  11064/ 4176 |  3436/ 1128 |
-| Scheduler, Two Coroutines (micros)  |  11160/ 4196 |  3532/ 1148 |
+| Scheduler, One Coroutine (micros)   |  11156/ 4180 |   260/   28 |
+| Scheduler, Two Coroutines (micros)  |  11252/ 4200 |   356/   48 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  |  11028/ 4176 |  3400/ 1128 |
-| Scheduler, Two Coroutines (seconds) |  11156/ 4196 |  3528/ 1148 |
+| Scheduler, One Coroutine (seconds)  |  11120/ 4180 |   224/   28 |
+| Scheduler, Two Coroutines (seconds) |  11248/ 4200 |   352/   48 |
 |-------------------------------------+--------------+-------------|
-| Blink Function                      |  11248/ 4148 |  3620/ 1100 |
-| Blink Coroutine                     |  11364/ 4168 |  3736/ 1120 |
+| Blink Function                      |  11352/ 4160 |   456/    8 |
+| Blink Coroutine                     |  11468/ 4176 |   572/   24 |
 +------------------------------------------------------------------+
 
 ```

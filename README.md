@@ -57,8 +57,7 @@ others (in my opinion of course):
         * `CoroutineScheduler` consumes only about 40 bytes of flash and
           2 bytes of RAM independent of the number of coroutines
     * 32-bit (e.g. STM32, ESP8266, ESP32) processors
-        * the first `Coroutine` consumes between 120-450 bytes of flash (except
-          on the Teensy 3.2 where the first instance brings in 3200 bytes)
+        * the first `Coroutine` consumes between 120-450 bytes of flash
         * each additional `Coroutine` consumes about 130-160 bytes of flash,
         * each `Coroutine` consumes 20 bytes of static RAM
         * `CoroutineScheduler` consumes only about 40-60 bytes of flash
@@ -508,31 +507,31 @@ etc) for a handful of AceRoutine features. Here are some highlights:
 +------------------------------------------------------------------+
 | functionality                       |  flash/  ram |       delta |
 |-------------------------------------+--------------+-------------|
-| Baseline                            |    400/   11 |     0/    0 |
+| Baseline                            |    606/   11 |     0/    0 |
 |-------------------------------------+--------------+-------------|
-| One Delay Function                  |    450/   13 |    50/    2 |
-| Two Delay Functions                 |    508/   15 |   108/    4 |
+| One Delay Function                  |    654/   13 |    48/    2 |
+| Two Delay Functions                 |    714/   15 |   108/    4 |
 |-------------------------------------+--------------+-------------|
-| One Coroutine                       |    628/   30 |   228/   19 |
-| Two Coroutines                      |    796/   47 |   396/   36 |
+| One Coroutine                       |    840/   30 |   234/   19 |
+| Two Coroutines                      |   1010/   47 |   404/   36 |
 |-------------------------------------+--------------+-------------|
-| One Coroutine (micros)              |    596/   30 |   196/   19 |
-| Two Coroutines (micros)             |    732/   47 |   332/   36 |
+| One Coroutine (micros)              |    812/   30 |   206/   19 |
+| Two Coroutines (micros)             |    954/   47 |   348/   36 |
 |-------------------------------------+--------------+-------------|
-| One Coroutine (seconds)             |    724/   30 |   324/   19 |
-| Two Coroutines (seconds)            |    920/   47 |   520/   36 |
+| One Coroutine (seconds)             |    940/   30 |   334/   19 |
+| Two Coroutines (seconds)            |   1142/   47 |   536/   36 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine            |    742/   32 |   342/   21 |
-| Scheduler, Two Coroutines           |    904/   49 |   504/   38 |
+| Scheduler, One Coroutine            |    964/   32 |   358/   21 |
+| Scheduler, Two Coroutines           |   1126/   49 |   520/   38 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   |    710/   32 |   310/   21 |
-| Scheduler, Two Coroutines (micros)  |    840/   49 |   440/   38 |
+| Scheduler, One Coroutine (micros)   |    936/   32 |   330/   21 |
+| Scheduler, Two Coroutines (micros)  |   1070/   49 |   464/   38 |
 |-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  |    838/   32 |   438/   21 |
-| Scheduler, Two Coroutines (seconds) |   1028/   49 |   628/   38 |
+| Scheduler, One Coroutine (seconds)  |   1064/   32 |   458/   21 |
+| Scheduler, Two Coroutines (seconds) |   1258/   49 |   652/   38 |
 |-------------------------------------+--------------+-------------|
-| Blink Function                      |    546/   14 |   146/    3 |
-| Blink Coroutine                     |    752/   30 |   352/   19 |
+| Blink Function                      |    938/   14 |   332/    3 |
+| Blink Coroutine                     |   1154/   30 |   548/   19 |
 +------------------------------------------------------------------+
 ```
 

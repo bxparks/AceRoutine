@@ -109,6 +109,11 @@ calculated flash size can jump around in unexpected ways.
           `digitalWrite()` in 2.0.0.
     * Upgrade SparkFun SAMD Core to 1.8.3.
         * No change in memory usage.
+    * Add a dummy `FooClass` with virtual methods for Teensy 3.2 so that
+      `FEATURE_BASELINE` becomes a useful comparison to the other benchmarks.
+      Teensyduino seems to pull in `malloc()` and `free()` functions as soon as
+      any class with virtual methods are uses, unlike AVR where they are pulled
+      in only if the destructor is virtual.
 
 ## How to Generate
 

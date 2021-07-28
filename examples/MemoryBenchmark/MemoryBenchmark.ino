@@ -326,17 +326,43 @@ volatile int disableCompilerOptimization = 0;
 
 #endif
 
+// TeensyDuino seems to pull in malloc() and free() when a class with virtual
+// functions is used polymorphically. This causes the memory consumption of
+// FEATURE_BASELINE (which normally has no classes defined, so does not include
+// malloc() and free()) to be artificially small which throws off the memory
+// consumption calculations for all subsequent features. Let's define a
+// throw-away class and call its method for all FEATURES, including BASELINE.
+#if defined(TEENSYDUINO)
+  class FooClass {
+    public:
+      virtual void doit() {
+        disableCompilerOptimization = 0;
+      }
+  };
+
+  FooClass* foo;
+#endif
+
 void setup() {
   delay(1000);
+
+#if defined(TEENSYDUINO)
+  // Force Teensy to bring in malloc(), free() and other things for virtual
+  // dispatch.
+  foo = new FooClass();
+#endif
 
 #if FEATURE >= FEATURE_SCHEDULER_ONE_COROUTINE \
     && FEATURE <= FEATURE_SCHEDULER_TWO_COROUTINES_SECONDS
   CoroutineScheduler::setup();
 #endif
-
 }
 
 void loop() {
+#if defined(TEENSYDUINO)
+  foo->doit();
+#endif
+
 #if FEATURE == FEATURE_BASELINE
   disableCompilerOptimization = 1;
 #elif FEATURE == FEATURE_ONE_DELAY_FUNCTION

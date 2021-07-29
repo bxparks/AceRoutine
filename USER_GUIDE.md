@@ -37,6 +37,7 @@ is installed.
 * [Customizing](#Customizing)
     * [Custom Coroutines](#CustomCoroutines)
     * [Manual Coroutines](#ManualCoroutines)
+    * [Coroutine Setup](#CoroutineSetup)
 * [Coroutine Communication](#Communication)
     * [Instance Variables](#InstanceVariables)
     * [Channels (Experimental)](#Channels)
@@ -1063,6 +1064,8 @@ ManualCoroutine2 coroutine2;
 void setup() {
   coroutine1.setupCoroutine();
   coroutine2.setupCoroutine();
+
+  CoroutineScheduler::setup();
   ...
 }
 ```
@@ -1070,22 +1073,23 @@ void setup() {
 If you have significant number of coroutines, or if you have enough flash and
 static memory that you don't need to worry about memory consumption, then you
 can call the `CoroutineScheduler::setupCoroutines()`. It will loop through the
-list of coroutines, and call the `setupCoroutine()` methods of each coroutine
+list of coroutines, and call the `setupCoroutine()` method of each coroutine
 automatically:
 
 ```C++
+ManualCoroutine1 coroutine1;
+ManualCoroutine2 coroutine2;
+
 void setup() {
-  // Optional
   CoroutineScheduler::setupCoroutines();
 
-  // Required
   CoroutineScheduler::setup();
   ...
 }
 ```
 
 You need to call `CoroutineScheduler::setupCoroutines()` explicitly if you want
-it. The CoroutineScheduler::setup()` method does *not* call `setupCoroutines()`
+it. The `CoroutineScheduler::setup()` method does *not* call `setupCoroutines()`
 automatically.
 
 **Warning**: The `Coroutine::setupCoroutine()` can consume significant amounts

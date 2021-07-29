@@ -12,6 +12,8 @@
     * Add virtual `Coroutine::setupCoroutine()` with a default empty
       implementation, and optional `CoroutineScheduler::setupCoroutines()` to
       automatically loop over all coroutines.
+        * See [Issue #36](https://github.com/bxparks/AceRoutine/issues/36) for
+          motivation.
         * If not used, `Coroutine::setupCoroutine()` increases flash consumption
           by 4 bytes, and static memory by 2 bytes per coroutine on AVR
           processors.

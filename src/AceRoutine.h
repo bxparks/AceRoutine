@@ -36,10 +36,6 @@ SOFTWARE.
 #ifndef ACE_ROUTINE_ACE_ROUTINE_H
 #define ACE_ROUTINE_ACE_ROUTINE_H
 
-#include "ace_routine/Coroutine.h"
-#include "ace_routine/CoroutineScheduler.h"
-#include "ace_routine/Channel.h"
-
 // Blacklist platforms using https://github.com/arduino/ArduinoCore-api due to
 // incompatibilities.
 #if defined(ARDUINO_API_VERSION)
@@ -47,7 +43,11 @@ SOFTWARE.
 #endif
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_ROUTINE_VERSION 10300
-#define ACE_ROUTINE_VERSION_STRING "1.3.0"
+#define ACE_ROUTINE_VERSION 10400
+#define ACE_ROUTINE_VERSION_STRING "1.4.0"
+
+#include "ace_routine/Coroutine.h"
+#include "ace_routine/CoroutineScheduler.h"
+#include "ace_routine/Channel.h"
 
 #endif

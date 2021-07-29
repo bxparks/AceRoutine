@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">1.3.1</span>
+   &#160;<span id="projectnumber">1.4.0</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -85,6 +85,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ac792080cdec6db9f6539a446d7af587c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1CoroutineSchedulerTemplate.html#ac792080cdec6db9f6539a446d7af587c">setup</a> ()</td></tr>
 <tr class="memdesc:ac792080cdec6db9f6539a446d7af587c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the scheduler.  <a href="classace__routine_1_1CoroutineSchedulerTemplate.html#ac792080cdec6db9f6539a446d7af587c">More...</a><br /></td></tr>
 <tr class="separator:ac792080cdec6db9f6539a446d7af587c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86ebd507e675b913301f92af0a34abde"><td class="memItemLeft" align="right" valign="top"><a id="a86ebd507e675b913301f92af0a34abde"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1CoroutineSchedulerTemplate.html#a86ebd507e675b913301f92af0a34abde">setupCoroutines</a> ()</td></tr>
+<tr class="memdesc:a86ebd507e675b913301f92af0a34abde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up the coroutines by calling their setupCoroutine() methods. <br /></td></tr>
+<tr class="separator:a86ebd507e675b913301f92af0a34abde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf192f6066f9a7cc80219461966cba2f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__routine_1_1CoroutineSchedulerTemplate.html#abf192f6066f9a7cc80219461966cba2f">loop</a> ()</td></tr>
 <tr class="memdesc:abf192f6066f9a7cc80219461966cba2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the current coroutine using the current scheduler.  <a href="classace__routine_1_1CoroutineSchedulerTemplate.html#abf192f6066f9a7cc80219461966cba2f">More...</a><br /></td></tr>
 <tr class="separator:abf192f6066f9a7cc80219461966cba2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -97,7 +101,13 @@ Static Public Member Functions</h2></td></tr>
 class ace_routine::CoroutineSchedulerTemplate&lt; T_COROUTINE &gt;</h3>
 
 <p>Class that manages instances of the <code>Coroutine</code> class, and executes them in a round-robin fashion. </p>
-<p>This is expected to be used as a singleton. </p>
+<p>This is expected to be used as a singleton.</p>
+<p>Design Notes:</p>
+<p>Originally, this class was intended to be more substantial, for example, I imagined that different scheduling algorithms could be implemented, allowing coroutines to have different priorities. To ensure that there was only a single instance of the <code>CoroutineScheduler</code>, a singleton pattern was used. The <code>getScheduler()</code> method fixes the problem that C++ does not guarantee the order of static initialization of resources defined in different files.</p>
+<p>It seemed cumbersome to require the client code to go through the <code>getScheduler()</code> method to access the singleton instance. So each public instance method of the <code>CoroutineScheduler</code> is wrapped in a more user-friendly static method to make it easier to use. For example, <code><a class="el" href="classace__routine_1_1CoroutineSchedulerTemplate.html#ac792080cdec6db9f6539a446d7af587c" title="Set up the scheduler.">CoroutineScheduler::setup()</a></code> is a shorthand for <code>CoroutineScheduler::getScheduler()-&gt;setupScheduler()</code>.</p>
+<p>As the library matured, I started to put more emphasis on keeping the runtime overhead of the library as small as possible, especially on 8-bit AVR processors, to allow a Coroutine instance to be a viable alternative to writing a normal C/C++ function with complex internal finite state machines. It turned out that the simple round-robin scheduling algorithm currently implemented by <code>CoroutineScheduler</code> is good enough, and this class remained quite simple.</p>
+<p>With its current functionality, the <code>CoroutineSchedule</code> does not need to be a singleton because the information that stores the singly-linked list of Coroutines is actually stored in the <code>Coroutine</code> class, not the <code>CoroutineScheduler</code> class. Because it does not need to be singleton, the <code>getScheduler()</code> method is not really required, and we could have just allowed the end-user to explicitly create an instance of <code>CoroutineScheduler</code> and use it like a normal object.</p>
+<p>However, once the API of <code>CoroutineScheduler</code> with its static wrapper methods was released to the public, backwards compatibility meant that I could not remove this extra layer of indirection. Fortunately, the none of these methods are virtual, so the extra level of indirection consumes very little overhead, even on 8-bit AVR processors. </p>
 
 <p class="definition">Definition at line <a class="el" href="Coroutine_8h_source.html#l00271">271</a> of file <a class="el" href="Coroutine_8h_source.html">Coroutine.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
@@ -130,7 +140,7 @@ template&lt;typename T_COROUTINE &gt; </div>
 <p>Print out the known coroutines to the printer (usually Serial). </p>
 <p>Note that if this method is never called, the linker will strip out the code. If Serial is never configured in <a class="el" href="classace__routine_1_1CoroutineSchedulerTemplate.html#ac792080cdec6db9f6539a446d7af587c" title="Set up the scheduler.">setup()</a>, then this method causes no additional flash memory consumption. </p>
 
-<p class="definition">Definition at line <a class="el" href="CoroutineScheduler_8h_source.html#l00061">61</a> of file <a class="el" href="CoroutineScheduler_8h_source.html">CoroutineScheduler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="CoroutineScheduler_8h_source.html#l00105">105</a> of file <a class="el" href="CoroutineScheduler_8h_source.html">CoroutineScheduler.h</a>.</p>
 
 </div>
 </div>
@@ -162,7 +172,7 @@ template&lt;typename T_COROUTINE &gt; </div>
 <p>Run the current coroutine using the current scheduler. </p>
 <p>This method returns when the underlying Coroutine suspends execution, which allows the system <a class="el" href="classace__routine_1_1CoroutineSchedulerTemplate.html#abf192f6066f9a7cc80219461966cba2f" title="Run the current coroutine using the current scheduler.">loop()</a> to return to do systems processing, such as WiFi. Everyone must cooperate to make the whole thing work. </p>
 
-<p class="definition">Definition at line <a class="el" href="CoroutineScheduler_8h_source.html#l00053">53</a> of file <a class="el" href="CoroutineScheduler_8h_source.html">CoroutineScheduler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="CoroutineScheduler_8h_source.html#l00097">97</a> of file <a class="el" href="CoroutineScheduler_8h_source.html">CoroutineScheduler.h</a>.</p>
 
 </div>
 </div>
@@ -194,7 +204,7 @@ template&lt;typename T_COROUTINE &gt; </div>
 <p>Set up the scheduler. </p>
 <p>Should be called from the global <a class="el" href="classace__routine_1_1CoroutineSchedulerTemplate.html#ac792080cdec6db9f6539a446d7af587c" title="Set up the scheduler.">setup()</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="CoroutineScheduler_8h_source.html#l00045">45</a> of file <a class="el" href="CoroutineScheduler_8h_source.html">CoroutineScheduler.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="CoroutineScheduler_8h_source.html#l00084">84</a> of file <a class="el" href="CoroutineScheduler_8h_source.html">CoroutineScheduler.h</a>.</p>
 
 </div>
 </div>

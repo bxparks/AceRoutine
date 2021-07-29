@@ -40,7 +40,7 @@ calculated flash size can jump around in unexpected ways.
 
 **NOTE**: This file was auto-generated using `make README.md`. DO NOT EDIT.
 
-**Version**: AceRoutine v1.3
+**Version**: AceRoutine v1.4
 
 **Changes**:
 
@@ -99,6 +99,24 @@ calculated flash size can jump around in unexpected ways.
           1000 which must be done in software on 8-bit processors.
         * The `CoroutineScheduler` is forced to become simpler  which reduces
           flash usage by 10-20 bytes.
+* v1.4
+    * Upgrade STM32duino Core to 2.0.0.
+        * Flash usage increases by 2.3kB across the board, but static RAM goes
+          down by 250 bytes.
+        * Very little change to AceRoutine code itself.
+        * "Blink Function" and "Blink Coroutine" both increase flash usage by
+          about 50 bytes, probably due to additional resource consumption of
+          `digitalWrite()` in 2.0.0.
+    * Upgrade SparkFun SAMD Core to 1.8.3.
+        * No change in memory usage.
+    * Add a dummy `FooClass` with virtual methods for Teensy 3.2 so that
+      `FEATURE_BASELINE` becomes a useful comparison to the other benchmarks.
+      Teensyduino seems to pull in `malloc()` and `free()` functions as soon as
+      any class with virtual methods are uses, unlike AVR where they are pulled
+      in only if the destructor is virtual.
+    * Add benchmarks for calling `CoroutineScheduler::setupCoroutine()`.
+      Increases flash memory by 50-60 bytes *per coroutine* (AVR) and 30-40
+      bytes per coroutine (32-bit processors).
 
 ## How to Generate
 
@@ -190,7 +208,7 @@ $ make README.md
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* SparkFun SAMD Core 1.8.1
+* SparkFun SAMD Core 1.8.3
 
 ```
 {samd_results}
@@ -200,7 +218,7 @@ $ make README.md
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
-* STM32duino 1.9.0
+* STM32duino 2.0.0
 
 ```
 {stm32_results}

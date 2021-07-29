@@ -2,11 +2,6 @@
 
 [![AUnit Tests](https://github.com/bxparks/AceRoutine/actions/workflows/aunit_tests.yml/badge.svg)](https://github.com/bxparks/AceRoutine/actions/workflows/aunit_tests.yml)
 
-**New**: [GitHub Discussions](https://github.com/bxparks/AceRoutine/discussions)
-for this project is now active! Let's use that for general support questions,
-and reserve the [GitHub Issues](https://github.com/bxparks/AceRoutine/issues)
-section for bugs and feature requests.
-
 **Breaking Changes in v1.3**: Breaking changes were made in v1.3 to reduce the
 flash memory consumption of `Coroutine` instances by 800-1000 bytes. See the
 [CHANGELOG.md](CHANGELOG.md) for a complete list.
@@ -57,8 +52,7 @@ others (in my opinion of course):
         * `CoroutineScheduler` consumes only about 40 bytes of flash and
           2 bytes of RAM independent of the number of coroutines
     * 32-bit (e.g. STM32, ESP8266, ESP32) processors
-        * the first `Coroutine` consumes between 120-450 bytes of flash (except
-          on the Teensy 3.2 where the first instance brings in 3200 bytes)
+        * the first `Coroutine` consumes between 120-450 bytes of flash
         * each additional `Coroutine` consumes about 130-160 bytes of flash,
         * each `Coroutine` consumes 20 bytes of static RAM
         * `CoroutineScheduler` consumes only about 40-60 bytes of flash
@@ -110,7 +104,7 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.3.1 (2021-06-02)
+**Version**: 1.4.0 (2021-07-29)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -505,69 +499,81 @@ etc) for a handful of AceRoutine features. Here are some highlights:
 **Arduino Nano (8-bits)**
 
 ```
-+------------------------------------------------------------------+
-| functionality                       |  flash/  ram |       delta |
-|-------------------------------------+--------------+-------------|
-| Baseline                            |    400/   11 |     0/    0 |
-|-------------------------------------+--------------+-------------|
-| One Delay Function                  |    450/   13 |    50/    2 |
-| Two Delay Functions                 |    508/   15 |   108/    4 |
-|-------------------------------------+--------------+-------------|
-| One Coroutine                       |    628/   30 |   228/   19 |
-| Two Coroutines                      |    796/   47 |   396/   36 |
-|-------------------------------------+--------------+-------------|
-| One Coroutine (micros)              |    596/   30 |   196/   19 |
-| Two Coroutines (micros)             |    732/   47 |   332/   36 |
-|-------------------------------------+--------------+-------------|
-| One Coroutine (seconds)             |    724/   30 |   324/   19 |
-| Two Coroutines (seconds)            |    920/   47 |   520/   36 |
-|-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine            |    742/   32 |   342/   21 |
-| Scheduler, Two Coroutines           |    904/   49 |   504/   38 |
-|-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   |    710/   32 |   310/   21 |
-| Scheduler, Two Coroutines (micros)  |    840/   49 |   440/   38 |
-|-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  |    838/   32 |   438/   21 |
-| Scheduler, Two Coroutines (seconds) |   1028/   49 |   628/   38 |
-|-------------------------------------+--------------+-------------|
-| Blink Function                      |    546/   14 |   146/    3 |
-| Blink Coroutine                     |    752/   30 |   352/   19 |
-+------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| functionality                         |  flash/  ram |       delta |
+|---------------------------------------+--------------+-------------|
+| Baseline                              |    606/   11 |     0/    0 |
+|---------------------------------------+--------------+-------------|
+| One Delay Function                    |    654/   13 |    48/    2 |
+| Two Delay Functions                   |    714/   15 |   108/    4 |
+|---------------------------------------+--------------+-------------|
+| One Coroutine                         |    844/   32 |   238/   21 |
+| Two Coroutines                        |   1016/   51 |   410/   40 |
+|---------------------------------------+--------------+-------------|
+| One Coroutine (micros)                |    816/   32 |   210/   21 |
+| Two Coroutines (micros)               |    960/   51 |   354/   40 |
+|---------------------------------------+--------------+-------------|
+| One Coroutine (seconds)               |    944/   32 |   338/   21 |
+| Two Coroutines (seconds)              |   1148/   51 |   542/   40 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine              |    968/   34 |   362/   23 |
+| Scheduler, Two Coroutines             |   1132/   53 |   526/   42 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine (micros)     |    940/   34 |   334/   23 |
+| Scheduler, Two Coroutines (micros)    |   1076/   53 |   470/   42 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine (seconds)    |   1068/   34 |   462/   23 |
+| Scheduler, Two Coroutines (seconds)   |   1264/   53 |   658/   42 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine (setup)      |   1018/   34 |   412/   23 |
+| Scheduler, Two Coroutines (setup)     |   1282/   53 |   676/   42 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine (man setup)  |    996/   34 |   390/   23 |
+| Scheduler, Two Coroutines (man setup) |   1268/   53 |   662/   42 |
+|---------------------------------------+--------------+-------------|
+| Blink Function                        |    938/   14 |   332/    3 |
+| Blink Coroutine                       |   1158/   32 |   552/   21 |
++--------------------------------------------------------------------+
 ```
 
 **ESP8266 (32-bits)**
 
 ```
-+------------------------------------------------------------------+
-| functionality                       |  flash/  ram |       delta |
-|-------------------------------------+--------------+-------------|
-| Baseline                            | 256924/26800 |     0/    0 |
-|-------------------------------------+--------------+-------------|
-| One Delay Function                  | 256988/26808 |    64/    8 |
-| Two Delay Functions                 | 257052/26808 |   128/    8 |
-|-------------------------------------+--------------+-------------|
-| One Coroutine                       | 257104/26820 |   180/   20 |
-| Two Coroutines                      | 257264/26844 |   340/   44 |
-|-------------------------------------+--------------+-------------|
-| One Coroutine (micros)              | 257136/26820 |   212/   20 |
-| Two Coroutines (micros)             | 257296/26844 |   372/   44 |
-|-------------------------------------+--------------+-------------|
-| One Coroutine (seconds)             | 257136/26820 |   212/   20 |
-| Two Coroutines (seconds)            | 257312/26844 |   388/   44 |
-|-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine            | 257152/26828 |   228/   28 |
-| Scheduler, Two Coroutines           | 257280/26844 |   356/   44 |
-|-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)   | 257168/26828 |   244/   28 |
-| Scheduler, Two Coroutines (micros)  | 257312/26844 |   388/   44 |
-|-------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)  | 257168/26828 |   244/   28 |
-| Scheduler, Two Coroutines (seconds) | 257328/26844 |   404/   44 |
-|-------------------------------------+--------------+-------------|
-| Blink Function                      | 257424/26816 |   500/   16 |
-| Blink Coroutine                     | 257556/26836 |   632/   36 |
-+------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| functionality                         |  flash/  ram |       delta |
+|---------------------------------------+--------------+-------------|
+| Baseline                              | 256924/26800 |     0/    0 |
+|---------------------------------------+--------------+-------------|
+| One Delay Function                    | 256988/26808 |    64/    8 |
+| Two Delay Functions                   | 257052/26808 |   128/    8 |
+|---------------------------------------+--------------+-------------|
+| One Coroutine                         | 257120/26820 |   196/   20 |
+| Two Coroutines                        | 257280/26844 |   356/   44 |
+|---------------------------------------+--------------+-------------|
+| One Coroutine (micros)                | 257136/26820 |   212/   20 |
+| Two Coroutines (micros)               | 257296/26844 |   372/   44 |
+|---------------------------------------+--------------+-------------|
+| One Coroutine (seconds)               | 257136/26820 |   212/   20 |
+| Two Coroutines (seconds)              | 257312/26844 |   388/   44 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine              | 257168/26828 |   244/   28 |
+| Scheduler, Two Coroutines             | 257312/26844 |   388/   44 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine (micros)     | 257184/26828 |   260/   28 |
+| Scheduler, Two Coroutines (micros)    | 257328/26844 |   404/   44 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine (seconds)    | 257184/26828 |   260/   28 |
+| Scheduler, Two Coroutines (seconds)   | 257344/26844 |   420/   44 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine (setup)      | 257200/26828 |   276/   28 |
+| Scheduler, Two Coroutines (setup)     | 257376/26844 |   452/   44 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine (man setup)  | 257184/26828 |   260/   28 |
+| Scheduler, Two Coroutines (man setup) | 257360/26844 |   436/   44 |
+|---------------------------------------+--------------+-------------|
+| Blink Function                        | 257424/26816 |   500/   16 |
+| Blink Coroutine                       | 257572/26836 |   648/   36 |
++--------------------------------------------------------------------+
 ```
 
 Comparing `Blink Function` and `Blink Coroutine` is probably the most
@@ -653,8 +659,8 @@ This library was developed and tested using:
 * [Arduino AVR Boards 1.8.3](https://github.com/arduino/ArduinoCore-avr)
 * [Arduino SAMD Boards 1.8.9](https://github.com/arduino/ArduinoCore-samd)
 * [SparkFun AVR Boards 1.1.13](https://github.com/sparkfun/Arduino_Boards)
-* [SparkFun SAMD Boards 1.8.1](https://github.com/sparkfun/Arduino_Boards)
-* [STM32duino 1.9.0](https://github.com/stm32duino/Arduino_Core_STM32)
+* [SparkFun SAMD Boards 1.8.3](https://github.com/sparkfun/Arduino_Boards)
+* [STM32duino 2.0.0](https://github.com/stm32duino/Arduino_Core_STM32)
 * [ESP8266 Arduino 2.7.4](https://github.com/esp8266/Arduino)
 * [ESP32 Arduino 1.0.6](https://github.com/espressif/arduino-esp32)
 * [Teensydino 1.53](https://www.pjrc.com/teensy/td_download.html)

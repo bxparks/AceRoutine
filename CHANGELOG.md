@@ -1,8 +1,27 @@
 # Changelog
 
 * Unreleased
+* 1.4.0 (2021-07-29)
+    * Upgrade STM32duino Core from 1.9.0 to 2.0.0.
+        * MemoryBenchmark: Flash usage increases by 2.3kB across the board, but
+          static RAM goes down by 250 bytes. Very little change to AceRoutine
+          code itself.
+        * AutoBenchmark: No change.
+    * Upgrade SparkFun SAMD Core from 1.8.1 to 1.8.3.
+        * No change observed in MemoryBenchmark or AutoBenchmark.
+    * Add virtual `Coroutine::setupCoroutine()` with a default empty
+      implementation, and optional `CoroutineScheduler::setupCoroutines()` to
+      automatically loop over all coroutines.
+        * See [Issue #36](https://github.com/bxparks/AceRoutine/issues/36) for
+          motivation.
+        * If not used, `Coroutine::setupCoroutine()` increases flash consumption
+          by 4 bytes, and static memory by 2 bytes per coroutine on AVR
+          processors.
+        * If used, `Coroutine::setupCoroutine()` can consume a significant
+          amount of memory resources. On AVR, at least 50-60 bytes per
+          coroutine. On 32-bit processors, about 30-40 bytes per coroutine.
 * 1.3.1 (2021-06-02)
-    * Bring back `COROUTINE_DELAY_MICROS()` and `COROUTINE_DELAY_SECONDS(),
+    * Bring back `COROUTINE_DELAY_MICROS()` and `COROUTINE_DELAY_SECONDS()`
       with an alternate implemenation that increases flash and static memory
       *only* if they are used.
         * The `Coroutine` itself knows whether it is delaying in units of
@@ -11,7 +30,7 @@
         * Make `CoroutineScheduler::runCoroutine()` always call into
           `Coroutine::runCoroutine()` when the `Coroutine::mStatus` is delaying,
           instead of preemptively trying to figure out if the delay has expired.
-        * `Coroutine` does not need a runtime `mDelayType` descriminator.
+        * `Coroutine` no longer needs a runtime `mDelayType` descriminator.
         * The result is that the code to support `COROUTINE_DELAY_MICROS()` and
           `COROUTINE_DELAY_SECONDS()` is not pulled into the program if they are
           not used.

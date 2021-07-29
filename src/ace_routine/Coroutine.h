@@ -294,6 +294,22 @@ class CoroutineTemplate {
     virtual int runCoroutine() = 0;
 
     /**
+     * Perform coroutine initialization. This is intended to be called directly
+     * from the global `setup()` function, or through the
+     * `CoroutineScheduler::setupCoroutines()` method which should also be
+     * called from the global `setup()` function.
+     *
+     * If your coroutines do not override this method, hence do not need to
+     * perform any setup, then you should *not* call
+     * `CoroutineScheduler::setupCoroutines()` to avoid consuming unnecessary
+     * flash memory. On AVR processors, each `Coroutine::setupCoroutine()` seems
+     * to consume at least 50-60 bytes of flash memory overhead per coroutine.
+     * On 32-bit processors, the overhead seems to be only about 30-40 bytes per
+     * coroutine.
+     */
+    virtual void setupCoroutine() {}
+
+    /**
      * Suspend the coroutine at the next scheduler iteration. If the coroutine
      * is already in the process of ending or is already terminated, then this
      * method does nothing. A coroutine cannot use this method to suspend

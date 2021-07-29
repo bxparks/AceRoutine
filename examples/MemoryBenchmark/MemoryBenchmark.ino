@@ -30,8 +30,12 @@
 #define FEATURE_SCHEDULER_TWO_COROUTINES_MICROS 12
 #define FEATURE_SCHEDULER_ONE_COROUTINE_SECONDS 13
 #define FEATURE_SCHEDULER_TWO_COROUTINES_SECONDS 14
-#define FEATURE_BLINK_FUNCTION 15
-#define FEATURE_BLINK_COROUTINE 16
+#define FEATURE_SCHEDULER_SETUP_ONE_COROUTINE 15
+#define FEATURE_SCHEDULER_SETUP_TWO_COROUTINES 16
+#define FEATURE_SCHEDULER_MANUAL_SETUP_ONE_COROUTINE 17
+#define FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES 18
+#define FEATURE_BLINK_FUNCTION 19
+#define FEATURE_BLINK_COROUTINE 20
 
 #if FEATURE != FEATURE_BASELINE
   #include <AceRoutine.h>
@@ -275,6 +279,108 @@ volatile int disableCompilerOptimization = 0;
   MyCoroutineA a;
   MyCoroutineB b;
 
+#elif FEATURE == FEATURE_SCHEDULER_SETUP_ONE_COROUTINE
+
+  class MyCoroutine : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY(10);
+        }
+      }
+
+      void setupCoroutine() override {
+        disableCompilerOptimization = 1;
+      }
+  };
+
+  MyCoroutine a;
+
+#elif FEATURE == FEATURE_SCHEDULER_SETUP_TWO_COROUTINES
+
+  class MyCoroutineA : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY(10);
+        }
+      }
+
+      void setupCoroutine() override {
+        disableCompilerOptimization = 1;
+      }
+  };
+
+  class MyCoroutineB : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY_SECONDS(10);
+        }
+      }
+
+      void setupCoroutine() override {
+        disableCompilerOptimization = 1;
+      }
+  };
+
+  MyCoroutineA a;
+  MyCoroutineB b;
+
+#elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_ONE_COROUTINE
+
+  class MyCoroutine : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY(10);
+        }
+      }
+
+      void setupCoroutine() override {
+        disableCompilerOptimization = 1;
+      }
+  };
+
+  MyCoroutine a;
+
+#elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES
+
+  class MyCoroutineA : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY(10);
+        }
+      }
+
+      void setupCoroutine() override {
+        disableCompilerOptimization = 1;
+      }
+  };
+
+  class MyCoroutineB : public Coroutine {
+    public:
+      int runCoroutine() override {
+        COROUTINE_LOOP() {
+          disableCompilerOptimization = 1;
+          COROUTINE_DELAY_SECONDS(10);
+        }
+      }
+
+      void setupCoroutine() override {
+        disableCompilerOptimization = 1;
+      }
+  };
+
+  MyCoroutineA a;
+  MyCoroutineB b;
+
 #elif FEATURE == FEATURE_BLINK_FUNCTION
 
   #ifndef LED_BUILTIN
@@ -292,14 +398,14 @@ volatile int disableCompilerOptimization = 0;
 
     if (blinkState == kBlinkStateHigh) {
       uint16_t nowMillis = millis();
-      if (nowMillis - prevMillis >= 100) {
+      if ((uint16_t) (nowMillis - prevMillis) >= 100) {
         prevMillis = nowMillis;
         digitalWrite(LED_BUILTIN, LOW);
         blinkState = kBlinkStateLow;
       }
     } else {
       uint16_t nowMillis = millis();
-      if (nowMillis - prevMillis >= 500) {
+      if ((uint16_t) (nowMillis - prevMillis) >= 500) {
         prevMillis = nowMillis;
         digitalWrite(LED_BUILTIN, HIGH);
         blinkState = kBlinkStateHigh;
@@ -326,11 +432,54 @@ volatile int disableCompilerOptimization = 0;
 
 #endif
 
+// TeensyDuino seems to pull in malloc() and free() when a class with virtual
+// functions is used polymorphically. This causes the memory consumption of
+// FEATURE_BASELINE (which normally has no classes defined, so does not include
+// malloc() and free()) to be artificially small which throws off the memory
+// consumption calculations for all subsequent features. Let's define a
+// throw-away class and call its method for all FEATURES, including BASELINE.
+#if defined(TEENSYDUINO)
+  class FooClass {
+    public:
+      virtual void doit() {
+        disableCompilerOptimization = 0;
+      }
+  };
+
+  FooClass* foo;
+#endif
+
 void setup() {
   delay(1000);
+
+#if defined(TEENSYDUINO)
+  // Force Teensy to bring in malloc(), free() and other things for virtual
+  // dispatch.
+  foo = new FooClass();
+#endif
+
+#if FEATURE >= FEATURE_SCHEDULER_ONE_COROUTINE \
+    && FEATURE <= FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES
+   CoroutineScheduler::setup();
+
+  #if FEATURE == FEATURE_SCHEDULER_SETUP_ONE_COROUTINE \
+      || FEATURE == FEATURE_SCHEDULER_SETUP_TWO_COROUTINES
+    CoroutineScheduler::setupCoroutines();
+  #elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_ONE_COROUTINE
+    a.setupCoroutine();
+  #elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES
+    a.setupCoroutine();
+    b.setupCoroutine();
+  #endif
+
+#endif
 }
 
 void loop() {
+#if defined(TEENSYDUINO)
+  foo->doit();
+#endif
+
 #if FEATURE == FEATURE_BASELINE
   disableCompilerOptimization = 1;
 #elif FEATURE == FEATURE_ONE_DELAY_FUNCTION
@@ -364,6 +513,14 @@ void loop() {
 #elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE_SECONDS
   CoroutineScheduler::loop();
 #elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES_SECONDS
+  CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_SCHEDULER_SETUP_ONE_COROUTINE
+  CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_SCHEDULER_SETUP_TWO_COROUTINES
+  CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_ONE_COROUTINE
+  CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES
   CoroutineScheduler::loop();
 #elif FEATURE == FEATURE_BLINK_COROUTINE
   blink.runCoroutine();

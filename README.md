@@ -2,11 +2,6 @@
 
 [![AUnit Tests](https://github.com/bxparks/AceRoutine/actions/workflows/aunit_tests.yml/badge.svg)](https://github.com/bxparks/AceRoutine/actions/workflows/aunit_tests.yml)
 
-**New**: [GitHub Discussions](https://github.com/bxparks/AceRoutine/discussions)
-for this project is now active! Let's use that for general support questions,
-and reserve the [GitHub Issues](https://github.com/bxparks/AceRoutine/issues)
-section for bugs and feature requests.
-
 **Breaking Changes in v1.3**: Breaking changes were made in v1.3 to reduce the
 flash memory consumption of `Coroutine` instances by 800-1000 bytes. See the
 [CHANGELOG.md](CHANGELOG.md) for a complete list.
@@ -109,7 +104,7 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.3.1 (2021-06-02)
+**Version**: 1.4.0 (2021-07-29)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 

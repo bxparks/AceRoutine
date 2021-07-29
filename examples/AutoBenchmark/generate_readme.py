@@ -40,7 +40,7 @@ is the overhead caused by the `Coroutine` context switch.
 
 All times in below are in microseconds.
 
-**Version**: AceRoutine v1.3
+**Version**: AceRoutine v1.4
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -131,7 +131,7 @@ $ make README.md
         * Makes `CoroutineScheduler` slightly slower on AVR processors (e.g. 5.2
           -> 5.5 micros on AVR) , but is actually *faster* on 32-bit processors
           (e.g. 1.100 -> 0.600 micros on ESP8266).
-* v1.3.1+
+* v1.4
     * Upgrade STM32duino Core from 1.9.0 to 2.0.0.
     * Upgrade SparkFun SAMD Core from 1.8.1 to 1.8.3.
     * No changes observed.

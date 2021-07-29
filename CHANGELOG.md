@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 1.4.0 (2021-07-29)
     * Upgrade STM32duino Core from 1.9.0 to 2.0.0.
         * MemoryBenchmark: Flash usage increases by 2.3kB across the board, but
           static RAM goes down by 250 bytes. Very little change to AceRoutine

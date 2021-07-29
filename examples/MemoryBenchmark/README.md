@@ -14,7 +14,7 @@ calculated flash size can jump around in unexpected ways.
 
 **NOTE**: This file was auto-generated using `make README.md`. DO NOT EDIT.
 
-**Version**: AceRoutine v1.3
+**Version**: AceRoutine v1.4
 
 **Changes**:
 
@@ -73,7 +73,7 @@ calculated flash size can jump around in unexpected ways.
           1000 which must be done in software on 8-bit processors.
         * The `CoroutineScheduler` is forced to become simpler  which reduces
           flash usage by 10-20 bytes.
-* v1.3.1+
+* v1.4
     * Upgrade STM32duino Core to 2.0.0.
         * Flash usage increases by 2.3kB across the board, but static RAM goes
           down by 250 bytes.

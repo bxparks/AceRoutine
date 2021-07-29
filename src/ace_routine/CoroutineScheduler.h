@@ -37,12 +37,56 @@ namespace ace_routine {
 /**
  * Class that manages instances of the `Coroutine` class, and executes them
  * in a round-robin fashion. This is expected to be used as a singleton.
+ *
+ * Design Notes:
+ *
+ * Originally, this class was intended to be more substantial, for example,
+ * I imagined that different scheduling algorithms could be implemented,
+ * allowing coroutines to have different priorities. To ensure that there was
+ * only a single instance of the `CoroutineScheduler`, a singleton pattern was
+ * used. The `getScheduler()` method fixes the problem that C++ does not
+ * guarantee the order of static initialization of resources defined in
+ * different files.
+ *
+ * It seemed cumbersome to require the client code to go through the
+ * `getScheduler()` method to access the singleton instance. So each public
+ * instance method of the `CoroutineScheduler` is wrapped in a more
+ * user-friendly static method to make it easier to use. For example,
+ * `CoroutineScheduler::setup()` is a shorthand for
+ * `CoroutineScheduler::getScheduler()->setupScheduler()`.
+ *
+ * As the library matured, I started to put more emphasis on keeping the runtime
+ * overhead of the library as small as possible, especially on 8-bit AVR
+ * processors, to allow a Coroutine instance to be a viable alternative to
+ * writing a normal C/C++ function with complex internal finite state
+ * machines. It turned out that the simple round-robin scheduling algorithm
+ * currently implemented by `CoroutineScheduler` is good enough, and this class
+ * remained quite simple.
+ *
+ * With its current functionality, the `CoroutineSchedule` does not need to be
+ * a singleton because the information that stores the singly-linked list of
+ * Coroutines is actually stored in the `Coroutine` class, not the
+ * `CoroutineScheduler` class. Because it does not need to be singleton, the
+ * `getScheduler()` method is not really required, and we could have just
+ * allowed the end-user to explicitly create an instance of `CoroutineScheduler`
+ * and use it like a normal object.
+ *
+ * However, once the API of `CoroutineScheduler` with its static wrapper methods
+ * was released to the public, backwards compatibility meant that I could not
+ * remove this extra layer of indirection. Fortunately, the none of these
+ * methods are virtual, so the extra level of indirection consumes very little
+ * overhead, even on 8-bit AVR processors.
  */
 template <typename T_COROUTINE>
 class CoroutineSchedulerTemplate {
   public:
     /** Set up the scheduler. Should be called from the global setup(). */
     static void setup() { getScheduler()->setupScheduler(); }
+
+    /** Set up the coroutines by calling their setupCoroutine() methods. */
+    static void setupCoroutines() {
+      getScheduler()->setupCoroutinesInternal();
+    }
 
     /**
      * Run the current coroutine using the current scheduler. This method
@@ -89,6 +133,16 @@ class CoroutineSchedulerTemplate {
      */
     void setupScheduler() {
       mCurrent = T_COROUTINE::getRoot();
+    }
+
+    /** Setup each coroutine by calling its setupCoroutine() function. */
+    void setupCoroutinesInternal() {
+      for (T_COROUTINE** p = T_COROUTINE::getRoot();
+          (*p) != nullptr;
+          p = (*p)->getNext()) {
+
+        (*p)->setupCoroutine();
+      }
     }
 
     /** Run the current coroutine. */

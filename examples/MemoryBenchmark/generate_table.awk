@@ -21,8 +21,12 @@ BEGIN {
   labels[12] = "Scheduler, Two Coroutines (micros)"
   labels[13] = "Scheduler, One Coroutine (seconds)"
   labels[14] = "Scheduler, Two Coroutines (seconds)"
-  labels[15] = "Blink Function"
-  labels[16] = "Blink Coroutine"
+  labels[15] = "Scheduler, One Coroutine (setup)"
+  labels[16] = "Scheduler, Two Coroutines (setup)"
+  labels[17] = "Scheduler, One Coroutine (man setup)"
+  labels[18] = "Scheduler, Two Coroutines (man setup)"
+  labels[19] = "Blink Function"
+  labels[20] = "Blink Coroutine"
   record_index = 0
 }
 {
@@ -40,8 +44,8 @@ END {
     u[i]["d_ram"] = u[i]["ram"] - base_ram
   }
 
-  printf("+------------------------------------------------------------------+\n")
-  printf("| functionality                       |  flash/  ram |       delta |\n")
+  printf("+--------------------------------------------------------------------+\n")
+  printf("| functionality                         |  flash/  ram |       delta |\n")
   for (i = 0; i < NUM_ENTRIES; i++) {
     if (labels[i] ~ /^Baseline$/ \
       || labels[i] ~ /^One Delay Function$/ \
@@ -51,12 +55,14 @@ END {
       || labels[i] ~ /^Scheduler, One Coroutine$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(micros\)$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(seconds\)$/ \
+      || labels[i] ~ /^Scheduler, One Coroutine \(setup\)$/ \
+      || labels[i] ~ /^Scheduler, One Coroutine \(man setup\)$/ \
       || labels[i] ~ /^Blink Function$/ \
     ) {
-      printf("|-------------------------------------+--------------+-------------|\n")
+      printf("|---------------------------------------+--------------+-------------|\n")
     }
-    printf("| %-35s | %6d/%5d | %5d/%5d |\n",
+    printf("| %-37s | %6d/%5d | %5d/%5d |\n",
         labels[i], u[i]["flash"], u[i]["ram"], u[i]["d_flash"], u[i]["d_ram"])
   }
-  printf("+------------------------------------------------------------------+\n")
+  printf("+--------------------------------------------------------------------+\n")
 }

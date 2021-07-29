@@ -114,6 +114,9 @@ calculated flash size can jump around in unexpected ways.
       Teensyduino seems to pull in `malloc()` and `free()` functions as soon as
       any class with virtual methods are uses, unlike AVR where they are pulled
       in only if the destructor is virtual.
+    * Add benchmarks for calling `CoroutineScheduler::setupCoroutine()`.
+      Increases flash memory by 50-60 bytes *per coroutine* (AVR) and 30-40
+      bytes per coroutine (32-bit processors).
 
 ## How to Generate
 

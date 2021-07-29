@@ -8,6 +8,15 @@
         * AutoBenchmark: No change.
     * Upgrade SparkFun SAMD Core from 1.8.1 to 1.8.3.
         * No change observed in MemoryBenchmark or AutoBenchmark.
+    * Add virtual `Coroutine::setupCoroutine()` with a default empty
+      implementation, and optional `CoroutineScheduler::setupCoroutines()` to
+      automatically loop over all coroutines.
+        * If not used, `Coroutine::setupCoroutine()` increases flash consumption
+          by 4 bytes, and static memory by 2 bytes per coroutine on AVR
+          processors.
+        * If used, `Coroutine::setupCoroutine()` can consume a significant
+          amount of memory resources. On AVR, at least 50-60 bytes per
+          coroutine. On 32-bit processors, about 30-40 bytes per coroutine.
 * 1.3.1 (2021-06-02)
     * Bring back `COROUTINE_DELAY_MICROS()` and `COROUTINE_DELAY_SECONDS()`
       with an alternate implemenation that increases flash and static memory

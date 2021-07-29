@@ -10,10 +10,11 @@ var searchData=
   ['setrunning_67',['setRunning',['../classace__routine_1_1CoroutineTemplate.html#a4e4cf5b9c25b340e040578a57382a70c',1,'ace_routine::CoroutineTemplate']]],
   ['setterminated_68',['setTerminated',['../classace__routine_1_1CoroutineTemplate.html#a76bbbd068a1a8a4e762e7834d28f38ed',1,'ace_routine::CoroutineTemplate']]],
   ['setup_69',['setup',['../classace__routine_1_1CoroutineSchedulerTemplate.html#ac792080cdec6db9f6539a446d7af587c',1,'ace_routine::CoroutineSchedulerTemplate']]],
-  ['setupcoroutine_70',['setupCoroutine',['../classace__routine_1_1CoroutineTemplate.html#ab386f5cb35ee03f927c72c281fe3518b',1,'ace_routine::CoroutineTemplate::setupCoroutine(const char *) ACE_ROUTINE_DEPRECATED'],['../classace__routine_1_1CoroutineTemplate.html#ab24d05e1a1c581a40cce8d4a85695aee',1,'ace_routine::CoroutineTemplate::setupCoroutine(const __FlashStringHelper *) ACE_ROUTINE_DEPRECATED']]],
-  ['setvalue_71',['setValue',['../classace__routine_1_1Channel.html#ab950ccdf77fdfaeea67ac19031733229',1,'ace_routine::Channel']]],
-  ['setyielding_72',['setYielding',['../classace__routine_1_1CoroutineTemplate.html#adf41ef1dfedfb5bb2fcd3ff1285bc100',1,'ace_routine::CoroutineTemplate']]],
-  ['status_73',['Status',['../classace__routine_1_1CoroutineTemplate.html#ac63ae27c5f03a0cf85c6be2718626f25',1,'ace_routine::CoroutineTemplate']]],
-  ['statusprintto_74',['statusPrintTo',['../classace__routine_1_1CoroutineTemplate.html#a4429565a460dd3fe53a61ecf60557a76',1,'ace_routine::CoroutineTemplate']]],
-  ['suspend_75',['suspend',['../classace__routine_1_1CoroutineTemplate.html#af106a49c67a4c2920bdc1ac527bad7d5',1,'ace_routine::CoroutineTemplate']]]
+  ['setupcoroutine_70',['setupCoroutine',['../classace__routine_1_1CoroutineTemplate.html#adcc2990d5ab0c53b33ddedc9c6cee579',1,'ace_routine::CoroutineTemplate::setupCoroutine()'],['../classace__routine_1_1CoroutineTemplate.html#ab386f5cb35ee03f927c72c281fe3518b',1,'ace_routine::CoroutineTemplate::setupCoroutine(const char *) ACE_ROUTINE_DEPRECATED'],['../classace__routine_1_1CoroutineTemplate.html#ab24d05e1a1c581a40cce8d4a85695aee',1,'ace_routine::CoroutineTemplate::setupCoroutine(const __FlashStringHelper *) ACE_ROUTINE_DEPRECATED']]],
+  ['setupcoroutines_71',['setupCoroutines',['../classace__routine_1_1CoroutineSchedulerTemplate.html#a86ebd507e675b913301f92af0a34abde',1,'ace_routine::CoroutineSchedulerTemplate']]],
+  ['setvalue_72',['setValue',['../classace__routine_1_1Channel.html#ab950ccdf77fdfaeea67ac19031733229',1,'ace_routine::Channel']]],
+  ['setyielding_73',['setYielding',['../classace__routine_1_1CoroutineTemplate.html#adf41ef1dfedfb5bb2fcd3ff1285bc100',1,'ace_routine::CoroutineTemplate']]],
+  ['status_74',['Status',['../classace__routine_1_1CoroutineTemplate.html#ac63ae27c5f03a0cf85c6be2718626f25',1,'ace_routine::CoroutineTemplate']]],
+  ['statusprintto_75',['statusPrintTo',['../classace__routine_1_1CoroutineTemplate.html#a4429565a460dd3fe53a61ecf60557a76',1,'ace_routine::CoroutineTemplate']]],
+  ['suspend_76',['suspend',['../classace__routine_1_1CoroutineTemplate.html#af106a49c67a4c2920bdc1ac527bad7d5',1,'ace_routine::CoroutineTemplate']]]
 ];

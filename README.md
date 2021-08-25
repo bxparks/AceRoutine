@@ -13,7 +13,7 @@ This library is an implementation of the
 [ProtoThreads](http://dunkels.com/adam/pt) library for the
 Arduino platform. It emulates a stackless coroutine that can suspend execution
 using a `yield()` or `delay()` functionality to allow other coroutines to
-execute. When the scheduler makes it way back to the original coroutine, the
+execute. When the scheduler makes its way back to the original coroutine, the
 execution continues right after the `yield()` or `delay()`.
 
 There are only 3 classes in this library:

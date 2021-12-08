@@ -33,9 +33,9 @@ test(suspendAndResume) {
   CoroutineScheduler::list(output);
 
   PrintStr<100> expected;
-  printfTo(expected, "Coroutine %ld; status: Yielding\r\n",
+  printfTo(expected, "Coroutine %ld; status: Yielding\n",
       (uintptr_t) &routine1);
-  printfTo(expected, "Coroutine %ld; status: Yielding\r\n",
+  printfTo(expected, "Coroutine %ld; status: Yielding\n",
       (uintptr_t) &routine2);
   assertEqual(expected.cstr(), output.cstr());
 
@@ -43,9 +43,9 @@ test(suspendAndResume) {
   expected.flush();
   routine2.suspend();
   CoroutineScheduler::list(output);
-  printfTo(expected, "Coroutine %ld; status: Yielding\r\n",
+  printfTo(expected, "Coroutine %ld; status: Yielding\n",
       (uintptr_t) &routine1);
-  printfTo(expected, "Coroutine %ld; status: Suspended\r\n",
+  printfTo(expected, "Coroutine %ld; status: Suspended\n",
       (uintptr_t) &routine2);
   assertEqual(expected.cstr(), output.cstr());
 
@@ -53,9 +53,9 @@ test(suspendAndResume) {
   expected.flush();
   routine2.resume();
   CoroutineScheduler::list(output);
-  printfTo(expected, "Coroutine %ld; status: Yielding\r\n",
+  printfTo(expected, "Coroutine %ld; status: Yielding\n",
       (uintptr_t) &routine1);
-  printfTo(expected, "Coroutine %ld; status: Yielding\r\n",
+  printfTo(expected, "Coroutine %ld; status: Yielding\n",
       (uintptr_t) &routine2);
   assertEqual(expected.cstr(), output.cstr());
 }

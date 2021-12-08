@@ -206,14 +206,15 @@ If you expand the `COROUTINE()` macro from `Coroutine.h`, the above code is
 equivalent to writing out the following by hand:
 
 ```C++
-struct Coroutine_doSomething: Coroutine {
-  Coroutine_doSomething() {}
+class Coroutine_doSomething : public Coroutine {
+  public:
+    Coroutine_doSomething() {}
 
-  int runCoroutine() override {
-    COROUTINE_BEGIN();
-    ...
-    COROUTINE_END();
-  }
+    int runCoroutine() override {
+        COROUTINE_BEGIN();
+        ...
+        COROUTINE_END();
+    }
 };
 
 Coroutine_doSomething doSomething;
@@ -227,11 +228,12 @@ relatively straightforward to see how we can create our own subclasses of
 
 ```C++
 class MyCoroutine : public Coroutine {
-  int runCoroutine() override {
-    COROUTINE_BEGIN();
-    ...
-    COROUTINE_END();
-  }
+  public:
+    int runCoroutine() override {
+        COROUTINE_BEGIN();
+        ...
+        COROUTINE_END();
+    }
 };
 
 

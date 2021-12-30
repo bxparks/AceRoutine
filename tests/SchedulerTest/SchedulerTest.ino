@@ -77,10 +77,10 @@ test(AceRoutineTest, scheduler) {
   TestableCoroutineScheduler::list(output);
 
   PrintStr<200> expected;
-  printfTo(expected, "Coroutine %ld; status: Yielding\n", (uintptr_t) &a);
-  printfTo(expected, "Coroutine %ld; status: Yielding\n", (uintptr_t) &b);
-  printfTo(expected, "Coroutine %ld; status: Yielding\n", (uintptr_t) &c);
-  printfTo(expected, "Coroutine %ld; status: Suspended\n",
+  printfTo(expected, "Coroutine %ld; status: Yielding\r\n", (uintptr_t) &a);
+  printfTo(expected, "Coroutine %ld; status: Yielding\r\n", (uintptr_t) &b);
+  printfTo(expected, "Coroutine %ld; status: Yielding\r\n", (uintptr_t) &c);
+  printfTo(expected, "Coroutine %ld; status: Suspended\r\n",
       (uintptr_t) &extra);
   assertEqual(expected.cstr(), output.cstr());
 

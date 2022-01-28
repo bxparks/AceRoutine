@@ -586,7 +586,7 @@ internal `prevMillis` static variable. The `Blink Coroutine` implements the
 same logic using a `Coroutine`. The `Coroutine` version is far more readable and
 maintainable, with only about 220 additional bytes of flash on AVR, and 130
 bytes on an ESP8266. In many situations, the increase in flash memory size may
-be worth ease of code maintenance.
+be worth paying to get easier code maintenance.
 
 <a name="CPU"></a>
 ### CPU

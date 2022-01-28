@@ -1,6 +1,9 @@
 # Changelog
 
 * Unreleased
+    * Update `examples/SoundManager` to demonstrate coroutines defined in
+      separate files (see
+      [Discussion#40](https://github.com/bxparks/AceRoutine/discussions/40)).
 * 1.4.0 (2021-07-29)
     * Upgrade STM32duino Core from 1.9.0 to 2.0.0.
         * MemoryBenchmark: Flash usage increases by 2.3kB across the board, but

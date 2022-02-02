@@ -1,9 +1,23 @@
 # Changelog
 
 * Unreleased
+* 1.4.1 (2022-02-02)
     * Update `examples/SoundManager` to demonstrate coroutines defined in
       separate files (see
       [Discussion#40](https://github.com/bxparks/AceRoutine/discussions/40)).
+    * Update various unit tests to conform to EpoxyDuino v1.2.0 which
+      reverts `Print::println()` to print `\r\n` instead of just `\n`.
+    * Remove SAMD21 boards into new "Tier 3: May work but unsupported" tier
+      because the SAMD21 tool chain no longer works for me, and Arduino SAMD21
+      boards use the ArduinoCore-api which is incompatible.
+    * Upgrade tool chain
+        * Arduino IDE from 1.8.13 to 1.8.19
+        * Arduino CLI from 0.14.0 to 0.19.2
+        * Arduino AVR Core from 1.8.3 to 1.8.4
+        * STM32duino from 2.0.0 to 2.2.0
+        * ESP8266 Core from 2.7.4 to 3.0.2
+        * ESP32 Core from 1.0.6 to 2.0.2
+        * Teensyduino from 1.54 to 1.56
 * 1.4.0 (2021-07-29)
     * Upgrade STM32duino Core from 1.9.0 to 2.0.0.
         * MemoryBenchmark: Flash usage increases by 2.3kB across the board, but

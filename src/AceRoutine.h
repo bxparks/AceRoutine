@@ -43,8 +43,8 @@ SOFTWARE.
 #endif
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_ROUTINE_VERSION 10400
-#define ACE_ROUTINE_VERSION_STRING "1.4.0"
+#define ACE_ROUTINE_VERSION 10401
+#define ACE_ROUTINE_VERSION_STRING "1.4.1"
 
 #include "ace_routine/Coroutine.h"
 #include "ace_routine/CoroutineScheduler.h"

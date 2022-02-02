@@ -1,11 +1,14 @@
 /*
- * An example of using the Coroutine::reset() from on coroutine to control the
+ * An example of using the Coroutine::reset() from one coroutine to control the
  * state of another coroutine. The SoundRoutine plays different sounds
  * depending on the 'currentSound' variable. The soundManager coroutine is able
  * to interrupt and reset the SoundRoutine to play a different sound.
  *
  * Adapted from the example posted by EkardNT@ on
  * https://github.com/bxparks/AceRoutine/issues/20.
+ *
+ * This example also demonstrates how coroutines can be defined in separate
+ * *.cpp and *.h files. See https://github.com/bxparks/AceRoutine/issues/39.
  *
  * The output of this program should be the following:
  *
@@ -43,84 +46,11 @@
 
 #include <Arduino.h>
 #include <AceRoutine.h>
+#include "SoundRoutine.h"
 
-using namespace ace_routine;
-
-const int SOUND_NONE = 0;
-const int SOUND_BEEP = 1;
-const int SOUND_BOOP = 2;
-
-// Coroutine that knows how to play certain sounds.
-class SoundRoutine : public Coroutine {
-  public:
-    int runCoroutine() override;
-    void playSound(int sound);
-
-  private:
-    int currentSound = SOUND_NONE;
-};
-
-void SoundRoutine::playSound(int sound) {
-  currentSound = sound;
-  reset();
-}
-
-int SoundRoutine::runCoroutine() {
-  COROUTINE_LOOP() {
-    switch (currentSound) {
-      case SOUND_NONE:
-        Serial.println("<silence>");
-        break;
-
-      case SOUND_BEEP:
-        // Calls to tone() go here, interspersed with some COROUTINE_DELAYs.
-        Serial.println("First BEEP");
-        COROUTINE_DELAY(500);
-        Serial.println("Second BEEP");
-        break;
-
-      case SOUND_BOOP:
-        // Calls to tone() go here, interspersed with some COROUTINE_DELAYs.
-        Serial.println("First BOOP");
-        COROUTINE_DELAY(500);
-        Serial.println("Second BOOP");
-        break;
-
-      default:
-        Serial.println("Unknown sound!");
-    }
-
-    currentSound = SOUND_NONE;
-    COROUTINE_AWAIT(currentSound != SOUND_NONE);
-  }
-}
+using ace_routine::CoroutineScheduler;
 
 SoundRoutine soundRoutine;
-
-// The soundManager controls what the soundRoutine will play.
-COROUTINE(soundManager) {
-  COROUTINE_LOOP() {
-    Serial.println("Wait 5 seconds...");
-    COROUTINE_DELAY(5000);
-
-    Serial.println();
-    Serial.println("Request Beep and wait 5 seconds...");
-    CoroutineScheduler::list(Serial);
-    soundRoutine.playSound(SOUND_BEEP);
-    COROUTINE_DELAY(5000);
-
-    Serial.println();
-    Serial.println("Request Boop and wait 5 seconds...");
-    CoroutineScheduler::list(Serial);
-    soundRoutine.playSound(SOUND_BOOP);
-    COROUTINE_DELAY(5000);
-
-    Serial.println();
-    Serial.println("Request Silence and wait 5 seconds...");
-    CoroutineScheduler::list(Serial);
-    soundRoutine.playSound(SOUND_NONE);
-  }
-}
 
 void setup() {
   delay(1000);

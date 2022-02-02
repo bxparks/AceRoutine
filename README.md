@@ -13,7 +13,7 @@ This library is an implementation of the
 [ProtoThreads](http://dunkels.com/adam/pt) library for the
 Arduino platform. It emulates a stackless coroutine that can suspend execution
 using a `yield()` or `delay()` functionality to allow other coroutines to
-execute. When the scheduler makes it way back to the original coroutine, the
+execute. When the scheduler makes its way back to the original coroutine, the
 execution continues right after the `yield()` or `delay()`.
 
 There are only 3 classes in this library:
@@ -104,7 +104,7 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.4.0 (2021-07-29)
+**Version**: 1.4.1 (2022-02-02)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -542,37 +542,37 @@ etc) for a handful of AceRoutine features. Here are some highlights:
 +--------------------------------------------------------------------+
 | functionality                         |  flash/  ram |       delta |
 |---------------------------------------+--------------+-------------|
-| Baseline                              | 256924/26800 |     0/    0 |
+| Baseline                              | 260329/27916 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| One Delay Function                    | 256988/26808 |    64/    8 |
-| Two Delay Functions                   | 257052/26808 |   128/    8 |
+| One Delay Function                    | 260377/27916 |    48/    0 |
+| Two Delay Functions                   | 260441/27916 |   112/    0 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine                         | 257120/26820 |   196/   20 |
-| Two Coroutines                        | 257280/26844 |   356/   44 |
+| One Coroutine                         | 260525/27944 |   196/   28 |
+| Two Coroutines                        | 260669/27960 |   340/   44 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (micros)                | 257136/26820 |   212/   20 |
-| Two Coroutines (micros)               | 257296/26844 |   372/   44 |
+| One Coroutine (micros)                | 260541/27944 |   212/   28 |
+| Two Coroutines (micros)               | 260701/27960 |   372/   44 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (seconds)               | 257136/26820 |   212/   20 |
-| Two Coroutines (seconds)              | 257312/26844 |   388/   44 |
+| One Coroutine (seconds)               | 260541/27944 |   212/   28 |
+| Two Coroutines (seconds)              | 260717/27960 |   388/   44 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine              | 257168/26828 |   244/   28 |
-| Scheduler, Two Coroutines             | 257312/26844 |   388/   44 |
+| Scheduler, One Coroutine              | 260573/27944 |   244/   28 |
+| Scheduler, Two Coroutines             | 260701/27968 |   372/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     | 257184/26828 |   260/   28 |
-| Scheduler, Two Coroutines (micros)    | 257328/26844 |   404/   44 |
+| Scheduler, One Coroutine (micros)     | 260589/27944 |   260/   28 |
+| Scheduler, Two Coroutines (micros)    | 260733/27968 |   404/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    | 257184/26828 |   260/   28 |
-| Scheduler, Two Coroutines (seconds)   | 257344/26844 |   420/   44 |
+| Scheduler, One Coroutine (seconds)    | 260589/27944 |   260/   28 |
+| Scheduler, Two Coroutines (seconds)   | 260749/27968 |   420/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      | 257200/26828 |   276/   28 |
-| Scheduler, Two Coroutines (setup)     | 257376/26844 |   452/   44 |
+| Scheduler, One Coroutine (setup)      | 260605/27944 |   276/   28 |
+| Scheduler, Two Coroutines (setup)     | 260765/27968 |   436/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  | 257184/26828 |   260/   28 |
-| Scheduler, Two Coroutines (man setup) | 257360/26844 |   436/   44 |
+| Scheduler, One Coroutine (man setup)  | 260589/27944 |   260/   28 |
+| Scheduler, Two Coroutines (man setup) | 260749/27968 |   420/   52 |
 |---------------------------------------+--------------+-------------|
-| Blink Function                        | 257424/26816 |   500/   16 |
-| Blink Coroutine                       | 257572/26836 |   648/   36 |
+| Blink Function                        | 261001/27988 |   672/   72 |
+| Blink Coroutine                       | 261133/28008 |   804/   92 |
 +--------------------------------------------------------------------+
 ```
 
@@ -586,7 +586,7 @@ internal `prevMillis` static variable. The `Blink Coroutine` implements the
 same logic using a `Coroutine`. The `Coroutine` version is far more readable and
 maintainable, with only about 220 additional bytes of flash on AVR, and 130
 bytes on an ESP8266. In many situations, the increase in flash memory size may
-be worth ease of code maintenance.
+be worth paying to get easier code maintenance.
 
 <a name="CPU"></a>
 ### CPU
@@ -611,9 +611,9 @@ ESP8266:
 +---------------------+--------+-------------+--------+
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       0.200 |  0.000 |
-| DirectScheduling    |  10000 |       0.500 |  0.300 |
-| CoroutineScheduling |  10000 |       0.800 |  0.600 |
+| EmptyLoop           |  10000 |       0.100 |  0.000 |
+| DirectScheduling    |  10000 |       0.500 |  0.400 |
+| CoroutineScheduling |  10000 |       0.900 |  0.800 |
 +---------------------+--------+-------------+--------+
 ```
 
@@ -623,26 +623,43 @@ ESP8266:
 <a name="Hardware"></a>
 ### Hardware
 
-The library has Tier 1 support on the following boards:
+**Tier 1: Fully Supported**
+
+These boards are tested on each release:
 
 * Arduino Nano (16 MHz ATmega328P)
 * SparkFun Pro Micro (16 MHz ATmega32U4)
-* SAMD21 M0 Mini (48 MHz ARM Cortex-M0+)
 * STM32 Blue Pill (STM32F103C8, 72 MHz ARM Cortex-M3)
 * NodeMCU 1.0 (ESP-12E module, 80 MHz ESP8266)
 * WeMos D1 Mini (ESP-12E module, 80 MHz ESP8266)
 * ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
 * Teensy 3.2 (96 MHz ARM Cortex-M4)
 
-Tier 2 support can be expected on the following boards, mostly because I don't
-test these as often:
+**Tier 2: Should work**
+
+These boards should work but I don't test them as often:
 
 * ATtiny85 (8 MHz ATtiny85)
 * Arduino Pro Mini (16 MHz ATmega328P)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 * Teensy LC (48 MHz ARM Cortex-M0+)
 
-The following boards are **not** supported:
+**Tier 3: May work, but not supported**
+
+* SAMD21 M0 Mini (48 MHz ARM Cortex-M0+)
+    * Arduino-branded SAMD21 boards use the ArduinoCore-API, so are explicitly
+      blacklisted. See below.
+    * Other 3rd party SAMD21 boards *may* work using the SparkFun SAMD core.
+    * However, as of SparkFun SAMD Core v1.8.6 and Arduino IDE 1.8.19, I can no
+      longer upload binaries to these 3rd party boards due to errors.
+    * Therefore, third party SAMD21 boards are now in this new Tier 3 category.
+    * This library may work on these boards, but I can no longer support them.
+
+**Tier Blacklisted**
+
+The following boards are *not* supported and are explicitly blacklisted to allow
+the compiler to print useful error messages instead of hundreds of lines of
+compiler errors:
 
 * Any platform using the ArduinoCore-API
   (https://github.com/arduino/ArduinoCore-api). For example:
@@ -654,16 +671,24 @@ The following boards are **not** supported:
 ### Tool Chain
 
 This library was developed and tested using:
-* [Arduino IDE 1.8.13](https://www.arduino.cc/en/Main/Software)
-* [Arduino CLI 0.14.0](https://arduino.github.io/arduino-cli)
-* [Arduino AVR Boards 1.8.3](https://github.com/arduino/ArduinoCore-avr)
+* [Arduino IDE 1.8.19](https://www.arduino.cc/en/Main/Software)
+* [Arduino CLI 0.19.2](https://arduino.github.io/arduino-cli)
+* [Arduino AVR Boards 1.8.4](https://github.com/arduino/ArduinoCore-avr)
 * [Arduino SAMD Boards 1.8.9](https://github.com/arduino/ArduinoCore-samd)
 * [SparkFun AVR Boards 1.1.13](https://github.com/sparkfun/Arduino_Boards)
-* [SparkFun SAMD Boards 1.8.3](https://github.com/sparkfun/Arduino_Boards)
-* [STM32duino 2.0.0](https://github.com/stm32duino/Arduino_Core_STM32)
-* [ESP8266 Arduino 2.7.4](https://github.com/esp8266/Arduino)
-* [ESP32 Arduino 1.0.6](https://github.com/espressif/arduino-esp32)
-* [Teensydino 1.53](https://www.pjrc.com/teensy/td_download.html)
+* [SparkFun SAMD Boards 1.8.6](https://github.com/sparkfun/Arduino_Boards)
+* [STM32duino 2.2.0](https://github.com/stm32duino/Arduino_Core_STM32)
+* [ESP8266 Arduino 3.0.2](https://github.com/esp8266/Arduino)
+* [ESP32 Arduino 2.0.2](https://github.com/espressif/arduino-esp32)
+* [Teensyduino 1.56](https://www.pjrc.com/teensy/td_download.html)
+
+This library is *not* compatible with:
+
+* Any platform using the
+  [ArduinoCore-API](https://github.com/arduino/ArduinoCore-api), for example:
+    * [Arduino megaAVR](https://github.com/arduino/ArduinoCore-megaavr/)
+    * [MegaCoreX](https://github.com/MCUdude/MegaCoreX)
+    * [Arduino SAMD Boards >=1.8.10](https://github.com/arduino/ArduinoCore-samd)
 
 It should work with [PlatformIO](https://platformio.org/) but I have
 not tested it.
@@ -674,8 +699,9 @@ the [EpoxyDuino](https://github.com/bxparks/EpoxyDuino) emulation layer.
 <a name="OperatingSystem"></a>
 ### Operating System
 
-I use Ubuntu 18.04 and 20.04 for most of my development and sometimes do sanity
-checks on MacOS 10.14.5.
+I use Ubuntu 20.04 for the vast majority of my development. I expect that the
+library will work fine under MacOS and Windows, but I have not explicitly tested
+them.
 
 <a name="License"></a>
 ## License
@@ -685,14 +711,14 @@ checks on MacOS 10.14.5.
 <a name="FeedbackAndSupport"></a>
 ## Feedback and Support
 
-If you have any questions, comments and other support questions about how to
-use this library, please use the
-[GitHub Discussions](https://github.com/bxparks/AceRoutine/discussions)
-for this project. If you have bug reports or feature requests, please file a
-ticket in [GitHub Issues](https://github.com/bxparks/AceRoutine/issues).
-I'd love to hear about how this software and its documentation can be improved.
-I can't promise that I will incorporate everything, but I will give your ideas
-serious consideration.
+If you have any questions, comments, or feature requests for this library,
+please use the [GitHub
+Discussions](https://github.com/bxparks/AceRoutine/discussions) for this
+project. If you have bug reports, please file a ticket in [GitHub
+Issues](https://github.com/bxparks/AceRoutine/issues). Feature requests should
+go into Discussions first because they often have alternative solutions which
+are useful to remain visible, instead of disappearing from the default view of
+the Issue tracker after the ticket is closed.
 
 Please refrain from emailing me directly unless the content is sensitive. The
 problem with email is that I cannot reference the email conversation when other

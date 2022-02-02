@@ -110,11 +110,21 @@ $ make README.md
     * Upgrade SparkFun SAMD Core from 1.8.1 to 1.8.3.
     * No changes observed.
 
+* v1.4.1
+    * Upgrade tool chain
+        * Arduino IDE from 1.8.13 to 1.8.19
+        * Arduino CLI from 0.14.0 to 0.19.2
+        * Arduino AVR Core from 1.8.3 to 1.8.4
+        * STM32duino from 2.0.0 to 2.2.0
+        * ESP8266 Core from 2.7.4 to 3.0.2
+        * ESP32 Core from 1.0.6 to 2.0.2
+        * Teensyduino from 1.54 to 1.56
+
 ## Arduino Nano
 
 * 16MHz ATmega328P
-* Arduino IDE 1.8.13
-* Arduino AVR Boards 1.8.3
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino AVR Boards 1.8.4
 * `micros()` has a resolution of 4 microseconds
 
 ```
@@ -137,7 +147,7 @@ CPU:
 ## SparkFun Pro Micro
 
 * 16 MHz ATmega32U4
-* Arduino IDE 1.8.13
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
 * SparkFun AVR Boards 1.1.13
 * `micros()` has a resolution of 4 microseconds
 
@@ -151,32 +161,9 @@ CPU:
 +---------------------+--------+-------------+--------+
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       1.700 |  0.000 |
-| DirectScheduling    |  10000 |       2.900 |  1.200 |
-| CoroutineScheduling |  10000 |       7.300 |  5.600 |
-+---------------------+--------+-------------+--------+
-
-```
-
-## SAMD21 M0 Mini
-
-* 48 MHz ARM Cortex-M0+
-* Arduino IDE 1.8.13
-* SparkFun SAMD Core 1.8.3
-
-```
-Sizes of Objects:
-sizeof(Coroutine): 20
-sizeof(CoroutineScheduler): 4
-sizeof(Channel<int>): 12
-
-CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  30000 |       0.200 |  0.000 |
-| DirectScheduling    |  30000 |       0.633 |  0.433 |
-| CoroutineScheduling |  30000 |       1.500 |  1.300 |
+| EmptyLoop           |  10000 |       1.800 |  0.000 |
+| DirectScheduling    |  10000 |       2.900 |  1.100 |
+| CoroutineScheduling |  10000 |       7.300 |  5.500 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -184,8 +171,8 @@ CPU:
 ## STM32
 
 * STM32 "Blue Pill", STM32F103C8, 72 MHz ARM Cortex-M3
-* Arduino IDE 1.8.13
-* STM32duino 2.0.0
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* STM32duino 2.2.0
 
 ```
 Sizes of Objects:
@@ -197,9 +184,9 @@ CPU:
 +---------------------+--------+-------------+--------+
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
-| EmptyLoop           |  30000 |       0.166 |  0.000 |
-| DirectScheduling    |  30000 |       0.500 |  0.334 |
-| CoroutineScheduling |  30000 |       1.100 |  0.934 |
+| EmptyLoop           |  30000 |       0.133 |  0.000 |
+| DirectScheduling    |  30000 |       0.533 |  0.400 |
+| CoroutineScheduling |  30000 |       1.133 |  1.000 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -207,8 +194,8 @@ CPU:
 ## ESP8266
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
-* Arduino IDE 1.8.13
-* ESP8266 Boards 2.7.4
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* ESP8266 Boards 3.0.2
 
 ```
 Sizes of Objects:
@@ -220,9 +207,9 @@ CPU:
 +---------------------+--------+-------------+--------+
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       0.200 |  0.000 |
-| DirectScheduling    |  10000 |       0.500 |  0.300 |
-| CoroutineScheduling |  10000 |       0.800 |  0.600 |
+| EmptyLoop           |  10000 |       0.100 |  0.000 |
+| DirectScheduling    |  10000 |       0.500 |  0.400 |
+| CoroutineScheduling |  10000 |       0.900 |  0.800 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -230,8 +217,8 @@ CPU:
 ## ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
-* Arduino IDE 1.8.13
-* ESP32 Boards 1.0.6
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* ESP32 Boards 2.0.2
 
 ```
 Sizes of Objects:
@@ -245,7 +232,7 @@ CPU:
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  30000 |       0.066 |  0.000 |
 | DirectScheduling    |  30000 |       0.133 |  0.067 |
-| CoroutineScheduling |  30000 |       0.300 |  0.234 |
+| CoroutineScheduling |  30000 |       0.333 |  0.267 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -253,8 +240,8 @@ CPU:
 ## Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
-* Arduino IDE 1.8.13
-* Teensyduino 1.53
+* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Teensyduino 1.56
 * Compiler options: "Faster"
 
 ```

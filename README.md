@@ -542,37 +542,37 @@ etc) for a handful of AceRoutine features. Here are some highlights:
 +--------------------------------------------------------------------+
 | functionality                         |  flash/  ram |       delta |
 |---------------------------------------+--------------+-------------|
-| Baseline                              | 256924/26800 |     0/    0 |
+| Baseline                              | 260329/27916 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| One Delay Function                    | 256988/26808 |    64/    8 |
-| Two Delay Functions                   | 257052/26808 |   128/    8 |
+| One Delay Function                    | 260377/27916 |    48/    0 |
+| Two Delay Functions                   | 260441/27916 |   112/    0 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine                         | 257120/26820 |   196/   20 |
-| Two Coroutines                        | 257280/26844 |   356/   44 |
+| One Coroutine                         | 260525/27944 |   196/   28 |
+| Two Coroutines                        | 260669/27960 |   340/   44 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (micros)                | 257136/26820 |   212/   20 |
-| Two Coroutines (micros)               | 257296/26844 |   372/   44 |
+| One Coroutine (micros)                | 260541/27944 |   212/   28 |
+| Two Coroutines (micros)               | 260701/27960 |   372/   44 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (seconds)               | 257136/26820 |   212/   20 |
-| Two Coroutines (seconds)              | 257312/26844 |   388/   44 |
+| One Coroutine (seconds)               | 260541/27944 |   212/   28 |
+| Two Coroutines (seconds)              | 260717/27960 |   388/   44 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine              | 257168/26828 |   244/   28 |
-| Scheduler, Two Coroutines             | 257312/26844 |   388/   44 |
+| Scheduler, One Coroutine              | 260573/27944 |   244/   28 |
+| Scheduler, Two Coroutines             | 260701/27968 |   372/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     | 257184/26828 |   260/   28 |
-| Scheduler, Two Coroutines (micros)    | 257328/26844 |   404/   44 |
+| Scheduler, One Coroutine (micros)     | 260589/27944 |   260/   28 |
+| Scheduler, Two Coroutines (micros)    | 260733/27968 |   404/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    | 257184/26828 |   260/   28 |
-| Scheduler, Two Coroutines (seconds)   | 257344/26844 |   420/   44 |
+| Scheduler, One Coroutine (seconds)    | 260589/27944 |   260/   28 |
+| Scheduler, Two Coroutines (seconds)   | 260749/27968 |   420/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      | 257200/26828 |   276/   28 |
-| Scheduler, Two Coroutines (setup)     | 257376/26844 |   452/   44 |
+| Scheduler, One Coroutine (setup)      | 260605/27944 |   276/   28 |
+| Scheduler, Two Coroutines (setup)     | 260765/27968 |   436/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  | 257184/26828 |   260/   28 |
-| Scheduler, Two Coroutines (man setup) | 257360/26844 |   436/   44 |
+| Scheduler, One Coroutine (man setup)  | 260589/27944 |   260/   28 |
+| Scheduler, Two Coroutines (man setup) | 260749/27968 |   420/   52 |
 |---------------------------------------+--------------+-------------|
-| Blink Function                        | 257424/26816 |   500/   16 |
-| Blink Coroutine                       | 257572/26836 |   648/   36 |
+| Blink Function                        | 261001/27988 |   672/   72 |
+| Blink Coroutine                       | 261133/28008 |   804/   92 |
 +--------------------------------------------------------------------+
 ```
 
@@ -611,9 +611,9 @@ ESP8266:
 +---------------------+--------+-------------+--------+
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       0.200 |  0.000 |
-| DirectScheduling    |  10000 |       0.500 |  0.300 |
-| CoroutineScheduling |  10000 |       0.800 |  0.600 |
+| EmptyLoop           |  10000 |       0.100 |  0.000 |
+| DirectScheduling    |  10000 |       0.500 |  0.400 |
+| CoroutineScheduling |  10000 |       0.900 |  0.800 |
 +---------------------+--------+-------------+--------+
 ```
 

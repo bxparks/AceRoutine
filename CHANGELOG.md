@@ -1,6 +1,14 @@
 # Changelog
 
 * Unreleased
+* 1.4.2 (2022-02-04)
+    * Remove dependency to AceCommon library in `libraries.properties`.
+        * AceRoutine core no longer depends on AceCommon.
+        * A few programs in `tests/` and `examples/` still depend it though,
+          but those are used mainly by the developers, not end-users.
+    * Clean up and update `examples/ChannelBenchmark` and its `README.md`.
+        * Use `generate_readme.py` and `generate_table.awk` scripts, just like
+          `examples/AutoBenchmark`.
 * 1.4.1 (2022-02-02)
     * Update `examples/SoundManager` to demonstrate coroutines defined in
       separate files (see

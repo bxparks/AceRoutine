@@ -104,7 +104,7 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.4.1 (2022-02-02)
+**Version**: 1.4.2 (2022-02-04)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -292,21 +292,22 @@ void loop() {
 <a name="Installation"></a>
 ## Installation
 
-The latest stable release is available in the Arduino IDE Library Manager. Two
-libraries need to be installed since v1.1:
+The latest stable release is available in the Arduino IDE Library Manager. Only
+a single library needs to be installed since v1.1:
 
 * Search for "AceRoutine". Click Install.
-* Search for "AceCommon". Click Install.
 
-The development version can be installed by cloning the 2 git repos:
+The direct dependency to the [AceRoutine](https://github.com/bxparks/AceRoutine)
+library was removed in v1.4.2, but some of the programs under `tests/` and
+`examples/` may still require the `AceCommon` library to be installed.
+
+The development version can be installed by cloning the following git repo:
 
 * AceRoutine (https://github.com/bxparks/AceRoutine)
-* AceCommon  (https://github.com/bxparks/AceCommon)
 
 You can copy these directories to the `./libraries` directory used by the
-Arduino IDE. (The result is a directory named `./libraries/AceRoutine` and
-`./libraries/AceCommon`). Or you can create symlinks from `/.libraries` to these
-directories.
+Arduino IDE. (The result is a directory named `./libraries/AceRoutine`). Or you
+can create symlinks from `/.libraries` to this directory.
 
 The `develop` branch contains the latest working version.
 The `master` branch contains the stable release.

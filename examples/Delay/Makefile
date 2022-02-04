@@ -2,5 +2,5 @@
 # Makefile to compile and run Arduino programs natively on Linux or MacOS.
 
 APP_NAME := Delay
-ARDUINO_LIBS := AceCommon AceRoutine
+ARDUINO_LIBS := AceRoutine
 include ../../../EpoxyDuino/EpoxyDuino.mk

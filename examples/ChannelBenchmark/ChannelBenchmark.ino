@@ -14,6 +14,7 @@
  * the Coroutine::loop() method, which causes additional calls to yield().
  */
 
+#include <stdio.h> // sprintf()
 #include <Arduino.h>
 #include <AceRoutine.h>
 using namespace ace_routine;
@@ -115,7 +116,7 @@ void doCoroutineCounter() {
 void printStats(float baselineDuration, float channelDuration) {
   char buf[100];
   float diff = channelDuration - baselineDuration;
-  sprintf(buf, "      %2d.%02d |%2d.%02d |%2d.%02d |",
+  snprintf(buf, 100, "      %2d.%02d |%2d.%02d |%2d.%02d |",
       (int)channelDuration, (int)(channelDuration*100)%100,
       (int)baselineDuration, (int)(baselineDuration*100)%100,
       (int)diff, (int)(diff*100)%100);

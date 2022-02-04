@@ -1,6 +1,10 @@
 # Changelog
 
 * Unreleased
+    * AceRoutine core no longer depends on AceCommon, so remove dependency in
+      `libraries.properties`.
+        * Some downstream projects in `tests/` and `examples/` may still depend
+          on AceCommon.
 * 1.4.1 (2022-02-02)
     * Update `examples/SoundManager` to demonstrate coroutines defined in
       separate files (see

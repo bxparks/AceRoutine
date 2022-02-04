@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include <stdint.h> // UINT16_MAX
 #include <Print.h> // Print
-#include <AceCommon.h> // FCString
 #include "ClockInterface.h"
 
 class AceRoutineTest_statusStrings;

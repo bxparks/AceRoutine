@@ -1,3 +1,27 @@
+#!/usr/bin/python3
+#
+# Python script that regenerates the README.md from the embedded template. Uses
+# ./generate_table.awk to regenerate the ASCII tables from the various *.txt
+# files.
+
+from subprocess import check_output
+
+nano_results = check_output(
+    "./generate_table.awk < nano.txt", shell=True, text=True)
+micro_results = check_output(
+    "./generate_table.awk < micro.txt", shell=True, text=True)
+stm32_results = check_output(
+    "./generate_table.awk < stm32.txt", shell=True, text=True)
+esp8266_results = check_output(
+    "./generate_table.awk < esp8266.txt", shell=True, text=True)
+stm32_results = check_output(
+    "./generate_table.awk < stm32.txt", shell=True, text=True)
+esp32_results = check_output(
+    "./generate_table.awk < esp32.txt", shell=True, text=True)
+teensy32_results = check_output(
+    "./generate_table.awk < teensy32.txt", shell=True, text=True)
+
+print(f"""\
 # ChannelBenchmark
 
 The `ChannelBenchmark` estimates the CPU overhead of writing and reading from
@@ -64,111 +88,63 @@ $ make README.md
 ## Arduino Nano
 
 * 16MHz ATmega328P
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino IDE 1.8.19, Arduino CLI 0.20.2
 * Arduino AVR Boards 1.8.4
 * `micros()` has a resolution of 4 microseconds
 
 ```
-
-CPU:
-+---------------+--------+-------------+--------+
-| Functionality |  count | micros/iter |   diff |
-+---------------+--------+-------------+--------+
-| Baseline      |  10000 |      16.400 |  0.000 |
-| Channels      |  10000 |      28.100 | 11.700 |
-+---------------+--------+-------------+--------+
-
+{nano_results}
 ```
 
 ## SparkFun Pro Micro
 
 * 16 MHz ATmega32U4
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino IDE 1.8.19, Arduino CLI 0.20.2
 * SparkFun AVR Boards 1.1.13
 * `micros()` has a resolution of 4 microseconds
 
 ```
-
-CPU:
-+---------------+--------+-------------+--------+
-| Functionality |  count | micros/iter |   diff |
-+---------------+--------+-------------+--------+
-| Baseline      |  10000 |      16.500 |  0.000 |
-| Channels      |  10000 |      28.300 | 11.800 |
-+---------------+--------+-------------+--------+
-
+{micro_results}
 ```
 
 ## STM32
 
 * STM32 "Blue Pill", STM32F103C8, 72 MHz ARM Cortex-M3
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino IDE 1.8.19, Arduino CLI 0.20.2
 * STM32duino 2.2.0
 
 ```
-
-CPU:
-+---------------+--------+-------------+--------+
-| Functionality |  count | micros/iter |   diff |
-+---------------+--------+-------------+--------+
-| Baseline      |  50000 |       3.040 |  0.000 |
-| Channels      |  50000 |       4.460 |  1.420 |
-+---------------+--------+-------------+--------+
-
+{stm32_results}
 ```
 
 ## ESP8266
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino IDE 1.8.19, Arduino CLI 0.20.2
 * ESP8266 Boards 3.0.2
 
 ```
-
-CPU:
-+---------------+--------+-------------+--------+
-| Functionality |  count | micros/iter |   diff |
-+---------------+--------+-------------+--------+
-| Baseline      |  10000 |       2.700 |  0.000 |
-| Channels      |  10000 |       4.200 |  1.500 |
-+---------------+--------+-------------+--------+
-
+{esp8266_results}
 ```
 
 ## ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino IDE 1.8.19, Arduino CLI 0.20.2
 * ESP32 Boards 2.0.2
 
 ```
-
-CPU:
-+---------------+--------+-------------+--------+
-| Functionality |  count | micros/iter |   diff |
-+---------------+--------+-------------+--------+
-| Baseline      | 100000 |       0.880 |  0.000 |
-| Channels      | 100000 |       1.340 |  0.460 |
-+---------------+--------+-------------+--------+
-
+{esp32_results}
 ```
 
 ## Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino IDE 1.8.19, Arduino CLI 0.20.2
 * Teensyduino 1.56
 * Compiler options: "Faster"
 
 ```
-
-CPU:
-+---------------+--------+-------------+--------+
-| Functionality |  count | micros/iter |   diff |
-+---------------+--------+-------------+--------+
-| Baseline      | 100000 |       0.950 |  0.000 |
-| Channels      | 100000 |       2.130 |  1.180 |
-+---------------+--------+-------------+--------+
-
+{teensy32_results}
 ```
-
+""")

@@ -5,6 +5,9 @@
       `libraries.properties`.
         * Some downstream projects in `tests/` and `examples/` may still depend
           on AceCommon.
+    * Update `examples/ChannelBenchmark` to use auto-generate the README.md.
+        * Use `generate_readme.py` and `generate_table.awk` scripts, just like
+          `examples/AutoBenchmark`.
 * 1.4.1 (2022-02-02)
     * Update `examples/SoundManager` to demonstrate coroutines defined in
       separate files (see

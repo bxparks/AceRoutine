@@ -1,11 +1,12 @@
 # Changelog
 
 * Unreleased
-    * AceRoutine core no longer depends on AceCommon, so remove dependency in
-      `libraries.properties`.
-        * Some downstream projects in `tests/` and `examples/` may still depend
-          on AceCommon.
-    * Update `examples/ChannelBenchmark` to use auto-generate the README.md.
+* 1.4.2 (2022-02-04)
+    * Remove dependency to AceCommon library in `libraries.properties`.
+        * AceRoutine core no longer depends on AceCommon.
+        * A few programs in `tests/` and `examples/` still depend it though,
+          but those are used mainly by the developers, not end-users.
+    * Clean up and update `examples/ChannelBenchmark` and its `README.md`.
         * Use `generate_readme.py` and `generate_table.awk` scripts, just like
           `examples/AutoBenchmark`.
 * 1.4.1 (2022-02-02)

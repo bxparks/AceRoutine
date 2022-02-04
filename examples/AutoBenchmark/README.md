@@ -14,7 +14,7 @@ is the overhead caused by the `Coroutine` context switch.
 
 All times in below are in microseconds.
 
-**Version**: AceRoutine v1.4.1
+**Version**: AceRoutine v1.4.2
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 

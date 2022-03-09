@@ -305,7 +305,7 @@ The development version can be installed by cloning the following git repo:
 
 * AceRoutine (https://github.com/bxparks/AceRoutine)
 
-You can copy these directories to the `./libraries` directory used by the
+You can copy this directory to the `./libraries` directory used by the
 Arduino IDE. (The result is a directory named `./libraries/AceRoutine`). Or you
 can create symlinks from `/.libraries` to this directory.
 

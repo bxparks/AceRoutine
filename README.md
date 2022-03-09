@@ -297,7 +297,7 @@ a single library needs to be installed since v1.1:
 
 * Search for "AceRoutine". Click Install.
 
-The direct dependency to the [AceRoutine](https://github.com/bxparks/AceRoutine)
+The direct dependency to the [AceCommon](https://github.com/bxparks/AceCommon)
 library was removed in v1.4.2, but some of the programs under `tests/` and
 `examples/` may still require the `AceCommon` library to be installed.
 
@@ -479,12 +479,12 @@ sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 ```
 
-The `CoroutineScheduler` consumes only 2 bytes of memory no matter how many
-coroutines are created. That's because it depends on a singly-linked list whose
-pointers live on the `Coroutine` object, not in the `CoroutineScheduler`. But
-using the `CoroutineScheduler::loop()` instead of calling
-`Coroutine::runCoroutine()` directly increases flash memory usage by 70-100
-bytes.
+The `CoroutineScheduler` consumes only 2 bytes (8-bit processors) or 4 bytes
+(32-bit processors) of static memory no matter how many coroutines are created.
+That's because it depends on a singly-linked list whose pointers live on the
+`Coroutine` object, not in the `CoroutineScheduler`. But using the
+`CoroutineScheduler::loop()` instead of calling `Coroutine::runCoroutine()`
+directly increases flash memory usage by 70-100 bytes.
 
 The `Channel` object requires 2 copies of the parameterized `<T>` type so its
 size is equal to `1 + 2 * sizeof(T)`, rounded to the nearest memory alignment

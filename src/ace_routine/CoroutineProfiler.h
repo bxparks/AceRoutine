@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2018 Brian T. Park
+Copyright (c) 2022 Brian T. Park
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,34 +22,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-/**
- * @mainpage AceRoutine Library
- *
- * This is the Doxygen documentation for the
- * <a href="https://github.com/bxparks/AceRoutine">AceRoutine Library</a>.
- *
- * Click on the "Classes" menu above to see the list of classes.
- *
- * Click on the "Files" menu above to see the list of header files.
- */
+#ifndef ACE_ROUTINE_COROUTINE_PROFILER_H
+#define ACE_ROUTINE_COROUTINE_PROFILER_H
 
-#ifndef ACE_ROUTINE_ACE_ROUTINE_H
-#define ACE_ROUTINE_ACE_ROUTINE_H
+#include <stdint.h> // uint32_t
 
-// Blacklist platforms using https://github.com/arduino/ArduinoCore-api due to
-// incompatibilities.
-#if defined(ARDUINO_API_VERSION)
-#error Platforms using ArduinoCore-API not supported
-#endif
+namespace ace_routine {
 
-// Version format: xxyyzz == "xx.yy.zz"
-#define ACE_ROUTINE_VERSION 10402
-#define ACE_ROUTINE_VERSION_STRING "1.4.2"
+class CoroutineProfiler {
+  public:
+    /**
+     * Process the completion of the runCoroutine() method which took
+     * `micros` microseconds.
+     */
+    virtual void updateElapsedMicros(uint32_t micros) = 0;
+};
 
-#include "ace_routine/Coroutine.h"
-#include "ace_routine/CoroutineScheduler.h"
-#include "ace_routine/CoroutineProfiler.h"
-#include "ace_routine/CoroutineLogBinProfiler.h"
-#include "ace_routine/Channel.h"
+}
 
 #endif

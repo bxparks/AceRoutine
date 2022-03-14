@@ -29,6 +29,7 @@ SOFTWARE.
   #include <Arduino.h> // Serial, Print
 #endif
 #include "Coroutine.h"
+#include "CoroutineProfiler.h"
 
 class Print;
 
@@ -172,7 +173,15 @@ class CoroutineSchedulerTemplate {
           // its continuation context determines whether to call
           // Coroutine::isDelayExpired(), Coroutine::isDelayMicrosExpired(), or
           // Coroutine::isDelaySecondsExpired().
-          (*mCurrent)->runCoroutine();
+          if ((*mCurrent)->mProfiler) {
+            uint32_t startMicros = T_COROUTINE::coroutineMicros();
+            (*mCurrent)->runCoroutine();
+            uint32_t elapsedMicros = T_COROUTINE::coroutineMicros()
+                - startMicros;
+            (*mCurrent)->mProfiler->updateElapsedMicros(elapsedMicros);
+          } else {
+            (*mCurrent)->runCoroutine();
+          }
           break;
 
         case T_COROUTINE::kStatusEnding:

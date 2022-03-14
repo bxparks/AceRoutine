@@ -264,6 +264,8 @@ extern className##_##name name
 
 namespace ace_routine {
 
+class CoroutineProfiler;
+
 /** A lookup table from Status integer to human-readable strings. */
 extern const __FlashStringHelper* const sStatusStrings[];
 
@@ -481,6 +483,31 @@ class CoroutineTemplate {
     void setupCoroutine(const __FlashStringHelper* /*name*/)
         ACE_ROUTINE_DEPRECATED {}
 
+    /** Set the profiler. */
+    void setProfiler(CoroutineProfiler* profiler) { mProfiler = profiler; }
+
+    CoroutineProfiler* getProfiler() const { return mProfiler; }
+
+    /**
+     * Get the pointer to the root pointer. Implemented as a function static to
+     * fix the C++ static initialization problem, making it safe to use this in
+     * other static contexts.
+     */
+    static CoroutineTemplate** getRoot() {
+      // Use a static variable inside a function to solve the static
+      // initialization ordering problem.
+      static CoroutineTemplate* root;
+      return &root;
+    }
+
+    /**
+     * Return the next pointer as a pointer to the pointer, similar to
+     * getRoot(). This makes it much easier to manipulate a singly-linked list.
+     * Also makes setNext() method unnecessary. Should be used only by
+     * CoroutineScheduler.
+     */
+    CoroutineTemplate** getNext() { return &mNext; }
+
   protected:
     /**
      * The execution status of the coroutine, corresponding to the
@@ -679,26 +706,6 @@ class CoroutineTemplate {
     CoroutineTemplate& operator=(const CoroutineTemplate&) = delete;
 
     /**
-     * Get the pointer to the root pointer. Implemented as a function static to
-     * fix the C++ static initialization problem, making it safe to use this in
-     * other static contexts.
-     */
-    static CoroutineTemplate** getRoot() {
-      // Use a static variable inside a function to solve the static
-      // initialization ordering problem.
-      static CoroutineTemplate* root;
-      return &root;
-    }
-
-    /**
-     * Return the next pointer as a pointer to the pointer, similar to
-     * getRoot(). This makes it much easier to manipulate a singly-linked list.
-     * Also makes setNext() method unnecessary. Should be used only by
-     * CoroutineScheduler.
-     */
-    CoroutineTemplate** getNext() { return &mNext; }
-
-    /**
      * Insert the current coroutine at the root of the singly linked list. This
      * is the most efficient and becomes the default with v1.2 because the
      * ordering of the coroutines in the CoroutineScheduler is no longer an
@@ -739,6 +746,8 @@ class CoroutineTemplate {
      * milliseconds, microseconds, or seconds.
      */
     uint16_t mDelayDuration;
+
+    CoroutineProfiler* mProfiler = nullptr;
 };
 
 /**

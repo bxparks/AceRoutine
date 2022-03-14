@@ -38,7 +38,7 @@ calculated flash size can jump around in unexpected ways.
 
 **NOTE**: This file was auto-generated using `make README.md`. DO NOT EDIT.
 
-**Version**: AceRoutine v1.4.2
+**Version**: AceRoutine v1.5
 
 **Changes**:
 
@@ -125,6 +125,13 @@ calculated flash size can jump around in unexpected ways.
         * ESP8266 Core from 2.7.4 to 3.0.2
         * ESP32 Core from 1.0.6 to 2.0.2
         * Teensyduino from 1.54 to 1.56
+
+* v1.5
+    * Add support for human-readable names to coroutine.
+        * Increases flash usage by 6-10 bytes per coroutine, even if name isn't
+          used.
+        * Increases static ram by 3 bytes (AVR) and 4 bytes (32-bits) per
+          coroutine.
 
 ## How to Generate
 

@@ -1,6 +1,14 @@
 # Changelog
 
 * Unreleased
+    * (Re)add support for human-readable coroutine names by adding the following
+      methods to the `Coroutine` class: `setCName()`, `setFName()`,
+      `getCName()`, `getFName()`, `getNameType()`, and `printNameTo()`.
+        * This is an optional feature which helps debugging. Coroutines do not
+          need to have human readable names.
+        * Increases flash usage by 6-10 bytes per coroutine.
+        * Increases static ram usage by 3 bytes (AVR) or 4 bytes (32-bit) per
+          coroutine.
 * 1.4.2 (2022-02-04)
     * Remove dependency to AceCommon library in `libraries.properties`.
         * AceRoutine core no longer depends on AceCommon.

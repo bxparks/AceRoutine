@@ -14,6 +14,7 @@ is installed.
     * [Overall Structure](#OverallStructure)
     * [Coroutine Class](#CoroutineClass)
     * [Coroutine Instance](#CoroutineInstance)
+    * [Coroutine Names](#CoroutineNames)
 * [Coroutine Body](#CoroutineBody)
     * [Begin and End Markers](#BeginAndEnd)
     * [Yield](#Yield)
@@ -243,6 +244,50 @@ MyCoroutine routine2;
 
 For more details on manual Coroutine instances, see the
 [Manual Coroutines](#ManualCoroutines) section below.
+
+<a name="CoroutineNames"></a>
+### Coroutine Names
+
+(Added in v1.5. Prior to v1.3, the name was automatically assigned to the
+coroutine using the `COROUTINE()` macro. It was removed in v1.3 to save flash
+memory. In v1.5, the feature is added back as an optional feature so that the
+end-user can decide whether they want to spend the extra flash storage for this
+feature.)
+
+A coroutine can be assigned a human-readable name through the following methods:
+
+```C++
+class Coroutine {
+  public:
+    static const uint8_t kNameTypeCString = 0;
+    static const uint8_t kNameTypeFString = 1;
+
+  public:
+    void Coroutine::setCName(const char* name);
+    void Coroutine::setFName(const __FlashStringHelper* name);
+
+    const char* Coroutine::getCName() const;
+    const __FlashStringHelper* Coroutine::getFName() const;
+
+    uint8_t getNameType() const;
+    void printNameTo(Print& printer) const;
+};
+``
+
+It is expected that the `setCName()` or `setFName()` will be called in the
+global `setup()` function.
+
+On most 32-bit processors, it makes little difference whether a C-string or an
+F-string is used. (The exception is the ESP8266.) On AVR processors, using the
+F-string will prevent those strings from consuming precious static RAM.
+
+The `printNameTo()` method prints the coroutine name to the given `Print`
+object, which will usually be the `Serial` object. If the name is not set (hence
+is the `nullptr`), `printNameTo()` will print the hexadecimal representation of
+the pointer to the Coroutine (e.g. "0xe38a").
+
+The `CoroutineScheduler::list()` method will now print the coroutine name if it
+is defined.
 
 <a name="CoroutineBody"></a>
 ## Coroutine Body

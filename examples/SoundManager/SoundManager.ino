@@ -59,8 +59,8 @@ EXTERN_COROUTINE(soundManager);
 
 COROUTINE(printProfile) {
   COROUTINE_LOOP() {
-    CoroutineLogBinProfiler::printBinsTo(Serial, getRoot(), 0, 16);
-    COROUTINE_DELAY_SECONDS(10);
+    CoroutineLogBinProfiler::printBinsTo(Serial, getRoot(), 0, 8);
+    COROUTINE_DELAY_SECONDS(5);
   }
 }
 

@@ -45,13 +45,28 @@
  */
 
 #include <Arduino.h>
+#include <AceCommon.h>
 #include <AceRoutine.h>
 #include "SoundRoutine.h"
 
+using ace_routine::Coroutine;;
 using ace_routine::CoroutineScheduler;
+using ace_routine::CoroutineLogBinProfiler;
+using ace_common::printfTo;
 
 SoundRoutine soundRoutine;
 EXTERN_COROUTINE(soundManager);
+
+COROUTINE(printProfile) {
+  COROUTINE_LOOP() {
+    CoroutineLogBinProfiler::printBinsTo(Serial, getRoot(), 0, 16);
+    COROUTINE_DELAY_SECONDS(10);
+  }
+}
+
+
+CoroutineLogBinProfiler soundRoutineProfiler;
+CoroutineLogBinProfiler soundManagerProfiler;
 
 void setup() {
   delay(1000);
@@ -61,6 +76,9 @@ void setup() {
   // Set names using both c-string and f-string for testing purposes.
   soundRoutine.setCName("soundRoutine");
   soundManager.setFName(F("soundManager"));
+
+  soundRoutine.setProfiler(&soundRoutineProfiler);
+  soundManager.setProfiler(&soundManagerProfiler);
 
   CoroutineScheduler::setup();
 }

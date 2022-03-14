@@ -195,7 +195,7 @@ class CoroutineSchedulerTemplate {
       for (T_COROUTINE** p = T_COROUTINE::getRoot(); (*p) != nullptr;
           p = (*p)->getNext()) {
         printer.print(F("Coroutine "));
-        printer.print((uintptr_t) *p);
+        (*p)->printNameTo(printer);
         printer.print(F("; status: "));
         (*p)->statusPrintTo(printer);
         printer.println();

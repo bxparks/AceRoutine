@@ -132,6 +132,15 @@ calculated flash size can jump around in unexpected ways.
           used.
         * Increases static ram by 3 bytes (AVR) and 4 bytes (32-bits) per
           coroutine.
+    * Add a `CoroutineLogBinProfiler` to 2 coroutines.
+        * Use a 3rd coroutine to print the frequency count to the `Serial`
+          output every 10 seconds.
+        * Provide `CoroutineLogBinProfiler::printBinsTo()` which prints
+          a table of the frequency count over all coroutines. This represents a
+          poor-man's version of the log-log graph of the frequency count.
+        * Increases the flash size of the `CoroutineScheduler` by 100-140 bytes
+          for both 8-bit and 32-bit processors, even if `CoroutineProfiler` is
+          not used. This is a one-time hit.
 
 ## How to Generate
 

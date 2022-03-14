@@ -27,6 +27,7 @@ SOFTWARE.
 
 #include <stdint.h> // UINT16_MAX
 #include <Print.h> // Print
+#include <AceCommon.h> // PrintStr<>
 #include "ClockInterface.h"
 
 class __FlashStringHelper;
@@ -347,16 +348,28 @@ class CoroutineTemplate {
     /**
      * Print name to the given Printer. If the name is null, then print the
      * hexadecimal representation of the pointer to the coroutine.
+     *
+     * @param printer destination of output, usually `Serial`
+     * @param maxLen truncate to maxLen if given
      */
-    void printNameTo(Print& printer) const {
+    void printNameTo(Print& printer, uint8_t maxLen = 0) const {
+      // Need to go through this contortion because vsnprintf() does not support
+      // flash string parameters, so I can't use something like "%12.12s" with
+      // a flash string.
+      ace_common::PrintStr<128> pname;
+
       if (mName == nullptr) {
-        printer.print("0x");
-        printer.print((uintptr_t) this, 16);
+        pname.print("0x");
+        pname.print((uintptr_t) this, 16);
       } else if (mNameType == kNameTypeCString) {
-        printer.print(mName);
+        pname.print(mName);
       } else {
-        printer.print((const __FlashStringHelper*) mName);
+        pname.print((const __FlashStringHelper*) mName);
       }
+
+      // Print up to maxLen characters.
+      maxLen = (maxLen == 0) ? pname.length() : maxLen;
+      printer.write(pname.cstr(), maxLen);
     }
 
     /**

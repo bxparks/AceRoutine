@@ -38,7 +38,7 @@ is the overhead caused by the `Coroutine` context switch.
 
 All times in below are in microseconds.
 
-**Version**: AceRoutine v1.4.2
+**Version**: AceRoutine v1.5.0
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -144,6 +144,15 @@ $ make README.md
         * ESP8266 Core from 2.7.4 to 3.0.2
         * ESP32 Core from 1.0.6 to 2.0.2
         * Teensyduino from 1.54 to 1.56
+
+* v1.5.0
+    * Add `CoroutineProfiler` to `CoroutineScheduler`.
+        * `CoroutineScheduler::runCoroutine()` becomes slightly slower:
+        * 0.7 microseconds (AVR)
+        * 0.5 microseconds (STM32)
+        * 0.2 microseconds (ESP8266)
+        * 0.07 microseconds (ESP32)
+        * 0.15 microseconds (Teensy 3.2)
 
 ## Arduino Nano
 

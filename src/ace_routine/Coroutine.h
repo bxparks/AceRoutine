@@ -29,6 +29,7 @@ SOFTWARE.
 #include <Print.h> // Print
 #include "ClockInterface.h"
 
+class __FlashStringHelper;
 class AceRoutineTest_statusStrings;
 class SuspendTest_suspendAndResume;
 
@@ -280,6 +281,13 @@ class CoroutineTemplate {
   friend class ::SuspendTest_suspendAndResume;
 
   public:
+    /** Coroutine name is a `const char*` c-string. */
+    static const uint8_t kNameTypeCString = 0;
+
+    /** Coroutine name is a `const __FlashStringHelper*` f-string. */
+    static const uint8_t kNameTypeFString = 1;
+
+  public:
     /**
      * The body of the coroutine. The COROUTINE macro creates a subclass of
      * this class and puts the body of the coroutine into this method.
@@ -309,11 +317,52 @@ class CoroutineTemplate {
     virtual void setupCoroutine() {}
 
     /**
+     * Return the type of the name string, either kNameTypeCString or
+     * kNameTypeFString.
+     */
+    uint8_t getNameType() const { return mNameType; }
+
+    /** Set the name of the coroutine to the given c-string. */
+    void setCName(const char* name) {
+      mNameType = kNameTypeCString;
+      mName = name;
+    }
+
+    /** Set the name of the coroutine to the given f-string. */
+    void setFName(const __FlashStringHelper* name) {
+      mNameType = kNameTypeFString;
+      mName = (const char*) name;
+    }
+
+    /** Get name of the coroutine assuming it's a c-string. Nullable. */
+    const char* getCName() const { return mName; }
+
+    /** Get name of the coroutine assuming it's an f-string. Nullable. */
+    const __FlashStringHelper* getFName() const {
+      return (const __FlashStringHelper*) mName;
+    }
+
+    /**
+     * Print name to the given Printer. If the name is null, then print the
+     * hexadecimal representation of the pointer to the coroutine.
+     */
+    void printNameTo(Print& printer) const {
+      if (mName == nullptr) {
+        printer.print("0x");
+        printer.print((uintptr_t) this, 16);
+      } else if (mNameType == kNameTypeCString) {
+        printer.print(mName);
+      } else {
+        printer.print((const __FlashStringHelper*) mName);
+      }
+    }
+
+    /**
      * Suspend the coroutine at the next scheduler iteration. If the coroutine
      * is already in the process of ending or is already terminated, then this
      * method does nothing. A coroutine cannot use this method to suspend
      * itself, it can only suspend some other coroutine. Currently, there is no
-     * ability for a coroutine to suspend itself, that would require the
+     * ability for a coroutine to suspend itself. I think that would require the
      * addition of a COROUTINE_SUSPEND() macro. Also, this method works only if
      * the CoroutineScheduler::loop() is used because the suspend functionality
      * is implemented by the CoroutineScheduler.
@@ -667,6 +716,12 @@ class CoroutineTemplate {
 
     /** Address of the label used by the computed-goto. */
     void* mJumpPoint = nullptr;
+
+    /** Name of the coroutine. (Optional) */
+    const char* mName = nullptr;
+
+    /** String type of the coroutine mName. */
+    uint8_t mNameType = kNameTypeCString;
 
     /** Run-state of the coroutine. */
     Status mStatus = kStatusYielding;

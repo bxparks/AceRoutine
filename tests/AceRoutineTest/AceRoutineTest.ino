@@ -1,13 +1,16 @@
 #line 2 "AceRoutineTest.ino"
 
+#include <Arduino.h>
+#include <AceCommon.h> // PrintStr<>
 #include <AceRoutine.h>
-#include <AUnitVerbose.h>
+#include <AUnitVerbose.h> // TestRunner
 #include "ace_routine/testing/TestableCoroutine.h"
 #include "ace_routine/testing/TestableClockInterface.h"
 
 using namespace ace_routine;
 using namespace ace_routine::testing;
-using namespace aunit;
+using aunit::TestRunner;
+using ace_common::PrintStr;
 
 // ---------------------------------------------------------------------------
 
@@ -153,6 +156,39 @@ test(AceRoutineTest, macroCoroutine) {
 
   macroCoroutine.runCoroutine();
   assertTrue(macroCoroutine.isEnding());
+}
+
+// ---------------------------------------------------------------------------
+
+test(AceRoutineTest, name_cstring) {
+  simpleCoroutine.setCName("simple");
+  assertEqual(simpleCoroutine.getNameType(), Coroutine::kNameTypeCString);
+  assertEqual(simpleCoroutine.getCName(), "simple");
+
+  PrintStr<16> str;
+  simpleCoroutine.printNameTo(str);
+  assertEqual(str.cstr(), "simple");
+}
+
+test(AceRoutineTest, name_fstring) {
+  simpleCoroutine.setFName(F("simple"));
+  assertEqual(simpleCoroutine.getNameType(), Coroutine::kNameTypeFString);
+  assertEqual(simpleCoroutine.getFName(), F("simple"));
+
+  PrintStr<16> str;
+  simpleCoroutine.printNameTo(str);
+  assertEqual(str.cstr(), "simple");
+}
+
+test(AceRoutineTest, name_nullptr) {
+  simpleCoroutine.setCName(nullptr);
+  assertEqual(simpleCoroutine.getNameType(), Coroutine::kNameTypeCString);
+  assertEqual(simpleCoroutine.getCName(), (const char*) nullptr);
+
+  // Name is printed as a pointer, so begins with "0x".
+  PrintStr<16> str;
+  simpleCoroutine.printNameTo(str);
+  assertEqual(strncmp(str.cstr(), "0x", 2), 0);
 }
 
 // ---------------------------------------------------------------------------

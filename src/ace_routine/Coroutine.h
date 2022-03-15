@@ -350,13 +350,13 @@ class CoroutineTemplate {
      * hexadecimal representation of the pointer to the coroutine.
      *
      * @param printer destination of output, usually `Serial`
-     * @param maxLen truncate to maxLen if given
+     * @param maxLen truncate or pad to maxLen if given
      */
     void printNameTo(Print& printer, uint8_t maxLen = 0) const {
       // Need to go through this contortion because vsnprintf() does not support
       // flash string parameters, so I can't use something like "%12.12s" with
       // a flash string.
-      ace_common::PrintStr<128> pname;
+      ace_common::PrintStr<64> pname;
 
       if (mName == nullptr) {
         pname.print("0x");
@@ -367,9 +367,19 @@ class CoroutineTemplate {
         pname.print((const __FlashStringHelper*) mName);
       }
 
-      // Print up to maxLen characters.
-      maxLen = (maxLen == 0) ? pname.length() : maxLen;
-      printer.write(pname.cstr(), maxLen);
+      // Print name, truncated to maxLen or padded to maxLen.
+      if (maxLen) {
+        if (pname.length() < maxLen) {
+          printer.write(pname.cstr());
+          for (uint8_t i = pname.length(); i < maxLen; i++) {
+            printer.write(' ');
+          }
+        } else {
+          printer.write(pname.cstr(), maxLen);
+        }
+      } else {
+        printer.write(pname.cstr());
+      }
     }
 
     /**

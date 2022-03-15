@@ -121,7 +121,9 @@ class CoroutineLogBinRendererTemplate {
      * @param startBin start index of the bins (0-31)
      * @param endBin end index (exclusive) of the bins (0-32)
      */
-    void printHeaderTo(Print& printer, uint8_t startBin, uint8_t endBin) const {
+    static void printHeaderTo(
+        Print& printer, uint8_t startBin, uint8_t endBin) {
+
       endBin = (endBin > Profiler::kNumBins) ? Profiler::kNumBins : endBin;
       if (endBin < startBin + 2) return;
 
@@ -140,11 +142,11 @@ class CoroutineLogBinRendererTemplate {
      * @param startBin start index of the bins (0-31)
      * @param endBin end index (exclusive) of the bins (0-32)
      */
-    void printBinsTo(
+    static void printBinsTo(
         Print& printer,
         Profiler* profiler,
         uint8_t startBin,
-        uint8_t endBin) const {
+        uint8_t endBin) {
 
       endBin = (endBin > Profiler::kNumBins) ? Profiler::kNumBins : endBin;
       if (endBin < startBin + 2) return;

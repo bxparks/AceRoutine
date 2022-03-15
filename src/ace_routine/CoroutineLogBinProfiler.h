@@ -73,7 +73,7 @@ class CoroutineLogBinProfilerTemplate : public CoroutineProfiler {
      * the number of samples whose elapsed micros is between 2^i and 2^(i+1).
      * Example, for Bin 3, and this bin contains the number of samples which
      * satsify (8us <= elapsed < 16us). The exception is Bin 0 because it
-     * includes samples where elapsed = 0 as well, so the sample interval for
+     * includes samples where elapsed is 0 as well, so the sample interval for
      * Bin 0 is (0 <= elapsed < 2), instead of (1 <= elapsed < 2).
      */
     void updateElapsedMicros(uint32_t micros) override {
@@ -87,6 +87,38 @@ class CoroutineLogBinProfilerTemplate : public CoroutineProfiler {
       uint16_t count = mBins[index];
       if (count < UINT16_MAX) {
         mBins[index]++;
+      }
+    }
+
+    /**
+     * Create a profiler on the heap for each coroutine in the singly-linked
+     * list of coroutines defined by `root`.
+     */
+    static void createProfilers(T_COROUTINE** root) {
+      for (Coroutine** p = root; (*p) != nullptr; p = (*p)->getNext()) {
+        auto* profiler = new CoroutineLogBinProfilerTemplate();
+        (*p)->setProfiler(profiler);
+      }
+    }
+
+    /** Delete the profilers created by createProfilers(). */
+    static void deleteProfilers(T_COROUTINE** root) {
+      for (Coroutine** p = root; (*p) != nullptr; p = (*p)->getNext()) {
+        auto* profiler = (CoroutineLogBinProfilerTemplate*) (*p)->getProfiler();
+        if (profiler) {
+          delete profiler;
+          (*p)->setProfiler(nullptr);
+        }
+      }
+    }
+
+    /** Init all profilers for all coroutines defined by `root`. */
+    static void initProfilers(T_COROUTINE** root) {
+      for (Coroutine** p = root; (*p) != nullptr; p = (*p)->getNext()) {
+        auto* profiler = (CoroutineLogBinProfilerTemplate*) (*p)->getProfiler();
+        if (profiler) {
+          profiler->init();
+        }
       }
     }
 

@@ -48,6 +48,8 @@ namespace ace_routine {
  * replaced by a '*' character.) Therefore the table is a rough ASCII version of
  * a log-log graph of the frequency count.
  *
+ * @tparam T_COROUTINE class of the specific CoroutineTemplate instantiation,
+ *    usually `Coroutine`
  */
 template <typename T_COROUTINE>
 class CoroutineLogBinProfilerTemplate : public CoroutineProfiler {

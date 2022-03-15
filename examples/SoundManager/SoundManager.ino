@@ -60,7 +60,7 @@ EXTERN_COROUTINE(soundManager);
 COROUTINE(printProfile) {
   COROUTINE_LOOP() {
     CoroutineLogBinRenderer renderer(getRoot());
-    renderer.printTableTo(Serial, 0, 8);
+    renderer.printTableTo(Serial, 2, 12);
     COROUTINE_DELAY_SECONDS(5);
   }
 }

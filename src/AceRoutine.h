@@ -50,6 +50,7 @@ SOFTWARE.
 #include "ace_routine/CoroutineScheduler.h"
 #include "ace_routine/CoroutineProfiler.h"
 #include "ace_routine/CoroutineLogBinProfiler.h"
+#include "ace_routine/CoroutineLogBinRenderer.h"
 #include "ace_routine/Channel.h"
 
 #endif

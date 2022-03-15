@@ -52,14 +52,15 @@
 using ace_routine::Coroutine;;
 using ace_routine::CoroutineScheduler;
 using ace_routine::CoroutineLogBinProfiler;
-using ace_common::printfTo;
+using ace_routine::CoroutineLogBinRenderer;
 
 SoundRoutine soundRoutine;
 EXTERN_COROUTINE(soundManager);
 
 COROUTINE(printProfile) {
   COROUTINE_LOOP() {
-    CoroutineLogBinProfiler::printBinsTo(Serial, getRoot(), 0, 8);
+    CoroutineLogBinRenderer renderer(getRoot());
+    renderer.printTableTo(Serial, 0, 8);
     COROUTINE_DELAY_SECONDS(5);
   }
 }

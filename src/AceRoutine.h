@@ -48,10 +48,10 @@ SOFTWARE.
 
 #include "ace_routine/Coroutine.h"
 #include "ace_routine/CoroutineScheduler.h"
-#include "ace_routine/CoroutineProfiler.h"
-#include "ace_routine/CoroutineLogBinProfiler.h"
-#include "ace_routine/CoroutineLogBinRenderer.h"
-#include "ace_routine/CoroutineLogBinJsonRenderer.h"
 #include "ace_routine/Channel.h"
+#include "ace_routine/CoroutineProfiler.h"
+#include "ace_routine/LogBinProfiler.h"
+#include "ace_routine/LogBinTableRenderer.h"
+#include "ace_routine/LogBinJsonRenderer.h"
 
 #endif

@@ -15,12 +15,15 @@
           microseconds for the `Coroutine::runCoroutine()` to run.
         * It then calls `CoroutineProfiler::updateElapsedMicros()` to allow the
           profiler to update its internal tracking.
-        * Provide `CoroutineLogBinProfiler`, and specific subclass that collects
+        * Provide `LogBinProfiler`, and specific subclass that collects
           the frequency count of the elapsed microseconds using 32 bins
           representing the `log2()` function of the microseconds.
-        * Provide `CoroutineLogBinProfiler::printBinsTo()` which prints
-          a table of the frequency count over all coroutines. This represents a
-          poor-man's version of the log-log graph of the frequency count.
+        * Provide 2 renderers:
+            * `LogBinTableRenderer::printTo()` prints a formatted table of the
+              frequency count over all coroutines. This represents a poor-man's
+              version of the log-log graph of the frequency count.
+            * `LogBinJsonRenderer::printTo()` prints the frequency count
+              in JSON format.
         * Increases the flash size of the `CoroutineScheduler` by 100-140 bytes
           for both 8-bit and 32-bit processors, even if `CoroutineProfiler` is
           not used. This is a one-time hit.

@@ -3,7 +3,7 @@
 #include <AceRoutine.h>
 #include <AUnitVerbose.h>
 
-using ace_routine::CoroutineLogBinProfiler;
+using ace_routine::LogBinProfiler;
 using ace_routine::rollupExteriorBins;
 using aunit::TestRunner;
 
@@ -12,7 +12,7 @@ using aunit::TestRunner;
 // ---------------------------------------------------------------------------
 
 test(updateElapsedMicros) {
-  CoroutineLogBinProfiler profiler;
+  LogBinProfiler profiler;
 
   profiler.updateElapsedMicros(0);
   assertEqual(profiler.mBins[0], 1);
@@ -34,7 +34,7 @@ test(updateElapsedMicros) {
 }
 
 test(rollupExteriorBins) {
-  CoroutineLogBinProfiler profiler;
+  LogBinProfiler profiler;
   profiler.mBins[0] = 1;
   profiler.mBins[1] = 2;
   profiler.mBins[2] = 3;

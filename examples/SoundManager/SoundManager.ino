@@ -51,28 +51,27 @@
 
 using ace_routine::Coroutine;;
 using ace_routine::CoroutineScheduler;
-using ace_routine::CoroutineLogBinProfiler;
-using ace_routine::CoroutineLogBinRenderer;
-using ace_routine::CoroutineLogBinJsonRenderer;
+using ace_routine::LogBinProfiler;
+using ace_routine::LogBinTableRenderer;
+using ace_routine::LogBinJsonRenderer;
 
 SoundRoutine soundRoutine;
 EXTERN_COROUTINE(soundManager);
 
 COROUTINE(printProfile) {
   COROUTINE_LOOP() {
-    CoroutineLogBinRenderer tableRenderer(getRoot());
-    tableRenderer.printTableTo(Serial, 2, 12, false /*clear*/);
+    LogBinTableRenderer tableRenderer(getRoot());
+    tableRenderer.printTo(Serial, 2, 12, false /*clear*/);
 
-    CoroutineLogBinJsonRenderer jsonRenderer(getRoot());
-    jsonRenderer.printJsonTo(Serial, 2, 12);
+    LogBinJsonRenderer jsonRenderer(getRoot());
+    jsonRenderer.printTo(Serial, 2, 12);
 
     COROUTINE_DELAY_SECONDS(5);
   }
 }
 
-
-CoroutineLogBinProfiler soundRoutineProfiler;
-CoroutineLogBinProfiler soundManagerProfiler;
+LogBinProfiler soundRoutineProfiler;
+LogBinProfiler soundManagerProfiler;
 
 void setup() {
   delay(1000);

@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_ROUTINE_COROUTINE_LOG_BIN_JSON_RENDERER_H
-#define ACE_ROUTINE_COROUTINE_LOG_BIN_JSON_RENDERER_H
+#ifndef ACE_ROUTINE_LOG_BIN_JSON_RENDERER_H
+#define ACE_ROUTINE_LOG_BIN_JSON_RENDERER_H
 
 #include <stdint.h> // uint8_t, uint32_t
 #include <Arduino.h> // Print
@@ -34,7 +34,7 @@ SOFTWARE.
 namespace ace_routine {
 
 /**
- * Print the `CoroutineLogBinProfiler bins as a JSON array. For example, here
+ * Print the `LogBinProfiler bins as a JSON array. For example, here
  * is the output from `examples/SoundManager`:
  *
  * @verbatim
@@ -45,13 +45,13 @@ namespace ace_routine {
  * @endverbatim
  */
 template <typename T_COROUTINE>
-class CoroutineLogBinJsonRendererTemplate {
+class LogBinJsonRendererTemplate {
   public:
-    /** Typedef of the CoroutineLogBinProfiler supported by this class. */
-    using Profiler = CoroutineLogBinProfilerTemplate<T_COROUTINE>;
+    /** Typedef of the LogBinProfiler supported by this class. */
+    using Profiler = LogBinProfilerTemplate<T_COROUTINE>;
 
     /** Constructor. */
-    CoroutineLogBinJsonRendererTemplate(T_COROUTINE** root)
+    LogBinJsonRendererTemplate(T_COROUTINE** root)
         : mRoot(root)
     {}
 
@@ -61,12 +61,12 @@ class CoroutineLogBinJsonRendererTemplate {
      * @param printer destination of output, usually `Serial`
      * @param startBin start index of the bins (0-31)
      * @param endBin end index (exclusive) of the bins (0-32)
-     * @param clear call CoroutineLogBinProfiler::clear() after printing
+     * @param clear call LogBinProfiler::clear() after printing
      *        (default true)
      * @param rollup roll-up exterior bins into the first and last bins
      *        (default true)
      */
-    void printJsonTo(
+    void printTo(
         Print& printer,
         uint8_t startBin,
         uint8_t endBin,
@@ -118,8 +118,7 @@ class CoroutineLogBinJsonRendererTemplate {
     T_COROUTINE** mRoot;
 };
 
-using CoroutineLogBinJsonRenderer =
-    CoroutineLogBinJsonRendererTemplate<Coroutine>;
+using LogBinJsonRenderer = LogBinJsonRendererTemplate<Coroutine>;
 
 }
 

@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_ROUTINE_COROUTINE_LOG_BIN_RENDERER_H
-#define ACE_ROUTINE_COROUTINE_LOG_BIN_RENDERER_H
+#ifndef ACE_ROUTINE_LOG_BIN_TABLE_RENDERER_H
+#define ACE_ROUTINE_LOG_BIN_TABLE_RENDERER_H
 
 #include <stdint.h> // uint8_t, uint32_t
 #include <Arduino.h> // Print
@@ -34,7 +34,7 @@ SOFTWARE.
 namespace ace_routine {
 
 /**
- * Print the information in the CoroutineLogBinProfiler for each Coroutine
+ * Print the information in the LogBinProfiler for each Coroutine
  * in a human-readable table. Each bin is printed as a 5-digit number, since the
  * bins use a `uint16_t` integer for the count. The number of digits in the
  * printed number is equivalent to the log10() of the frequency count. To see
@@ -42,7 +42,7 @@ namespace ace_routine {
  * character. Therefore the table is a rough ASCII version of a log-log graph of
  * the frequency count.
  *
- * For example, the output of `printTableTo(Serial, 2, 10)` for
+ * For example, the output of `printTo(Serial, 2, 10)` for
  * `examples/SoundManager` looks like this:
  *
  * @verbatim
@@ -59,31 +59,31 @@ namespace ace_routine {
  *    usually `Coroutine`
  */
 template <typename T_COROUTINE>
-class CoroutineLogBinRendererTemplate {
+class LogBinRendererTemplate {
   public:
-    /** Typedef of the CoroutineLogBinProfiler supported by this class. */
-    using Profiler = CoroutineLogBinProfilerTemplate<T_COROUTINE>;
+    /** Typedef of the LogBinProfiler supported by this class. */
+    using Profiler = LogBinProfilerTemplate<T_COROUTINE>;
 
     /** Constructor. */
-    CoroutineLogBinRendererTemplate(T_COROUTINE** root)
+    LogBinRendererTemplate(T_COROUTINE** root)
         : mRoot(root)
     {}
 
     /**
-     * Loop over all coroutines and print the ASCII version of a histogram. This
-     * assumes that all the coroutines are using the same CoroutineProfiler
-     * class, so we can use any of the profilers to print the header, and the
-     * numbers will be lined up properly.
+     * Loop over all coroutines and print the ASCII version of the frequency
+     * distribution. This assumes that all the coroutines are using the same
+     * CoroutineProfiler class, so we can use any of the profilers to print the
+     * header, and the numbers will be lined up properly.
      *
      * @param printer destination of output, usually `Serial`
      * @param startBin start index of the bins (0-31)
      * @param endBin end index (exclusive) of the bins (0-32)
-     * @param clear call CoroutineLogBinProfiler::clear() after printing
+     * @param clear call LogBinProfiler::clear() after printing
      *        (default true)
      * @param rollup roll-up exterior bins into the first and last bins
      *        (default true)
      */
-    void printTableTo(
+    void printTo(
         Print& printer,
         uint8_t startBin,
         uint8_t endBin,
@@ -180,15 +180,15 @@ class CoroutineLogBinRendererTemplate {
     }
 
   private:
-    /** Labels for each bin in CoroutineLogBinProfiler::mBins. */
+    /** Labels for each bin in LogBinProfiler::mBins. */
     static const char* const kBinLabels[Profiler::kNumBins];
 
     T_COROUTINE** mRoot;
 };
 
 template <typename T_COROUTINE>
-const char* const CoroutineLogBinRendererTemplate<T_COROUTINE>::kBinLabels[
-    CoroutineLogBinProfilerTemplate<T_COROUTINE>::kNumBins] = {
+const char* const LogBinRendererTemplate<T_COROUTINE>::kBinLabels[
+    LogBinProfilerTemplate<T_COROUTINE>::kNumBins] = {
   "<2us",
   "<4us",
   "<8us",
@@ -223,7 +223,7 @@ const char* const CoroutineLogBinRendererTemplate<T_COROUTINE>::kBinLabels[
   "<4295s",
 };
 
-using CoroutineLogBinRenderer = CoroutineLogBinRendererTemplate<Coroutine>;
+using LogBinTableRenderer = LogBinRendererTemplate<Coroutine>;
 
 }
 

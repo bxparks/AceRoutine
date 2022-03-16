@@ -115,7 +115,7 @@ calculated flash size can jump around in unexpected ways.
     * Add `LogBinProfiler`
         * Adds about 90 bytes of flash and 70 bytes of RAM on AVR.
     * Add `LogBinTableRenderer`
-        * Adds about 2200 bytes of flash and 450 bytes of RAM on AVR.
+        * Adds about 2200 bytes of flash and 200 bytes of RAM on AVR.
     * Add `LogBinJsonRenderer`
         * Adds about 1800 bytes of flash and 200 bytes of RAM on AVR.
 
@@ -215,7 +215,7 @@ $ make README.md
 | Scheduler, Two Coroutines (man setup) |   1186/   63 |   786/   52 |
 |---------------------------------------+--------------+-------------|
 | Scheduler, LogBinProfiler             |    954/  111 |   554/  100 |
-| Scheduler, LogBinTableRenderer        |   2776/  439 |  2376/  428 |
+| Scheduler, LogBinTableRenderer        |   2798/  193 |  2398/  182 |
 | Scheduler, LogBinJsonRenderer         |   2356/  197 |  1956/  186 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        |    546/   14 |   146/    3 |
@@ -228,7 +228,7 @@ $ make README.md
 
 * 16MHz ATmega328P
 * Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* Arduino AVR Boards 1.8.3
+* Arduino AVR Boards 1.8.4
 
 ```
 +--------------------------------------------------------------------+
@@ -264,7 +264,7 @@ $ make README.md
 | Scheduler, Two Coroutines (man setup) |   1400/   63 |   794/   52 |
 |---------------------------------------+--------------+-------------|
 | Scheduler, LogBinProfiler             |   1166/  111 |   560/  100 |
-| Scheduler, LogBinTableRenderer        |   3348/  552 |  2742/  541 |
+| Scheduler, LogBinTableRenderer        |   3364/  304 |  2758/  293 |
 | Scheduler, LogBinJsonRenderer         |   2924/  308 |  2318/  297 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        |    938/   14 |   332/    3 |
@@ -313,7 +313,7 @@ $ make README.md
 | Scheduler, Two Coroutines (man setup) |   4288/  203 |   734/   52 |
 |---------------------------------------+--------------+-------------|
 | Scheduler, LogBinProfiler             |   4054/  251 |   500/  100 |
-| Scheduler, LogBinTableRenderer        |   5404/  515 |  1850/  364 |
+| Scheduler, LogBinTableRenderer        |   5422/  269 |  1868/  118 |
 | Scheduler, LogBinJsonRenderer         |   4980/  273 |  1426/  122 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        |   3994/  154 |   440/    3 |
@@ -326,7 +326,7 @@ $ make README.md
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* STM32duino 2.0.0
+* STM32duino 2.2.0
 
 ```
 +--------------------------------------------------------------------+
@@ -375,7 +375,7 @@ $ make README.md
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
 * Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* ESP8266 Boards 2.7.4
+* ESP8266 Boards 3.0.2
 
 ```
 +--------------------------------------------------------------------+
@@ -411,7 +411,7 @@ $ make README.md
 | Scheduler, Two Coroutines (man setup) | 260861/27984 |   532/   68 |
 |---------------------------------------+--------------+-------------|
 | Scheduler, LogBinProfiler             | 260765/28024 |   436/  108 |
-| Scheduler, LogBinTableRenderer        | 265465/28420 |  5136/  504 |
+| Scheduler, LogBinTableRenderer        | 265217/28100 |  4888/  184 |
 | Scheduler, LogBinJsonRenderer         | 264785/28104 |  4456/  188 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        | 261001/27988 |   672/   72 |
@@ -424,7 +424,7 @@ $ make README.md
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* ESP32 Boards 1.0.6
+* ESP32 Boards 2.0.2
 
 ```
 +--------------------------------------------------------------------+
@@ -432,39 +432,39 @@ $ make README.md
 |---------------------------------------+--------------+-------------|
 | Baseline                              | 204573/16060 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| One Delay Function                    | 204985/16084 |   412/   24 |
-| Two Delay Functions                   | 205057/16084 |   484/   24 |
+| One Delay Function                    | 205017/16092 |   444/   32 |
+| Two Delay Functions                   | 205089/16092 |   516/   32 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine                         | 205097/16116 |   524/   56 |
-| Two Coroutines                        | 205269/16140 |   696/   80 |
+| One Coroutine                         | 205129/16124 |   556/   64 |
+| Two Coroutines                        | 205301/16148 |   728/   88 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (micros)                | 205085/16116 |   512/   56 |
-| Two Coroutines (micros)               | 205257/16140 |   684/   80 |
+| One Coroutine (micros)                | 205117/16124 |   544/   64 |
+| Two Coroutines (micros)               | 205289/16148 |   716/   88 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (seconds)               | 205113/16116 |   540/   56 |
-| Two Coroutines (seconds)              | 205301/16140 |   728/   80 |
+| One Coroutine (seconds)               | 205145/16124 |   572/   64 |
+| Two Coroutines (seconds)              | 205333/16148 |   760/   88 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine              | 205253/16116 |   680/   56 |
-| Scheduler, Two Coroutines             | 205393/16148 |   820/   88 |
+| Scheduler, One Coroutine              | 205285/16124 |   712/   64 |
+| Scheduler, Two Coroutines             | 205425/16156 |   852/   96 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     | 205229/16116 |   656/   56 |
-| Scheduler, Two Coroutines (micros)    | 205369/16148 |   796/   88 |
+| Scheduler, One Coroutine (micros)     | 205261/16124 |   688/   64 |
+| Scheduler, Two Coroutines (micros)    | 205401/16156 |   828/   96 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    | 205269/16116 |   696/   56 |
-| Scheduler, Two Coroutines (seconds)   | 205425/16148 |   852/   88 |
+| Scheduler, One Coroutine (seconds)    | 205301/16124 |   728/   64 |
+| Scheduler, Two Coroutines (seconds)   | 205457/16156 |   884/   96 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      | 205281/16116 |   708/   56 |
-| Scheduler, Two Coroutines (setup)     | 205453/16148 |   880/   88 |
+| Scheduler, One Coroutine (setup)      | 205313/16124 |   740/   64 |
+| Scheduler, Two Coroutines (setup)     | 205485/16156 |   912/   96 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  | 205273/16116 |   700/   56 |
-| Scheduler, Two Coroutines (man setup) | 205453/16148 |   880/   88 |
+| Scheduler, One Coroutine (man setup)  | 205305/16124 |   732/   64 |
+| Scheduler, Two Coroutines (man setup) | 205485/16156 |   912/   96 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             | 205333/16188 |   760/  128 |
-| Scheduler, LogBinTableRenderer        | 210941/16268 |  6368/  208 |
-| Scheduler, LogBinJsonRenderer         | 210477/16268 |  5904/  208 |
+| Scheduler, LogBinProfiler             | 205365/16196 |   792/  136 |
+| Scheduler, LogBinTableRenderer        | 210973/16276 |  6400/  216 |
+| Scheduler, LogBinJsonRenderer         | 210509/16276 |  5936/  216 |
 |---------------------------------------+--------------+-------------|
-| Blink Function                        | 205337/16092 |   764/   32 |
-| Blink Coroutine                       | 205449/16116 |   876/   56 |
+| Blink Function                        | 205369/16100 |   796/   40 |
+| Blink Coroutine                       | 205481/16124 |   908/   64 |
 +--------------------------------------------------------------------+
 
 ```
@@ -473,7 +473,7 @@ $ make README.md
 
 * 96 MHz ARM Cortex-M4
 * Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* Teensyduino 1.53
+* Teensyduino 1.56
 * Compiler options: "Faster"
 
 ```

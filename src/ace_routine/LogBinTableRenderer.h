@@ -29,9 +29,17 @@ SOFTWARE.
 #include <Arduino.h> // Print
 #include <AceCommon.h> // printPad5To()
 #include "Coroutine.h" // Coroutine
-#include "CoroutineProfiler.h"
+#include "LogBinProfiler.h"
 
 namespace ace_routine {
+
+namespace internal {
+  /** Number of bins in LogBinProfiler. */
+  const uint8_t kNumBinLabels = 32;
+
+  /** Labels for each bin in LogBinProfiler::mBins. */
+  extern const char* const kBinLabels[kNumBinLabels] PROGMEM;
+}
 
 /**
  * Print the information in the LogBinProfiler for each Coroutine
@@ -149,11 +157,16 @@ class LogBinRendererTemplate {
       if (endBin <= startBin) return; // needed if startBin = endBin = 0
 
       for (uint8_t i = startBin; i < endBin - 1; i++) {
-        uint8_t labelLength = strlen(kBinLabels[i]);
+        // These contortions are needed because the labels are stored in PROGMEM
+        // flash memory.
+        auto* label = (const char*) pgm_read_ptr(&internal::kBinLabels[i]);
+        uint8_t labelLength = strlen_P(label);
+
+        // Print label right justified in a box of 6 characters.
         for (uint8_t i = 0; i < (6 - labelLength); i++) {
           printer.print(' ');
         }
-        printer.print(kBinLabels[i]);
+        printer.print((const __FlashStringHelper*) label);
       }
       printer.print(F("    >>"));
     }
@@ -185,47 +198,7 @@ class LogBinRendererTemplate {
     }
 
   private:
-    /** Labels for each bin in LogBinProfiler::mBins. */
-    static const char* const kBinLabels[Profiler::kNumBins];
-
     T_COROUTINE** mRoot;
-};
-
-template <typename T_COROUTINE>
-const char* const LogBinRendererTemplate<T_COROUTINE>::kBinLabels[
-    LogBinProfilerTemplate<T_COROUTINE>::kNumBins] = {
-  "<2us",
-  "<4us",
-  "<8us",
-  "<16us",
-  "<32us",
-  "<64us",
-  "<128us",
-  "<256us",
-  "<512us",
-  "<1ms",
-  "<2ms",
-  "<4ms",
-  "<8ms",
-  "<16ms",
-  "<33ms",
-  "<66ms",
-  "<131ms",
-  "<262ms",
-  "<524ms",
-  "<1s",
-  "<2s",
-  "<4s",
-  "<8s",
-  "<17s",
-  "<34s",
-  "<67s",
-  "<134s",
-  "<268s",
-  "<537s",
-  "<1074s",
-  "<2147s",
-  "<4295s",
 };
 
 using LogBinTableRenderer = LogBinRendererTemplate<Coroutine>;

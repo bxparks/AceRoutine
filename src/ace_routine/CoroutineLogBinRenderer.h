@@ -80,7 +80,7 @@ class CoroutineLogBinRendererTemplate {
      * @param endBin end index (exclusive) of the bins (0-32)
      * @param clear call CoroutineLogBinProfiler::clear() after printing
      *        (default true)
-     * @param rollup roll-up exterior bins into the startBin and (endBin-1) bin
+     * @param rollup roll-up exterior bins into the first and last bins
      *        (default true)
      */
     void printTableTo(

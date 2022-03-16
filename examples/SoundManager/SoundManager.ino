@@ -53,14 +53,19 @@ using ace_routine::Coroutine;;
 using ace_routine::CoroutineScheduler;
 using ace_routine::CoroutineLogBinProfiler;
 using ace_routine::CoroutineLogBinRenderer;
+using ace_routine::CoroutineLogBinJsonRenderer;
 
 SoundRoutine soundRoutine;
 EXTERN_COROUTINE(soundManager);
 
 COROUTINE(printProfile) {
   COROUTINE_LOOP() {
-    CoroutineLogBinRenderer renderer(getRoot());
-    renderer.printTableTo(Serial, 2, 12);
+    CoroutineLogBinRenderer tableRenderer(getRoot());
+    tableRenderer.printTableTo(Serial, 2, 12, false /*clear*/);
+
+    CoroutineLogBinJsonRenderer jsonRenderer(getRoot());
+    jsonRenderer.printJsonTo(Serial, 2, 12);
+
     COROUTINE_DELAY_SECONDS(5);
   }
 }

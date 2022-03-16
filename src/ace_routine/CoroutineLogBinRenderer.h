@@ -80,14 +80,19 @@ class CoroutineLogBinRendererTemplate {
      * @param endBin end index (exclusive) of the bins (0-32)
      * @param clear call CoroutineLogBinProfiler::clear() after printing
      *        (default true)
+     * @param rollup roll-up exterior bins into the startBin and (endBin-1) bin
+     *        (default true)
      */
     void printTableTo(
         Print& printer,
         uint8_t startBin,
         uint8_t endBin,
-        bool clear = true
+        bool clear = true,
+        bool rollup = true
     ) {
       if (endBin <= startBin) return;
+
+      uint16_t bufBins[Profiler::kNumBins];
 
       bool isHeaderPrinted = false;
       for (Coroutine** p = mRoot; (*p) != nullptr; p = (*p)->getNext()) {
@@ -107,10 +112,20 @@ class CoroutineLogBinRendererTemplate {
         // always be a space between the coroutine name and the next number.
         (*p)->printNameTo(printer, 12);
 
+        // Roll up the exterior bins in to the first and last bins if requested.
+        const uint16_t* bins;
+        if (rollup) {
+          rollupExteriorBins(bufBins, profiler->mBins, Profiler::kNumBins,
+              startBin, endBin);
+          bins = bufBins;
+        } else {
+          bins = profiler->mBins;
+        }
+
         // Print the bins. The number of digits is automatically a log10() of
         // the counts, so we should be able to visually scan the table and see
         // which coroutine is taking too long.
-        printBinsTo(printer, profiler, startBin, endBin);
+        printBinsTo(printer, bins, Profiler::kNumBins, startBin, endBin);
         printer.println();
 
         if (clear) {
@@ -131,7 +146,7 @@ class CoroutineLogBinRendererTemplate {
         Print& printer, uint8_t startBin, uint8_t endBin) {
 
       endBin = (endBin > Profiler::kNumBins) ? Profiler::kNumBins : endBin;
-      if (endBin < startBin + 2) return;
+      if (endBin <= startBin) return; // needed if startBin = endBin = 0
 
       for (uint8_t i = startBin; i < endBin - 1; i++) {
         ace_common::printfTo(printer, "%6.6s", kBinLabels[i]);
@@ -145,39 +160,23 @@ class CoroutineLogBinRendererTemplate {
      * remaining counts after the `endBin`, the cummulative sum of the remaining
      * bins are printed in another 6-character box.
      *
+     * @param printer usual `Serial`
+     * @param bins pointer to array of bins
      * @param startBin start index of the bins (0-31)
      * @param endBin end index (exclusive) of the bins (0-32)
      */
     static void printBinsTo(
         Print& printer,
-        Profiler* profiler,
+        const uint16_t bins[],
+        uint8_t numBins,
         uint8_t startBin,
         uint8_t endBin) {
 
-      endBin = (endBin > Profiler::kNumBins) ? Profiler::kNumBins : endBin;
-      if (endBin < startBin + 2) return;
-
-      // Rollup all bins below startBin into the first bin.
-      uint32_t underCount = 0;
-      for (uint8_t i = 0; i <= startBin; i++) {
-        underCount += profiler->mBins[i];
-      }
-      if (underCount > UINT16_MAX) underCount = UINT16_MAX;
-      ace_common::printfTo(printer, "%6u", underCount);
-
-      // Print interior bins.
-      for (uint8_t i = startBin + 1; i < endBin - 1; i++) {
-        uint16_t count = profiler->mBins[i];
+      endBin = (endBin > numBins) ? numBins : endBin;
+      for (uint8_t i = startBin; i < endBin; i++) {
+        uint16_t count = bins[i];
         ace_common::printfTo(printer, "%6u", count);
       }
-
-      // Rollup all bins at or above endBin into the last bin.
-      uint32_t overCount = 0;
-      for (uint8_t i = endBin - 1; i < Profiler::kNumBins; i++) {
-        overCount += profiler->mBins[i];
-      }
-      if (overCount > UINT16_MAX) overCount = UINT16_MAX;
-      ace_common::printfTo(printer, "%6u", overCount);
     }
 
   private:

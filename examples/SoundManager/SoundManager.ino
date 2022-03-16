@@ -21,25 +21,36 @@
  * Coroutine soundManager; status: Running
  * First BEEP
  * Second BEEP
+ * name          <8us <16us <32us <64us<128us<256us<512us  <1ms  <2ms    >>
+ * soundManager  1440     0     1     0     0     0     0     0     1     0
+ * 0x55C5AB3CE2  1438     1     2     0     0     0     0     0     0     1
+ * soundRoutine  1440     0     0     0     2     0     0     0     0     0
+ * {
+ * "soundManager":[1440,0,1,0,0,0,0,0,1,0],
+ * "0x55C5AB3CE240":[1438,1,2,0,0,0,0,0,0,1],
+ * "soundRoutine":[1440,0,0,0,2,0,0,0,0,0]
+ * }
  * 
  * Request Boop and wait 5 seconds...
  * Coroutine soundRoutine; status: Yielding
  * Coroutine soundManager; status: Running
  * First BOOP
  * Second BOOP
+ * name          <8us <16us <32us <64us<128us<256us<512us  <1ms  <2ms    >>
+ * soundManager  1440     0     1     0     0     0     0     0     1     0
+ * 0x55C5AB3CE2  1438     1     2     0     0     0     0     0     0     1
+ * soundRoutine  1440     0     0     0     2     0     0     0     0     0
+ * {
+ * "soundManager":[1440,0,1,0,0,0,0,0,1,0],
+ * "0x55C5AB3CE240":[1438,1,2,0,0,0,0,0,0,1],
+ * "soundRoutine":[1440,0,0,0,2,0,0,0,0,0]
+ * }
  * 
  * Request Silence and wait 5 seconds...
  * Coroutine soundRoutine; status: Yielding
  * Coroutine soundManager; status: Running
  * Wait 5 seconds...
  * <silence>
- * 
- * Request Beep and wait 5 seconds...
- * Coroutine soundRoutine; status: Yielding
- * Coroutine soundManager; status: Running
- * First BEEP
- * Second BEEP
- *
  * ...
  * @endverbatim
  */
@@ -58,7 +69,9 @@ using ace_routine::LogBinJsonRenderer;
 SoundRoutine soundRoutine;
 EXTERN_COROUTINE(soundManager);
 
-COROUTINE(printProfile) {
+// Every 5 seconds, print out the elapsed time frequency distribution from the
+// LogBinProfiler.
+COROUTINE(printProfiler) {
   COROUTINE_LOOP() {
     LogBinTableRenderer tableRenderer(getRoot());
     tableRenderer.printTo(Serial, 2, 12, false /*clear*/);
@@ -70,9 +83,6 @@ COROUTINE(printProfile) {
   }
 }
 
-LogBinProfiler soundRoutineProfiler;
-LogBinProfiler soundManagerProfiler;
-
 void setup() {
   delay(1000);
   Serial.begin(115200);
@@ -82,8 +92,12 @@ void setup() {
   soundRoutine.setCName("soundRoutine");
   soundManager.setFName(F("soundManager"));
 
-  soundRoutine.setProfiler(&soundRoutineProfiler);
-  soundManager.setProfiler(&soundManagerProfiler);
+  // Don't set the name of 'printProfiler' to verify that the name of the
+  // coroutine becomes the pointer address in hexadecimal.
+  // printProfiler.setFName(F("printProfiler"));
+
+  // Attach profilers to all coroutines.
+  LogBinProfiler::createProfilers(Coroutine::getRoot());
 
   CoroutineScheduler::setup();
 }

@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include <stdint.h> // uint8_t, uint32_t
 #include <Arduino.h> // Print
-#include <AceCommon.h> // printfTo()
 #include "Coroutine.h" // Coroutine
 #include "CoroutineProfiler.h"
 

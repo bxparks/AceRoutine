@@ -375,7 +375,10 @@ class CoroutineTemplate {
             printer.write(' ');
           }
         } else {
-          printer.write(pname.cstr(), maxLen);
+          // NOTE: Must cast to (const uint8_t*) because the ATtiny85 core does
+          // not have a version of write() that accepts a (const char*), in
+          // contrast to every other Arduino Core.
+          printer.write((const uint8_t*) pname.cstr(), maxLen);
         }
       } else {
         printer.write(pname.cstr());

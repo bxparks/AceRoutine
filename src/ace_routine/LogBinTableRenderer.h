@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include <stdint.h> // uint8_t, uint32_t
 #include <Arduino.h> // Print
-#include <AceCommon.h> // printfTo()
+#include <AceCommon.h> // printPad5To()
 #include "Coroutine.h" // Coroutine
 #include "CoroutineProfiler.h"
 
@@ -101,7 +101,7 @@ class LogBinRendererTemplate {
 
         // Print header if needed.
         if (! isHeaderPrinted) {
-          ace_common::printfTo(printer, "%-12.12s", "name");
+          printer.print(F("name        "));
           printHeaderTo(printer, startBin, endBin);
           printer.println();
           isHeaderPrinted = true;
@@ -149,9 +149,13 @@ class LogBinRendererTemplate {
       if (endBin <= startBin) return; // needed if startBin = endBin = 0
 
       for (uint8_t i = startBin; i < endBin - 1; i++) {
-        ace_common::printfTo(printer, "%6.6s", kBinLabels[i]);
+        uint8_t labelLength = strlen(kBinLabels[i]);
+        for (uint8_t i = 0; i < (6 - labelLength); i++) {
+          printer.print(' ');
+        }
+        printer.print(kBinLabels[i]);
       }
-      ace_common::printfTo(printer, "%6.6s", ">>");
+      printer.print(F("    >>"));
     }
 
     /**
@@ -175,7 +179,8 @@ class LogBinRendererTemplate {
       endBin = (endBin > numBins) ? numBins : endBin;
       for (uint8_t i = startBin; i < endBin; i++) {
         uint16_t count = bins[i];
-        ace_common::printfTo(printer, "%6u", count);
+        printer.print(' ');
+        ace_common::printPad5To(printer, count);
       }
     }
 

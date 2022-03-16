@@ -136,6 +136,13 @@ calculated flash size can jump around in unexpected ways.
         * Increases the flash size of the `CoroutineScheduler` by 100-140 bytes
           for both 8-bit and 32-bit processors, even if `CoroutineProfiler` is
           not used. This is a one-time hit.
+    * Add `LogBinProfiler`
+        * Adds about 90 bytes of flash and 70 bytes of RAM on AVR.
+    * Add `LogBinTableRenderer`
+        * Adds about 2200 bytes of flash and 450 bytes of RAM on AVR.
+    * Add `LogBinJsonRenderer`
+        * Adds about 1800 bytes of flash and 200 bytes of RAM on AVR.
+
 
 ## How to Generate
 

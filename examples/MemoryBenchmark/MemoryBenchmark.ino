@@ -34,8 +34,11 @@
 #define FEATURE_SCHEDULER_SETUP_TWO_COROUTINES 16
 #define FEATURE_SCHEDULER_MANUAL_SETUP_ONE_COROUTINE 17
 #define FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES 18
-#define FEATURE_BLINK_FUNCTION 19
-#define FEATURE_BLINK_COROUTINE 20
+#define FEATURE_LOG_BIN_PROFILER 19
+#define FEATURE_LOG_BIN_TABLE_RENDERER 20
+#define FEATURE_LOG_BIN_JSON_RENDERER 21
+#define FEATURE_BLINK_FUNCTION 22
+#define FEATURE_BLINK_COROUTINE 23
 
 #if FEATURE != FEATURE_BASELINE
   #include <AceRoutine.h>
@@ -413,6 +416,17 @@ volatile int disableCompilerOptimization = 0;
     }
   }
 
+#elif FEATURE == FEATURE_LOG_BIN_PROFILER \
+    || FEATURE == FEATURE_LOG_BIN_TABLE_RENDERER \
+    || FEATURE == FEATURE_LOG_BIN_JSON_RENDERER
+
+  COROUTINE(profiled) {
+    COROUTINE_LOOP() {
+      disableCompilerOptimization = 1;
+      COROUTINE_DELAY(10);
+    }
+  }
+
 #elif FEATURE == FEATURE_BLINK_COROUTINE
 
   #ifndef LED_BUILTIN
@@ -449,6 +463,12 @@ volatile int disableCompilerOptimization = 0;
   FooClass* foo;
 #endif
 
+#if FEATURE == FEATURE_LOG_BIN_PROFILER \
+    || FEATURE == FEATURE_LOG_BIN_TABLE_RENDERER \
+    || FEATURE == FEATURE_LOG_BIN_JSON_RENDERER
+  LogBinProfiler profiler;
+#endif
+
 void setup() {
   delay(1000);
 
@@ -472,6 +492,12 @@ void setup() {
     b.setupCoroutine();
   #endif
 
+#endif
+
+#if FEATURE == FEATURE_LOG_BIN_PROFILER \
+    || FEATURE == FEATURE_LOG_BIN_TABLE_RENDERER \
+    || FEATURE == FEATURE_LOG_BIN_JSON_RENDERER
+  profiled.setProfiler(&profiler);
 #endif
 }
 
@@ -522,6 +548,16 @@ void loop() {
   CoroutineScheduler::loop();
 #elif FEATURE == FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES
   CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_LOG_BIN_PROFILER
+  CoroutineScheduler::loop();
+#elif FEATURE == FEATURE_LOG_BIN_TABLE_RENDERER
+  CoroutineScheduler::loop();
+  LogBinTableRenderer renderer(Coroutine::getRoot());
+  renderer.printTo(Serial, 0, 32);
+#elif FEATURE == FEATURE_LOG_BIN_JSON_RENDERER
+  CoroutineScheduler::loop();
+  LogBinJsonRenderer renderer(Coroutine::getRoot());
+  renderer.printTo(Serial, 0, 32);
 #elif FEATURE == FEATURE_BLINK_COROUTINE
   blink.runCoroutine();
 #elif FEATURE == FEATURE_BLINK_FUNCTION

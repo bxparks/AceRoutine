@@ -25,8 +25,11 @@ BEGIN {
   labels[16] = "Scheduler, Two Coroutines (setup)"
   labels[17] = "Scheduler, One Coroutine (man setup)"
   labels[18] = "Scheduler, Two Coroutines (man setup)"
-  labels[19] = "Blink Function"
-  labels[20] = "Blink Coroutine"
+  labels[19] = "Scheduler, LogBinProfiler"
+  labels[20] = "Scheduler, LogBinTableRenderer"
+  labels[21] = "Scheduler, LogBinJsonRenderer"
+  labels[22] = "Blink Function"
+  labels[23] = "Blink Coroutine"
   record_index = 0
 }
 {
@@ -57,6 +60,7 @@ END {
       || labels[i] ~ /^Scheduler, One Coroutine \(seconds\)$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(setup\)$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(man setup\)$/ \
+      || labels[i] ~ /^Scheduler, LogBinProfiler$/ \
       || labels[i] ~ /^Blink Function$/ \
     ) {
       printf("|---------------------------------------+--------------+-------------|\n")

@@ -35,11 +35,18 @@ namespace ace_routine {
 
 /**
  * Print the information in the CoroutineLogBinProfiler for each Coroutine
- * in a human-readable table. For example, the output of `printTableTo(Serial,
- * 2, 10)` for `examples/SoundManager` looks like this:
+ * in a human-readable table. Each bin is printed as a 5-digit number, since the
+ * bins use a `uint16_t` integer for the count. The number of digits in the
+ * printed number is equivalent to the log10() of the frequency count. To see
+ * why that's true, imagine if each digit of the bin count was replaced by a '*'
+ * character. Therefore the table is a rough ASCII version of a log-log graph of
+ * the frequency count.
+ *
+ * For example, the output of `printTableTo(Serial, 2, 10)` for
+ * `examples/SoundManager` looks like this:
  *
  * @verbatim
- *               <8us <16us <32us <64us<128us<256us<512us  <1ms  <2ms    >>
+ * name          <8us <16us <32us <64us<128us<256us<512us  <1ms  <2ms    >>
  * soundManager  1418     0     0     1     0     0     0     0     1     0
  * soundRoutine  1417     0     0     1     1     1     0     0     0     0
  * @endverbatim
@@ -47,8 +54,6 @@ namespace ace_routine {
  * The bins below the startBin are rolled into the first bin. The bins above the
  * (endBin-1) are rolled into the last bin with the label `>>`. There must be at
  * least 2 rendering bins (endBin >= startBin + 2) otherwise nothing is printed.
- *
- * The `init()` method resets the frequency count of the bins.
  *
  * @tparam T_COROUTINE class of the specific CoroutineTemplate instantiation,
  *    usually `Coroutine`
@@ -72,8 +77,9 @@ class CoroutineLogBinRendererTemplate {
      *
      * @param printer destination of output, usually `Serial`
      * @param startBin start index of the bins (0-31)
-     * @param endBin end inex (exclusive) of the bins (0-32)
-     * @param clear call init() after printing (default true)
+     * @param endBin end index (exclusive) of the bins (0-32)
+     * @param clear call CoroutineLogBinProfiler::clear() after printing
+     *        (default true)
      */
     void printTableTo(
         Print& printer,
@@ -90,7 +96,7 @@ class CoroutineLogBinRendererTemplate {
 
         // Print header if needed.
         if (! isHeaderPrinted) {
-          ace_common::printfTo(printer, "%12.12s", "");
+          ace_common::printfTo(printer, "%-12.12s", "name");
           printHeaderTo(printer, startBin, endBin);
           printer.println();
           isHeaderPrinted = true;
@@ -108,7 +114,7 @@ class CoroutineLogBinRendererTemplate {
         printer.println();
 
         if (clear) {
-          profiler->init();
+          profiler->clear();
         }
       }
     }

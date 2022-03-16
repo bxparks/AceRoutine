@@ -40,13 +40,9 @@ namespace ace_routine {
  * to a given coroutine through the `Coroutine::setProfiler()` method.
  *
  * After sufficient number of samples are collected, the frequency distribution
- * of all profilers for all coroutines can be printed as a table using the
- * `printBinsTo()` static helper function. Each bin is printed as a 5-digit
- * number (since the bins use a `uint16_t` integer for the count). The number of
- * digits in the printed number is equivalent to the log10() of the frequency
- * count. (To see why that's true, imagine if each digit of the bin count was
- * replaced by a '*' character.) Therefore the table is a rough ASCII version of
- * a log-log graph of the frequency count.
+ * of all profilers for all coroutines can be printed by a renderer. An
+ * implementation of such a render is `CoroutineLogBinRendererTemplate`
+ * which prints the frequency distribution as a formatted table.
  *
  * @tparam T_COROUTINE class of the specific CoroutineTemplate instantiation,
  *    usually `Coroutine`
@@ -59,11 +55,11 @@ class CoroutineLogBinProfilerTemplate : public CoroutineProfiler {
   public:
     /** Constructor. */
     CoroutineLogBinProfilerTemplate() {
-      init();
+      clear();
     }
 
     /** Clear the bins. */
-    void init() {
+    void clear() {
       memset(mBins, 0, sizeof(mBins));
     }
 
@@ -91,11 +87,20 @@ class CoroutineLogBinProfilerTemplate : public CoroutineProfiler {
     }
 
     /**
-     * Create a profiler on the heap for each coroutine in the singly-linked
-     * list of coroutines defined by `root`.
+     * Create a new profiler on the heap and attach it to each coroutine in the
+     * singly-linked list of coroutines defined by `root`.
      */
     static void createProfilers(T_COROUTINE** root) {
       for (Coroutine** p = root; (*p) != nullptr; p = (*p)->getNext()) {
+
+        // Delete any existing profiler.
+        auto* currentProfiler =
+            (CoroutineLogBinProfilerTemplate*) (*p)->getProfiler();
+        if (currentProfiler) {
+          delete currentProfiler;
+        }
+
+        // Attach new profiler.
         auto* profiler = new CoroutineLogBinProfilerTemplate();
         (*p)->setProfiler(profiler);
       }
@@ -112,12 +117,12 @@ class CoroutineLogBinProfilerTemplate : public CoroutineProfiler {
       }
     }
 
-    /** Init all profilers for all coroutines defined by `root`. */
-    static void initProfilers(T_COROUTINE** root) {
+    /** Clear counters for all profilers in the coroutines defined by `root`. */
+    static void clearProfilers(T_COROUTINE** root) {
       for (Coroutine** p = root; (*p) != nullptr; p = (*p)->getNext()) {
         auto* profiler = (CoroutineLogBinProfilerTemplate*) (*p)->getProfiler();
         if (profiler) {
-          profiler->init();
+          profiler->clear();
         }
       }
     }

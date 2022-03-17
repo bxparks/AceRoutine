@@ -23,14 +23,16 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
+#include <AceCommon.h> // printPad5To()
 #include "LogBinTableRenderer.h"
 
 namespace ace_routine {
 namespace internal {
 
 // The numbers for higher duration values deviate from powers of 2 because 2^10
-// = 1024, which is not exactly 1000. The length of each string *must* be 6 or
-// smaller, otherwise a bit of code in LogBinTableRenderer.h must be updated.
+// = 1024, which is not exactly 1000. The length of each string should be 6 or
+// smaller, otherwise it will be truncated by
+// LogBinTableRenderer::printHeaderTo().
 static const char kBinLabel00[] PROGMEM = "<2us";
 static const char kBinLabel01[] PROGMEM = "<4us";
 static const char kBinLabel02[] PROGMEM = "<8us";
@@ -98,6 +100,49 @@ const char* const kBinLabels[kNumBinLabels] PROGMEM = {
   kBinLabel30,
   kBinLabel31,
 };
+
+void printHeaderTo(Print& printer, uint8_t startBin, uint8_t endBin) {
+  endBin = (endBin > kNumBinLabels) ? kNumBinLabels : endBin;
+  if (endBin <= startBin) return; // needed if startBin = endBin = 0
+
+  for (uint8_t i = startBin; i < endBin - 1; i++) {
+    auto* label = (const char*) pgm_read_ptr(&internal::kBinLabels[i]);
+    printPStringTo(printer, label, 6);
+  }
+  printer.print(F("    >>"));
+}
+
+void printPStringTo(Print& printer, const char* s, uint8_t boxSize) {
+  uint8_t length = strlen_P(s);
+  uint8_t printLength;
+  if (length < boxSize) {
+    for (uint8_t i = 0; i < (boxSize - length); i++) {
+      printer.print(' ');
+    }
+    printLength = length;
+  } else {
+    printLength = boxSize;
+  }
+
+  for (uint8_t i = 0; i < printLength; i++) {
+    printer.print((char) pgm_read_byte(&s[i]));
+  }
+}
+
+void printBinsTo(
+    Print& printer,
+    const uint16_t bins[],
+    uint8_t numBins,
+    uint8_t startBin,
+    uint8_t endBin) {
+
+  endBin = (endBin > numBins) ? numBins : endBin;
+  for (uint8_t i = startBin; i < endBin; i++) {
+    uint16_t count = bins[i];
+    printer.print(' ');
+    ace_common::printPad5To(printer, count);
+  }
+}
 
 }
 }

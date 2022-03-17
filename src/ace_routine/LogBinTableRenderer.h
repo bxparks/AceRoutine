@@ -27,19 +27,54 @@ SOFTWARE.
 
 #include <stdint.h> // uint8_t, uint32_t
 #include <Arduino.h> // Print
-#include <AceCommon.h> // printPad5To()
 #include "Coroutine.h" // Coroutine
 #include "LogBinProfiler.h" // rollupExteriorBins()
 
 namespace ace_routine {
 
 namespace internal {
-  /** Number of bins in LogBinProfiler. */
-  const uint8_t kNumBinLabels = 32;
 
-  /** Labels for each bin in LogBinProfiler::mBins. */
-  extern const char* const kBinLabels[kNumBinLabels] PROGMEM;
-}
+/** Number of bins in LogBinProfiler. */
+const uint8_t kNumBinLabels = 32;
+
+/** Labels for each bin in LogBinProfiler::mBins. */
+extern const char* const kBinLabels[kNumBinLabels] PROGMEM;
+
+/**
+ * Print the header related to this profiler.
+ *
+ * @param printer destination of output
+ * @param startBin start index of the bins (0-31)
+ * @param endBin end index (exclusive) of the bins (0-32)
+ */
+void printHeaderTo( Print& printer, uint8_t startBin, uint8_t endBin);
+
+/**
+ * Print string in PROGMEM into boxSize, right justified. The string is padded
+ * with spaces on the left if too short, and truncated on the right if too
+ * long.
+ */
+void printPStringTo(Print& printer, const char* s, uint8_t boxSize);
+
+/**
+ * Print the bins of this profiler as a single line of text with each bin
+ * printed as a 5-digit number in a 6-character box. If there are any remaining
+ * counts after the `endBin`, the cummulative sum of the remaining bins are
+ * printed in another 6-character box.
+ *
+ * @param printer usual `Serial`
+ * @param bins pointer to array of bins
+ * @param startBin start index of the bins (0-31)
+ * @param endBin end index (exclusive) of the bins (0-32)
+ */
+void printBinsTo(
+    Print& printer,
+    const uint16_t bins[],
+    uint8_t numBins,
+    uint8_t startBin,
+    uint8_t endBin);
+
+} // namespace internal
 
 /**
  * Print the information in the LogBinProfiler for each Coroutine
@@ -59,9 +94,9 @@ namespace internal {
  * soundRoutine  1417     0     0     1     1     1     0     0     0     0
  * @endverbatim
  *
- * The bins below the startBin are rolled into the first bin. The bins above the
- * (endBin-1) are rolled into the last bin with the label `>>`. There must be at
- * least 2 rendering bins (endBin >= startBin + 2) otherwise nothing is printed.
+ * The bins below the first bin (at `startBin`) are rolled into the first bin.
+ * The bins above the last bin (at `endBin-1`) are rolled into the last bin and
+ * printed with the label `>>`.
  *
  * @tparam T_COROUTINE class of the specific CoroutineTemplate instantiation,
  *    usually `Coroutine`
@@ -110,7 +145,7 @@ class LogBinRendererTemplate {
         // Print header if needed.
         if (! isHeaderPrinted) {
           printer.print(F("name        "));
-          printHeaderTo(printer, startBin, endBin);
+          internal::printHeaderTo(printer, startBin, endBin);
           printer.println();
           isHeaderPrinted = true;
         }
@@ -133,7 +168,8 @@ class LogBinRendererTemplate {
         // Print the bins. The number of digits is automatically a log10() of
         // the counts, so we should be able to visually scan the table and see
         // which coroutine is taking too long.
-        printBinsTo(printer, bins, Profiler::kNumBins, startBin, endBin);
+        internal::printBinsTo(
+            printer, bins, Profiler::kNumBins, startBin, endBin);
         printer.println();
 
         if (clear) {
@@ -143,66 +179,11 @@ class LogBinRendererTemplate {
     }
 
   private:
-    /**
-     * Print the header related to this profiler.
-     *
-     * @param printer destination of output
-     * @param startBin start index of the bins (0-31)
-     * @param endBin end index (exclusive) of the bins (0-32)
-     */
-    static void printHeaderTo(
-        Print& printer, uint8_t startBin, uint8_t endBin) {
-
-      endBin = (endBin > Profiler::kNumBins) ? Profiler::kNumBins : endBin;
-      if (endBin <= startBin) return; // needed if startBin = endBin = 0
-
-      for (uint8_t i = startBin; i < endBin - 1; i++) {
-        // These contortions are needed because the labels are stored in PROGMEM
-        // flash memory.
-        auto* label = (const char*) pgm_read_ptr(&internal::kBinLabels[i]);
-        uint8_t labelLength = strlen_P(label);
-
-        // Print label right justified in a box of 6 characters.
-        for (uint8_t i = 0; i < (6 - labelLength); i++) {
-          printer.print(' ');
-        }
-        printer.print((const __FlashStringHelper*) label);
-      }
-      printer.print(F("    >>"));
-    }
-
-    /**
-     * Print the bins of this profiler as a single line of text with each bin
-     * printed as a 5-digit number in a 6-character box. If there are any
-     * remaining counts after the `endBin`, the cummulative sum of the remaining
-     * bins are printed in another 6-character box.
-     *
-     * @param printer usual `Serial`
-     * @param bins pointer to array of bins
-     * @param startBin start index of the bins (0-31)
-     * @param endBin end index (exclusive) of the bins (0-32)
-     */
-    static void printBinsTo(
-        Print& printer,
-        const uint16_t bins[],
-        uint8_t numBins,
-        uint8_t startBin,
-        uint8_t endBin) {
-
-      endBin = (endBin > numBins) ? numBins : endBin;
-      for (uint8_t i = startBin; i < endBin; i++) {
-        uint16_t count = bins[i];
-        printer.print(' ');
-        ace_common::printPad5To(printer, count);
-      }
-    }
-
-  private:
     T_COROUTINE** mRoot;
 };
 
 using LogBinTableRenderer = LogBinRendererTemplate<Coroutine>;
 
-}
+} // namespace ace_routine
 
 #endif

@@ -173,15 +173,13 @@ class CoroutineSchedulerTemplate {
           // its continuation context determines whether to call
           // Coroutine::isDelayExpired(), Coroutine::isDelayMicrosExpired(), or
           // Coroutine::isDelaySecondsExpired().
-          if ((*mCurrent)->mProfiler) {
-            uint32_t startMicros = T_COROUTINE::coroutineMicros();
-            (*mCurrent)->runCoroutine();
-            uint32_t elapsedMicros = T_COROUTINE::coroutineMicros()
-                - startMicros;
-            (*mCurrent)->mProfiler->updateElapsedMicros(elapsedMicros);
-          } else {
-            (*mCurrent)->runCoroutine();
-          }
+          //
+          // The `CoroutineScheduler` always enables the profiler by calling
+          // `Coroutine::runCoroutineWithProfiler()`. If memory usage is a
+          // problem, then consider calling the `Coroutine::runCoroutine()`
+          // directly in the global `loop()` function, instead of going through
+          // the `CoroutineScheduler`.
+          (*mCurrent)->runCoroutineWithProfiler();
           break;
 
         case T_COROUTINE::kStatusEnding:
@@ -197,7 +195,6 @@ class CoroutineSchedulerTemplate {
       // Go to the next coroutine
       mCurrent = (*mCurrent)->getNext();
     }
-
 
     /** List all the routines in the linked list to the printer. */
     void listCoroutines(Print& printer) {

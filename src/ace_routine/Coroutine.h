@@ -28,6 +28,7 @@ SOFTWARE.
 #include <stdint.h> // UINT16_MAX
 #include <Print.h> // Print
 #include <AceCommon.h> // PrintStr<>
+#include "CoroutineProfiler.h"
 #include "ClockInterface.h"
 
 class __FlashStringHelper;
@@ -265,8 +266,6 @@ extern className##_##name name
 
 namespace ace_routine {
 
-class CoroutineProfiler;
-
 /** A lookup table from Status integer to human-readable strings. */
 extern const __FlashStringHelper* const sStatusStrings[];
 
@@ -318,6 +317,29 @@ class CoroutineTemplate {
      * coroutine.
      */
     virtual void setupCoroutine() {}
+
+    /**
+     * This is a variant of runCoroutine() which measures the execution time of
+     * runCoroutine() and updates the attached profiler if it exists.
+     *
+     * On 8-bit processors, memory consumption can be reduced by calling the
+     * `Coroutine::runCoroutine()` method directly in the global `loop()`
+     * function, instead of using the `CoroutineScheduler`. In such an
+     * environment, the end-user can enable profiling by manually changing the
+     * calls to `Coroutine::runCoroutine()` to
+     * `Coroutine::runCoroutineWithProfiler()`, and recompiling the program.
+     */
+    int runCoroutineWithProfiler() {
+      if (mProfiler) {
+        uint32_t startMicros = coroutineMicros();
+        runCoroutine();
+        uint32_t elapsedMicros = coroutineMicros() - startMicros;
+        mProfiler->updateElapsedMicros(elapsedMicros);
+        return 0;
+      } else {
+        return runCoroutine();
+      }
+    }
 
     /**
      * Return the type of the name string, either kNameTypeCString or

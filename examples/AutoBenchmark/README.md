@@ -124,11 +124,11 @@ $ make README.md
 * v1.5.0
     * Add `CoroutineProfiler` to `CoroutineScheduler`.
         * `CoroutineScheduler::runCoroutine()` becomes slightly slower:
-        * 0.7 microseconds (AVR)
-        * 0.5 microseconds (STM32)
-        * 0.2 microseconds (ESP8266)
-        * 0.07 microseconds (ESP32)
-        * 0.15 microseconds (Teensy 3.2)
+        * 0.100 microseconds (AVR)
+        * 0.133 microseconds (STM32)
+        * 0.100 microseconds (ESP8266)
+        * 0.033 microseconds (ESP32)
+        * 0.133 microseconds (Teensy 3.2)
 
 ## Arduino Nano
 
@@ -149,7 +149,7 @@ CPU:
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  10000 |       1.700 |  0.000 |
 | DirectScheduling    |  10000 |       2.900 |  1.200 |
-| CoroutineScheduling |  10000 |       7.900 |  6.200 |
+| CoroutineScheduling |  10000 |       7.200 |  5.500 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -171,9 +171,9 @@ CPU:
 +---------------------+--------+-------------+--------+
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       1.700 |  0.000 |
-| DirectScheduling    |  10000 |       2.900 |  1.200 |
-| CoroutineScheduling |  10000 |       7.900 |  6.200 |
+| EmptyLoop           |  10000 |       1.800 |  0.000 |
+| DirectScheduling    |  10000 |       2.800 |  1.000 |
+| CoroutineScheduling |  10000 |       7.200 |  5.400 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -196,7 +196,7 @@ CPU:
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  30000 |       0.133 |  0.000 |
 | DirectScheduling    |  30000 |       0.533 |  0.400 |
-| CoroutineScheduling |  30000 |       1.600 |  1.467 |
+| CoroutineScheduling |  30000 |       1.266 |  1.133 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -217,9 +217,9 @@ CPU:
 +---------------------+--------+-------------+--------+
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       0.200 |  0.000 |
-| DirectScheduling    |  10000 |       0.500 |  0.300 |
-| CoroutineScheduling |  10000 |       1.200 |  1.000 |
+| EmptyLoop           |  10000 |       0.100 |  0.000 |
+| DirectScheduling    |  10000 |       0.500 |  0.400 |
+| CoroutineScheduling |  10000 |       1.000 |  0.900 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -241,8 +241,8 @@ CPU:
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  30000 |       0.066 |  0.000 |
-| DirectScheduling    |  30000 |       0.100 |  0.034 |
-| CoroutineScheduling |  30000 |       0.400 |  0.334 |
+| DirectScheduling    |  30000 |       0.133 |  0.067 |
+| CoroutineScheduling |  30000 |       0.366 |  0.300 |
 +---------------------+--------+-------------+--------+
 
 ```

@@ -30,6 +30,7 @@ SOFTWARE.
 #include <AceCommon.h> // PrintStr<>
 #include "CoroutineProfiler.h"
 #include "ClockInterface.h"
+#include "compat.h" // PROGMEM
 
 class __FlashStringHelper;
 class AceRoutineTest_statusStrings;
@@ -275,10 +276,21 @@ template <typename T> class CoroutineSchedulerTemplate;
 /**
  * Base class of all coroutines. The actual coroutine code is an implementation
  * of the virtual runCoroutine() method.
+ *
+ * @tparam T_CLOCK class that provides micros(), millis() and seconds()
+ *    functions, usually `ClockInterface` but can be something else for testing
+ *    purposes.
+ * @tparam T_DELAY type used to store the mDelayStart and mDelayDuration,
+ *    usually `uint16_t`. It may be possible to create a variant set of
+ *    Coroutine32 and CoroutineScheduler32 classes which use a `uint32_t`
+ *    instead of a `uint16_t`. This would probably allow the
+ *    `COROUTINE_DELAY()`, `COROUTINE_DELAY_MICROS()` and
+ *    `COROUTINE_DELAY_SECONDS()` macros to accept 32-bit integers instead of
+ *    16-bits. I have not tested this possibility at all.
  */
-template <typename T_CLOCK>
+template <typename T_CLOCK, typename T_DELAY>
 class CoroutineTemplate {
-  friend class CoroutineSchedulerTemplate<CoroutineTemplate<T_CLOCK>>;
+  friend class CoroutineSchedulerTemplate<CoroutineTemplate<T_CLOCK, T_DELAY>>;
   friend class ::AceRoutineTest_statusStrings;
   friend class ::SuspendTest_suspendAndResume;
 
@@ -459,22 +471,22 @@ class CoroutineTemplate {
 
     /** Check if delay millis time is over. */
     bool isDelayExpired() const {
-      uint16_t nowMillis = coroutineMillis();
-      uint16_t elapsed = nowMillis - mDelayStart;
+      T_DELAY nowMillis = coroutineMillis();
+      T_DELAY elapsed = nowMillis - mDelayStart;
       return elapsed >= mDelayDuration;
     }
 
     /** Check if delay micros time is over. */
     bool isDelayMicrosExpired() const {
-      uint16_t nowMicros = coroutineMicros();
-      uint16_t elapsed = nowMicros - mDelayStart;
+      T_DELAY nowMicros = coroutineMicros();
+      T_DELAY elapsed = nowMicros - mDelayStart;
       return elapsed >= mDelayDuration;
     }
 
     /** Check if delay seconds time is over. */
     bool isDelaySecondsExpired() const {
-      uint16_t nowSeconds = coroutineSeconds();
-      uint16_t elapsed = nowSeconds - mDelayStart;
+      T_DELAY nowSeconds = coroutineSeconds();
+      T_DELAY elapsed = nowSeconds - mDelayStart;
       return elapsed >= mDelayDuration;
     }
 
@@ -684,7 +696,7 @@ class CoroutineTemplate {
      * COROUTINE_DELAY() macro inside Coroutine::runCoroutine()) because the
      * clock increments by 1 millisecond.)
      */
-    void setDelayMillis(uint16_t delayMillis) {
+    void setDelayMillis(T_DELAY delayMillis) {
       mDelayStart = coroutineMillis();
 
       // If delayMillis is a compile-time constant, the compiler seems to
@@ -698,7 +710,7 @@ class CoroutineTemplate {
      * Configure the delay timer for delayMicros. Similar to seDelayMillis(),
      * the maximum delay is 32767 micros.
      */
-    void setDelayMicros(uint16_t delayMicros) {
+    void setDelayMicros(T_DELAY delayMicros) {
       mDelayStart = coroutineMicros();
 
       // If delayMicros is a compile-time constant, the compiler seems to
@@ -712,7 +724,7 @@ class CoroutineTemplate {
      * Configure the delay timer for delaySeconds. Similar to seDelayMillis(),
      * the maximum delay is 32767 seconds.
      */
-    void setDelaySeconds(uint16_t delaySeconds) {
+    void setDelaySeconds(T_DELAY delaySeconds) {
       mDelayStart = coroutineSeconds();
 
       // If delaySeconds is a compile-time constant, the compiler seems to
@@ -791,15 +803,16 @@ class CoroutineTemplate {
      * COROUTINE_DELAY_SECONDS(). The unit of this number is context dependent,
      * milliseconds, microseconds, or seconds.
      */
-    uint16_t mDelayStart;
+    T_DELAY mDelayStart;
 
     /**
      * Delay time specified by COROUTINE_DELAY(), COROUTINE_DELAY_MICROS() or,
      * COROUTINE_DELAY_SECONDS(). The unit of this number is context dependent,
      * milliseconds, microseconds, or seconds.
      */
-    uint16_t mDelayDuration;
+    T_DELAY mDelayDuration;
 
+    /** Pointer to a profiler instance, either static or on the heap. */
     CoroutineProfiler* mProfiler = nullptr;
 };
 
@@ -809,7 +822,7 @@ class CoroutineTemplate {
  * class of all user-defined coroutines created using the COROUTINE() macro or
  * through manual subclassing of this class.
  */
-using Coroutine = CoroutineTemplate<ClockInterface>;
+using Coroutine = CoroutineTemplate<ClockInterface, uint16_t>;
 
 }
 

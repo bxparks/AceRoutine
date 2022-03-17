@@ -35,7 +35,7 @@ namespace testing {
  * A version of Coroutine that uses the TestableClockInterface to provide the
  * clock can for unit testing purposes.
  */
-using TestableCoroutine = CoroutineTemplate<TestableClockInterface>;
+using TestableCoroutine = CoroutineTemplate<TestableClockInterface, uint16_t>;
 
 }
 }

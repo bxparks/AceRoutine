@@ -29,7 +29,8 @@ namespace ace_routine {
 namespace internal {
 
 // The numbers for higher duration values deviate from powers of 2 because 2^10
-// = 1024, which is not exactly 1000.
+// = 1024, which is not exactly 1000. The length of each string *must* be 6 or
+// smaller, otherwise a bit of code in LogBinTableRenderer.h must be updated.
 static const char kBinLabel00[] PROGMEM = "<2us";
 static const char kBinLabel01[] PROGMEM = "<4us";
 static const char kBinLabel02[] PROGMEM = "<8us";

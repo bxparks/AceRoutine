@@ -31,6 +31,38 @@ namespace ace_routine {
 
 class CoroutineProfiler {
   public:
+    /** Use default constructor. */
+    CoroutineProfiler() = default;
+
+    /**
+     * The destructor is NON-virtual on AVR processors because adding a virtual
+     * destructor causes flash consumption to increase by 600 bytes, even if the
+     * profiler is never used. If profiling is enabled on 8-bit processors, I
+     * expect the number of coroutines in the system to be relatively small, so
+     * it seems reasonable to create instances of the CoroutineProfiler
+     * statically at the global scope, and attach them to the Coroutines using
+     * the `Coroutine::setProfiler()` method. This means that this destructor
+     * will never be called polymorphically.
+     *
+     * On 32-bit processors, the destructor is virtual because I expect that the
+     * application will use a larger number of coroutines, so it will be much
+     * easier to use to the `LogBinProfiler::createProfilers()` and
+     * `LogBinProfiler::deleteProfilers()` helper methods to create the
+     * profilers on the heap. This means that the destructor may be called
+     * polymorphically and a virtual destructor is needed for correctness.
+     * It is expected that 32-bit processors will have far more flash memory and
+     * static RAM than 8-bit processors, so the additional resource consumption
+     * will hopefully not be too burdensome. If it is, then 32-bit processors
+     * have the option of using the same technique as 8-bit processors, and use
+     * the `Coroutine::setProfiler()` to attach statically created instances
+     * instead.
+     */
+  #if defined(ARDUINO_ARCH_AVR)
+    ~CoroutineProfiler() = default;
+  #else
+    virtual ~CoroutineProfiler() = default;
+  #endif
+
     /**
      * Process the completion of the runCoroutine() method which took
      * `micros` microseconds.

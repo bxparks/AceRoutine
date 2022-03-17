@@ -267,7 +267,7 @@ extern className##_##name name
 namespace ace_routine {
 
 /** A lookup table from Status integer to human-readable strings. */
-extern const __FlashStringHelper* const sStatusStrings[];
+extern const __FlashStringHelper* const sStatusStrings[] PROGMEM;
 
 // Forward declaration of CoroutineSchedulerTemplate<T>
 template <typename T> class CoroutineSchedulerTemplate;
@@ -637,7 +637,8 @@ class CoroutineTemplate {
 
     /** Print the human-readable string of the Status. */
     void statusPrintTo(Print& printer) {
-      printer.print(sStatusStrings[mStatus]);
+      printer.print((const __FlashStringHelper*)
+          pgm_read_ptr(&sStatusStrings[mStatus]));
     }
 
     /**

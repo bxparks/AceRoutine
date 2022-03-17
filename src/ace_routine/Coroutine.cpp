@@ -29,9 +29,8 @@ namespace ace_routine {
 
 // Create the sStatusStrings lookup table to translate Status integer to a
 // human-readable string. When it is used, it increases flash memory by 86
-// bytes, and static RAM by 14 bytes. It is currently only used by
-// CoroutineScheduler::list() but I think it's worth it to make debugging
-// easier.
+// bytes. It is currently only used by CoroutineScheduler::list() but I think
+// it's worth it to make debugging easier.
 
 static const char kStatusSuspendedString[] PROGMEM = "Suspended";
 static const char kStatusYieldingString[] PROGMEM = "Yielding";
@@ -40,7 +39,9 @@ static const char kStatusRunningString[] PROGMEM = "Running";
 static const char kStatusEndingString[] PROGMEM = "Ending";
 static const char kStatusTerminatedString[] PROGMEM = "Terminated";
 
-const __FlashStringHelper* const sStatusStrings[] = {
+// Store the array of PROGMEM pointers in PROGMEM as well, saving 14 bytes of
+// RAM on AVR, and 28 bytes on ESP8266.
+const __FlashStringHelper* const sStatusStrings[] PROGMEM = {
   FPSTR(kStatusSuspendedString),
   FPSTR(kStatusYieldingString),
   FPSTR(kStatusDelayingString),

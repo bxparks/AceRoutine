@@ -102,7 +102,7 @@ void printBinsTo(
  *    usually `Coroutine`
  */
 template <typename T_COROUTINE>
-class LogBinRendererTemplate {
+class LogBinTableRendererTemplate {
   public:
     /** Typedef of the LogBinProfiler supported by this class. */
     using Profiler = LogBinProfilerTemplate<T_COROUTINE>;
@@ -175,7 +175,7 @@ class LogBinRendererTemplate {
     }
 };
 
-using LogBinTableRenderer = LogBinRendererTemplate<Coroutine>;
+using LogBinTableRenderer = LogBinTableRendererTemplate<Coroutine>;
 
 } // namespace ace_routine
 

@@ -40,9 +40,12 @@ namespace ace_routine {
  * to a given coroutine through the `Coroutine::setProfiler()` method.
  *
  * After sufficient number of samples are collected, the frequency distribution
- * of all profilers for all coroutines can be printed by a renderer. An
- * implementation of such a render is `LogBinRendererTemplate`
- * which prints the frequency distribution as a formatted table.
+ * of all profilers for all coroutines can be printed by a renderer. Two
+ * renderer are provided:
+ *
+ *    * `LogBinTableRenderer` which prints the frequency distribution as a
+ *      formatted table.
+ *    * `LogBinJsonRenderer` which prints the info as a JSON object
  *
  * @tparam T_COROUTINE class of the specific CoroutineTemplate instantiation,
  *    usually `Coroutine`

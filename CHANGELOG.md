@@ -2,7 +2,7 @@
 
 * Unreleased
     * (Re)add support for human-readable coroutine names by adding the following
-      methods to the `Coroutine` class: `setCName()`, `setFName()`,
+      methods to the `Coroutine` class: `setName()`, `setName()`,
       `getCName()`, `getFName()`, `getNameType()`, and `printNameTo()`.
         * This is an optional feature which helps debugging. Coroutines do not
           need to have human readable names.

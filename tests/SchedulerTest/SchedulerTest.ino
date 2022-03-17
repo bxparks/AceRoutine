@@ -412,8 +412,8 @@ void setup() {
   extra.suspend();
 
   // Set human-readable names to some coroutines.
-  a.setCName("coA");
-  b.setFName(F("coB"));
+  a.setName("coA");
+  b.setName(F("coB"));
   TestableCoroutineScheduler::setup();
 }
 

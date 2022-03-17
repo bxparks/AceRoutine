@@ -348,19 +348,19 @@ class CoroutineTemplate {
     uint8_t getNameType() const { return mNameType; }
 
     /** Set the name of the coroutine to the given c-string. */
-    void setCName(const char* name) {
+    void setName(const char* name) {
       mNameType = kNameTypeCString;
       mName = name;
     }
 
     /** Set the name of the coroutine to the given f-string. */
-    void setFName(const __FlashStringHelper* name) {
+    void setName(const __FlashStringHelper* name) {
       mNameType = kNameTypeFString;
-      mName = (const char*) name;
+      mName = name;
     }
 
     /** Get name of the coroutine assuming it's a c-string. Nullable. */
-    const char* getCName() const { return mName; }
+    const char* getCName() const { return (const char*) mName; }
 
     /** Get name of the coroutine assuming it's an f-string. Nullable. */
     const __FlashStringHelper* getFName() const {
@@ -384,7 +384,7 @@ class CoroutineTemplate {
         pname.print("0x");
         pname.print((uintptr_t) this, 16);
       } else if (mNameType == kNameTypeCString) {
-        pname.print(mName);
+        pname.print((const char*) mName);
       } else {
         pname.print((const __FlashStringHelper*) mName);
       }
@@ -772,8 +772,11 @@ class CoroutineTemplate {
     /** Address of the label used by the computed-goto. */
     void* mJumpPoint = nullptr;
 
-    /** Name of the coroutine. (Optional) */
-    const char* mName = nullptr;
+    /**
+     * Name of the coroutine, either (const char*) or (const
+     * __FlashStringHelper*). (Optional)
+     */
+    const void* mName = nullptr;
 
     /** String type of the coroutine mName. */
     uint8_t mNameType = kNameTypeCString;

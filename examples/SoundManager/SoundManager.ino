@@ -89,12 +89,12 @@ void setup() {
   while (!Serial); // needed for Leonardo/Micro
 
   // Set names using both c-string and f-string for testing purposes.
-  soundRoutine.setCName("soundRoutine");
-  soundManager.setFName(F("soundManager"));
+  soundRoutine.setName("soundRoutine");
+  soundManager.setName(F("soundManager"));
 
   // Don't set the name of 'printProfiler' to verify that the name of the
   // coroutine becomes the pointer address in hexadecimal.
-  // printProfiler.setFName(F("printProfiler"));
+  // printProfiler.setName(F("printProfiler"));
 
   // Attach profilers to all coroutines.
   LogBinProfiler::createProfilers(Coroutine::getRoot());

@@ -29,7 +29,7 @@ SOFTWARE.
 #include <Arduino.h> // Print
 #include <AceCommon.h> // printPad5To()
 #include "Coroutine.h" // Coroutine
-#include "LogBinProfiler.h"
+#include "LogBinProfiler.h" // rollupExteriorBins()
 
 namespace ace_routine {
 
@@ -123,8 +123,8 @@ class LogBinRendererTemplate {
         // Roll up the exterior bins in to the first and last bins if requested.
         const uint16_t* bins;
         if (rollup) {
-          rollupExteriorBins(bufBins, profiler->mBins, Profiler::kNumBins,
-              startBin, endBin);
+          internal::rollupExteriorBins(
+              bufBins, profiler->mBins, Profiler::kNumBins, startBin, endBin);
           bins = bufBins;
         } else {
           bins = profiler->mBins;

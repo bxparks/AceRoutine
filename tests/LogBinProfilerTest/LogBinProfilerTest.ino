@@ -4,7 +4,7 @@
 #include <AUnitVerbose.h>
 
 using ace_routine::LogBinProfiler;
-using ace_routine::rollupExteriorBins;
+using ace_routine::internal::rollupExteriorBins;
 using aunit::TestRunner;
 
 // ---------------------------------------------------------------------------

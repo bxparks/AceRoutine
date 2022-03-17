@@ -133,45 +133,25 @@ class LogBinProfilerTemplate : public CoroutineProfiler {
 
 using LogBinProfiler = LogBinProfilerTemplate<Coroutine>;
 
+namespace internal {
+
 /**
-  * Rollup bins before `startBin` into `startBin` and bins at or after
-  * `endBin` into the last bin (at `endBin - 1`). This is useful to preserve
-  * count information when printing only a subset of the `mBins[]` array. If
-  * `endBin <= startBin`, this function does nothing. If `endBin < startBin -
-  * 1`, there is only single interior bin, so everything gets rolled up into
-  * the single bin. This is probably not useful, but at least it's
+  * Rollup bins before `startBin` into the first bin (at `startBin`) and bins at
+  * or after `endBin` into the last bin (at `endBin - 1`). This is useful to
+  * preserve count information when printing only a subset of the `mBins[]`
+  * array. If `endBin <= startBin`, this function does nothing. If `endBin ==
+  * startBin + 1`, there is only single interior bin, so everything gets rolled
+  * up into the single bin. This is probably not useful, but at least it's
   * mathematically correct.
   */
-inline void rollupExteriorBins(
+void rollupExteriorBins(
     uint16_t dst[],
     const uint16_t src[],
     uint8_t numBins,
     uint8_t startBin,
     uint8_t endBin
-) {
-  endBin = (endBin > numBins) ? numBins : endBin;
-  if (endBin <= startBin) return;
+);
 
-  // Rollup all bins at or below startBin into the startBin.
-  uint32_t leftRollup = 0;
-  for (uint8_t i = 0; i <= startBin; i++) {
-    leftRollup += src[i];
-  }
-  if (leftRollup > UINT16_MAX) leftRollup = UINT16_MAX;
-  dst[startBin] = leftRollup;
-
-  // Copy the interior bins.
-  for (uint8_t i = startBin + 1; i < endBin - 1; i++) {
-    dst[i] = src[i];
-  }
-
-  // Rollup all bins at or above the last bin into the last bin.
-  uint32_t rightRollup = (endBin - 1 == startBin) ? leftRollup : 0;
-  for (uint8_t i = endBin - 1; i < numBins; i++) {
-    rightRollup += src[i];
-  }
-  if (rightRollup > UINT16_MAX) rightRollup = UINT16_MAX;
-  dst[endBin - 1] = rightRollup;
 }
 
 }

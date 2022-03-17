@@ -1262,6 +1262,14 @@ every coroutine (defined by `Coroutine::getRoot()`, and assigns an instance of
 #include <AceRoutine.h>
 using namespace ace_routine;
 
+COROUTINE(coroutine1) {
+  ...
+}
+
+COROUTINE(coroutine1) {
+  ...
+}
+
 void setup() {
   ...
   LogBinProfiler::createProfilers();
@@ -1304,6 +1312,7 @@ void loop() {
   myCoroutine.runCoroutineWithProfiler();
   ...
 }
+```
 
 This technique is intended for resource constrained environments, usually 8-bit
 processors, where the overhead of a `CoroutineScheduler` is not desired.
@@ -1350,7 +1359,7 @@ The `LogBinProfiler` comes with 2 rendering classes:
 
 These classes expose a simple `printTo()` static function like this:
 
-```
+```C++
 class LogBinTableRenderer {
   public:
     static void printTo(

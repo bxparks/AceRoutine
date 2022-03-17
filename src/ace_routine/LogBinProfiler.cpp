@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2018 Brian T. Park
+Copyright (c) 2022 Brian T. Park
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,36 +22,42 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-/**
- * @mainpage AceRoutine Library
- *
- * This is the Doxygen documentation for the
- * <a href="https://github.com/bxparks/AceRoutine">AceRoutine Library</a>.
- *
- * Click on the "Classes" menu above to see the list of classes.
- *
- * Click on the "Files" menu above to see the list of header files.
- */
+#include "LogBinProfiler.h"
 
-#ifndef ACE_ROUTINE_ACE_ROUTINE_H
-#define ACE_ROUTINE_ACE_ROUTINE_H
+namespace ace_routine {
+namespace internal {
 
-// Blacklist platforms using https://github.com/arduino/ArduinoCore-api due to
-// incompatibilities.
-#if defined(ARDUINO_API_VERSION)
-#error Platforms using ArduinoCore-API not supported
-#endif
+void rollupExteriorBins(
+    uint16_t dst[],
+    const uint16_t src[],
+    uint8_t numBins,
+    uint8_t startBin,
+    uint8_t endBin
+) {
+  endBin = (endBin > numBins) ? numBins : endBin;
+  if (endBin <= startBin) return;
 
-// Version format: xxyyzz == "xx.yy.zz"
-#define ACE_ROUTINE_VERSION 10402
-#define ACE_ROUTINE_VERSION_STRING "1.4.2"
+  // Rollup all bins at or below startBin into the startBin.
+  uint32_t leftRollup = 0;
+  for (uint8_t i = 0; i <= startBin; i++) {
+    leftRollup += src[i];
+  }
+  if (leftRollup > UINT16_MAX) leftRollup = UINT16_MAX;
+  dst[startBin] = leftRollup;
 
-#include "ace_routine/Coroutine.h"
-#include "ace_routine/CoroutineScheduler.h"
-#include "ace_routine/Channel.h"
-#include "ace_routine/CoroutineProfiler.h"
-#include "ace_routine/LogBinProfiler.h"
-#include "ace_routine/LogBinTableRenderer.h"
-#include "ace_routine/LogBinJsonRenderer.h"
+  // Copy the interior bins.
+  for (uint8_t i = startBin + 1; i < endBin - 1; i++) {
+    dst[i] = src[i];
+  }
 
-#endif
+  // Rollup all bins at or above the last bin into the last bin.
+  uint32_t rightRollup = (endBin - 1 == startBin) ? leftRollup : 0;
+  for (uint8_t i = endBin - 1; i < numBins; i++) {
+    rightRollup += src[i];
+  }
+  if (rightRollup > UINT16_MAX) rightRollup = UINT16_MAX;
+  dst[endBin - 1] = rightRollup;
+}
+
+}
+}

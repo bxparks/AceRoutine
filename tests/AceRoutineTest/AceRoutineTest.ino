@@ -161,7 +161,7 @@ test(AceRoutineTest, macroCoroutine) {
 // ---------------------------------------------------------------------------
 
 test(AceRoutineTest, name_cstring) {
-  simpleCoroutine.setCName("simple");
+  simpleCoroutine.setName("simple");
   assertEqual(simpleCoroutine.getNameType(), Coroutine::kNameTypeCString);
   assertEqual(simpleCoroutine.getCName(), "simple");
 
@@ -171,7 +171,7 @@ test(AceRoutineTest, name_cstring) {
 }
 
 test(AceRoutineTest, name_fstring) {
-  simpleCoroutine.setFName(F("simple"));
+  simpleCoroutine.setName(F("simple"));
   assertEqual(simpleCoroutine.getNameType(), Coroutine::kNameTypeFString);
   assertEqual(simpleCoroutine.getFName(), F("simple"));
 
@@ -181,7 +181,7 @@ test(AceRoutineTest, name_fstring) {
 }
 
 test(AceRoutineTest, name_nullptr) {
-  simpleCoroutine.setCName(nullptr);
+  simpleCoroutine.setName((const char*) nullptr);
   assertEqual(simpleCoroutine.getNameType(), Coroutine::kNameTypeCString);
   assertEqual(simpleCoroutine.getCName(), (const char*) nullptr);
 
@@ -189,6 +189,18 @@ test(AceRoutineTest, name_nullptr) {
   PrintStr<16> str;
   simpleCoroutine.printNameTo(str);
   assertEqual(strncmp(str.cstr(), "0x", 2), 0);
+}
+
+test(AceRoutineTest, name_printTo_truncation_padding) {
+  simpleCoroutine.setName("simple");
+
+  PrintStr<16> str;
+  simpleCoroutine.printNameTo(str, 4);
+  assertEqual(str.cstr(), "simp");
+
+  str.flush();
+  simpleCoroutine.printNameTo(str, 8);
+  assertEqual(str.cstr(), "simple  ");
 }
 
 // ---------------------------------------------------------------------------

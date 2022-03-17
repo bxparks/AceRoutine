@@ -14,7 +14,7 @@ is the overhead caused by the `Coroutine` context switch.
 
 All times in below are in microseconds.
 
-**Version**: AceRoutine v1.4.2
+**Version**: AceRoutine v1.5.0
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -121,6 +121,15 @@ $ make README.md
         * ESP32 Core from 1.0.6 to 2.0.2
         * Teensyduino from 1.54 to 1.56
 
+* v1.5.0
+    * Add `CoroutineProfiler` to `CoroutineScheduler`.
+        * `CoroutineScheduler::runCoroutine()` becomes slightly slower:
+        * 0.100 microseconds (AVR)
+        * 0.133 microseconds (STM32)
+        * 0.100 microseconds (ESP8266)
+        * 0.033 microseconds (ESP32)
+        * 0.133 microseconds (Teensy 3.2)
+
 ## Arduino Nano
 
 * 16MHz ATmega328P
@@ -130,7 +139,7 @@ $ make README.md
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 11
+sizeof(Coroutine): 16
 sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
 
@@ -154,7 +163,7 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 11
+sizeof(Coroutine): 16
 sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
 
@@ -163,8 +172,8 @@ CPU:
 | Functionality       |  iters | micros/iter |   diff |
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  10000 |       1.800 |  0.000 |
-| DirectScheduling    |  10000 |       2.900 |  1.100 |
-| CoroutineScheduling |  10000 |       7.300 |  5.500 |
+| DirectScheduling    |  10000 |       2.800 |  1.000 |
+| CoroutineScheduling |  10000 |       7.200 |  5.400 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -177,7 +186,7 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 20
+sizeof(Coroutine): 28
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
@@ -187,7 +196,7 @@ CPU:
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  30000 |       0.133 |  0.000 |
 | DirectScheduling    |  30000 |       0.533 |  0.400 |
-| CoroutineScheduling |  30000 |       1.133 |  1.000 |
+| CoroutineScheduling |  30000 |       1.266 |  1.133 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -200,7 +209,7 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 20
+sizeof(Coroutine): 28
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
@@ -210,7 +219,7 @@ CPU:
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  10000 |       0.100 |  0.000 |
 | DirectScheduling    |  10000 |       0.500 |  0.400 |
-| CoroutineScheduling |  10000 |       0.900 |  0.800 |
+| CoroutineScheduling |  10000 |       1.000 |  0.900 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -223,7 +232,7 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 20
+sizeof(Coroutine): 28
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
@@ -233,7 +242,7 @@ CPU:
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  30000 |       0.066 |  0.000 |
 | DirectScheduling    |  30000 |       0.133 |  0.067 |
-| CoroutineScheduling |  30000 |       0.333 |  0.267 |
+| CoroutineScheduling |  30000 |       0.366 |  0.300 |
 +---------------------+--------+-------------+--------+
 
 ```
@@ -247,7 +256,7 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 20
+sizeof(Coroutine): 28
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
 
@@ -257,7 +266,7 @@ CPU:
 |---------------------+--------+-------------+--------|
 | EmptyLoop           |  30000 |       0.066 |  0.000 |
 | DirectScheduling    |  30000 |       0.233 |  0.167 |
-| CoroutineScheduling |  30000 |       0.533 |  0.467 |
+| CoroutineScheduling |  30000 |       0.666 |  0.600 |
 +---------------------+--------+-------------+--------+
 
 ```

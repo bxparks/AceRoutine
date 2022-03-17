@@ -39,6 +39,12 @@ is installed.
     * [Custom Coroutines](#CustomCoroutines)
     * [Manual Coroutines](#ManualCoroutines)
     * [Coroutine Setup](#CoroutineSetup)
+* [Coroutine Profiling](#CoroutineProfiling)
+    * [Creating Profilers Directly](#CreatingProfilersDirectly)
+    * [Creating Profilers on Heap](#CreatingProfilersOnHeap)
+    * [Running Coroutine With Profiler](#RunningCoroutineWithProfiler)
+    * [Running Scheduler With Profiler](#RunningSchedulerWithProfiler)
+    * [Rendering the Profiler Results](#RenderingProfilerResults)
 * [Coroutine Communication](#Communication)
     * [Instance Variables](#InstanceVariables)
     * [Channels (Experimental)](#Channels)
@@ -263,8 +269,8 @@ class Coroutine {
     static const uint8_t kNameTypeFString = 1;
 
   public:
-    void Coroutine::setCName(const char* name);
-    void Coroutine::setFName(const __FlashStringHelper* name);
+    void Coroutine::setName(const char* name);
+    void Coroutine::setName(const __FlashStringHelper* name);
 
     const char* Coroutine::getCName() const;
     const __FlashStringHelper* Coroutine::getFName() const;
@@ -274,8 +280,8 @@ class Coroutine {
 };
 ``
 
-It is expected that the `setCName()` or `setFName()` will be called in the
-global `setup()` function.
+It is expected that the `setName()` will be called in the global `setup()`
+function.
 
 On most 32-bit processors, it makes little difference whether a C-string or an
 F-string is used. (The exception is the ESP8266.) On AVR processors, using the
@@ -284,7 +290,7 @@ F-string will prevent those strings from consuming precious static RAM.
 The `printNameTo()` method prints the coroutine name to the given `Print`
 object, which will usually be the `Serial` object. If the name is not set (hence
 is the `nullptr`), `printNameTo()` will print the hexadecimal representation of
-the pointer to the Coroutine (e.g. "0xe38a").
+the pointer to the Coroutine (e.g. "0xE38A").
 
 The `CoroutineScheduler::list()` method will now print the coroutine name if it
 is defined.
@@ -819,11 +825,6 @@ necessary because the `Coroutine::Coroutine()` constructor automatically inserts
 itself into the internal singly-linked list. The `setupCoroutine()` is retained
 for backwards compatibility, but is now marked deprecated.
 
-Starting with v1.3, the name of the coroutine is no longer saved, and
-`Coroutine::getName()` does not exist anymore. `CoroutineScheduler::list()`
-prints the integer value of the coroutine instance instead of the name of the
-coroutine.
-
 <a name="DirectOrAutomatic"></a>
 ### Direct Scheduling or CoroutineScheduler
 
@@ -1147,6 +1148,265 @@ flash per coroutine. On 32-bit processors, it takes slightly less memory, about
 `CoroutineScheduler::setupCoroutines()` consumes about 20-30 bytes of flash on
 AVR processors. The virtual dispatch on `Coroutine::setupCoroutine()` consumes
 about 14 bytes of flash per invocation.
+
+<a name="CoroutineProfiling"></a>
+## Coroutine Profiling
+
+Version 1.5 added the ability to profile the execution time of
+`Coroutine::runCoroutine()` and render the information as a formatted table, or
+as a JSON object. The `CoroutineProfiler` is an interface that allows an object
+to receive information about the execution time of the
+`Coroutine::runCoroutine()` method:
+
+```C++
+class CoroutineProfiler {
+  public:
+    /**
+     * Process the completion of the runCoroutine() method which took
+     * `micros` microseconds.
+     */
+    virtual void updateElapsedMicros(uint32_t micros) = 0;
+};
+```
+
+Each `Coroutine` object has the ability to hold a pointer to a
+`CoroutineProfiler` object:
+
+```C++
+class Coroutine {
+  ...
+  public:
+    void setProfiler(CoroutineProfiler* profiler);
+    CoroutineProfiler* getProfiler() const;
+
+    int runCoroutineWithProfiler();
+  ...
+};
+```
+
+Currently only a single implementation of `CoroutineProfiler` is provided, the
+`LogBinProfiler`. It contains 32 bins of `uint16_t` which tracks the number of
+times a `micros` was seen. The bins are logarithmically scaled, so that Bin 0
+collects all events `<2us`, Bin 1 collects events `<4us`, Bin 2 collects events
+`<8us`, Bin 30 collects events `<2147s`, and the last Bin 31 collects events
+`<4295s`.
+
+```C++
+class LogBinProfiler : public CoroutineProfiler {
+  public:
+    static const uint8_t kNumBins = 32;
+
+  public:
+    LogBinProfiler();
+
+    void updateElapsedMicros(uint32_t micros) override;
+    void clear();
+
+    static void createProfilers();
+    static void deleteProfilers();
+    static void clearProfilers();
+
+  public:
+    uint16_t mBins[kNumBins];
+};
+```
+
+Details on how to configure and use these are are provided below, but it may
+help to look at 2 examples while looking through the following subsections:
+
+* [HelloCoroutineWithProfiler](examples/HelloCoroutineWithProfiler)
+* [HelloSchedulerWithProfiler](examples/HelloSchedulerWithProfiler)
+
+<a name="CreatingProfilersDirectly"></a>
+### Creating Profilers Directly
+
+By default, a `Coroutine` has no reference to a `CoroutineProfiler`. The user
+can directly assign a profiler instance by creating it statically, then calling
+`Coroutine::setProfiler()` like this:
+
+```C++
+#include <AceRoutine.h>
+using namespace ace_routine;
+
+COROUTINE(coroutine1) {
+  ...
+}
+
+COROUTINE(coroutine1) {
+  ...
+}
+
+LogBinProfiler profiler1;
+LogBinProfiler profiler2;
+
+void setup() {
+  ...
+  coroutine1.setProfiler(&profiler1);
+  coroutine2.setProfiler(&profiler2);
+  ...
+}
+```
+
+This technique works well if you have a small number of coroutines.
+
+<a name="CreatingProfilersOnHeap"></a>
+### Creating Profilers on Heap
+
+If you are using a substantial number of coroutines, it is cumbersome to
+manually create these profilers for all coroutines. In that case, you can use
+the `LogBinProfiler::createProfilers()` convenience function which loops through
+every coroutine (defined by `Coroutine::getRoot()`, and assigns an instance of
+`LogBinProfiler` that is created on the heap:
+
+```C++
+#include <AceRoutine.h>
+using namespace ace_routine;
+
+void setup() {
+  ...
+  LogBinProfiler::createProfilers();
+}
+```
+
+In the unlikely event that you delete the Profiler instances which were created
+on the heap, you can call the `LogBinProfiler::deleteProfilers()` static method.
+
+Finally, the `LogBinProfiler::clearProfilers()` static method calls the
+`LogBinProfiler::clear()` method on every profiler attached to every coroutine
+so that the event count in all the bins are cleared to 0.
+
+<a name="RunningCoroutineWithProfiler"></a>
+### Running Coroutine with Profiler
+
+Once a `Coroutine` is assigned a `CoroutineProfiler`, the statistics can be
+gathered in a couple of ways. The simplest is to call the new
+`Coroutine::runCoroutineWithProfiler()` instead of the normal
+`Coroutine::runCoroutine()` in the global `loop()` function like this:
+
+```C++
+#include <AceRoutine.h>
+using namespace ace_routine;
+
+COROUTINE(myCoroutine) {
+  ...
+}
+
+LogBinProfiler profiler;
+
+void setup() {
+  ...
+  myCoroutine.setName(F("myCoroutine"));
+  myCoroutine.setProfiler(&profiler);
+  ...
+}
+
+void loop() {
+  myCoroutine.runCoroutineWithProfiler();
+  ...
+}
+
+This technique is intended for resource constrained environments, usually 8-bit
+processors, where the overhead of a `CoroutineScheduler` is not desired.
+
+<a name="RunningSchedulerWithProfiler"></a>
+### Running Scheduler with Profiler
+
+If the environment is using the `CoroutineScheduler`, it will automatically call
+the `Coroutine::runCoroutineWithProfiler()` on each coroutine and gather the
+profiling information automatically.
+
+```C++
+#include <AceRoutine.h>
+using namespace ace_routine;
+
+COROUTINE(myCoroutine) {
+  ...
+}
+
+void setup() {
+  ...
+  myCoroutine.setName(F("myCoroutine"));
+  myCoroutine.setProfiler(&profiler);
+
+  LogBinProfiler::createProfilers();
+  CoroutineScheduler::setup();
+}
+
+void loop() {
+  CoroutineScheduler::loop();
+}
+```
+
+<a name="RenderingProfilerResults"></a>
+### Rendering the Profiler Results
+
+The `LogBinProfiler` comes with 2 rendering classes:
+
+* `LogBinTableRenderer`
+    * displays the event count in a human-readable formatted table with fixed
+      column widths
+* `LogBinJsonRenderer`
+    * prints the same info as a JSON object
+
+These classes expose a simple `printTo()` static function like this:
+
+```
+class LogBinTableRenderer {
+  public:
+    static void printTo(
+        Print& printer,
+        uint8_t startBin,
+        uint8_t endBin,
+        bool clear = true,
+        bool rollup = true
+    );
+};
+
+class LogBinJsonRenderer{
+  public:
+    static void printTo(
+        Print& printer,
+        uint8_t startBin,
+        uint8_t endBin,
+        bool clear = true,
+        bool rollup = true
+    );
+};
+```
+
+* The `printer` is usually the `Serial` object, but can be changed to something
+  else if needed.
+* The `startBin` (0-31) and `endBin` (0-32) identify the bins which should be
+  printed.
+    * A range of something like [2, 14) is useful to keep the width of the table
+      reasonable.
+    * Often the bins lower and higher than this range do not contain any events.
+* The `clear` flag (default true) causes the bins to be cleared (through the
+  `LogBinProfiler::clear()` method) so that new events can be tracked.
+* The `rollup` flag (default true) causes roll up of the exterior bins.
+    * Events before `startBin` are added to the first bin.
+    * Events at or after `endBin` are added to the last bin (at `endBin-1`)
+
+For example, calling `LogBinTableRenderer::printTo(Serial, 2, 16)` prints
+something like this:
+
+```
+name         <16us <32us <64us<128us<256us<512us  <1ms  <2ms  <4ms  <8ms    >>
+0x1DB        16898 52688     0     0     0     0     0     0     0     0     1
+readPin      65535  1128     0     0     0     0     0     0     0     0     0
+blinkLed     65535   800     0     0     0     0     0     0     0     0     0
+```
+
+And calling `LogBinJsonRenderer::printTo(Serial, 2, 16)` prints something like
+this:
+
+```
+{
+"0x1DB":[16898,52688,0,0,0,0,0,0,0,0,1],
+"readPin":[65535,1128,0,0,0,0,0,0,0,0,0],
+"blinkLed":[65535,800,0,0,0,0,0,0,0,0,0]
+}
+```
 
 <a name="Communication"></a>
 ## Coroutine Communication

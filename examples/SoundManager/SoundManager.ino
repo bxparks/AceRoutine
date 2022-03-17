@@ -33,34 +33,28 @@
  * Coroutine soundManager; status: Running
  * Wait 5 seconds...
  * <silence>
- * 
- * Request Beep and wait 5 seconds...
- * Coroutine soundRoutine; status: Yielding
- * Coroutine soundManager; status: Running
- * First BEEP
- * Second BEEP
- *
  * ...
  * @endverbatim
  */
 
 #include <Arduino.h>
+#include <AceCommon.h>
 #include <AceRoutine.h>
 #include "SoundRoutine.h"
 
 using ace_routine::CoroutineScheduler;
 
-SoundRoutine soundRoutine;
 EXTERN_COROUTINE(soundManager);
+SoundRoutine soundRoutine;
 
 void setup() {
   delay(1000);
   Serial.begin(115200);
   while (!Serial); // needed for Leonardo/Micro
 
-  // Set names using both c-string and f-string for testing purposes.
-  soundRoutine.setCName("soundRoutine");
-  soundManager.setFName(F("soundManager"));
+  // Coroutine name can be ether C-string or F-string.
+  soundRoutine.setName("soundRoutine"); 
+  soundManager.setName(F("soundManager"));
 
   CoroutineScheduler::setup();
 }

@@ -132,6 +132,20 @@ calculated flash size can jump around in unexpected ways.
           used.
         * Increases static ram by 3 bytes (AVR) and 4 bytes (32-bits) per
           coroutine.
+    * Support `CoroutineProfiler` in the `CoroutineScheduler`.
+        * Increases the flash size of the `CoroutineScheduler` by 90-140 bytes
+          for both 8-bit and 32-bit processors, even if `CoroutineProfiler` is
+          not used. This is a one-time hit.
+    * Add `LogBinProfiler`
+        * Adds about 90 bytes of flash and 70 bytes of RAM on AVR.
+        * Adds about 140 bytes of flash and 70 bytes of RAM on ESP8266.
+    * Add `LogBinTableRenderer`
+        * Adds about 1400 bytes of flash and ~20 bytes of RAM on AVR.
+        * Adds about 1900 bytes of flash and ~0 bytes of RAM on ESP8266.
+    * Add `LogBinJsonRenderer`
+        * Adds about 900 bytes of flash and ~20 bytes of RAM on AVR.
+        * Adds about 1300 bytes of flash and ~0 bytes of RAM on ESP8266.
+
 
 ## How to Generate
 
@@ -202,7 +216,7 @@ $ make README.md
 
 * 16MHz ATmega328P
 * Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* Arduino AVR Boards 1.8.3
+* Arduino AVR Boards 1.8.4
 
 ```
 {nano_results}
@@ -222,7 +236,7 @@ $ make README.md
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* STM32duino 2.0.0
+* STM32duino 2.2.0
 
 ```
 {stm32_results}
@@ -232,7 +246,7 @@ $ make README.md
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
 * Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* ESP8266 Boards 2.7.4
+* ESP8266 Boards 3.0.2
 
 ```
 {esp8266_results}
@@ -242,7 +256,7 @@ $ make README.md
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* ESP32 Boards 1.0.6
+* ESP32 Boards 2.0.2
 
 ```
 {esp32_results}
@@ -252,7 +266,7 @@ $ make README.md
 
 * 96 MHz ARM Cortex-M4
 * Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* Teensyduino 1.53
+* Teensyduino 1.56
 * Compiler options: "Faster"
 
 ```

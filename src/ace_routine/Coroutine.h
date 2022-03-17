@@ -27,6 +27,8 @@ SOFTWARE.
 
 #include <stdint.h> // UINT16_MAX
 #include <Print.h> // Print
+#include <AceCommon.h> // PrintStr<>
+#include "CoroutineProfiler.h"
 #include "ClockInterface.h"
 
 class __FlashStringHelper;
@@ -317,25 +319,48 @@ class CoroutineTemplate {
     virtual void setupCoroutine() {}
 
     /**
+     * This is a variant of runCoroutine() which measures the execution time of
+     * runCoroutine() and updates the attached profiler if it exists.
+     *
+     * On 8-bit processors, memory consumption can be reduced by calling the
+     * `Coroutine::runCoroutine()` method directly in the global `loop()`
+     * function, instead of using the `CoroutineScheduler`. In such an
+     * environment, the end-user can enable profiling by manually changing the
+     * calls to `Coroutine::runCoroutine()` to
+     * `Coroutine::runCoroutineWithProfiler()`, and recompiling the program.
+     */
+    int runCoroutineWithProfiler() {
+      if (mProfiler) {
+        uint32_t startMicros = coroutineMicros();
+        runCoroutine();
+        uint32_t elapsedMicros = coroutineMicros() - startMicros;
+        mProfiler->updateElapsedMicros(elapsedMicros);
+        return 0;
+      } else {
+        return runCoroutine();
+      }
+    }
+
+    /**
      * Return the type of the name string, either kNameTypeCString or
      * kNameTypeFString.
      */
     uint8_t getNameType() const { return mNameType; }
 
     /** Set the name of the coroutine to the given c-string. */
-    void setCName(const char* name) {
+    void setName(const char* name) {
       mNameType = kNameTypeCString;
       mName = name;
     }
 
     /** Set the name of the coroutine to the given f-string. */
-    void setFName(const __FlashStringHelper* name) {
+    void setName(const __FlashStringHelper* name) {
       mNameType = kNameTypeFString;
-      mName = (const char*) name;
+      mName = name;
     }
 
     /** Get name of the coroutine assuming it's a c-string. Nullable. */
-    const char* getCName() const { return mName; }
+    const char* getCName() const { return (const char*) mName; }
 
     /** Get name of the coroutine assuming it's an f-string. Nullable. */
     const __FlashStringHelper* getFName() const {
@@ -345,15 +370,40 @@ class CoroutineTemplate {
     /**
      * Print name to the given Printer. If the name is null, then print the
      * hexadecimal representation of the pointer to the coroutine.
+     *
+     * @param printer destination of output, usually `Serial`
+     * @param maxLen truncate or pad to maxLen if given
      */
-    void printNameTo(Print& printer) const {
+    void printNameTo(Print& printer, uint8_t maxLen = 0) const {
+      // Need to go through this contortion because vsnprintf() does not support
+      // flash string parameters, so I can't use something like "%12.12s" with
+      // a flash string.
+      ace_common::PrintStr<64> pname;
+
       if (mName == nullptr) {
-        printer.print("0x");
-        printer.print((uintptr_t) this, 16);
+        pname.print("0x");
+        pname.print((uintptr_t) this, 16);
       } else if (mNameType == kNameTypeCString) {
-        printer.print(mName);
+        pname.print((const char*) mName);
       } else {
-        printer.print((const __FlashStringHelper*) mName);
+        pname.print((const __FlashStringHelper*) mName);
+      }
+
+      // Print name, truncated to maxLen or padded to maxLen.
+      if (maxLen) {
+        if (pname.length() < maxLen) {
+          printer.write(pname.cstr());
+          for (uint8_t i = pname.length(); i < maxLen; i++) {
+            printer.write(' ');
+          }
+        } else {
+          // NOTE: Must cast to (const uint8_t*) because the ATtiny85 core does
+          // not have a version of write() that accepts a (const char*), in
+          // contrast to every other Arduino Core.
+          printer.write((const uint8_t*) pname.cstr(), maxLen);
+        }
+      } else {
+        printer.write(pname.cstr());
       }
     }
 
@@ -480,6 +530,32 @@ class CoroutineTemplate {
      */
     void setupCoroutine(const __FlashStringHelper* /*name*/)
         ACE_ROUTINE_DEPRECATED {}
+
+    /** Set the profiler. */
+    void setProfiler(CoroutineProfiler* profiler) { mProfiler = profiler; }
+
+    /** Get the profiler. Nullable. */
+    CoroutineProfiler* getProfiler() const { return mProfiler; }
+
+    /**
+     * Get the pointer to the root pointer. Implemented as a function static to
+     * fix the C++ static initialization problem, making it safe to use this in
+     * other static contexts.
+     */
+    static CoroutineTemplate** getRoot() {
+      // Use a static variable inside a function to solve the static
+      // initialization ordering problem.
+      static CoroutineTemplate* root;
+      return &root;
+    }
+
+    /**
+     * Return the next pointer as a pointer to the pointer, similar to
+     * getRoot(). This makes it much easier to manipulate a singly-linked list.
+     * Also makes setNext() method unnecessary. Should be used only by
+     * CoroutineScheduler.
+     */
+    CoroutineTemplate** getNext() { return &mNext; }
 
   protected:
     /**
@@ -679,26 +755,6 @@ class CoroutineTemplate {
     CoroutineTemplate& operator=(const CoroutineTemplate&) = delete;
 
     /**
-     * Get the pointer to the root pointer. Implemented as a function static to
-     * fix the C++ static initialization problem, making it safe to use this in
-     * other static contexts.
-     */
-    static CoroutineTemplate** getRoot() {
-      // Use a static variable inside a function to solve the static
-      // initialization ordering problem.
-      static CoroutineTemplate* root;
-      return &root;
-    }
-
-    /**
-     * Return the next pointer as a pointer to the pointer, similar to
-     * getRoot(). This makes it much easier to manipulate a singly-linked list.
-     * Also makes setNext() method unnecessary. Should be used only by
-     * CoroutineScheduler.
-     */
-    CoroutineTemplate** getNext() { return &mNext; }
-
-    /**
      * Insert the current coroutine at the root of the singly linked list. This
      * is the most efficient and becomes the default with v1.2 because the
      * ordering of the coroutines in the CoroutineScheduler is no longer an
@@ -717,8 +773,11 @@ class CoroutineTemplate {
     /** Address of the label used by the computed-goto. */
     void* mJumpPoint = nullptr;
 
-    /** Name of the coroutine. (Optional) */
-    const char* mName = nullptr;
+    /**
+     * Name of the coroutine, either (const char*) or (const
+     * __FlashStringHelper*). (Optional)
+     */
+    const void* mName = nullptr;
 
     /** String type of the coroutine mName. */
     uint8_t mNameType = kNameTypeCString;
@@ -739,6 +798,8 @@ class CoroutineTemplate {
      * milliseconds, microseconds, or seconds.
      */
     uint16_t mDelayDuration;
+
+    CoroutineProfiler* mProfiler = nullptr;
 };
 
 /**

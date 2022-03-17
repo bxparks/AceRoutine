@@ -9,14 +9,14 @@ BEGIN {
   labels[0] = "Baseline"
   labels[1] = "One Delay Function"
   labels[2] = "Two Delay Functions"
-  labels[3] = "One Coroutine"
-  labels[4] = "Two Coroutines"
+  labels[3] = "One Coroutine (millis)"
+  labels[4] = "Two Coroutines (millis)"
   labels[5] = "One Coroutine (micros)"
   labels[6] = "Two Coroutines (micros)"
   labels[7] = "One Coroutine (seconds)"
   labels[8] = "Two Coroutines (seconds)"
-  labels[9] = "Scheduler, One Coroutine"
-  labels[10] = "Scheduler, Two Coroutines"
+  labels[9] = "Scheduler, One Coroutine (millis)"
+  labels[10] = "Scheduler, Two Coroutines (millis)"
   labels[11] = "Scheduler, One Coroutine (micros)"
   labels[12] = "Scheduler, Two Coroutines (micros)"
   labels[13] = "Scheduler, One Coroutine (seconds)"
@@ -25,8 +25,11 @@ BEGIN {
   labels[16] = "Scheduler, Two Coroutines (setup)"
   labels[17] = "Scheduler, One Coroutine (man setup)"
   labels[18] = "Scheduler, Two Coroutines (man setup)"
-  labels[19] = "Blink Function"
-  labels[20] = "Blink Coroutine"
+  labels[19] = "Scheduler, LogBinProfiler"
+  labels[20] = "Scheduler, LogBinTableRenderer"
+  labels[21] = "Scheduler, LogBinJsonRenderer"
+  labels[22] = "Blink Function"
+  labels[23] = "Blink Coroutine"
   record_index = 0
 }
 {
@@ -49,14 +52,15 @@ END {
   for (i = 0; i < NUM_ENTRIES; i++) {
     if (labels[i] ~ /^Baseline$/ \
       || labels[i] ~ /^One Delay Function$/ \
-      || labels[i] ~ /^One Coroutine$/ \
+      || labels[i] ~ /^One Coroutine \(millis\)$/ \
       || labels[i] ~ /^One Coroutine \(micros\)$/ \
       || labels[i] ~ /^One Coroutine \(seconds\)$/ \
-      || labels[i] ~ /^Scheduler, One Coroutine$/ \
+      || labels[i] ~ /^Scheduler, One Coroutine \(millis\)$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(micros\)$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(seconds\)$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(setup\)$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(man setup\)$/ \
+      || labels[i] ~ /^Scheduler, LogBinProfiler$/ \
       || labels[i] ~ /^Blink Function$/ \
     ) {
       printf("|---------------------------------------+--------------+-------------|\n")

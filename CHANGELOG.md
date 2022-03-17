@@ -1,14 +1,48 @@
 # Changelog
 
 * Unreleased
-    * (Re)add support for human-readable coroutine names by adding the following
-      methods to the `Coroutine` class: `setCName()`, `setFName()`,
-      `getCName()`, `getFName()`, `getNameType()`, and `printNameTo()`.
-        * This is an optional feature which helps debugging. Coroutines do not
-          need to have human readable names.
-        * Increases flash usage by 6-10 bytes per coroutine.
-        * Increases static ram usage by 3 bytes (AVR) or 4 bytes (32-bit) per
-          coroutine.
+    * (Re)add support for human-readable coroutine names.
+        * See [Coroutine Names](USER_GUIDE.md#CoroutineNames) in the
+          `USER_GUIDE.md`.
+        * Adds the following methods to the `Coroutine` class: `setName()`,
+          `setName()`, `getCName()`, `getFName()`, `getNameType()`, and
+          `printNameTo()`.
+        * Resource consumption
+            * Increases flash usage by 6-10 bytes per coroutine.
+            * Increases static ram usage by 3 bytes (AVR) or 4 bytes (32-bit)
+              per coroutine.
+    * Support profiling of `Coroutine::runCoroutine()` execution time.
+        * See [Coroutine Profiling](USER_GUIDE.md#CoroutineProfiling) in the
+          `USER_GUIDE.md`.
+        * API changes
+            * Add `CoroutineProfiler` interface with a `updateElapsedMicros()`
+              method.
+            * Add `Coroutine::setProfiler()`.
+            * Add `Coroutine::runCoroutineWithProfiler()` which measures the
+              elapsed time of `runCoroutine()`.
+            * Update `CoroutineScheduler::runCoroutine()` to call
+              `runCoroutineWithProfiler()`.
+        * Provide `LogBinProfiler` subclass of `CoroutineProfiler`.
+            * Keeps a frequency count of the elapsed microseconds using 32 bins
+              representing the `log2()` function of the elapsed microseconds.
+        * Provide 2 renderers:
+            * `LogBinTableRenderer::printTo()` prints a formatted table of the
+              frequency count over all coroutines. This represents a poor-man's
+              version of the log-log graph of the frequency count.
+            * `LogBinJsonRenderer::printTo()` prints the frequency count
+              in JSON format.
+        * Resource consumption
+            * Increases static ram usage by 2 bytes (AVR) or 4 bytes (32-bit)
+              per coroutine.
+            * Increases latency of `CoroutineScheduler::runCoroutine()` by only
+              100ns (AVR, ESP8266), 133ns (STM32, Teensy 3.2), and 33ns (ESP32).
+            * Increases the flash size of the `CoroutineScheduler` by 100-140
+              bytes for both 8-bit and 32-bit processors, even if
+              `CoroutineProfiler` is not used. This is a one-time hit.
+        * See [HelloCoroutineWithProfiler](examples/HelloCoroutineWithProfiler)
+          and [HelloSchedulerWithProfiler](examples/HelloSchedulerWithProfiler).
+        * Thanks to peufeu2@ who provided the ideas and proof of concept in
+          [Discussion#50](https://github.com/bxparks/AceRoutine/discussions/50).
 * 1.4.2 (2022-02-04)
     * Remove dependency to AceCommon library in `libraries.properties`.
         * AceRoutine core no longer depends on AceCommon.

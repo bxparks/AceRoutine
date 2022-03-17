@@ -88,19 +88,19 @@ class LogBinProfilerTemplate : public CoroutineProfiler {
 
     /**
      * Create a new profiler on the heap and attach it to each coroutine in the
-     * singly-linked list of coroutines defined by `root`.
+     * singly-linked list of coroutines defined by `root`. If the coroutine has
+     * an existing profiler attached to it, the previous profiler is simply
+     * replaced, but *not* deleted. The reason is that the previous profiler
+     * could have been created statically, instead of on the heap, and we
+     * would crash the program if we tried to call `delete` on that pointer.
+     *
+     * If createProfilers() is called twice within the same application, (which
+     * should rarely happen), the program must ensure that deleteProfilers() is
+     * called before the second call to createProfilers(). Otherwise, heap
+     * memory will be leaked.
      */
     static void createProfilers(T_COROUTINE** root) {
       for (Coroutine** p = root; (*p) != nullptr; p = (*p)->getNext()) {
-
-        // Delete any existing profiler.
-        auto* currentProfiler =
-            (LogBinProfilerTemplate*) (*p)->getProfiler();
-        if (currentProfiler) {
-          delete currentProfiler;
-        }
-
-        // Attach new profiler.
         auto* profiler = new LogBinProfilerTemplate();
         (*p)->setProfiler(profiler);
       }

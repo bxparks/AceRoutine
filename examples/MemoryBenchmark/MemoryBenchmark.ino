@@ -18,14 +18,14 @@
 #define FEATURE_BASELINE 0
 #define FEATURE_ONE_DELAY_FUNCTION 1
 #define FEATURE_TWO_DELAY_FUNCTIONS 2
-#define FEATURE_ONE_COROUTINE 3
-#define FEATURE_TWO_COROUTINES 4
+#define FEATURE_ONE_COROUTINE_MILLIS 3
+#define FEATURE_TWO_COROUTINES_MILLIS 4
 #define FEATURE_ONE_COROUTINE_MICROS 5
 #define FEATURE_TWO_COROUTINES_MICROS 6
 #define FEATURE_ONE_COROUTINE_SECONDS 7
 #define FEATURE_TWO_COROUTINES_SECONDS 8
-#define FEATURE_SCHEDULER_ONE_COROUTINE 9
-#define FEATURE_SCHEDULER_TWO_COROUTINES 10
+#define FEATURE_SCHEDULER_ONE_COROUTINE_MILLIS 9
+#define FEATURE_SCHEDULER_TWO_COROUTINES_MILLIS 10
 #define FEATURE_SCHEDULER_ONE_COROUTINE_MICROS 11
 #define FEATURE_SCHEDULER_TWO_COROUTINES_MICROS 12
 #define FEATURE_SCHEDULER_ONE_COROUTINE_SECONDS 13
@@ -90,7 +90,7 @@ volatile int disableCompilerOptimization = 0;
     }
   }
 
-#elif FEATURE == FEATURE_ONE_COROUTINE
+#elif FEATURE == FEATURE_ONE_COROUTINE_MILLIS
 
   COROUTINE(a) {
     COROUTINE_LOOP() {
@@ -99,7 +99,7 @@ volatile int disableCompilerOptimization = 0;
     }
   }
 
-#elif FEATURE == FEATURE_TWO_COROUTINES
+#elif FEATURE == FEATURE_TWO_COROUTINES_MILLIS
 
   COROUTINE(a) {
     COROUTINE_LOOP() {
@@ -165,7 +165,7 @@ volatile int disableCompilerOptimization = 0;
     }
   }
 
-#elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE
+#elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE_MILLIS
 
   class MyCoroutine : public Coroutine {
     public:
@@ -179,7 +179,7 @@ volatile int disableCompilerOptimization = 0;
 
   MyCoroutine a;
 
-#elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES
+#elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES_MILLIS
 
   class MyCoroutineA : public Coroutine {
     public:
@@ -472,13 +472,19 @@ volatile int disableCompilerOptimization = 0;
 void setup() {
   delay(1000);
 
+  // Include the `Serial` in the baseline, so that it will be subtracted out
+  // for LogBinTableRenderer and LogBinJsonRenderer. Otherwise, those numbers
+  // include the overhead of the `Serial` object.
+  Serial.begin(115200);
+  Serial.write(disableCompilerOptimization);
+
 #if defined(TEENSYDUINO)
   // Force Teensy to bring in malloc(), free() and other things for virtual
   // dispatch.
   foo = new FooClass();
 #endif
 
-#if FEATURE >= FEATURE_SCHEDULER_ONE_COROUTINE \
+#if FEATURE >= FEATURE_SCHEDULER_ONE_COROUTINE_MILLIS \
     && FEATURE <= FEATURE_SCHEDULER_MANUAL_SETUP_TWO_COROUTINES
    CoroutineScheduler::setup();
 
@@ -513,9 +519,9 @@ void loop() {
 #elif FEATURE == FEATURE_TWO_DELAY_FUNCTIONS
   delayFunctionA();
   delayFunctionB();
-#elif FEATURE == FEATURE_ONE_COROUTINE
+#elif FEATURE == FEATURE_ONE_COROUTINE_MILLIS
   a.runCoroutine();
-#elif FEATURE == FEATURE_TWO_COROUTINES
+#elif FEATURE == FEATURE_TWO_COROUTINES_MILLIS
   a.runCoroutine();
   b.runCoroutine();
 #elif FEATURE == FEATURE_ONE_COROUTINE_MICROS
@@ -528,9 +534,9 @@ void loop() {
 #elif FEATURE == FEATURE_TWO_COROUTINES_SECONDS
   a.runCoroutine();
   b.runCoroutine();
-#elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE
+#elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE_MILLIS
   CoroutineScheduler::loop();
-#elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES
+#elif FEATURE == FEATURE_SCHEDULER_TWO_COROUTINES_MILLIS
   CoroutineScheduler::loop();
 #elif FEATURE == FEATURE_SCHEDULER_ONE_COROUTINE_MICROS
   CoroutineScheduler::loop();
@@ -550,6 +556,7 @@ void loop() {
   CoroutineScheduler::loop();
 #elif FEATURE == FEATURE_LOG_BIN_PROFILER
   CoroutineScheduler::loop();
+  disableCompilerOptimization = profiler.mBins[3];
 #elif FEATURE == FEATURE_LOG_BIN_TABLE_RENDERER
   CoroutineScheduler::loop();
   LogBinTableRenderer::printTo(Serial, 0, 32);

@@ -133,15 +133,18 @@ calculated flash size can jump around in unexpected ways.
         * Increases static ram by 3 bytes (AVR) and 4 bytes (32-bits) per
           coroutine.
     * Support `CoroutineProfiler` in the `CoroutineScheduler`.
-        * Increases the flash size of the `CoroutineScheduler` by 100-140 bytes
+        * Increases the flash size of the `CoroutineScheduler` by 90-140 bytes
           for both 8-bit and 32-bit processors, even if `CoroutineProfiler` is
           not used. This is a one-time hit.
     * Add `LogBinProfiler`
         * Adds about 90 bytes of flash and 70 bytes of RAM on AVR.
+        * Adds about 140 bytes of flash and 70 bytes of RAM on ESP8266.
     * Add `LogBinTableRenderer`
-        * Adds about 2200 bytes of flash and 200 bytes of RAM on AVR.
+        * Adds about 1400 bytes of flash and ~20 bytes of RAM on AVR.
+        * Adds about 1900 bytes of flash and ~0 bytes of RAM on ESP8266.
     * Add `LogBinJsonRenderer`
-        * Adds about 1800 bytes of flash and 200 bytes of RAM on AVR.
+        * Adds about 900 bytes of flash and ~20 bytes of RAM on AVR.
+        * Adds about 1300 bytes of flash and ~0 bytes of RAM on ESP8266.
 
 
 ## How to Generate

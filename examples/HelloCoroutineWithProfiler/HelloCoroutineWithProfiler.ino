@@ -72,18 +72,15 @@ COROUTINE(readPin) {
 // include information about itself.
 COROUTINE(printProfiling) {
   COROUTINE_LOOP() {
-    LogBinTableRenderer tableRenderer(Coroutine::getRoot());
-    LogBinJsonRenderer jsonRenderer(Coroutine::getRoot());
-
   #if defined(ARDUINO_ARCH_AVR)
-    tableRenderer.printTo(
+    LogBinTableRenderer::printTo(
         Serial, 3 /*startBin*/, 14 /*endBin*/, false /*clear*/);
-    jsonRenderer.printTo(
+    LogBinJsonRenderer::printTo(
         Serial, 3 /*startBin*/, 14 /*endBin*/);
   #else
-    tableRenderer.printTo(
+    LogBinTableRenderer::printTo(
         Serial, 2 /*startBin*/, 13 /*endBin*/, false /*clear*/);
-    jsonRenderer.printTo(
+    LogBinJsonRenderer::printTo(
         Serial, 2 /*startBin*/, 13 /*endBin*/);
   #endif
 

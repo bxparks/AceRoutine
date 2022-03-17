@@ -362,8 +362,8 @@ $ make README.md
 | Scheduler, Two Coroutines (man setup) |  22344/ 3604 |   460/   64 |
 |---------------------------------------+--------------+-------------|
 | Scheduler, LogBinProfiler             |  22300/ 3644 |   416/  104 |
-| Scheduler, LogBinTableRenderer        |  23708/ 3644 |  1824/  104 |
-| Scheduler, LogBinJsonRenderer         |  23172/ 3644 |  1288/  104 |
+| Scheduler, LogBinTableRenderer        |  23704/ 3644 |  1820/  104 |
+| Scheduler, LogBinJsonRenderer         |  23164/ 3644 |  1280/  104 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        |  22120/ 3540 |   236/    0 |
 | Blink Coroutine                       |  22232/ 3568 |   348/   28 |

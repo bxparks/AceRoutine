@@ -50,11 +50,6 @@ class LogBinJsonRendererTemplate {
     /** Typedef of the LogBinProfiler supported by this class. */
     using Profiler = LogBinProfilerTemplate<T_COROUTINE>;
 
-    /** Constructor. */
-    LogBinJsonRendererTemplate(T_COROUTINE** root)
-        : mRoot(root)
-    {}
-
     /**
      * Loop over all coroutines and print the bin counts as JSON.
      *
@@ -66,7 +61,7 @@ class LogBinJsonRendererTemplate {
      * @param rollup roll-up exterior bins into the first and last bins
      *        (default true)
      */
-    void printTo(
+    static void printTo(
         Print& printer,
         uint8_t startBin,
         uint8_t endBin,
@@ -77,7 +72,8 @@ class LogBinJsonRendererTemplate {
 
       printer.println('{');
       bool lineNeedsTrailingComma = false;
-      for (Coroutine** p = mRoot; (*p) != nullptr; p = (*p)->getNext()) {
+      T_COROUTINE** root = T_COROUTINE::getRoot();
+      for (T_COROUTINE** p = root; (*p) != nullptr; p = (*p)->getNext()) {
         auto* profiler = (Profiler*) (*p)->getProfiler();
         if (! profiler) continue;
 
@@ -113,9 +109,6 @@ class LogBinJsonRendererTemplate {
       printer.println();
       printer.println('}');
     }
-
-  public:
-    T_COROUTINE** mRoot;
 };
 
 using LogBinJsonRenderer = LogBinJsonRendererTemplate<Coroutine>;

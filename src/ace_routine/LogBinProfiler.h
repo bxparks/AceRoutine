@@ -87,28 +87,30 @@ class LogBinProfilerTemplate : public CoroutineProfiler {
     }
 
     /**
-     * Create a new profiler on the heap and attach it to each coroutine in the
-     * singly-linked list of coroutines defined by `root`. If the coroutine has
-     * an existing profiler attached to it, the previous profiler is simply
-     * replaced, but *not* deleted. The reason is that the previous profiler
-     * could have been created statically, instead of on the heap, and we
-     * would crash the program if we tried to call `delete` on that pointer.
+     * Create a new profiler on the heap and attach it to each coroutine.
+     * If the coroutine has an existing profiler attached to it, the previous
+     * profiler is simply replaced, but *not* deleted. The reason is that the
+     * previous profiler could have been created statically, instead of on the
+     * heap, and we would crash the program if we tried to call `delete` on that
+     * pointer.
      *
      * If createProfilers() is called twice within the same application, (which
      * should rarely happen), the program must ensure that deleteProfilers() is
      * called before the second call to createProfilers(). Otherwise, heap
      * memory will be leaked.
      */
-    static void createProfilers(T_COROUTINE** root) {
-      for (Coroutine** p = root; (*p) != nullptr; p = (*p)->getNext()) {
+    static void createProfilers() {
+      T_COROUTINE** root = T_COROUTINE::getRoot();
+      for (T_COROUTINE** p = root; (*p) != nullptr; p = (*p)->getNext()) {
         auto* profiler = new LogBinProfilerTemplate();
         (*p)->setProfiler(profiler);
       }
     }
 
     /** Delete the profilers created by createProfilers(). */
-    static void deleteProfilers(T_COROUTINE** root) {
-      for (Coroutine** p = root; (*p) != nullptr; p = (*p)->getNext()) {
+    static void deleteProfilers() {
+      T_COROUTINE** root = T_COROUTINE::getRoot();
+      for (T_COROUTINE** p = root; (*p) != nullptr; p = (*p)->getNext()) {
         auto* profiler = (LogBinProfilerTemplate*) (*p)->getProfiler();
         if (profiler) {
           delete profiler;
@@ -117,9 +119,10 @@ class LogBinProfilerTemplate : public CoroutineProfiler {
       }
     }
 
-    /** Clear counters for all profilers in the coroutines defined by `root`. */
-    static void clearProfilers(T_COROUTINE** root) {
-      for (Coroutine** p = root; (*p) != nullptr; p = (*p)->getNext()) {
+    /** Clear counters for all profilers. */
+    static void clearProfilers() {
+      T_COROUTINE** root = T_COROUTINE::getRoot();
+      for (T_COROUTINE** p = root; (*p) != nullptr; p = (*p)->getNext()) {
         auto* profiler = (LogBinProfilerTemplate*) (*p)->getProfiler();
         if (profiler) {
           profiler->clear();

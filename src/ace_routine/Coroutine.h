@@ -534,6 +534,7 @@ class CoroutineTemplate {
     /** Set the profiler. */
     void setProfiler(CoroutineProfiler* profiler) { mProfiler = profiler; }
 
+    /** Get the profiler. Nullable. */
     CoroutineProfiler* getProfiler() const { return mProfiler; }
 
     /**

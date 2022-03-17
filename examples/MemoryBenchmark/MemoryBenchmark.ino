@@ -552,12 +552,10 @@ void loop() {
   CoroutineScheduler::loop();
 #elif FEATURE == FEATURE_LOG_BIN_TABLE_RENDERER
   CoroutineScheduler::loop();
-  LogBinTableRenderer renderer(Coroutine::getRoot());
-  renderer.printTo(Serial, 0, 32);
+  LogBinTableRenderer::printTo(Serial, 0, 32);
 #elif FEATURE == FEATURE_LOG_BIN_JSON_RENDERER
   CoroutineScheduler::loop();
-  LogBinJsonRenderer renderer(Coroutine::getRoot());
-  renderer.printTo(Serial, 0, 32);
+  LogBinJsonRenderer::printTo(Serial, 0, 32);
 #elif FEATURE == FEATURE_BLINK_COROUTINE
   blink.runCoroutine();
 #elif FEATURE == FEATURE_BLINK_FUNCTION

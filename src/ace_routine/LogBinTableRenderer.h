@@ -107,11 +107,6 @@ class LogBinRendererTemplate {
     /** Typedef of the LogBinProfiler supported by this class. */
     using Profiler = LogBinProfilerTemplate<T_COROUTINE>;
 
-    /** Constructor. */
-    LogBinRendererTemplate(T_COROUTINE** root)
-        : mRoot(root)
-    {}
-
     /**
      * Loop over all coroutines and print the ASCII version of the frequency
      * distribution. This assumes that all the coroutines are using the same
@@ -126,7 +121,7 @@ class LogBinRendererTemplate {
      * @param rollup roll-up exterior bins into the first and last bins
      *        (default true)
      */
-    void printTo(
+    static void printTo(
         Print& printer,
         uint8_t startBin,
         uint8_t endBin,
@@ -138,7 +133,8 @@ class LogBinRendererTemplate {
       uint16_t bufBins[Profiler::kNumBins];
 
       bool isHeaderPrinted = false;
-      for (Coroutine** p = mRoot; (*p) != nullptr; p = (*p)->getNext()) {
+      T_COROUTINE** root = T_COROUTINE::getRoot();
+      for (T_COROUTINE** p = root; (*p) != nullptr; p = (*p)->getNext()) {
         auto* profiler = (Profiler*) (*p)->getProfiler();
         if (! profiler) continue;
 
@@ -177,9 +173,6 @@ class LogBinRendererTemplate {
         }
       }
     }
-
-  private:
-    T_COROUTINE** mRoot;
 };
 
 using LogBinTableRenderer = LogBinRendererTemplate<Coroutine>;

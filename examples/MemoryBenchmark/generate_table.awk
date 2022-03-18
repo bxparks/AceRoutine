@@ -15,21 +15,25 @@ BEGIN {
   labels[6] = "Two Coroutines (micros)"
   labels[7] = "One Coroutine (seconds)"
   labels[8] = "Two Coroutines (seconds)"
-  labels[9] = "Scheduler, One Coroutine (millis)"
-  labels[10] = "Scheduler, Two Coroutines (millis)"
-  labels[11] = "Scheduler, One Coroutine (micros)"
-  labels[12] = "Scheduler, Two Coroutines (micros)"
-  labels[13] = "Scheduler, One Coroutine (seconds)"
-  labels[14] = "Scheduler, Two Coroutines (seconds)"
-  labels[15] = "Scheduler, One Coroutine (setup)"
-  labels[16] = "Scheduler, Two Coroutines (setup)"
-  labels[17] = "Scheduler, One Coroutine (man setup)"
-  labels[18] = "Scheduler, Two Coroutines (man setup)"
-  labels[19] = "Scheduler, LogBinProfiler"
-  labels[20] = "Scheduler, LogBinTableRenderer"
-  labels[21] = "Scheduler, LogBinJsonRenderer"
-  labels[22] = "Blink Function"
-  labels[23] = "Blink Coroutine"
+  labels[9] = "One Coroutine, Profiler"
+  labels[10] = "Two Coroutines, Profiler"
+  labels[11] = "Scheduler, One Coroutine (millis)"
+  labels[12] = "Scheduler, Two Coroutines (millis)"
+  labels[13] = "Scheduler, One Coroutine (micros)"
+  labels[14] = "Scheduler, Two Coroutines (micros)"
+  labels[15] = "Scheduler, One Coroutine (seconds)"
+  labels[16] = "Scheduler, Two Coroutines (seconds)"
+  labels[17] = "Scheduler, One Coroutine (setup)"
+  labels[18] = "Scheduler, Two Coroutines (setup)"
+  labels[19] = "Scheduler, One Coroutine (man setup)"
+  labels[20] = "Scheduler, Two Coroutines (man setup)"
+  labels[21] = "Scheduler, One Coroutine, Profiler"
+  labels[22] = "Scheduler, Two Coroutines, Profiler"
+  labels[23] = "Scheduler, LogBinProfiler"
+  labels[24] = "Scheduler, LogBinTableRenderer"
+  labels[25] = "Scheduler, LogBinJsonRenderer"
+  labels[26] = "Blink Function"
+  labels[27] = "Blink Coroutine"
   record_index = 0
 }
 {
@@ -55,11 +59,13 @@ END {
       || labels[i] ~ /^One Coroutine \(millis\)$/ \
       || labels[i] ~ /^One Coroutine \(micros\)$/ \
       || labels[i] ~ /^One Coroutine \(seconds\)$/ \
+      || labels[i] ~ /^One Coroutine, Profiler$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(millis\)$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(micros\)$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(seconds\)$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(setup\)$/ \
       || labels[i] ~ /^Scheduler, One Coroutine \(man setup\)$/ \
+      || labels[i] ~ /^Scheduler, One Coroutine, Profiler$/ \
       || labels[i] ~ /^Scheduler, LogBinProfiler$/ \
       || labels[i] ~ /^Blink Function$/ \
     ) {

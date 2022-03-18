@@ -202,24 +202,30 @@ $ make README.md
 | One Coroutine (seconds)               |   1302/  107 |   276/   26 |
 | Two Coroutines (seconds)              |   1524/  131 |   498/   50 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (millis)     |   1396/  109 |   370/   28 |
-| Scheduler, Two Coroutines (millis)    |   1582/  133 |   556/   52 |
+| One Coroutine, Profiler               |   1276/  107 |   250/   26 |
+| Two Coroutines, Profiler              |   1528/  131 |   502/   50 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     |   1364/  109 |   338/   28 |
-| Scheduler, Two Coroutines (micros)    |   1518/  133 |   492/   52 |
+| Scheduler, One Coroutine (millis)     |   1336/  109 |   310/   28 |
+| Scheduler, Two Coroutines (millis)    |   1522/  133 |   496/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    |   1492/  109 |   466/   28 |
-| Scheduler, Two Coroutines (seconds)   |   1706/  133 |   680/   52 |
+| Scheduler, One Coroutine (micros)     |   1304/  109 |   278/   28 |
+| Scheduler, Two Coroutines (micros)    |   1458/  133 |   432/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      |   1446/  109 |   420/   28 |
-| Scheduler, Two Coroutines (setup)     |   1728/  133 |   702/   52 |
+| Scheduler, One Coroutine (seconds)    |   1432/  109 |   406/   28 |
+| Scheduler, Two Coroutines (seconds)   |   1646/  133 |   620/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  |   1424/  109 |   398/   28 |
-| Scheduler, Two Coroutines (man setup) |   1714/  133 |   688/   52 |
+| Scheduler, One Coroutine (setup)      |   1388/  109 |   362/   28 |
+| Scheduler, Two Coroutines (setup)     |   1670/  133 |   644/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             |   1500/  181 |   474/  100 |
-| Scheduler, LogBinTableRenderer        |   2864/  193 |  1838/  112 |
-| Scheduler, LogBinJsonRenderer         |   2398/  197 |  1372/  116 |
+| Scheduler, One Coroutine (man setup)  |   1364/  109 |   338/   28 |
+| Scheduler, Two Coroutines (man setup) |   1654/  133 |   628/   52 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine, Profiler    |   1396/  109 |   370/   28 |
+| Scheduler, Two Coroutines, Profiler   |   1582/  133 |   556/   52 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, LogBinProfiler             |   1512/  181 |   486/  100 |
+| Scheduler, LogBinTableRenderer        |   2876/  193 |  1850/  112 |
+| Scheduler, LogBinJsonRenderer         |   2410/  197 |  1384/  116 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        |   1176/   84 |   150/    3 |
 | Blink Coroutine                       |   1330/  107 |   304/   26 |
@@ -251,24 +257,30 @@ $ make README.md
 | One Coroutine (seconds)               |   1904/  212 |   288/   26 |
 | Two Coroutines (seconds)              |   2130/  236 |   514/   50 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (millis)     |   1992/  214 |   376/   28 |
-| Scheduler, Two Coroutines (millis)    |   2178/  238 |   562/   52 |
+| One Coroutine, Profiler               |   1874/  212 |   258/   26 |
+| Two Coroutines, Profiler              |   2132/  236 |   516/   50 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     |   1964/  214 |   348/   28 |
-| Scheduler, Two Coroutines (micros)    |   2122/  238 |   506/   52 |
+| Scheduler, One Coroutine (millis)     |   1928/  214 |   312/   28 |
+| Scheduler, Two Coroutines (millis)    |   2114/  238 |   498/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    |   2092/  214 |   476/   28 |
-| Scheduler, Two Coroutines (seconds)   |   2310/  238 |   694/   52 |
+| Scheduler, One Coroutine (micros)     |   1900/  214 |   284/   28 |
+| Scheduler, Two Coroutines (micros)    |   2058/  238 |   442/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      |   2046/  214 |   430/   28 |
-| Scheduler, Two Coroutines (setup)     |   2332/  238 |   716/   52 |
+| Scheduler, One Coroutine (seconds)    |   2028/  214 |   412/   28 |
+| Scheduler, Two Coroutines (seconds)   |   2246/  238 |   630/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  |   2024/  214 |   408/   28 |
-| Scheduler, Two Coroutines (man setup) |   2318/  238 |   702/   52 |
+| Scheduler, One Coroutine (setup)      |   1978/  214 |   362/   28 |
+| Scheduler, Two Coroutines (setup)     |   2264/  238 |   648/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             |   2100/  286 |   484/  100 |
-| Scheduler, LogBinTableRenderer        |   3502/  304 |  1886/  118 |
-| Scheduler, LogBinJsonRenderer         |   3022/  308 |  1406/  122 |
+| Scheduler, One Coroutine (man setup)  |   1956/  214 |   340/   28 |
+| Scheduler, Two Coroutines (man setup) |   2250/  238 |   634/   52 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine, Profiler    |   1992/  214 |   376/   28 |
+| Scheduler, Two Coroutines, Profiler   |   2178/  238 |   562/   52 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, LogBinProfiler             |   2112/  286 |   496/  100 |
+| Scheduler, LogBinTableRenderer        |   3514/  304 |  1898/  118 |
+| Scheduler, LogBinJsonRenderer         |   3034/  308 |  1418/  122 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        |   1948/  189 |   332/    3 |
 | Blink Coroutine                       |   2118/  212 |   502/   26 |
@@ -300,24 +312,30 @@ $ make README.md
 | One Coroutine (seconds)               |   3870/  177 |   288/   26 |
 | Two Coroutines (seconds)              |   4096/  201 |   514/   50 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (millis)     |   3958/  179 |   376/   28 |
-| Scheduler, Two Coroutines (millis)    |   4144/  203 |   562/   52 |
+| One Coroutine, Profiler               |   3840/  177 |   258/   26 |
+| Two Coroutines, Profiler              |   4098/  201 |   516/   50 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     |   3930/  179 |   348/   28 |
-| Scheduler, Two Coroutines (micros)    |   4088/  203 |   506/   52 |
+| Scheduler, One Coroutine (millis)     |   3894/  179 |   312/   28 |
+| Scheduler, Two Coroutines (millis)    |   4080/  203 |   498/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    |   4058/  179 |   476/   28 |
-| Scheduler, Two Coroutines (seconds)   |   4276/  203 |   694/   52 |
+| Scheduler, One Coroutine (micros)     |   3866/  179 |   284/   28 |
+| Scheduler, Two Coroutines (micros)    |   4024/  203 |   442/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      |   4012/  179 |   430/   28 |
-| Scheduler, Two Coroutines (setup)     |   4298/  203 |   716/   52 |
+| Scheduler, One Coroutine (seconds)    |   3994/  179 |   412/   28 |
+| Scheduler, Two Coroutines (seconds)   |   4212/  203 |   630/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  |   3990/  179 |   408/   28 |
-| Scheduler, Two Coroutines (man setup) |   4284/  203 |   702/   52 |
+| Scheduler, One Coroutine (setup)      |   3944/  179 |   362/   28 |
+| Scheduler, Two Coroutines (setup)     |   4230/  203 |   648/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             |   4066/  251 |   484/  100 |
-| Scheduler, LogBinTableRenderer        |   5466/  269 |  1884/  118 |
-| Scheduler, LogBinJsonRenderer         |   4986/  273 |  1404/  122 |
+| Scheduler, One Coroutine (man setup)  |   3922/  179 |   340/   28 |
+| Scheduler, Two Coroutines (man setup) |   4216/  203 |   634/   52 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine, Profiler    |   3958/  179 |   376/   28 |
+| Scheduler, Two Coroutines, Profiler   |   4144/  203 |   562/   52 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, LogBinProfiler             |   4078/  251 |   496/  100 |
+| Scheduler, LogBinTableRenderer        |   5478/  269 |  1896/  118 |
+| Scheduler, LogBinJsonRenderer         |   4998/  273 |  1416/  122 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        |   4022/  154 |   440/    3 |
 | Blink Coroutine                       |   4192/  177 |   610/   26 |
@@ -349,24 +367,30 @@ $ make README.md
 | One Coroutine (seconds)               |  22080/ 3572 |   148/   32 |
 | Two Coroutines (seconds)              |  22244/ 3600 |   312/   60 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (millis)     |  22232/ 3576 |   300/   36 |
-| Scheduler, Two Coroutines (millis)    |  22336/ 3604 |   404/   64 |
+| One Coroutine, Profiler               |  22172/ 3572 |   240/   32 |
+| Two Coroutines, Profiler              |  22328/ 3600 |   396/   60 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     |  22232/ 3576 |   300/   36 |
-| Scheduler, Two Coroutines (micros)    |  22336/ 3604 |   404/   64 |
+| Scheduler, One Coroutine (millis)     |  22132/ 3576 |   200/   36 |
+| Scheduler, Two Coroutines (millis)    |  22236/ 3604 |   304/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    |  22248/ 3576 |   316/   36 |
-| Scheduler, Two Coroutines (seconds)   |  22368/ 3604 |   436/   64 |
+| Scheduler, One Coroutine (micros)     |  22196/ 3576 |   264/   36 |
+| Scheduler, Two Coroutines (micros)    |  22300/ 3604 |   368/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      |  22252/ 3576 |   320/   36 |
-| Scheduler, Two Coroutines (setup)     |  22384/ 3604 |   452/   64 |
+| Scheduler, One Coroutine (seconds)    |  22148/ 3576 |   216/   36 |
+| Scheduler, Two Coroutines (seconds)   |  22268/ 3604 |   336/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  |  22244/ 3576 |   312/   36 |
-| Scheduler, Two Coroutines (man setup) |  22376/ 3604 |   444/   64 |
+| Scheduler, One Coroutine (setup)      |  22152/ 3576 |   220/   36 |
+| Scheduler, Two Coroutines (setup)     |  22284/ 3604 |   352/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             |  22356/ 3644 |   424/  104 |
-| Scheduler, LogBinTableRenderer        |  23740/ 3644 |  1808/  104 |
-| Scheduler, LogBinJsonRenderer         |  23200/ 3644 |  1268/  104 |
+| Scheduler, One Coroutine (man setup)  |  22144/ 3576 |   212/   36 |
+| Scheduler, Two Coroutines (man setup) |  22276/ 3604 |   344/   64 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine, Profiler    |  22232/ 3576 |   300/   36 |
+| Scheduler, Two Coroutines, Profiler   |  22336/ 3604 |   404/   64 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, LogBinProfiler             |  22368/ 3644 |   436/  104 |
+| Scheduler, LogBinTableRenderer        |  23752/ 3644 |  1820/  104 |
+| Scheduler, LogBinJsonRenderer         |  23212/ 3644 |  1280/  104 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        |  22168/ 3544 |   236/    4 |
 | Blink Coroutine                       |  22280/ 3572 |   348/   32 |
@@ -398,24 +422,30 @@ $ make README.md
 | One Coroutine (seconds)               | 265209/28028 |   228/   44 |
 | Two Coroutines (seconds)              | 265385/28060 |   404/   76 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (millis)     | 265321/28036 |   340/   52 |
-| Scheduler, Two Coroutines (millis)    | 265449/28060 |   468/   76 |
+| One Coroutine, Profiler               | 265257/28028 |   276/   44 |
+| Two Coroutines, Profiler              | 265433/28060 |   452/   76 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     | 265321/28036 |   340/   52 |
-| Scheduler, Two Coroutines (micros)    | 265449/28060 |   468/   76 |
+| Scheduler, One Coroutine (millis)     | 265241/28036 |   260/   52 |
+| Scheduler, Two Coroutines (millis)    | 265385/28060 |   404/   76 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    | 265337/28036 |   356/   52 |
-| Scheduler, Two Coroutines (seconds)   | 265497/28060 |   516/   76 |
+| Scheduler, One Coroutine (micros)     | 265257/28036 |   276/   52 |
+| Scheduler, Two Coroutines (micros)    | 265401/28060 |   420/   76 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      | 265337/28036 |   356/   52 |
-| Scheduler, Two Coroutines (setup)     | 265513/28060 |   532/   76 |
+| Scheduler, One Coroutine (seconds)    | 265257/28036 |   276/   52 |
+| Scheduler, Two Coroutines (seconds)   | 265417/28060 |   436/   76 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  | 265337/28036 |   356/   52 |
-| Scheduler, Two Coroutines (man setup) | 265513/28060 |   532/   76 |
+| Scheduler, One Coroutine (setup)      | 265273/28036 |   292/   52 |
+| Scheduler, Two Coroutines (setup)     | 265433/28060 |   452/   76 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             | 265449/28100 |   468/  116 |
+| Scheduler, One Coroutine (man setup)  | 265257/28036 |   276/   52 |
+| Scheduler, Two Coroutines (man setup) | 265433/28060 |   452/   76 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine, Profiler    | 265321/28036 |   340/   52 |
+| Scheduler, Two Coroutines, Profiler   | 265449/28060 |   468/   76 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, LogBinProfiler             | 265465/28100 |   484/  116 |
 | Scheduler, LogBinTableRenderer        | 267381/28100 |  2400/  116 |
-| Scheduler, LogBinJsonRenderer         | 266773/28104 |  1792/  120 |
+| Scheduler, LogBinJsonRenderer         | 266789/28104 |  1808/  120 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        | 265669/28064 |   688/   80 |
 | Blink Coroutine                       | 265801/28100 |   820/  116 |
@@ -447,24 +477,30 @@ $ make README.md
 | One Coroutine (seconds)               | 231081/16292 |   668/   72 |
 | Two Coroutines (seconds)              | 231269/16316 |   856/   96 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (millis)     | 231181/16292 |   768/   72 |
-| Scheduler, Two Coroutines (millis)    | 231321/16324 |   908/  104 |
+| One Coroutine, Profiler               | 231117/16292 |   704/   72 |
+| Two Coroutines, Profiler              | 231333/16316 |   920/   96 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     | 231181/16292 |   768/   72 |
-| Scheduler, Two Coroutines (micros)    | 231321/16324 |   908/  104 |
+| Scheduler, One Coroutine (millis)     | 231129/16292 |   716/   72 |
+| Scheduler, Two Coroutines (millis)    | 231269/16324 |   856/  104 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    | 231197/16292 |   784/   72 |
-| Scheduler, Two Coroutines (seconds)   | 231353/16324 |   940/  104 |
+| Scheduler, One Coroutine (micros)     | 231141/16292 |   728/   72 |
+| Scheduler, Two Coroutines (micros)    | 231281/16324 |   868/  104 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      | 231209/16292 |   796/   72 |
-| Scheduler, Two Coroutines (setup)     | 231381/16324 |   968/  104 |
+| Scheduler, One Coroutine (seconds)    | 231145/16292 |   732/   72 |
+| Scheduler, Two Coroutines (seconds)   | 231301/16324 |   888/  104 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  | 231197/16292 |   784/   72 |
-| Scheduler, Two Coroutines (man setup) | 231373/16324 |   960/  104 |
+| Scheduler, One Coroutine (setup)      | 231157/16292 |   744/   72 |
+| Scheduler, Two Coroutines (setup)     | 231329/16324 |   916/  104 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             | 231313/16364 |   900/  144 |
-| Scheduler, LogBinTableRenderer        | 232645/16364 |  2232/  144 |
-| Scheduler, LogBinJsonRenderer         | 232093/16364 |  1680/  144 |
+| Scheduler, One Coroutine (man setup)  | 231145/16292 |   732/   72 |
+| Scheduler, Two Coroutines (man setup) | 231321/16324 |   908/  104 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine, Profiler    | 231181/16292 |   768/   72 |
+| Scheduler, Two Coroutines, Profiler   | 231321/16324 |   908/  104 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, LogBinProfiler             | 231321/16364 |   908/  144 |
+| Scheduler, LogBinTableRenderer        | 232653/16364 |  2240/  144 |
+| Scheduler, LogBinJsonRenderer         | 232101/16364 |  1688/  144 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        | 231301/16268 |   888/   48 |
 | Blink Coroutine                       | 231413/16300 |  1000/   80 |
@@ -497,24 +533,30 @@ $ make README.md
 | One Coroutine (seconds)               |  10824/ 4188 |   176/   32 |
 | Two Coroutines (seconds)              |  10964/ 4216 |   316/   60 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (millis)     |  10976/ 4192 |   328/   36 |
-| Scheduler, Two Coroutines (millis)    |  11092/ 4220 |   444/   64 |
+| One Coroutine, Profiler               |  10904/ 4188 |   256/   32 |
+| Two Coroutines, Profiler              |  11072/ 4216 |   424/   60 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     |  10964/ 4192 |   316/   36 |
-| Scheduler, Two Coroutines (micros)    |  11068/ 4220 |   420/   64 |
+| Scheduler, One Coroutine (millis)     |  10868/ 4192 |   220/   36 |
+| Scheduler, Two Coroutines (millis)    |  10984/ 4220 |   336/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    |  10996/ 4192 |   348/   36 |
-| Scheduler, Two Coroutines (seconds)   |  11132/ 4220 |   484/   64 |
+| Scheduler, One Coroutine (micros)     |  10924/ 4192 |   276/   36 |
+| Scheduler, Two Coroutines (micros)    |  11028/ 4220 |   380/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      |  11012/ 4192 |   364/   36 |
-| Scheduler, Two Coroutines (setup)     |  11160/ 4220 |   512/   64 |
+| Scheduler, One Coroutine (seconds)    |  10888/ 4192 |   240/   36 |
+| Scheduler, Two Coroutines (seconds)   |  11024/ 4220 |   376/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  |  10988/ 4192 |   340/   36 |
-| Scheduler, Two Coroutines (man setup) |  11140/ 4220 |   492/   64 |
+| Scheduler, One Coroutine (setup)      |  10904/ 4192 |   256/   36 |
+| Scheduler, Two Coroutines (setup)     |  11052/ 4220 |   404/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             |  11380/ 4268 |   732/  112 |
+| Scheduler, One Coroutine (man setup)  |  10880/ 4192 |   232/   36 |
+| Scheduler, Two Coroutines (man setup) |  11032/ 4220 |   384/   64 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine, Profiler    |  10976/ 4192 |   328/   36 |
+| Scheduler, Two Coroutines, Profiler   |  11092/ 4220 |   444/   64 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, LogBinProfiler             |  11396/ 4268 |   748/  112 |
 | Scheduler, LogBinTableRenderer        |  14120/ 4284 |  3472/  128 |
-| Scheduler, LogBinJsonRenderer         |  13412/ 4284 |  2764/  128 |
+| Scheduler, LogBinJsonRenderer         |  13476/ 4284 |  2828/  128 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        |  11104/ 4164 |   456/    8 |
 | Blink Coroutine                       |  11236/ 4188 |   588/   32 |

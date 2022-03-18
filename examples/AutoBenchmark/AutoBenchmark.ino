@@ -8,9 +8,11 @@
 
 #include <Arduino.h>
 #include <AceRoutine.h>
-#include <AceCommon.h> // printPad3To()
+#include <AceCommon.h> // printUint32AsFloat3To()
 using namespace ace_routine;
-using ace_common::printPad3To;
+using ace_common::printUint32AsFloat3To;
+
+//-----------------------------------------------------------------------------
 
 // NUM_ITERATIONS must be in multiples of 1000, due to the algorithm used to
 // convert to nanos below.
@@ -57,68 +59,95 @@ void checkEqual(
   }
 }
 
-uint16_t doEmptyLoop(uint32_t iterations) {
+//-----------------------------------------------------------------------------
+
+uint32_t doEmptyLoop(uint32_t iterations) {
   yield();
   counter = 0;
-  uint16_t start = millis();
+  uint32_t start = millis();
   for (uint32_t i = 0; i < iterations; i++) {
     counter++;
   }
-  uint16_t end = millis();
+  uint32_t end = millis();
   yield();
   checkEqual(F("doEmptyLoop(): "), counter, iterations);
   return end - start;
 }
 
-uint16_t doDirectScheduling(uint32_t iterations) {
+uint32_t doDirectScheduling(uint32_t iterations) {
   yield();
   counter = 0;
-  uint16_t start = millis();
+  uint32_t start = millis();
 
   // Run for 1/2 as many iterations because each loop calls 2 coroutines.
   for (uint32_t i = 0; i < iterations / 2; i++) {
     counterA.runCoroutine();
     counterB.runCoroutine();
   }
-  uint16_t end = millis();
+  uint32_t end = millis();
   yield();
   checkEqual(F("doDirectScheduling(): "), counter, iterations);
   return end - start;
 }
 
-uint16_t doCoroutineScheduling(uint32_t iterations) {
+uint32_t doDirectSchedulingWithProfiler(uint32_t iterations) {
   yield();
   counter = 0;
-  uint16_t start = millis();
+  uint32_t start = millis();
+
+  // Run for 1/2 as many iterations because each loop calls 2 coroutines.
+  for (uint32_t i = 0; i < iterations / 2; i++) {
+    counterA.runCoroutineWithProfiler();
+    counterB.runCoroutineWithProfiler();
+  }
+  uint32_t end = millis();
+  yield();
+  checkEqual(F("doDirectSchedulingWithProfiler(): "), counter, iterations);
+  return end - start;
+}
+
+uint32_t doCoroutineScheduling(uint32_t iterations) {
+  yield();
+  counter = 0;
+  uint32_t start = millis();
   for (uint32_t i = 0; i < iterations; i++) {
     CoroutineScheduler::loop();
   }
-  uint16_t end = millis();
+  uint32_t end = millis();
   yield();
   checkEqual(F("doCoroutineScheduling()"), counter, iterations);
   return end - start;
 }
 
-void printNanosAsMicros(Print& printer, uint16_t nanos) {
-  uint16_t wholeMicros = nanos / 1000;
-  uint16_t fracMicros = nanos - wholeMicros * 1000;
-  printer.print(wholeMicros);
-  printer.print('.');
-  printPad3To(printer, fracMicros, '0');
+uint32_t doCoroutineSchedulingWithProfiler(uint32_t iterations) {
+  yield();
+  counter = 0;
+  uint32_t start = millis();
+  for (uint32_t i = 0; i < iterations; i++) {
+    CoroutineScheduler::loopWithProfiler();
+  }
+  uint32_t end = millis();
+  yield();
+  checkEqual(F("doCoroutineSchedulingWithProfiler()"), counter, iterations);
+  return end - start;
 }
+
+//-----------------------------------------------------------------------------
 
 // Print millis 'ms' as micros (to 3 decimal places) per iteration as a floating
 // point number. The number of 'iterations' must be divisible by 1000.
 void printStats(
-    const __FlashStringHelper* name, uint16_t ms, uint32_t iterations) {
-  uint16_t nanosPerIteration = (uint32_t) ms * 1000 / (iterations / 1000);
+    const __FlashStringHelper* name, uint32_t ms, uint32_t iterations) {
+  uint32_t nanosPerIteration = ms * 1000 / (iterations / 1000);
   SERIAL_PORT_MONITOR.print(name);
   SERIAL_PORT_MONITOR.print(' ');
-  printNanosAsMicros(SERIAL_PORT_MONITOR, nanosPerIteration);
+  printUint32AsFloat3To(SERIAL_PORT_MONITOR, nanosPerIteration);
   SERIAL_PORT_MONITOR.print(' ');
   SERIAL_PORT_MONITOR.print(iterations);
   SERIAL_PORT_MONITOR.println();
 }
+
+//-----------------------------------------------------------------------------
 
 void setup() {
 #if ! defined(EPOXY_DUINO)
@@ -136,20 +165,36 @@ void setup() {
   SERIAL_PORT_MONITOR.println(sizeof(CoroutineScheduler));
   SERIAL_PORT_MONITOR.print(F("sizeof(Channel<int>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Channel<int>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(LogBinProfiler): "));
+  SERIAL_PORT_MONITOR.println(sizeof(LogBinProfiler));
+  SERIAL_PORT_MONITOR.print(F("sizeof(LogBinTableRenderer): "));
+  SERIAL_PORT_MONITOR.println(sizeof(LogBinTableRenderer));
+  SERIAL_PORT_MONITOR.print(F("sizeof(LogBinJsonRenderer): "));
+  SERIAL_PORT_MONITOR.println(sizeof(LogBinJsonRenderer));
 
   CoroutineScheduler::setup();
   //CoroutineScheduler::list(SERIAL_PORT_MONITOR);
 
   SERIAL_PORT_MONITOR.println(F("BENCHMARKS"));
 
-  uint16_t emptyLoopMillis = doEmptyLoop(NUM_ITERATIONS);
+  uint32_t emptyLoopMillis = doEmptyLoop(NUM_ITERATIONS);
   printStats(F("EmptyLoop"), emptyLoopMillis, NUM_ITERATIONS);
 
-  uint16_t directMillis = doDirectScheduling(NUM_ITERATIONS);
+  uint32_t directMillis = doDirectScheduling(NUM_ITERATIONS);
   printStats(F("DirectScheduling"), directMillis, NUM_ITERATIONS);
 
-  uint16_t schedulerMillis = doCoroutineScheduling(NUM_ITERATIONS);
+  uint32_t directMillisWithProfiler =
+      doDirectSchedulingWithProfiler(NUM_ITERATIONS);
+  printStats(F("DirectSchedulingWithProfiler"),
+      directMillisWithProfiler, NUM_ITERATIONS);
+
+  uint32_t schedulerMillis = doCoroutineScheduling(NUM_ITERATIONS);
   printStats(F("CoroutineScheduling"), schedulerMillis, NUM_ITERATIONS);
+
+  uint32_t schedulerMillisWithProfiler =
+      doCoroutineSchedulingWithProfiler(NUM_ITERATIONS);
+  printStats(F("CoroutineSchedulingWithProfiler"),
+      schedulerMillisWithProfiler, NUM_ITERATIONS);
 
   SERIAL_PORT_MONITOR.println(F("END"));
 

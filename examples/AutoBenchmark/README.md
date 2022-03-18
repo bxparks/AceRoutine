@@ -142,15 +142,22 @@ Sizes of Objects:
 sizeof(Coroutine): 16
 sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
+sizeof(LogBinProfiler): 66
+sizeof(LogBinTableRenderer): 1
+sizeof(LogBinJsonRenderer): 1
 
 CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       1.700 |  0.000 |
-| DirectScheduling    |  10000 |       2.900 |  1.200 |
-| CoroutineScheduling |  10000 |       7.200 |  5.500 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  10000 |       1.900 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  10000 |       2.800 |  0.900 |
+| DirectSchedulingWithProfiler    |  10000 |       5.800 |  3.900 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  10000 |       7.000 |  5.100 |
+| CoroutineSchedulingWithProfiler |  10000 |       9.300 |  7.400 |
++---------------------------------+--------+-------------+--------+
 
 ```
 
@@ -166,15 +173,22 @@ Sizes of Objects:
 sizeof(Coroutine): 16
 sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
+sizeof(LogBinProfiler): 66
+sizeof(LogBinTableRenderer): 1
+sizeof(LogBinJsonRenderer): 1
 
 CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       1.800 |  0.000 |
-| DirectScheduling    |  10000 |       2.800 |  1.000 |
-| CoroutineScheduling |  10000 |       7.200 |  5.400 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  10000 |       1.700 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  10000 |       2.800 |  1.100 |
+| DirectSchedulingWithProfiler    |  10000 |       5.800 |  4.100 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  10000 |       7.100 |  5.400 |
+| CoroutineSchedulingWithProfiler |  10000 |       9.400 |  7.700 |
++---------------------------------+--------+-------------+--------+
 
 ```
 
@@ -186,18 +200,19 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 28
-sizeof(CoroutineScheduler): 4
-sizeof(Channel<int>): 12
 
 CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  30000 |       0.133 |  0.000 |
-| DirectScheduling    |  30000 |       0.533 |  0.400 |
-| CoroutineScheduling |  30000 |       1.266 |  1.133 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  30000 |       0.166 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  30000 |       0.533 |  0.367 |
+| DirectSchedulingWithProfiler    |  30000 |       0.933 |  0.767 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  30000 |       1.066 |  0.900 |
+| CoroutineSchedulingWithProfiler |  30000 |       1.466 |  1.300 |
++---------------------------------+--------+-------------+--------+
 
 ```
 
@@ -212,15 +227,22 @@ Sizes of Objects:
 sizeof(Coroutine): 28
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
+sizeof(LogBinProfiler): 68
+sizeof(LogBinTableRenderer): 1
+sizeof(LogBinJsonRenderer): 1
 
 CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       0.100 |  0.000 |
-| DirectScheduling    |  10000 |       0.500 |  0.400 |
-| CoroutineScheduling |  10000 |       1.000 |  0.900 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  10000 |       0.100 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  10000 |       0.500 |  0.400 |
+| DirectSchedulingWithProfiler    |  10000 |       0.800 |  0.700 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  10000 |       0.900 |  0.800 |
+| CoroutineSchedulingWithProfiler |  10000 |       1.100 |  1.000 |
++---------------------------------+--------+-------------+--------+
 
 ```
 
@@ -235,15 +257,22 @@ Sizes of Objects:
 sizeof(Coroutine): 28
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
+sizeof(LogBinProfiler): 68
+sizeof(LogBinTableRenderer): 1
+sizeof(LogBinJsonRenderer): 1
 
 CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  30000 |       0.066 |  0.000 |
-| DirectScheduling    |  30000 |       0.133 |  0.067 |
-| CoroutineScheduling |  30000 |       0.366 |  0.300 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  30000 |       0.033 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  30000 |       0.133 |  0.100 |
+| DirectSchedulingWithProfiler    |  30000 |       0.233 |  0.200 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  30000 |       0.333 |  0.300 |
+| CoroutineSchedulingWithProfiler |  30000 |       0.433 |  0.400 |
++---------------------------------+--------+-------------+--------+
 
 ```
 
@@ -259,15 +288,22 @@ Sizes of Objects:
 sizeof(Coroutine): 28
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
+sizeof(LogBinProfiler): 68
+sizeof(LogBinTableRenderer): 1
+sizeof(LogBinJsonRenderer): 1
 
 CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  30000 |       0.066 |  0.000 |
-| DirectScheduling    |  30000 |       0.233 |  0.167 |
-| CoroutineScheduling |  30000 |       0.666 |  0.600 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  30000 |       0.066 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  30000 |       0.233 |  0.167 |
+| DirectSchedulingWithProfiler    |  30000 |       0.266 |  0.200 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  30000 |       0.500 |  0.434 |
+| CoroutineSchedulingWithProfiler |  30000 |       0.666 |  0.600 |
++---------------------------------+--------+-------------+--------+
 
 ```
 

@@ -40,11 +40,12 @@ is installed.
     * [Manual Coroutines](#ManualCoroutines)
     * [Coroutine Setup](#CoroutineSetup)
 * [Coroutine Profiling](#CoroutineProfiling)
-    * [Creating Profilers Directly](#CreatingProfilersDirectly)
-    * [Creating Profilers on Heap](#CreatingProfilersOnHeap)
+    * [Creating Profilers Manually](#CreatingProfilersManually)
+    * [Creating Profilers Automatically](#CreatingProfilersAutomatically)
     * [Running Coroutine With Profiler](#RunningCoroutineWithProfiler)
     * [Running Scheduler With Profiler](#RunningSchedulerWithProfiler)
     * [Rendering the Profiler Results](#RenderingProfilerResults)
+    * [Profiling Resource Consumption](#ProfilingResourceConsumption)
 * [Coroutine Communication](#Communication)
     * [Instance Variables](#InstanceVariables)
     * [Channels (Experimental)](#Channels)
@@ -1217,8 +1218,8 @@ help to look at 2 examples while looking through the following subsections:
 * [HelloCoroutineWithProfiler](examples/HelloCoroutineWithProfiler)
 * [HelloSchedulerWithProfiler](examples/HelloSchedulerWithProfiler)
 
-<a name="CreatingProfilersDirectly"></a>
-### Creating Profilers Directly
+<a name="CreatingProfilersManually"></a>
+### Creating Profilers Manually
 
 By default, a `Coroutine` has no reference to a `CoroutineProfiler`. The user
 can directly assign a profiler instance by creating it statically, then calling
@@ -1249,14 +1250,13 @@ void setup() {
 
 This technique works well if you have a small number of coroutines.
 
-<a name="CreatingProfilersOnHeap"></a>
-### Creating Profilers on Heap
+<a name="CreatingProfilersAutomatically"></a>
+### Creating Profilers Automatically
 
 If you are using a substantial number of coroutines, it is cumbersome to
 manually create these profilers for all coroutines. In that case, you can use
 the `LogBinProfiler::createProfilers()` convenience function which loops through
-every coroutine (defined by `Coroutine::getRoot()`, and assigns an instance of
-`LogBinProfiler` that is created on the heap:
+every coroutine and creates an instance of `LogBinProfiler` on the heap:
 
 ```C++
 #include <AceRoutine.h>
@@ -1276,8 +1276,9 @@ void setup() {
 }
 ```
 
-In the unlikely event that you delete the Profiler instances which were created
-on the heap, you can call the `LogBinProfiler::deleteProfilers()` static method.
+In the unlikely event that you need to delete the Profiler instances which were
+created on the heap, you can call the `LogBinProfiler::deleteProfilers()` static
+method.
 
 Finally, the `LogBinProfiler::clearProfilers()` static method calls the
 `LogBinProfiler::clear()` method on every profiler attached to every coroutine
@@ -1309,20 +1310,16 @@ void setup() {
 }
 
 void loop() {
-  myCoroutine.runCoroutineWithProfiler();
+  myCoroutine.runCoroutineWithProfiler(); // <---- instead of runCoroutine()
   ...
 }
 ```
 
-This technique is intended for resource constrained environments, usually 8-bit
-processors, where the overhead of a `CoroutineScheduler` is not desired.
-
 <a name="RunningSchedulerWithProfiler"></a>
 ### Running Scheduler with Profiler
 
-If the environment is using the `CoroutineScheduler`, it will automatically call
-the `Coroutine::runCoroutineWithProfiler()` on each coroutine and gather the
-profiling information automatically.
+To activate profiling when using the `CoroutineScheduler`, just replace the call
+to `CoroutineScheduler::loop()` with `CoroutineScheduler::loopWithProfiler()`.
 
 ```C++
 #include <AceRoutine.h>
@@ -1342,7 +1339,7 @@ void setup() {
 }
 
 void loop() {
-  CoroutineScheduler::loop();
+  CoroutineScheduler::loopWithProfiler(); // <---- instead of loop()
 }
 ```
 
@@ -1416,6 +1413,46 @@ this:
 "blinkLed":[65535,800,0,0,0,0,0,0,0,0,0]
 }
 ```
+
+<a name="ProfilingResourceConsumption"></a>
+### Profiling Resource Consumption
+
+The ability to profile the execution time of coroutines does not come for free,
+but I have tried to make it as cheap as possible.
+
+**Memory consumption**
+
+If the profiling feature is not wanted, you can continue to use the
+`Coroutine::runCoroutine()` or the `CoroutineScheduler::loop()` functions, and
+the flash usage will not increase. The only additional resource is 2 extra bytes
+(8-bit processors) or 4 extra bytes (32-bit processors) of static RAM, *per
+coroutine*, because each coroutine holds a pointer to the `CoroutineProfiler`,
+even if it is not used.
+
+If the profiling feature is enabled, the
+[MemoryBenchmark](examples/MemoryBenchmark) program shows that:
+
+* Using `Coroutine::runCoroutineWithProfiler()` consumes 50-80 bytes of extra
+  bytes of flash *per coroutine* compared to the normal
+  `Coroutine::runCoroutine()`, probably due to the virtual dispatch.
+* Using `CoroutineScheduler::loopWithProfiler()` consumes an additional 50-100
+  bytes of flash compared to using `CoroutineScheduler::loop()`, *plus* the
+  additional 50-80 bytes of flash *per coroutine* because the dispatching is
+  routed to `Coroutine::runCoroutineWithProfiler()`.
+* The `LogBinProfiler` consumes at least 64 bytes of static RAM per instance
+  because it holds an array of 32 bin of `uint16_t` integers. It also increases
+  the flash usage by 120-150 bytes, but that's a one-time hit, not per profiler
+  or coroutine.
+* The `LogBinTableRenderer` increases flash usage by 1300-2000 bytes.
+* The `LogBinJsonRenderer` increases flash usage by 700-1200 bytes.
+
+**CPU consumption**
+
+The [AutoBenchmark](examples/AutoBenchmark) program shows that calling the
+profiler-enabled methods, `Coroutine::runCoroutineWithProfiler()` and
+`CoroutineScheduler::loopWithProfiler(), increases latency by only 100ns (AVR,
+ESP8266), 133ns (STM32, Teensy 3.2), and 33ns (ESP32). Most applications should
+not be affected by this small increase in latency.
 
 <a name="Communication"></a>
 ## Coroutine Communication

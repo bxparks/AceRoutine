@@ -10,35 +10,32 @@
         * Resource consumption
             * Increases flash usage by 6-10 bytes per coroutine.
             * Increases static ram usage by 3 bytes (AVR) or 4 bytes (32-bit)
-              per coroutine.
+              per coroutine, plus the additional storage for string itself.
     * Support profiling of `Coroutine::runCoroutine()` execution time.
         * See [Coroutine Profiling](USER_GUIDE.md#CoroutineProfiling) in the
           `USER_GUIDE.md`.
         * API changes
             * Add `CoroutineProfiler` interface with a `updateElapsedMicros()`
               method.
-            * Add `Coroutine::setProfiler()`.
+            * Add `Coroutine::setProfiler()` to store the profiler pointer.
             * Add `Coroutine::runCoroutineWithProfiler()` which measures the
-              elapsed time of `runCoroutine()`.
-            * Update `CoroutineScheduler::runCoroutine()` to call
-              `runCoroutineWithProfiler()`.
+              elapsed time of `runCoroutine()` and calls
+              `CoroutineProfiler::updateElapsedMicros()`.
+            * Add `CoroutineScheduler::runCoroutineWithProfiler()` which calls
+              `Coroutine::runCoroutineWithProfiler()` instead of the normal
+              `Coroutine::runCoroutine()`.
+            * Add `CoroutineScheduler::loopWithProfiler()` public static method
+              which calls `runCoroutineWithProfiler()`.
         * Provide `LogBinProfiler` subclass of `CoroutineProfiler`.
             * Keeps a frequency count of the elapsed microseconds using 32 bins
               representing the `log2()` function of the elapsed microseconds.
-        * Provide 2 renderers:
+        * Provide 2 renderers of `LogBinProfiler`:
             * `LogBinTableRenderer::printTo()` prints a formatted table of the
               frequency count over all coroutines. This represents a poor-man's
               version of the log-log graph of the frequency count.
             * `LogBinJsonRenderer::printTo()` prints the frequency count
               in JSON format.
-        * Resource consumption
-            * Increases static ram usage by 2 bytes (AVR) or 4 bytes (32-bit)
-              per coroutine.
-            * Increases latency of `CoroutineScheduler::runCoroutine()` by only
-              100ns (AVR, ESP8266), 133ns (STM32, Teensy 3.2), and 33ns (ESP32).
-            * Increases the flash size of the `CoroutineScheduler` by 100-140
-              bytes for both 8-bit and 32-bit processors, even if
-              `CoroutineProfiler` is not used. This is a one-time hit.
+        * Memory consumption
         * See [HelloCoroutineWithProfiler](examples/HelloCoroutineWithProfiler)
           and [HelloSchedulerWithProfiler](examples/HelloSchedulerWithProfiler).
         * Thanks to peufeu2@ who provided the ideas and proof of concept in

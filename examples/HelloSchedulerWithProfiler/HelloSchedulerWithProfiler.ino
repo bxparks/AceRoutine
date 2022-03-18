@@ -109,5 +109,5 @@ void setup() {
 }
 
 void loop() {
-  CoroutineScheduler::loop();
+  CoroutineScheduler::loopWithProfiler();
 }

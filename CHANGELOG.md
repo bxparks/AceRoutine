@@ -35,7 +35,6 @@
               version of the log-log graph of the frequency count.
             * `LogBinJsonRenderer::printTo()` prints the frequency count
               in JSON format.
-        * Memory consumption
         * See [HelloCoroutineWithProfiler](examples/HelloCoroutineWithProfiler)
           and [HelloSchedulerWithProfiler](examples/HelloSchedulerWithProfiler).
         * Thanks to peufeu2@ who provided the ideas and proof of concept in

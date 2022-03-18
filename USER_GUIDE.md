@@ -45,7 +45,7 @@ is installed.
     * [Running Coroutine With Profiler](#RunningCoroutineWithProfiler)
     * [Running Scheduler With Profiler](#RunningSchedulerWithProfiler)
     * [Rendering the Profiler Results](#RenderingProfilerResults)
-    * [Profiling Resource Consumption](#ProfilingResourceConsumption)
+    * [Profiler Resource Consumption](#ProfilerResourceConsumption)
 * [Coroutine Communication](#Communication)
     * [Instance Variables](#InstanceVariables)
     * [Channels (Experimental)](#Channels)
@@ -1414,8 +1414,8 @@ this:
 }
 ```
 
-<a name="ProfilingResourceConsumption"></a>
-### Profiling Resource Consumption
+<a name="ProfilerResourceConsumption"></a>
+### Profiler Resource Consumption
 
 The ability to profile the execution time of coroutines does not come for free,
 but I have tried to make it as cheap as possible.
@@ -1450,9 +1450,16 @@ If the profiling feature is enabled, the
 
 The [AutoBenchmark](examples/AutoBenchmark) program shows that calling the
 profiler-enabled methods, `Coroutine::runCoroutineWithProfiler()` and
-`CoroutineScheduler::loopWithProfiler(), increases latency by only 100ns (AVR,
-ESP8266), 133ns (STM32, Teensy 3.2), and 33ns (ESP32). Most applications should
-not be affected by this small increase in latency.
+`CoroutineScheduler::loopWithProfiler(), increases latency by:
+
+* 3 - 3.2 micros on AVR
+* 0.4 micros on STM32F1
+* 0.2 - 0.3 micros on ESP8266
+* 0.1 micros on ESP32
+* 0.033 - 0.166 micros on Teensy 3.2
+
+On 32-bit processors, the overhead seems neglegible. On 8-bit processors, the 3
+microsecond of overhead might be an issue with sensitive applications.
 
 <a name="Communication"></a>
 ## Coroutine Communication

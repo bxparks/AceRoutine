@@ -59,7 +59,7 @@ others (in my opinion of course):
           and 4 bytes of static RAM independent of the number of coroutines
 * extremely fast context switching
     * Direct Scheduling (call `Coroutine::runCoroutine()` directly)
-        * ~1.2 microseconds on a 16 MHz ATmega328P
+        * ~1.0 microseconds on a 16 MHz ATmega328P
         * ~0.4 microseconds on a 48 MHz SAMD21
         * ~0.3 microseconds on a 72 MHz STM32
         * ~0.3 microseconds on a 80 MHz ESP8266
@@ -67,12 +67,12 @@ others (in my opinion of course):
         * ~0.17 microseconds on 96 MHz Teensy 3.2 (depending on compiler
           settings)
     * Coroutine Scheduling (use `CoroutineScheduler::loop()`):
-        * ~5.5 microseconds on a 16 MHz ATmega328P
+        * ~5.2 microseconds on a 16 MHz ATmega328P
         * ~1.3 microseconds on a 48 MHz SAMD21
         * ~0.9 microseconds on a 72 MHz STM32
-        * ~0.6 microseconds on a 80 MHz ESP8266
-        * ~0.2 microseconds on a 240 MHz ESP32
-        * ~0.5 microseconds on 96 MHz Teensy 3.2 (depending on compiler
+        * ~0.8 microseconds on a 80 MHz ESP8266
+        * ~0.3 microseconds on a 240 MHz ESP32
+        * ~0.4 microseconds on 96 MHz Teensy 3.2 (depending on compiler
           settings)
 * uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
   feature of the GCC compiler (also supported by Clang) to avoid the
@@ -298,9 +298,9 @@ Version 1.5 added support for profiling the execution time of
 only a single implementation (`LogBinProfiler`) is provided.
 
 The [HelloCoroutineWithProfiler.ino](examples/HelloCoroutineWithProfiler)
-program shows how to setup the profilers and extract the profiling information.
-This example is intended for resource constrained 8-bit processors which do not
-want to pay for the cost of the `CoroutineScheduler`.
+program shows how to setup the profilers and extract the profiling information
+using the `Coroutine::runCoroutineWithProfiler()` instead of the usual
+`Coroutine::runCoroutine()`:
 
 ```C++
 #include <AceRoutine.h>
@@ -332,12 +332,9 @@ COROUTINE(printHelloWorld) {
 
 COROUTINE(printProfiling) {
   COROUTINE_LOOP() {
-    LogBinTableRenderer tableRenderer(Coroutine::getRoot());
-    LogBinJsonRenderer jsonRenderer(Coroutine::getRoot());
-
-    tableRenderer.printTo(
+    LogBinTableRenderer::printTo(
         Serial, 3 /*startBin*/, 14 /*endBin*/, false /*clear*/);
-    jsonRenderer.printTo(
+    LogBinJsonRenderer::printTo(
         Serial, 3 /*startBin*/, 14 /*endBin*/);
 
     COROUTINE_DELAY(5000);
@@ -395,12 +392,13 @@ blinkLed     65535   830     0     0     0     0     0     0     0     0     0
 ### HelloSchedulerWithProfiler
 
 The [HelloSchedulerWithProfiler.ino](examples/HelloSchedulerWithProfiler) sketch
-implements the same thing as `HelloCoroutineWithProfiler` using the
-`CoroutineScheduler` which automatically supports the `CoroutineProfiler`.
-The assumption was that if the environment has enough resources to support
-a `CoroutineScheduler`, then it is probably not a large burden to include the
-code to support `CoroutineProfiler` by default. Hence, this is intended for
-32-bit environments where flash and static RAM resources are more plentiful.
+implements the same thing as `HelloCoroutineWithProfiler` using 2 techniques to
+handle larger numbers of coroutines:
+
+* use `LogBinProfiler::createProfilers()` to automatically create the profilers
+  on the heap and assign them to all coroutines
+* use `CoroutineScheduler::loopWithProfiler()` method instead of the
+  `CoroutineScheduler::loop()` method.
 
 ```C++
 #include <AceRoutine.h>
@@ -432,12 +430,9 @@ COROUTINE(printHelloWorld) {
 
 COROUTINE(printProfiling) {
   COROUTINE_LOOP() {
-    LogBinTableRenderer tableRenderer(Coroutine::getRoot());
-    LogBinJsonRenderer jsonRenderer(Coroutine::getRoot());
-
-    tableRenderer.printTo(
+    LogBinTableRenderer::printTo(
         Serial, 3 /*startBin*/, 14 /*endBin*/, false /*clear*/);
-    jsonRenderer.printTo(
+    LogBinJsonRenderer::printTo(
         Serial, 3 /*startBin*/, 14 /*endBin*/);
 
     COROUTINE_DELAY(5000);
@@ -457,13 +452,13 @@ void setup() {
   readPin.setName(F("readPin"));
 
   // Create profilers on the heap and attach them to all coroutines.
-  LogBinProfiler::createProfilers(Coroutine::getRoot());
+  LogBinProfiler::createProfilers();
 
   CoroutineScheduler::setup();
 }
 
 void loop() {
-  CoroutineScheduler::loop();
+  CoroutineScheduler::loopWithProfiler();
 }
 ```
 
@@ -665,6 +660,9 @@ On 8-bit processors (AVR Nano, Uno, etc):
 sizeof(Coroutine): 16
 sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
+sizeof(LogBinProfiler): 66
+sizeof(LogBinTableRenderer): 1
+sizeof(LogBinJsonRenderer): 1
 ```
 
 On 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32):
@@ -673,6 +671,9 @@ On 32-bit processors (e.g. Teensy ARM, ESP8266, ESP32):
 sizeof(Coroutine): 28
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
+sizeof(LogBinProfiler): 68
+sizeof(LogBinTableRenderer): 1
+sizeof(LogBinJsonRenderer): 1
 ```
 
 The `CoroutineScheduler` consumes only 2 bytes (8-bit processors) or 4 bytes
@@ -713,24 +714,30 @@ etc) for a handful of AceRoutine features. Here are some highlights:
 | One Coroutine (seconds)               |   1904/  212 |   288/   26 |
 | Two Coroutines (seconds)              |   2130/  236 |   514/   50 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (millis)     |   1992/  214 |   376/   28 |
-| Scheduler, Two Coroutines (millis)    |   2178/  238 |   562/   52 |
+| One Coroutine, Profiler               |   1874/  212 |   258/   26 |
+| Two Coroutines, Profiler              |   2132/  236 |   516/   50 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     |   1964/  214 |   348/   28 |
-| Scheduler, Two Coroutines (micros)    |   2122/  238 |   506/   52 |
+| Scheduler, One Coroutine (millis)     |   1928/  214 |   312/   28 |
+| Scheduler, Two Coroutines (millis)    |   2114/  238 |   498/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    |   2092/  214 |   476/   28 |
-| Scheduler, Two Coroutines (seconds)   |   2310/  238 |   694/   52 |
+| Scheduler, One Coroutine (micros)     |   1900/  214 |   284/   28 |
+| Scheduler, Two Coroutines (micros)    |   2058/  238 |   442/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      |   2046/  214 |   430/   28 |
-| Scheduler, Two Coroutines (setup)     |   2332/  238 |   716/   52 |
+| Scheduler, One Coroutine (seconds)    |   2028/  214 |   412/   28 |
+| Scheduler, Two Coroutines (seconds)   |   2246/  238 |   630/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  |   2024/  214 |   408/   28 |
-| Scheduler, Two Coroutines (man setup) |   2318/  238 |   702/   52 |
+| Scheduler, One Coroutine (setup)      |   1978/  214 |   362/   28 |
+| Scheduler, Two Coroutines (setup)     |   2264/  238 |   648/   52 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             |   2100/  286 |   484/  100 |
-| Scheduler, LogBinTableRenderer        |   3502/  304 |  1886/  118 |
-| Scheduler, LogBinJsonRenderer         |   3022/  308 |  1406/  122 |
+| Scheduler, One Coroutine (man setup)  |   1956/  214 |   340/   28 |
+| Scheduler, Two Coroutines (man setup) |   2250/  238 |   634/   52 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine, Profiler    |   1992/  214 |   376/   28 |
+| Scheduler, Two Coroutines, Profiler   |   2178/  238 |   562/   52 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, LogBinProfiler             |   2112/  286 |   496/  100 |
+| Scheduler, LogBinTableRenderer        |   3514/  304 |  1898/  118 |
+| Scheduler, LogBinJsonRenderer         |   3034/  308 |  1418/  122 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        |   1948/  189 |   332/    3 |
 | Blink Coroutine                       |   2118/  212 |   502/   26 |
@@ -757,24 +764,30 @@ etc) for a handful of AceRoutine features. Here are some highlights:
 | One Coroutine (seconds)               | 265209/28028 |   228/   44 |
 | Two Coroutines (seconds)              | 265385/28060 |   404/   76 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (millis)     | 265321/28036 |   340/   52 |
-| Scheduler, Two Coroutines (millis)    | 265449/28060 |   468/   76 |
+| One Coroutine, Profiler               | 265257/28028 |   276/   44 |
+| Two Coroutines, Profiler              | 265433/28060 |   452/   76 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     | 265321/28036 |   340/   52 |
-| Scheduler, Two Coroutines (micros)    | 265449/28060 |   468/   76 |
+| Scheduler, One Coroutine (millis)     | 265241/28036 |   260/   52 |
+| Scheduler, Two Coroutines (millis)    | 265385/28060 |   404/   76 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    | 265337/28036 |   356/   52 |
-| Scheduler, Two Coroutines (seconds)   | 265497/28060 |   516/   76 |
+| Scheduler, One Coroutine (micros)     | 265257/28036 |   276/   52 |
+| Scheduler, Two Coroutines (micros)    | 265401/28060 |   420/   76 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      | 265337/28036 |   356/   52 |
-| Scheduler, Two Coroutines (setup)     | 265513/28060 |   532/   76 |
+| Scheduler, One Coroutine (seconds)    | 265257/28036 |   276/   52 |
+| Scheduler, Two Coroutines (seconds)   | 265417/28060 |   436/   76 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  | 265337/28036 |   356/   52 |
-| Scheduler, Two Coroutines (man setup) | 265513/28060 |   532/   76 |
+| Scheduler, One Coroutine (setup)      | 265273/28036 |   292/   52 |
+| Scheduler, Two Coroutines (setup)     | 265433/28060 |   452/   76 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             | 265449/28100 |   468/  116 |
+| Scheduler, One Coroutine (man setup)  | 265257/28036 |   276/   52 |
+| Scheduler, Two Coroutines (man setup) | 265433/28060 |   452/   76 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, One Coroutine, Profiler    | 265321/28036 |   340/   52 |
+| Scheduler, Two Coroutines, Profiler   | 265449/28060 |   468/   76 |
+|---------------------------------------+--------------+-------------|
+| Scheduler, LogBinProfiler             | 265465/28100 |   484/  116 |
 | Scheduler, LogBinTableRenderer        | 267381/28100 |  2400/  116 |
-| Scheduler, LogBinJsonRenderer         | 266773/28104 |  1792/  120 |
+| Scheduler, LogBinJsonRenderer         | 266789/28104 |  1808/  120 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        | 265669/28064 |   688/   80 |
 | Blink Coroutine                       | 265801/28100 |   820/  116 |
@@ -801,25 +814,33 @@ See [examples/AutoBenchmark](examples/AutoBenchmark). Here are 2 samples:
 Arduino Nano:
 
 ```
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       1.700 |  0.000 |
-| DirectScheduling    |  10000 |       2.900 |  1.200 |
-| CoroutineScheduling |  10000 |       7.200 |  5.500 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  10000 |       1.900 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  10000 |       2.800 |  0.900 |
+| DirectSchedulingWithProfiler    |  10000 |       5.800 |  3.900 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  10000 |       7.000 |  5.100 |
+| CoroutineSchedulingWithProfiler |  10000 |       9.300 |  7.400 |
++---------------------------------+--------+-------------+--------+
 ```
 
 ESP8266:
 
 ```
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       0.100 |  0.000 |
-| DirectScheduling    |  10000 |       0.500 |  0.400 |
-| CoroutineScheduling |  10000 |       1.000 |  0.900 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  10000 |       0.100 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  10000 |       0.500 |  0.400 |
+| DirectSchedulingWithProfiler    |  10000 |       0.800 |  0.700 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  10000 |       0.900 |  0.800 |
+| CoroutineSchedulingWithProfiler |  10000 |       1.100 |  1.000 |
++---------------------------------+--------+-------------+--------+
 ```
 
 <a name="SystemRequirements"></a>

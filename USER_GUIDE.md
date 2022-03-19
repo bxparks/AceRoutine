@@ -279,7 +279,7 @@ class Coroutine {
     uint8_t getNameType() const;
     void printNameTo(Print& printer) const;
 };
-``
+```
 
 It is expected that the `setName()` will be called in the global `setup()`
 function.

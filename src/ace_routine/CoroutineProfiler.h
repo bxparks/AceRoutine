@@ -29,6 +29,10 @@ SOFTWARE.
 
 namespace ace_routine {
 
+/**
+ * An interface class for profiling classes that can track the elapsed time
+ * consumed by `Coroutine::runCoroutine()`.
+ */
 class CoroutineProfiler {
   public:
     /** Use default constructor. */

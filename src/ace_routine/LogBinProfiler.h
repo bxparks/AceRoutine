@@ -53,6 +53,7 @@ namespace ace_routine {
 template <typename T_COROUTINE>
 class LogBinProfilerTemplate : public CoroutineProfiler {
   public:
+    /** Number of event counter bins used by this class. */
     static const uint8_t kNumBins = 32;
 
   public:
@@ -134,6 +135,7 @@ class LogBinProfilerTemplate : public CoroutineProfiler {
     }
 
   public:
+    /** Event count bins. */
     uint16_t mBins[kNumBins];
 };
 

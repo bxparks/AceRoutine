@@ -34,7 +34,7 @@ SOFTWARE.
 namespace ace_routine {
 
 /**
- * Print the `LogBinProfiler bins as a JSON array. For example, here
+ * Print the `LogBinProfiler` bins as a JSON array. For example, here
  * is the output from `examples/SoundManager`:
  *
  * @verbatim

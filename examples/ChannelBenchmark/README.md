@@ -16,7 +16,7 @@ operations took, per iteration.
 
 All times in below are in microseconds.
 
-**Version**: AceRoutine v1.4.2
+**Version**: AceRoutine v1.5.0
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 

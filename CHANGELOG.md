@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 1.5.0 (2022-03-19)
     * (Re)add support for human-readable coroutine names.
         * See [Coroutine Names](USER_GUIDE.md#CoroutineNames) in the
           `USER_GUIDE.md`.

@@ -30,11 +30,10 @@ The following classes are used for profiling:
 * `LogBinTableRenderer` prints the histogram as a table
 * `LogBinJsonRenderer` prints the histogram as a JSON object
 
-The following is an experimental feature:
+The following is an experimental feature whose API and functionality may change
+considerably in the future:
 
-* `Channel` class allows coroutines to send messages to each other. This is
-  an experimental feature whose API and feature may change considerably
-  in the future.
+* `Channel` class allows coroutines to send messages to each other
 
 The library provides a number of macros to help create coroutines and manage
 their life cycle:
@@ -89,7 +88,8 @@ others (in my opinion of course):
         * ~0.3 microseconds on a 240 MHz ESP32
         * ~0.4 microseconds on 96 MHz Teensy 3.2 (depending on compiler
           settings)
-* uses the [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
+* uses the
+  [computed goto](https://gcc.gnu.org/onlinedocs/gcc/Labels-as-Values.html)
   feature of the GCC compiler (also supported by Clang) to avoid the
   [Duff's Device](https://en.wikipedia.org/wiki/Duff%27s_device) hack
     * allows `switch` statements in the coroutines

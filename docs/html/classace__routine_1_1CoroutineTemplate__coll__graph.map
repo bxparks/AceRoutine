@@ -1,3 +1,4 @@
-<map id="ace_routine::CoroutineTemplate&lt; T_CLOCK &gt;" name="ace_routine::CoroutineTemplate&lt; T_CLOCK &gt;">
-<area shape="rect" id="node1" title="Base class of all coroutines." alt="" coords="5,5,235,47"/>
+<map id="ace_routine::CoroutineTemplate&lt; T_CLOCK, T_DELAY &gt;" name="ace_routine::CoroutineTemplate&lt; T_CLOCK, T_DELAY &gt;">
+<area shape="rect" id="node1" title="Base class of all coroutines." alt="" coords="5,95,235,136"/>
+<area shape="rect" id="node2" href="$classace__routine_1_1CoroutineProfiler.html" title="An interface class for profiling classes that can track the elapsed time consumed by Coroutine::runCo..." alt="" coords="13,5,227,32"/>
 </map>

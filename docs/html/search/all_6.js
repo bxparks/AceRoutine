@@ -1,9 +1,13 @@
 var searchData=
 [
-  ['kstatusdelaying_41',['kStatusDelaying',['../classace__routine_1_1CoroutineTemplate.html#a673ca8db9f3bf62a2f3be8d394358e6a',1,'ace_routine::CoroutineTemplate']]],
-  ['kstatusending_42',['kStatusEnding',['../classace__routine_1_1CoroutineTemplate.html#a14912dd5c52d2a3963a377aae4059dc1',1,'ace_routine::CoroutineTemplate']]],
-  ['kstatusrunning_43',['kStatusRunning',['../classace__routine_1_1CoroutineTemplate.html#a2b05fc95e0d6765be90955655f64cfd4',1,'ace_routine::CoroutineTemplate']]],
-  ['kstatussuspended_44',['kStatusSuspended',['../classace__routine_1_1CoroutineTemplate.html#a51ea72999f8fe2d32f753f9bbb436234',1,'ace_routine::CoroutineTemplate']]],
-  ['kstatusterminated_45',['kStatusTerminated',['../classace__routine_1_1CoroutineTemplate.html#ac0980cd59e49683d0f649687010e38f4',1,'ace_routine::CoroutineTemplate']]],
-  ['kstatusyielding_46',['kStatusYielding',['../classace__routine_1_1CoroutineTemplate.html#aaa2157d08593c9f88f1b0698528573bd',1,'ace_routine::CoroutineTemplate']]]
+  ['isdelayexpired_42',['isDelayExpired',['../classace__routine_1_1CoroutineTemplate.html#adab02ac8807017d168b0ba1c5cec3920',1,'ace_routine::CoroutineTemplate']]],
+  ['isdelaying_43',['isDelaying',['../classace__routine_1_1CoroutineTemplate.html#a731663b0141022c126e9368e1dfe3e17',1,'ace_routine::CoroutineTemplate']]],
+  ['isdelaymicrosexpired_44',['isDelayMicrosExpired',['../classace__routine_1_1CoroutineTemplate.html#acd7d7d1d81f507a04e7a9db8b8820381',1,'ace_routine::CoroutineTemplate']]],
+  ['isdelaysecondsexpired_45',['isDelaySecondsExpired',['../classace__routine_1_1CoroutineTemplate.html#a122e9d35f313975df73ac49afaaa3015',1,'ace_routine::CoroutineTemplate']]],
+  ['isdone_46',['isDone',['../classace__routine_1_1CoroutineTemplate.html#ad753c3b474c659fa6684bde0bd20919c',1,'ace_routine::CoroutineTemplate']]],
+  ['isending_47',['isEnding',['../classace__routine_1_1CoroutineTemplate.html#ad7d690556138014c63be958b0a125516',1,'ace_routine::CoroutineTemplate']]],
+  ['isrunning_48',['isRunning',['../classace__routine_1_1CoroutineTemplate.html#a733385866face30c4fc4223780c1b47e',1,'ace_routine::CoroutineTemplate']]],
+  ['issuspended_49',['isSuspended',['../classace__routine_1_1CoroutineTemplate.html#aa0f33aa5a6197aa143e86708d7f6fb15',1,'ace_routine::CoroutineTemplate']]],
+  ['isterminated_50',['isTerminated',['../classace__routine_1_1CoroutineTemplate.html#a5c74778815c76301895765e7485b4bf8',1,'ace_routine::CoroutineTemplate']]],
+  ['isyielding_51',['isYielding',['../classace__routine_1_1CoroutineTemplate.html#a9c07ae01d589335fa5728210de000755',1,'ace_routine::CoroutineTemplate']]]
 ];

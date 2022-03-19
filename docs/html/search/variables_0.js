@@ -1,9 +1,12 @@
 var searchData=
 [
-  ['kstatusdelaying_128',['kStatusDelaying',['../classace__routine_1_1CoroutineTemplate.html#a673ca8db9f3bf62a2f3be8d394358e6a',1,'ace_routine::CoroutineTemplate']]],
-  ['kstatusending_129',['kStatusEnding',['../classace__routine_1_1CoroutineTemplate.html#a14912dd5c52d2a3963a377aae4059dc1',1,'ace_routine::CoroutineTemplate']]],
-  ['kstatusrunning_130',['kStatusRunning',['../classace__routine_1_1CoroutineTemplate.html#a2b05fc95e0d6765be90955655f64cfd4',1,'ace_routine::CoroutineTemplate']]],
-  ['kstatussuspended_131',['kStatusSuspended',['../classace__routine_1_1CoroutineTemplate.html#a51ea72999f8fe2d32f753f9bbb436234',1,'ace_routine::CoroutineTemplate']]],
-  ['kstatusterminated_132',['kStatusTerminated',['../classace__routine_1_1CoroutineTemplate.html#ac0980cd59e49683d0f649687010e38f4',1,'ace_routine::CoroutineTemplate']]],
-  ['kstatusyielding_133',['kStatusYielding',['../classace__routine_1_1CoroutineTemplate.html#aaa2157d08593c9f88f1b0698528573bd',1,'ace_routine::CoroutineTemplate']]]
+  ['knametypecstring_182',['kNameTypeCString',['../classace__routine_1_1CoroutineTemplate.html#ac2c0bed6845b265a15d047f5fb9e1f2a',1,'ace_routine::CoroutineTemplate']]],
+  ['knametypefstring_183',['kNameTypeFString',['../classace__routine_1_1CoroutineTemplate.html#af5edcad4909c75a7dfe85f5b59135d1b',1,'ace_routine::CoroutineTemplate']]],
+  ['knumbins_184',['kNumBins',['../classace__routine_1_1LogBinProfilerTemplate.html#af25fa69ddc686411422f38a2e7a461ee',1,'ace_routine::LogBinProfilerTemplate']]],
+  ['kstatusdelaying_185',['kStatusDelaying',['../classace__routine_1_1CoroutineTemplate.html#affeba86cf0732cd88588732cc29e3fb3',1,'ace_routine::CoroutineTemplate']]],
+  ['kstatusending_186',['kStatusEnding',['../classace__routine_1_1CoroutineTemplate.html#a300f41394630bc6324b7749afbb8e583',1,'ace_routine::CoroutineTemplate']]],
+  ['kstatusrunning_187',['kStatusRunning',['../classace__routine_1_1CoroutineTemplate.html#af35a3db36cc75dce8aa9196ff3d4068b',1,'ace_routine::CoroutineTemplate']]],
+  ['kstatussuspended_188',['kStatusSuspended',['../classace__routine_1_1CoroutineTemplate.html#af9b629c958610313eb1c0dc2d63cf047',1,'ace_routine::CoroutineTemplate']]],
+  ['kstatusterminated_189',['kStatusTerminated',['../classace__routine_1_1CoroutineTemplate.html#aee76b758eb2c683b1823f05433bc13ee',1,'ace_routine::CoroutineTemplate']]],
+  ['kstatusyielding_190',['kStatusYielding',['../classace__routine_1_1CoroutineTemplate.html#a803df9549b871e9071eb48b5a896cea7',1,'ace_routine::CoroutineTemplate']]]
 ];

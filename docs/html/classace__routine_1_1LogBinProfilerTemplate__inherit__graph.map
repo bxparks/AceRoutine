@@ -1,0 +1,4 @@
+<map id="ace_routine::LogBinProfilerTemplate&lt; T_COROUTINE &gt;" name="ace_routine::LogBinProfilerTemplate&lt; T_COROUTINE &gt;">
+<area shape="rect" id="node1" title="Class that maintains the frequency count of the elapsed time of runCoroutine() in an array of bins wh..." alt="" coords="10,80,215,121"/>
+<area shape="rect" id="node2" href="$classace__routine_1_1CoroutineProfiler.html" title="An interface class for profiling classes that can track the elapsed time consumed by Coroutine::runCo..." alt="" coords="5,5,220,32"/>
+</map>

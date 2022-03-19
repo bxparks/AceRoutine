@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['status_140',['Status',['../classace__routine_1_1CoroutineTemplate.html#ac63ae27c5f03a0cf85c6be2718626f25',1,'ace_routine::CoroutineTemplate']]]
+  ['profiler_201',['Profiler',['../classace__routine_1_1LogBinJsonRendererTemplate.html#ab5d0a981189b55dbc175adc487570283',1,'ace_routine::LogBinJsonRendererTemplate::Profiler()'],['../classace__routine_1_1LogBinTableRendererTemplate.html#a0db94e7cfc0b34dd12f012b7b7959e35',1,'ace_routine::LogBinTableRendererTemplate::Profiler()']]]
 ];

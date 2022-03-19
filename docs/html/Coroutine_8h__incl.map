@@ -1,7 +1,11 @@
 <map id="/home/brian/src/AceRoutine/src/ace_routine/Coroutine.h" name="/home/brian/src/AceRoutine/src/ace_routine/Coroutine.h">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,209,47"/>
-<area shape="rect" id="node2" title=" " alt="" coords="47,169,117,196"/>
-<area shape="rect" id="node3" title=" " alt="" coords="75,95,139,121"/>
-<area shape="rect" id="node4" href="$ClockInterface_8h_source.html" title=" " alt="" coords="163,95,291,121"/>
-<area shape="rect" id="node5" title=" " alt="" coords="185,169,269,196"/>
+<area shape="rect" id="node1" title=" " alt="" coords="149,5,353,47"/>
+<area shape="rect" id="node2" title=" " alt="" coords="293,169,364,196"/>
+<area shape="rect" id="node3" title=" " alt="" coords="29,95,93,121"/>
+<area shape="rect" id="node4" title=" " alt="" coords="117,95,234,121"/>
+<area shape="rect" id="node5" href="$CoroutineProfiler_8h_source.html" title=" " alt="" coords="257,95,400,121"/>
+<area shape="rect" id="node6" href="$ClockInterface_8h_source.html" title=" " alt="" coords="425,95,553,121"/>
+<area shape="rect" id="node8" href="$compat_8h.html" title=" " alt="" coords="577,95,659,121"/>
+<area shape="rect" id="node7" title=" " alt="" coords="447,169,531,196"/>
+<area shape="rect" id="node9" title=" " alt="" coords="555,169,681,196"/>
 </map>

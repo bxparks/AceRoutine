@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['micros_104',['micros',['../classace__routine_1_1ClockInterface.html#ab8963dc53edb04d3ab800eac7c3b358e',1,'ace_routine::ClockInterface']]],
-  ['millis_105',['millis',['../classace__routine_1_1ClockInterface.html#aeb6701bd63ee8fb7dbb81efaf0ac02bf',1,'ace_routine::ClockInterface']]]
+  ['list_147',['list',['../classace__routine_1_1CoroutineSchedulerTemplate.html#adfe184942d2691e1b4c8774623722d8e',1,'ace_routine::CoroutineSchedulerTemplate']]],
+  ['logbinprofilertemplate_148',['LogBinProfilerTemplate',['../classace__routine_1_1LogBinProfilerTemplate.html#a761a35277eac30dcd74c5ba5957df7df',1,'ace_routine::LogBinProfilerTemplate']]],
+  ['loop_149',['loop',['../classace__routine_1_1CoroutineSchedulerTemplate.html#abf192f6066f9a7cc80219461966cba2f',1,'ace_routine::CoroutineSchedulerTemplate']]],
+  ['loopwithprofiler_150',['loopWithProfiler',['../classace__routine_1_1CoroutineSchedulerTemplate.html#a63c906ac67be3feb9cf6b64efef1c866',1,'ace_routine::CoroutineSchedulerTemplate']]]
 ];

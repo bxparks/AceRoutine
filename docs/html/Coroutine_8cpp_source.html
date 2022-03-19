@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceRoutine
-   &#160;<span id="projectnumber">1.4.2</span>
+   &#160;<span id="projectnumber">1.5.0</span>
    </div>
    <div id="projectbrief">A low-memory, fast-switching, cooperative multitasking library using stackless coroutines on Arduino platforms.</div>
   </td>
@@ -102,27 +102,28 @@ $(function() {
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment">// Create the sStatusStrings lookup table to translate Status integer to a</span></div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">// human-readable string. When it is used, it increases flash memory by 86</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">// bytes, and static RAM by 14 bytes. It is currently only used by</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment">// CoroutineScheduler::list() but I think it&#39;s worth it to make debugging</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">// easier.</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusSuspendedString[] PROGMEM = <span class="stringliteral">&quot;Suspended&quot;</span>;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusYieldingString[] PROGMEM = <span class="stringliteral">&quot;Yielding&quot;</span>;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusDelayingString[] PROGMEM = <span class="stringliteral">&quot;Delaying&quot;</span>;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusRunningString[] PROGMEM = <span class="stringliteral">&quot;Running&quot;</span>;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusEndingString[] PROGMEM = <span class="stringliteral">&quot;Ending&quot;</span>;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusTerminatedString[] PROGMEM = <span class="stringliteral">&quot;Terminated&quot;</span>;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">const</span> __FlashStringHelper* <span class="keyword">const</span> sStatusStrings[] = {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusSuspendedString),</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusYieldingString),</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusDelayingString),</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusRunningString),</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusEndingString),</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusTerminatedString),</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;};</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">// bytes. It is currently only used by CoroutineScheduler::list() but I think</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment">// it&#39;s worth it to make debugging easier.</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusSuspendedString[] PROGMEM = <span class="stringliteral">&quot;Suspended&quot;</span>;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusYieldingString[] PROGMEM = <span class="stringliteral">&quot;Yielding&quot;</span>;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusDelayingString[] PROGMEM = <span class="stringliteral">&quot;Delaying&quot;</span>;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusRunningString[] PROGMEM = <span class="stringliteral">&quot;Running&quot;</span>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusEndingString[] PROGMEM = <span class="stringliteral">&quot;Ending&quot;</span>;</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> <span class="keywordtype">char</span> kStatusTerminatedString[] PROGMEM = <span class="stringliteral">&quot;Terminated&quot;</span>;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160; </div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">// Store the array of PROGMEM pointers in PROGMEM as well, saving 14 bytes of</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">// RAM on AVR, and 28 bytes on ESP8266.</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">const</span> __FlashStringHelper* <span class="keyword">const</span> sStatusStrings[] PROGMEM = {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusSuspendedString),</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusYieldingString),</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusDelayingString),</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusRunningString),</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusEndingString),</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a>(kStatusTerminatedString),</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;};</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="acompat_8h_html_aaa60649c7ffe7ed1fbe16dc20ed7e8c3"><div class="ttname"><a href="compat_8h.html#aaa60649c7ffe7ed1fbe16dc20ed7e8c3">FPSTR</a></div><div class="ttdeci">#define FPSTR(p)</div><div class="ttdoc">A macro that converts a const char* that already points to a PROGMEM string to a const __FlashStringH...</div><div class="ttdef"><b>Definition:</b> <a href="compat_8h_source.html#l00087">compat.h:87</a></div></div>
 <div class="ttc" id="acompat_8h_html"><div class="ttname"><a href="compat_8h.html">compat.h</a></div></div>

@@ -29,6 +29,7 @@ SOFTWARE.
   #include <Arduino.h> // Serial, Print
 #endif
 #include "Coroutine.h"
+#include "CoroutineProfiler.h"
 
 class Print;
 
@@ -91,10 +92,20 @@ class CoroutineSchedulerTemplate {
     /**
      * Run the current coroutine using the current scheduler. This method
      * returns when the underlying Coroutine suspends execution, which allows
-     * the system loop() to return to do systems processing, such as WiFi.
+     * the system loop() to return to do systems processing.
      * Everyone must cooperate to make the whole thing work.
      */
     static void loop() { getScheduler()->runCoroutine(); }
+
+    /**
+     * Run the current coroutine using the current scheduler with the coroutine
+     * profiler enabled. This method returns when the underlying Coroutine
+     * suspends execution, which allows the system loop() to return to do
+     * systems processing. Everyone must cooperate to make the whole thing work.
+     */
+    static void loopWithProfiler() {
+      getScheduler()->runCoroutineWithProfiler();
+    }
 
     /**
      * Print out the known coroutines to the printer (usually Serial). Note that
@@ -145,7 +156,10 @@ class CoroutineSchedulerTemplate {
       }
     }
 
-    /** Run the current coroutine. */
+    /**
+     * Run the current coroutine without the overhead of the profiler by calling
+     * Coroutine::runCoroutine().
+     */
     void runCoroutine() {
       // If reached the end, start from the beginning again.
       if (*mCurrent == nullptr) {
@@ -157,12 +171,6 @@ class CoroutineSchedulerTemplate {
           return;
         }
       }
-
-    #if ACE_ROUTINE_DEBUG == 1
-      Serial.print(F("Processing "));
-      Serial.print((uintptr_t) (*mCurrent));
-      Serial.println();
-    #endif
 
       // Handle the coroutine's dispatch back to the last known internal status.
       switch ((*mCurrent)->getStatus()) {
@@ -189,13 +197,56 @@ class CoroutineSchedulerTemplate {
       mCurrent = (*mCurrent)->getNext();
     }
 
+    /*
+     * Run the current coroutine with profiling enabled by calling
+     * Coroutine::runCoroutineWithProfiler().
+     */
+    void runCoroutineWithProfiler() {
+      // If reached the end, start from the beginning again.
+      if (*mCurrent == nullptr) {
+        mCurrent = T_COROUTINE::getRoot();
+        // Return if the list is empty. Checking for a null getRoot() inside the
+        // if-statement is deliberate, since it optimizes the common case where
+        // the linked list is not empty.
+        if (*mCurrent == nullptr) {
+          return;
+        }
+      }
+
+      // Handle the coroutine's dispatch back to the last known internal status.
+      switch ((*mCurrent)->getStatus()) {
+        case T_COROUTINE::kStatusYielding:
+        case T_COROUTINE::kStatusDelaying:
+          // The coroutine itself knows whether it is yielding or delaying, and
+          // its continuation context determines whether to call
+          // Coroutine::isDelayExpired(), Coroutine::isDelayMicrosExpired(), or
+          // Coroutine::isDelaySecondsExpired().
+          //
+          // This version calls `Coroutine::runCoroutineWithProfiler()` to
+          // enable the profiler.
+          (*mCurrent)->runCoroutineWithProfiler();
+          break;
+
+        case T_COROUTINE::kStatusEnding:
+          // mark it terminated
+          (*mCurrent)->setTerminated();
+          break;
+
+        default:
+          // For all other cases, just skip to the next coroutine.
+          break;
+      }
+
+      // Go to the next coroutine
+      mCurrent = (*mCurrent)->getNext();
+    }
 
     /** List all the routines in the linked list to the printer. */
     void listCoroutines(Print& printer) {
       for (T_COROUTINE** p = T_COROUTINE::getRoot(); (*p) != nullptr;
           p = (*p)->getNext()) {
         printer.print(F("Coroutine "));
-        printer.print((uintptr_t) *p);
+        (*p)->printNameTo(printer);
         printer.print(F("; status: "));
         (*p)->statusPrintTo(printer);
         printer.println();

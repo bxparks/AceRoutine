@@ -59,16 +59,19 @@ END {
   print ""
   print "CPU:"
 
-  printf("+---------------------+--------+-------------+--------+\n")
-  printf("| Functionality       |  iters | micros/iter |   diff |\n")
+  printf("+---------------------------------+--------+-------------+--------+\n")
+  printf("| Functionality                   |  iters | micros/iter |   diff |\n")
   for (i = 0; i < TOTAL_BENCHMARKS; i++) {
     name = u[i]["name"]
-    if (name ~ /^EmptyLoop$/ || name ~ /^DirectScheduler$/){
-      printf("|---------------------+--------+-------------+--------|\n")
+    if (name ~ /^EmptyLoop$/ \
+        || name ~ /^DirectScheduling$/ \
+        || name ~ /^CoroutineScheduling$/ \
+    ) {
+      printf("|---------------------------------+--------+-------------+--------|\n")
     }
 
-    printf("| %-19s | %6d | %11.3f | %6.3f |\n",
-      u[i]["name"], u[i]["iterations"], u[i]["micros"], u[i]["diff"])
+    printf("| %-31s | %6d | %11.3f | %6.3f |\n",
+      name, u[i]["iterations"], u[i]["micros"], u[i]["diff"])
   }
-  printf("+---------------------+--------+-------------+--------+\n")
+  printf("+---------------------------------+--------+-------------+--------+\n")
 }

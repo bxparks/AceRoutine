@@ -14,7 +14,7 @@ is the overhead caused by the `Coroutine` context switch.
 
 All times in below are in microseconds.
 
-**Version**: AceRoutine v1.4.2
+**Version**: AceRoutine v1.5.0
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -121,6 +121,15 @@ $ make README.md
         * ESP32 Core from 1.0.6 to 2.0.2
         * Teensyduino from 1.54 to 1.56
 
+* v1.5.0
+    * Add `CoroutineProfiler` to `CoroutineScheduler`.
+        * `CoroutineScheduler::runCoroutine()` becomes slightly slower:
+        * 0.100 microseconds (AVR)
+        * 0.133 microseconds (STM32)
+        * 0.100 microseconds (ESP8266)
+        * 0.033 microseconds (ESP32)
+        * 0.133 microseconds (Teensy 3.2)
+
 ## Arduino Nano
 
 * 16MHz ATmega328P
@@ -130,18 +139,25 @@ $ make README.md
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 11
+sizeof(Coroutine): 16
 sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
+sizeof(LogBinProfiler): 66
+sizeof(LogBinTableRenderer): 1
+sizeof(LogBinJsonRenderer): 1
 
 CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       1.700 |  0.000 |
-| DirectScheduling    |  10000 |       2.900 |  1.200 |
-| CoroutineScheduling |  10000 |       7.200 |  5.500 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  10000 |       1.900 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  10000 |       2.800 |  0.900 |
+| DirectSchedulingWithProfiler    |  10000 |       5.800 |  3.900 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  10000 |       7.000 |  5.100 |
+| CoroutineSchedulingWithProfiler |  10000 |       9.300 |  7.400 |
++---------------------------------+--------+-------------+--------+
 
 ```
 
@@ -154,18 +170,25 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 11
+sizeof(Coroutine): 16
 sizeof(CoroutineScheduler): 2
 sizeof(Channel<int>): 5
+sizeof(LogBinProfiler): 66
+sizeof(LogBinTableRenderer): 1
+sizeof(LogBinJsonRenderer): 1
 
 CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       1.800 |  0.000 |
-| DirectScheduling    |  10000 |       2.900 |  1.100 |
-| CoroutineScheduling |  10000 |       7.300 |  5.500 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  10000 |       1.700 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  10000 |       2.800 |  1.100 |
+| DirectSchedulingWithProfiler    |  10000 |       5.800 |  4.100 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  10000 |       7.100 |  5.400 |
+| CoroutineSchedulingWithProfiler |  10000 |       9.400 |  7.700 |
++---------------------------------+--------+-------------+--------+
 
 ```
 
@@ -177,18 +200,19 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 20
-sizeof(CoroutineScheduler): 4
-sizeof(Channel<int>): 12
 
 CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  30000 |       0.133 |  0.000 |
-| DirectScheduling    |  30000 |       0.533 |  0.400 |
-| CoroutineScheduling |  30000 |       1.133 |  1.000 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  30000 |       0.166 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  30000 |       0.533 |  0.367 |
+| DirectSchedulingWithProfiler    |  30000 |       0.933 |  0.767 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  30000 |       1.066 |  0.900 |
+| CoroutineSchedulingWithProfiler |  30000 |       1.466 |  1.300 |
++---------------------------------+--------+-------------+--------+
 
 ```
 
@@ -200,18 +224,25 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 20
+sizeof(Coroutine): 28
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
+sizeof(LogBinProfiler): 68
+sizeof(LogBinTableRenderer): 1
+sizeof(LogBinJsonRenderer): 1
 
 CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  10000 |       0.100 |  0.000 |
-| DirectScheduling    |  10000 |       0.500 |  0.400 |
-| CoroutineScheduling |  10000 |       0.900 |  0.800 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  10000 |       0.100 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  10000 |       0.500 |  0.400 |
+| DirectSchedulingWithProfiler    |  10000 |       0.800 |  0.700 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  10000 |       0.900 |  0.800 |
+| CoroutineSchedulingWithProfiler |  10000 |       1.100 |  1.000 |
++---------------------------------+--------+-------------+--------+
 
 ```
 
@@ -223,18 +254,25 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 20
+sizeof(Coroutine): 28
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
+sizeof(LogBinProfiler): 68
+sizeof(LogBinTableRenderer): 1
+sizeof(LogBinJsonRenderer): 1
 
 CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  30000 |       0.066 |  0.000 |
-| DirectScheduling    |  30000 |       0.133 |  0.067 |
-| CoroutineScheduling |  30000 |       0.333 |  0.267 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  30000 |       0.033 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  30000 |       0.133 |  0.100 |
+| DirectSchedulingWithProfiler    |  30000 |       0.233 |  0.200 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  30000 |       0.333 |  0.300 |
+| CoroutineSchedulingWithProfiler |  30000 |       0.433 |  0.400 |
++---------------------------------+--------+-------------+--------+
 
 ```
 
@@ -247,18 +285,25 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(Coroutine): 20
+sizeof(Coroutine): 28
 sizeof(CoroutineScheduler): 4
 sizeof(Channel<int>): 12
+sizeof(LogBinProfiler): 68
+sizeof(LogBinTableRenderer): 1
+sizeof(LogBinJsonRenderer): 1
 
 CPU:
-+---------------------+--------+-------------+--------+
-| Functionality       |  iters | micros/iter |   diff |
-|---------------------+--------+-------------+--------|
-| EmptyLoop           |  30000 |       0.066 |  0.000 |
-| DirectScheduling    |  30000 |       0.233 |  0.167 |
-| CoroutineScheduling |  30000 |       0.533 |  0.467 |
-+---------------------+--------+-------------+--------+
++---------------------------------+--------+-------------+--------+
+| Functionality                   |  iters | micros/iter |   diff |
+|---------------------------------+--------+-------------+--------|
+| EmptyLoop                       |  30000 |       0.066 |  0.000 |
+|---------------------------------+--------+-------------+--------|
+| DirectScheduling                |  30000 |       0.233 |  0.167 |
+| DirectSchedulingWithProfiler    |  30000 |       0.266 |  0.200 |
+|---------------------------------+--------+-------------+--------|
+| CoroutineScheduling             |  30000 |       0.500 |  0.434 |
+| CoroutineSchedulingWithProfiler |  30000 |       0.666 |  0.600 |
++---------------------------------+--------+-------------+--------+
 
 ```
 

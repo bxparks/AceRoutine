@@ -4,7 +4,7 @@ See the [README.md](README.md) for installation instructions and other
 background information. This document describes how to use the library once it
 is installed.
 
-**Version**: 1.4.2 (2022-02-04)
+**Version**: 1.5.0 (2022-03-19)
 
 ## Table of Contents
 
@@ -14,6 +14,7 @@ is installed.
     * [Overall Structure](#OverallStructure)
     * [Coroutine Class](#CoroutineClass)
     * [Coroutine Instance](#CoroutineInstance)
+    * [Coroutine Names](#CoroutineNames)
 * [Coroutine Body](#CoroutineBody)
     * [Begin and End Markers](#BeginAndEnd)
     * [Yield](#Yield)
@@ -38,6 +39,13 @@ is installed.
     * [Custom Coroutines](#CustomCoroutines)
     * [Manual Coroutines](#ManualCoroutines)
     * [Coroutine Setup](#CoroutineSetup)
+* [Coroutine Profiling](#CoroutineProfiling)
+    * [Creating Profilers Manually](#CreatingProfilersManually)
+    * [Creating Profilers Automatically](#CreatingProfilersAutomatically)
+    * [Running Coroutine With Profiler](#RunningCoroutineWithProfiler)
+    * [Running Scheduler With Profiler](#RunningSchedulerWithProfiler)
+    * [Rendering the Profiler Results](#RenderingProfilerResults)
+    * [Profiler Resource Consumption](#ProfilerResourceConsumption)
 * [Coroutine Communication](#Communication)
     * [Instance Variables](#InstanceVariables)
     * [Channels (Experimental)](#Channels)
@@ -243,6 +251,50 @@ MyCoroutine routine2;
 
 For more details on manual Coroutine instances, see the
 [Manual Coroutines](#ManualCoroutines) section below.
+
+<a name="CoroutineNames"></a>
+### Coroutine Names
+
+(Added in v1.5. Prior to v1.3, the name was automatically assigned to the
+coroutine using the `COROUTINE()` macro. It was removed in v1.3 to save flash
+memory. In v1.5, the feature is added back as an optional feature so that the
+end-user can decide whether they want to spend the extra flash storage for this
+feature.)
+
+A coroutine can be assigned a human-readable name through the following methods:
+
+```C++
+class Coroutine {
+  public:
+    static const uint8_t kNameTypeCString = 0;
+    static const uint8_t kNameTypeFString = 1;
+
+  public:
+    void Coroutine::setName(const char* name);
+    void Coroutine::setName(const __FlashStringHelper* name);
+
+    const char* Coroutine::getCName() const;
+    const __FlashStringHelper* Coroutine::getFName() const;
+
+    uint8_t getNameType() const;
+    void printNameTo(Print& printer) const;
+};
+```
+
+It is expected that the `setName()` will be called in the global `setup()`
+function.
+
+On most 32-bit processors, it makes little difference whether a C-string or an
+F-string is used. (The exception is the ESP8266.) On AVR processors, using the
+F-string will prevent those strings from consuming precious static RAM.
+
+The `printNameTo()` method prints the coroutine name to the given `Print`
+object, which will usually be the `Serial` object. If the name is not set (hence
+is the `nullptr`), `printNameTo()` will print the hexadecimal representation of
+the pointer to the Coroutine (e.g. "0xE38A").
+
+The `CoroutineScheduler::list()` method will now print the coroutine name if it
+is defined.
 
 <a name="CoroutineBody"></a>
 ## Coroutine Body
@@ -774,11 +826,6 @@ necessary because the `Coroutine::Coroutine()` constructor automatically inserts
 itself into the internal singly-linked list. The `setupCoroutine()` is retained
 for backwards compatibility, but is now marked deprecated.
 
-Starting with v1.3, the name of the coroutine is no longer saved, and
-`Coroutine::getName()` does not exist anymore. `CoroutineScheduler::list()`
-prints the integer value of the coroutine instance instead of the name of the
-coroutine.
-
 <a name="DirectOrAutomatic"></a>
 ### Direct Scheduling or CoroutineScheduler
 
@@ -1012,12 +1059,10 @@ class ManualCoroutine : public Coroutine {
 ManualCoroutine manualRoutine(params, ..., objects, ...);
 ```
 
-Prior to v1.3, a manual coroutine (created without the `COROUTINE()` macro) was
-*not* automatically added to the linked list used by the `CoroutineScheduler`.
-This was changed in v1.3 so that the `Coroutine::Coroutine()` constructor
-now automatically adds itself to the internal linked list. Calling
-`setupCoroutine()` is no longer required. The method is retained for backwards
-compatibility, but it is a no-op and is marked deprecated.
+The `Coroutine::Coroutine()` constructor automatically adds itself to the
+internal list of coroutines, so manually created coroutines are available to the
+`CoroutineScheduler` automatically just like the coroutines defined by the
+`COROUTINE()` macro.
 
 Some examples of manual coroutines:
 
@@ -1092,7 +1137,7 @@ void setup() {
 
 You need to call `CoroutineScheduler::setupCoroutines()` explicitly if you want
 it. The `CoroutineScheduler::setup()` method does *not* call `setupCoroutines()`
-automatically.
+automatically in order to save flash memory if the feature is not used.
 
 **Warning**: The `Coroutine::setupCoroutine()` can consume significant amounts
 of memory, especially on AVR processors. On AVR processors, each
@@ -1102,6 +1147,328 @@ flash per coroutine. On 32-bit processors, it takes slightly less memory, about
 `CoroutineScheduler::setupCoroutines()` consumes about 20-30 bytes of flash on
 AVR processors. The virtual dispatch on `Coroutine::setupCoroutine()` consumes
 about 14 bytes of flash per invocation.
+
+<a name="CoroutineProfiling"></a>
+## Coroutine Profiling
+
+Version 1.5 added the ability to profile the execution time of
+`Coroutine::runCoroutine()` and render the information as a formatted table, or
+as a JSON object. If the profiling feature is not used, no additional flash
+memory is consumed. The static RAM usage does increase by 2 bytes (8-bits) and 4
+bytes (32-bits) per coroutine.
+
+The following classes and API methods were added to support the profiling
+feature. The `CoroutineProfiler` class is an interface that allows an object to
+receive information about the execution time of the `Coroutine::runCoroutine()`
+method:
+
+```C++
+class CoroutineProfiler {
+  public:
+    /**
+     * Process the completion of the runCoroutine() method which took
+     * `micros` microseconds.
+     */
+    virtual void updateElapsedMicros(uint32_t micros) = 0;
+};
+```
+
+Each `Coroutine` object has the ability to hold a pointer to a
+`CoroutineProfiler` object:
+
+```C++
+class Coroutine {
+  ...
+  public:
+    void setProfiler(CoroutineProfiler* profiler);
+    CoroutineProfiler* getProfiler() const;
+
+    int runCoroutineWithProfiler();
+  ...
+};
+```
+
+**Note**: When creating Coroutines with profiling enabled, it will probably be
+necessary to assign human-readable names to each coroutine for identification
+purposes. See [Coroutine Names](#CoroutineNames) for information on the
+`setName()`, `getCName()`, `getFName()`, `getNameType()`, and `printNameTo()`
+methods. Each coroutine name will consume additional flash memory.
+
+Currently only a single implementation of `CoroutineProfiler` is provided, the
+`LogBinProfiler`. It contains 32 bins of `uint16_t` which tracks the number of
+times a `micros` was seen. The bins are logarithmically scaled, so that Bin 0
+collects all events `<2us`, Bin 1 collects events `<4us`, Bin 2 collects events
+`<8us`, ..., Bin 30 collects events `<2147s`, and the last Bin 31 collects
+events `<4295s`.
+
+```C++
+class LogBinProfiler : public CoroutineProfiler {
+  public:
+    static const uint8_t kNumBins = 32;
+
+  public:
+    LogBinProfiler();
+
+    void updateElapsedMicros(uint32_t micros) override;
+    void clear();
+
+    static void createProfilers();
+    static void deleteProfilers();
+    static void clearProfilers();
+
+  public:
+    uint16_t mBins[kNumBins];
+};
+```
+
+Details on how to configure and use these are are provided below, but it may
+help to look at 2 examples while looking through the following subsections:
+
+* [HelloCoroutineWithProfiler](examples/HelloCoroutineWithProfiler)
+* [HelloSchedulerWithProfiler](examples/HelloSchedulerWithProfiler)
+
+<a name="CreatingProfilersManually"></a>
+### Creating Profilers Manually
+
+By default, a `Coroutine` has no reference to a `CoroutineProfiler`. The user
+can directly assign a profiler instance by creating it statically, then calling
+`Coroutine::setProfiler()` like this:
+
+```C++
+#include <AceRoutine.h>
+using namespace ace_routine;
+
+COROUTINE(coroutine1) {
+  ...
+}
+
+COROUTINE(coroutine1) {
+  ...
+}
+
+LogBinProfiler profiler1;
+LogBinProfiler profiler2;
+
+void setup() {
+  ...
+  coroutine1.setProfiler(&profiler1);
+  coroutine2.setProfiler(&profiler2);
+  ...
+}
+```
+
+This technique works well if you have a small number of coroutines.
+
+<a name="CreatingProfilersAutomatically"></a>
+### Creating Profilers Automatically
+
+If you are using a substantial number of coroutines, it is cumbersome to
+manually create these profilers for all coroutines. In that case, you can use
+the `LogBinProfiler::createProfilers()` convenience function which loops through
+every coroutine and creates an instance of `LogBinProfiler` on the heap:
+
+```C++
+#include <AceRoutine.h>
+using namespace ace_routine;
+
+COROUTINE(coroutine1) {
+  ...
+}
+
+COROUTINE(coroutine1) {
+  ...
+}
+
+void setup() {
+  ...
+  LogBinProfiler::createProfilers();
+}
+```
+
+In the unlikely event that you need to delete the Profiler instances which were
+created on the heap, you can call the `LogBinProfiler::deleteProfilers()` static
+method.
+
+Finally, the `LogBinProfiler::clearProfilers()` static method calls the
+`LogBinProfiler::clear()` method on every profiler attached to every coroutine
+so that the event count in all the bins are cleared to 0.
+
+<a name="RunningCoroutineWithProfiler"></a>
+### Running Coroutine with Profiler
+
+Once a `Coroutine` is assigned a `CoroutineProfiler`, the statistics can be
+gathered in a couple of ways. The simplest is to call the new
+`Coroutine::runCoroutineWithProfiler()` instead of the normal
+`Coroutine::runCoroutine()` in the global `loop()` function like this:
+
+```C++
+#include <AceRoutine.h>
+using namespace ace_routine;
+
+COROUTINE(myCoroutine) {
+  ...
+}
+
+LogBinProfiler profiler;
+
+void setup() {
+  ...
+  myCoroutine.setName(F("myCoroutine"));
+  myCoroutine.setProfiler(&profiler);
+  ...
+}
+
+void loop() {
+  myCoroutine.runCoroutineWithProfiler(); // <---- instead of runCoroutine()
+  ...
+}
+```
+
+<a name="RunningSchedulerWithProfiler"></a>
+### Running Scheduler with Profiler
+
+To activate profiling when using the `CoroutineScheduler`, just replace the call
+to `CoroutineScheduler::loop()` with `CoroutineScheduler::loopWithProfiler()`.
+
+```C++
+#include <AceRoutine.h>
+using namespace ace_routine;
+
+COROUTINE(myCoroutine) {
+  ...
+}
+
+void setup() {
+  ...
+  myCoroutine.setName(F("myCoroutine"));
+  myCoroutine.setProfiler(&profiler);
+
+  LogBinProfiler::createProfilers();
+  CoroutineScheduler::setup();
+}
+
+void loop() {
+  CoroutineScheduler::loopWithProfiler(); // <---- instead of loop()
+}
+```
+
+<a name="RenderingProfilerResults"></a>
+### Rendering the Profiler Results
+
+The `LogBinProfiler` comes with 2 rendering classes:
+
+* `LogBinTableRenderer`
+    * displays the event count in a human-readable formatted table with fixed
+      column widths
+* `LogBinJsonRenderer`
+    * prints the same info as a JSON object
+
+These classes expose a simple `printTo()` static function like this:
+
+```C++
+class LogBinTableRenderer {
+  public:
+    static void printTo(
+        Print& printer,
+        uint8_t startBin,
+        uint8_t endBin,
+        bool clear = true,
+        bool rollup = true
+    );
+};
+
+class LogBinJsonRenderer{
+  public:
+    static void printTo(
+        Print& printer,
+        uint8_t startBin,
+        uint8_t endBin,
+        bool clear = true,
+        bool rollup = true
+    );
+};
+```
+
+* The `printer` is usually the `Serial` object, but can be changed to something
+  else if needed.
+* The `startBin` (0-31) and `endBin` (0-32) identify the bins which should be
+  printed.
+    * A range of something like [2, 13) is useful to keep the width of the table
+      reasonable.
+    * Often the bins below and above than this range do not contain any events.
+* The `clear` flag (default true) causes the bins to be cleared (through the
+  `LogBinProfiler::clear()` method) so that new events can be tracked.
+* The `rollup` flag (default true) causes roll up of the exterior bins.
+    * Events before `startBin` are added to the first bin.
+    * Events at or after `endBin` are added to the last bin (at `endBin-1`)
+
+For example, calling `LogBinTableRenderer::printTo(Serial, 2, 13)` prints
+something like this:
+
+```
+name         <16us <32us <64us<128us<256us<512us  <1ms  <2ms  <4ms  <8ms    >>
+0x1DB        16898 52688     0     0     0     0     0     0     0     0     1
+readPin      65535  1128     0     0     0     0     0     0     0     0     0
+blinkLed     65535   800     0     0     0     0     0     0     0     0     0
+```
+
+And calling `LogBinJsonRenderer::printTo(Serial, 2, 13)` prints something like
+this:
+
+```
+{
+"0x1DB":[16898,52688,0,0,0,0,0,0,0,0,1],
+"readPin":[65535,1128,0,0,0,0,0,0,0,0,0],
+"blinkLed":[65535,800,0,0,0,0,0,0,0,0,0]
+}
+```
+
+<a name="ProfilerResourceConsumption"></a>
+### Profiler Resource Consumption
+
+The ability to profile the execution time of coroutines does not come for free,
+but I have tried to make it as cheap as possible.
+
+**Memory consumption**
+
+If the profiling feature is not wanted, you can continue to use the
+`Coroutine::runCoroutine()` or the `CoroutineScheduler::loop()` functions, and
+the flash usage will not increase. The only additional resource is 2 extra bytes
+(8-bit processors) or 4 extra bytes (32-bit processors) of static RAM, *per
+coroutine*, because each coroutine holds a pointer to the `CoroutineProfiler`,
+even if it is not used.
+
+If the profiling feature is enabled, the
+[MemoryBenchmark](examples/MemoryBenchmark) program shows that:
+
+* Using `Coroutine::runCoroutineWithProfiler()` consumes 50-80 bytes of extra
+  bytes of flash *per coroutine* compared to the normal
+  `Coroutine::runCoroutine()`, probably due to the virtual dispatch.
+* Using `CoroutineScheduler::loopWithProfiler()` consumes an additional 50-100
+  bytes of flash compared to using `CoroutineScheduler::loop()`, *plus* the
+  additional 50-80 bytes of flash *per coroutine* because the dispatching is
+  routed to `Coroutine::runCoroutineWithProfiler()`.
+* The `LogBinProfiler` consumes at least 64 bytes of static RAM per instance
+  because it holds an array of 32 bin of `uint16_t` integers. It also increases
+  the flash usage by 120-150 bytes, but that's a one-time hit, not per profiler
+  or coroutine.
+* The `LogBinTableRenderer` increases flash usage by 1300-2000 bytes.
+* The `LogBinJsonRenderer` increases flash usage by 700-1200 bytes.
+
+**CPU consumption**
+
+The [AutoBenchmark](examples/AutoBenchmark) program shows that calling the
+profiler-enabled methods, `Coroutine::runCoroutineWithProfiler()` and
+`CoroutineScheduler::loopWithProfiler(), increases latency by:
+
+* 3 - 3.2 micros on AVR
+* 0.4 micros on STM32F1
+* 0.2 - 0.3 micros on ESP8266
+* 0.1 micros on ESP32
+* 0.033 - 0.166 micros on Teensy 3.2
+
+On 32-bit processors, the overhead seems neglegible. On 8-bit processors, the 3
+microsecond of overhead might be an issue with sensitive applications.
 
 <a name="Communication"></a>
 ## Coroutine Communication

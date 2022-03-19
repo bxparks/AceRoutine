@@ -27,8 +27,12 @@ SOFTWARE.
 
 #include <stdint.h> // UINT16_MAX
 #include <Print.h> // Print
+#include <AceCommon.h> // PrintStr<>
+#include "CoroutineProfiler.h"
 #include "ClockInterface.h"
+#include "compat.h" // PROGMEM
 
+class __FlashStringHelper;
 class AceRoutineTest_statusStrings;
 class SuspendTest_suspendAndResume;
 
@@ -264,7 +268,7 @@ extern className##_##name name
 namespace ace_routine {
 
 /** A lookup table from Status integer to human-readable strings. */
-extern const __FlashStringHelper* const sStatusStrings[];
+extern const __FlashStringHelper* const sStatusStrings[] PROGMEM;
 
 // Forward declaration of CoroutineSchedulerTemplate<T>
 template <typename T> class CoroutineSchedulerTemplate;
@@ -272,12 +276,30 @@ template <typename T> class CoroutineSchedulerTemplate;
 /**
  * Base class of all coroutines. The actual coroutine code is an implementation
  * of the virtual runCoroutine() method.
+ *
+ * @tparam T_CLOCK class that provides micros(), millis() and seconds()
+ *    functions, usually `ClockInterface` but can be something else for testing
+ *    purposes.
+ * @tparam T_DELAY type used to store the mDelayStart and mDelayDuration,
+ *    usually `uint16_t`. It may be possible to create a variant set of
+ *    Coroutine32 and CoroutineScheduler32 classes which use a `uint32_t`
+ *    instead of a `uint16_t`. This would probably allow the
+ *    `COROUTINE_DELAY()`, `COROUTINE_DELAY_MICROS()` and
+ *    `COROUTINE_DELAY_SECONDS()` macros to accept 32-bit integers instead of
+ *    16-bits. I have not tested this possibility at all.
  */
-template <typename T_CLOCK>
+template <typename T_CLOCK, typename T_DELAY>
 class CoroutineTemplate {
-  friend class CoroutineSchedulerTemplate<CoroutineTemplate<T_CLOCK>>;
+  friend class CoroutineSchedulerTemplate<CoroutineTemplate<T_CLOCK, T_DELAY>>;
   friend class ::AceRoutineTest_statusStrings;
   friend class ::SuspendTest_suspendAndResume;
+
+  public:
+    /** Coroutine name is a `const char*` c-string. */
+    static const uint8_t kNameTypeCString = 0;
+
+    /** Coroutine name is a `const __FlashStringHelper*` f-string. */
+    static const uint8_t kNameTypeFString = 1;
 
   public:
     /**
@@ -309,11 +331,100 @@ class CoroutineTemplate {
     virtual void setupCoroutine() {}
 
     /**
+     * This is a variant of runCoroutine() which measures the execution time of
+     * runCoroutine() and updates the attached profiler if it exists.
+     *
+     * On 8-bit processors, memory consumption can be reduced by calling the
+     * `Coroutine::runCoroutine()` method directly in the global `loop()`
+     * function, instead of using the `CoroutineScheduler`. In such an
+     * environment, the end-user can enable profiling by manually changing the
+     * calls to `Coroutine::runCoroutine()` to
+     * `Coroutine::runCoroutineWithProfiler()`, and recompiling the program.
+     */
+    int runCoroutineWithProfiler() {
+      if (mProfiler) {
+        uint32_t startMicros = coroutineMicros();
+        runCoroutine();
+        uint32_t elapsedMicros = coroutineMicros() - startMicros;
+        mProfiler->updateElapsedMicros(elapsedMicros);
+        return 0;
+      } else {
+        return runCoroutine();
+      }
+    }
+
+    /**
+     * Return the type of the name string, either kNameTypeCString or
+     * kNameTypeFString.
+     */
+    uint8_t getNameType() const { return mNameType; }
+
+    /** Set the name of the coroutine to the given c-string. */
+    void setName(const char* name) {
+      mNameType = kNameTypeCString;
+      mName = name;
+    }
+
+    /** Set the name of the coroutine to the given f-string. */
+    void setName(const __FlashStringHelper* name) {
+      mNameType = kNameTypeFString;
+      mName = name;
+    }
+
+    /** Get name of the coroutine assuming it's a c-string. Nullable. */
+    const char* getCName() const { return (const char*) mName; }
+
+    /** Get name of the coroutine assuming it's an f-string. Nullable. */
+    const __FlashStringHelper* getFName() const {
+      return (const __FlashStringHelper*) mName;
+    }
+
+    /**
+     * Print name to the given Printer. If the name is null, then print the
+     * hexadecimal representation of the pointer to the coroutine.
+     *
+     * @param printer destination of output, usually `Serial`
+     * @param maxLen truncate or pad to maxLen if given
+     */
+    void printNameTo(Print& printer, uint8_t maxLen = 0) const {
+      // Need to go through this contortion because vsnprintf() does not support
+      // flash string parameters, so I can't use something like "%12.12s" with
+      // a flash string.
+      ace_common::PrintStr<64> pname;
+
+      if (mName == nullptr) {
+        pname.print("0x");
+        pname.print((uintptr_t) this, 16);
+      } else if (mNameType == kNameTypeCString) {
+        pname.print((const char*) mName);
+      } else {
+        pname.print((const __FlashStringHelper*) mName);
+      }
+
+      // Print name, truncated to maxLen or padded to maxLen.
+      if (maxLen) {
+        if (pname.length() < maxLen) {
+          printer.write(pname.cstr());
+          for (uint8_t i = pname.length(); i < maxLen; i++) {
+            printer.write(' ');
+          }
+        } else {
+          // NOTE: Must cast to (const uint8_t*) because the ATtiny85 core does
+          // not have a version of write() that accepts a (const char*), in
+          // contrast to every other Arduino Core.
+          printer.write((const uint8_t*) pname.cstr(), maxLen);
+        }
+      } else {
+        printer.write(pname.cstr());
+      }
+    }
+
+    /**
      * Suspend the coroutine at the next scheduler iteration. If the coroutine
      * is already in the process of ending or is already terminated, then this
      * method does nothing. A coroutine cannot use this method to suspend
      * itself, it can only suspend some other coroutine. Currently, there is no
-     * ability for a coroutine to suspend itself, that would require the
+     * ability for a coroutine to suspend itself. I think that would require the
      * addition of a COROUTINE_SUSPEND() macro. Also, this method works only if
      * the CoroutineScheduler::loop() is used because the suspend functionality
      * is implemented by the CoroutineScheduler.
@@ -360,22 +471,22 @@ class CoroutineTemplate {
 
     /** Check if delay millis time is over. */
     bool isDelayExpired() const {
-      uint16_t nowMillis = coroutineMillis();
-      uint16_t elapsed = nowMillis - mDelayStart;
+      T_DELAY nowMillis = coroutineMillis();
+      T_DELAY elapsed = nowMillis - mDelayStart;
       return elapsed >= mDelayDuration;
     }
 
     /** Check if delay micros time is over. */
     bool isDelayMicrosExpired() const {
-      uint16_t nowMicros = coroutineMicros();
-      uint16_t elapsed = nowMicros - mDelayStart;
+      T_DELAY nowMicros = coroutineMicros();
+      T_DELAY elapsed = nowMicros - mDelayStart;
       return elapsed >= mDelayDuration;
     }
 
     /** Check if delay seconds time is over. */
     bool isDelaySecondsExpired() const {
-      uint16_t nowSeconds = coroutineSeconds();
-      uint16_t elapsed = nowSeconds - mDelayStart;
+      T_DELAY nowSeconds = coroutineSeconds();
+      T_DELAY elapsed = nowSeconds - mDelayStart;
       return elapsed >= mDelayDuration;
     }
 
@@ -431,6 +542,32 @@ class CoroutineTemplate {
      */
     void setupCoroutine(const __FlashStringHelper* /*name*/)
         ACE_ROUTINE_DEPRECATED {}
+
+    /** Set the profiler. */
+    void setProfiler(CoroutineProfiler* profiler) { mProfiler = profiler; }
+
+    /** Get the profiler. Nullable. */
+    CoroutineProfiler* getProfiler() const { return mProfiler; }
+
+    /**
+     * Get the pointer to the root pointer. Implemented as a function static to
+     * fix the C++ static initialization problem, making it safe to use this in
+     * other static contexts.
+     */
+    static CoroutineTemplate** getRoot() {
+      // Use a static variable inside a function to solve the static
+      // initialization ordering problem.
+      static CoroutineTemplate* root;
+      return &root;
+    }
+
+    /**
+     * Return the next pointer as a pointer to the pointer, similar to
+     * getRoot(). This makes it much easier to manipulate a singly-linked list.
+     * Also makes setNext() method unnecessary. Should be used only by
+     * CoroutineScheduler.
+     */
+    CoroutineTemplate** getNext() { return &mNext; }
 
   protected:
     /**
@@ -512,7 +649,8 @@ class CoroutineTemplate {
 
     /** Print the human-readable string of the Status. */
     void statusPrintTo(Print& printer) {
-      printer.print(sStatusStrings[mStatus]);
+      printer.print((const __FlashStringHelper*)
+          pgm_read_ptr(&sStatusStrings[mStatus]));
     }
 
     /**
@@ -558,7 +696,7 @@ class CoroutineTemplate {
      * COROUTINE_DELAY() macro inside Coroutine::runCoroutine()) because the
      * clock increments by 1 millisecond.)
      */
-    void setDelayMillis(uint16_t delayMillis) {
+    void setDelayMillis(T_DELAY delayMillis) {
       mDelayStart = coroutineMillis();
 
       // If delayMillis is a compile-time constant, the compiler seems to
@@ -572,7 +710,7 @@ class CoroutineTemplate {
      * Configure the delay timer for delayMicros. Similar to seDelayMillis(),
      * the maximum delay is 32767 micros.
      */
-    void setDelayMicros(uint16_t delayMicros) {
+    void setDelayMicros(T_DELAY delayMicros) {
       mDelayStart = coroutineMicros();
 
       // If delayMicros is a compile-time constant, the compiler seems to
@@ -586,7 +724,7 @@ class CoroutineTemplate {
      * Configure the delay timer for delaySeconds. Similar to seDelayMillis(),
      * the maximum delay is 32767 seconds.
      */
-    void setDelaySeconds(uint16_t delaySeconds) {
+    void setDelaySeconds(T_DELAY delaySeconds) {
       mDelayStart = coroutineSeconds();
 
       // If delaySeconds is a compile-time constant, the compiler seems to
@@ -630,26 +768,6 @@ class CoroutineTemplate {
     CoroutineTemplate& operator=(const CoroutineTemplate&) = delete;
 
     /**
-     * Get the pointer to the root pointer. Implemented as a function static to
-     * fix the C++ static initialization problem, making it safe to use this in
-     * other static contexts.
-     */
-    static CoroutineTemplate** getRoot() {
-      // Use a static variable inside a function to solve the static
-      // initialization ordering problem.
-      static CoroutineTemplate* root;
-      return &root;
-    }
-
-    /**
-     * Return the next pointer as a pointer to the pointer, similar to
-     * getRoot(). This makes it much easier to manipulate a singly-linked list.
-     * Also makes setNext() method unnecessary. Should be used only by
-     * CoroutineScheduler.
-     */
-    CoroutineTemplate** getNext() { return &mNext; }
-
-    /**
      * Insert the current coroutine at the root of the singly linked list. This
      * is the most efficient and becomes the default with v1.2 because the
      * ordering of the coroutines in the CoroutineScheduler is no longer an
@@ -668,6 +786,15 @@ class CoroutineTemplate {
     /** Address of the label used by the computed-goto. */
     void* mJumpPoint = nullptr;
 
+    /**
+     * Name of the coroutine, either (const char*) or (const
+     * __FlashStringHelper*). (Optional)
+     */
+    const void* mName = nullptr;
+
+    /** String type of the coroutine mName. */
+    uint8_t mNameType = kNameTypeCString;
+
     /** Run-state of the coroutine. */
     Status mStatus = kStatusYielding;
 
@@ -676,14 +803,17 @@ class CoroutineTemplate {
      * COROUTINE_DELAY_SECONDS(). The unit of this number is context dependent,
      * milliseconds, microseconds, or seconds.
      */
-    uint16_t mDelayStart;
+    T_DELAY mDelayStart;
 
     /**
      * Delay time specified by COROUTINE_DELAY(), COROUTINE_DELAY_MICROS() or,
      * COROUTINE_DELAY_SECONDS(). The unit of this number is context dependent,
      * milliseconds, microseconds, or seconds.
      */
-    uint16_t mDelayDuration;
+    T_DELAY mDelayDuration;
+
+    /** Pointer to a profiler instance, either static or on the heap. */
+    CoroutineProfiler* mProfiler = nullptr;
 };
 
 /**
@@ -692,7 +822,7 @@ class CoroutineTemplate {
  * class of all user-defined coroutines created using the COROUTINE() macro or
  * through manual subclassing of this class.
  */
-using Coroutine = CoroutineTemplate<ClockInterface>;
+using Coroutine = CoroutineTemplate<ClockInterface, uint16_t>;
 
 }
 

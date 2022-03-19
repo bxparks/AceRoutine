@@ -77,10 +77,11 @@ test(AceRoutineTest, scheduler) {
   TestableCoroutineScheduler::list(output);
 
   PrintStr<200> expected;
-  printfTo(expected, "Coroutine %ld; status: Yielding\r\n", (uintptr_t) &a);
-  printfTo(expected, "Coroutine %ld; status: Yielding\r\n", (uintptr_t) &b);
-  printfTo(expected, "Coroutine %ld; status: Yielding\r\n", (uintptr_t) &c);
-  printfTo(expected, "Coroutine %ld; status: Suspended\r\n",
+  printfTo(expected, "Coroutine coA; status: Yielding\r\n");
+  printfTo(expected, "Coroutine coB; status: Yielding\r\n");
+  printfTo(expected, "Coroutine 0x%lX; status: Yielding\r\n",
+      (unsigned long) &c);
+  printfTo(expected, "Coroutine 0x%lX; status: Suspended\r\n",
       (uintptr_t) &extra);
   assertEqual(expected.cstr(), output.cstr());
 
@@ -410,6 +411,9 @@ void setup() {
   // suspended coroutine will be retained in the linked list of coroutines.
   extra.suspend();
 
+  // Set human-readable names to some coroutines.
+  a.setName("coA");
+  b.setName(F("coB"));
   TestableCoroutineScheduler::setup();
 }
 

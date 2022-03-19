@@ -1,4 +1,8 @@
 var searchData=
 [
-  ['write_77',['write',['../classace__routine_1_1Channel.html#ad7fa46d27162b4ec9ffa257f3881931d',1,'ace_routine::Channel::write()'],['../classace__routine_1_1Channel.html#a1134e9c905c7c0bb7255f208534355d8',1,'ace_routine::Channel::write(const T &amp;value)']]]
+  ['read_81',['read',['../classace__routine_1_1Channel.html#a931ce2344667a4b36e76bb4f8f3b70a0',1,'ace_routine::Channel']]],
+  ['reset_82',['reset',['../classace__routine_1_1CoroutineTemplate.html#a1adcb8c720aa9c452fcbd10274325380',1,'ace_routine::CoroutineTemplate']]],
+  ['resume_83',['resume',['../classace__routine_1_1CoroutineTemplate.html#a148bb40a4b373e322ea1ed5bad0fadc1',1,'ace_routine::CoroutineTemplate']]],
+  ['runcoroutine_84',['runCoroutine',['../classace__routine_1_1CoroutineTemplate.html#a6c03c8f778f5cf38f25a07de8186ea1e',1,'ace_routine::CoroutineTemplate']]],
+  ['runcoroutinewithprofiler_85',['runCoroutineWithProfiler',['../classace__routine_1_1CoroutineTemplate.html#a544e4c65d0e309eb18eb4a60cb5c069f',1,'ace_routine::CoroutineTemplate']]]
 ];

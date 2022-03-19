@@ -1,8 +1,12 @@
 var searchData=
 [
-  ['mdelayduration_134',['mDelayDuration',['../classace__routine_1_1CoroutineTemplate.html#ac1180a32fdf2953c758f864ce775301f',1,'ace_routine::CoroutineTemplate']]],
-  ['mdelaystart_135',['mDelayStart',['../classace__routine_1_1CoroutineTemplate.html#a1b61128fe005b2f4bbeb7f647c367dfa',1,'ace_routine::CoroutineTemplate']]],
-  ['mjumppoint_136',['mJumpPoint',['../classace__routine_1_1CoroutineTemplate.html#acfd2bb74feb52ea24de73339a9c97b4d',1,'ace_routine::CoroutineTemplate']]],
-  ['mnext_137',['mNext',['../classace__routine_1_1CoroutineTemplate.html#a3a7f50c509463e57ac5ece39992a8ae5',1,'ace_routine::CoroutineTemplate']]],
-  ['mstatus_138',['mStatus',['../classace__routine_1_1CoroutineTemplate.html#a9e60528d72bf9887c7d9102028b46665',1,'ace_routine::CoroutineTemplate']]]
+  ['mbins_191',['mBins',['../classace__routine_1_1LogBinProfilerTemplate.html#a9872d0ca3028086423c2014352394f68',1,'ace_routine::LogBinProfilerTemplate']]],
+  ['mdelayduration_192',['mDelayDuration',['../classace__routine_1_1CoroutineTemplate.html#a5648aae7d2c2d922a4719e5d7eeddd8a',1,'ace_routine::CoroutineTemplate']]],
+  ['mdelaystart_193',['mDelayStart',['../classace__routine_1_1CoroutineTemplate.html#a7c48e60b623fa01ed6b45efe95822fd0',1,'ace_routine::CoroutineTemplate']]],
+  ['mjumppoint_194',['mJumpPoint',['../classace__routine_1_1CoroutineTemplate.html#aaebc2fa42fd65b6dbf87d305fd57595a',1,'ace_routine::CoroutineTemplate']]],
+  ['mname_195',['mName',['../classace__routine_1_1CoroutineTemplate.html#a8008de77ec60f569fff0a392317b1a22',1,'ace_routine::CoroutineTemplate']]],
+  ['mnametype_196',['mNameType',['../classace__routine_1_1CoroutineTemplate.html#aaf7ab2306cfb11e2e99b1027233ce706',1,'ace_routine::CoroutineTemplate']]],
+  ['mnext_197',['mNext',['../classace__routine_1_1CoroutineTemplate.html#ae91d27950ff42e3aac63e47c5889caeb',1,'ace_routine::CoroutineTemplate']]],
+  ['mprofiler_198',['mProfiler',['../classace__routine_1_1CoroutineTemplate.html#a541efc6473dd13e1174a683ba0173cce',1,'ace_routine::CoroutineTemplate']]],
+  ['mstatus_199',['mStatus',['../classace__routine_1_1CoroutineTemplate.html#a989fa3e73aef42e475a7f034d9407bd2',1,'ace_routine::CoroutineTemplate']]]
 ];

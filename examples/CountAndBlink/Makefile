@@ -2,5 +2,5 @@
 # Makefile to compile and run Arduino programs natively on Linux or MacOS.
 
 APP_NAME := CountAndBlink
-ARDUINO_LIBS := AceRoutine
+ARDUINO_LIBS := AceCommon AceRoutine
 include ../../../EpoxyDuino/EpoxyDuino.mk

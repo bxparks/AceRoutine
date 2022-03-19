@@ -26,9 +26,9 @@ The following classes are used for profiling:
 
 * `CoroutineProfiler` interface
 * `LogBinProfiler` provides an implementation that tracks the execution time
-  in 32 logarithmic bins between 1us to 4295s.
+  in 32 logarithmic bins from 1us to 4295s.
 * `LogBinTableRenderer` prints the histogram as a table
-* `LogBinJsonRenderer` prints the history as a JSON object
+* `LogBinJsonRenderer` prints the histogram as a JSON object
 
 The following is an experimental feature:
 
@@ -63,13 +63,13 @@ others (in my opinion of course):
     * 8-bit (e.g. AVR) processors:
         * the first `Coroutine` consumes about 230 bytes of flash
         * each additional `Coroutine` consumes 170 bytes of flash
-        * each `Coroutine` consumes 11 bytes of static RAM
+        * each `Coroutine` consumes 16 bytes of static RAM
         * `CoroutineScheduler` consumes only about 40 bytes of flash and
           2 bytes of RAM independent of the number of coroutines
     * 32-bit (e.g. STM32, ESP8266, ESP32) processors
         * the first `Coroutine` consumes between 120-450 bytes of flash
         * each additional `Coroutine` consumes about 130-160 bytes of flash,
-        * each `Coroutine` consumes 20 bytes of static RAM
+        * each `Coroutine` consumes 28 bytes of static RAM
         * `CoroutineScheduler` consumes only about 40-60 bytes of flash
           and 4 bytes of static RAM independent of the number of coroutines
 * extremely fast context switching

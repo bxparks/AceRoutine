@@ -11,7 +11,7 @@
         * Resource consumption
             * Increases flash usage by 6-10 bytes per coroutine.
             * Increases static ram usage by 3 bytes (AVR) or 4 bytes (32-bit)
-              per coroutine, plus the additional storage for string itself.
+              per coroutine, plus the additional storage for the string itself.
     * Support profiling of `Coroutine::runCoroutine()` execution time.
         * See [Coroutine Profiling](USER_GUIDE.md#CoroutineProfiling) in the
           `USER_GUIDE.md`.
@@ -40,6 +40,13 @@
           and [HelloSchedulerWithProfiler](examples/HelloSchedulerWithProfiler).
         * Thanks to peufeu2@ who provided the ideas and proof of concept in
           [Discussion#50](https://github.com/bxparks/AceRoutine/discussions/50).
+    * Coroutine consumes more static RAM
+        * due to extra pointers to support `setName()` and `setProfiler()`
+        * 8-bits: increases from 11 bytes to 16 bytes per coroutine
+        * 32-bits: increases from 20 bytes to 28 bytes per coroutine
+    * Move `Coroutine::sStatusStrings` to `PROGMEM`
+        * Saves 12 bytes of static RAM on AVR and 24 bytes on ESP8266, if
+          `CoroutineScheduler::list()` is used.
 * 1.4.2 (2022-02-04)
     * Remove dependency to AceCommon library in `libraries.properties`.
         * AceRoutine core no longer depends on AceCommon.

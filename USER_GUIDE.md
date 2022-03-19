@@ -4,7 +4,7 @@ See the [README.md](README.md) for installation instructions and other
 background information. This document describes how to use the library once it
 is installed.
 
-**Version**: 1.4.2 (2022-02-04)
+**Version**: 1.5.0 (2022-03-19)
 
 ## Table of Contents
 
@@ -1059,12 +1059,10 @@ class ManualCoroutine : public Coroutine {
 ManualCoroutine manualRoutine(params, ..., objects, ...);
 ```
 
-Prior to v1.3, a manual coroutine (created without the `COROUTINE()` macro) was
-*not* automatically added to the linked list used by the `CoroutineScheduler`.
-This was changed in v1.3 so that the `Coroutine::Coroutine()` constructor
-now automatically adds itself to the internal linked list. Calling
-`setupCoroutine()` is no longer required. The method is retained for backwards
-compatibility, but it is a no-op and is marked deprecated.
+The `Coroutine::Coroutine()` constructor automatically adds itself to the
+internal list of coroutines, so manually created coroutines are available to the
+`CoroutineScheduler` automatically just like the coroutines defined by the
+`COROUTINE()` macro.
 
 Some examples of manual coroutines:
 
@@ -1139,7 +1137,7 @@ void setup() {
 
 You need to call `CoroutineScheduler::setupCoroutines()` explicitly if you want
 it. The `CoroutineScheduler::setup()` method does *not* call `setupCoroutines()`
-automatically.
+automatically in order to save flash memory if the feature is not used.
 
 **Warning**: The `Coroutine::setupCoroutine()` can consume significant amounts
 of memory, especially on AVR processors. On AVR processors, each
@@ -1155,9 +1153,14 @@ about 14 bytes of flash per invocation.
 
 Version 1.5 added the ability to profile the execution time of
 `Coroutine::runCoroutine()` and render the information as a formatted table, or
-as a JSON object. The `CoroutineProfiler` is an interface that allows an object
-to receive information about the execution time of the
-`Coroutine::runCoroutine()` method:
+as a JSON object. If the profiling feature is not used, no additional flash
+memory is consumed. The static RAM usage does increase by 2 bytes (8-bits) and 4
+bytes (32-bits) per coroutine.
+
+The following classes and API methods were added to support the profiling
+feature. The `CoroutineProfiler` class is an interface that allows an object to
+receive information about the execution time of the `Coroutine::runCoroutine()`
+method:
 
 ```C++
 class CoroutineProfiler {
@@ -1185,12 +1188,18 @@ class Coroutine {
 };
 ```
 
+**Note**: When creating Coroutines with profiling enabled, it will probably be
+necessary to assign human-readable names to each coroutine for identification
+purposes. See [Coroutine Names](#CoroutineNames) for information on the
+`setName()`, `getCName()`, `getFName()`, `getNameType()`, and `printNameTo()`
+methods. Each coroutine name will consume additional flash memory.
+
 Currently only a single implementation of `CoroutineProfiler` is provided, the
 `LogBinProfiler`. It contains 32 bins of `uint16_t` which tracks the number of
 times a `micros` was seen. The bins are logarithmically scaled, so that Bin 0
 collects all events `<2us`, Bin 1 collects events `<4us`, Bin 2 collects events
-`<8us`, Bin 30 collects events `<2147s`, and the last Bin 31 collects events
-`<4295s`.
+`<8us`, ..., Bin 30 collects events `<2147s`, and the last Bin 31 collects
+events `<4295s`.
 
 ```C++
 class LogBinProfiler : public CoroutineProfiler {
@@ -1384,16 +1393,16 @@ class LogBinJsonRenderer{
   else if needed.
 * The `startBin` (0-31) and `endBin` (0-32) identify the bins which should be
   printed.
-    * A range of something like [2, 14) is useful to keep the width of the table
+    * A range of something like [2, 13) is useful to keep the width of the table
       reasonable.
-    * Often the bins lower and higher than this range do not contain any events.
+    * Often the bins below and above than this range do not contain any events.
 * The `clear` flag (default true) causes the bins to be cleared (through the
   `LogBinProfiler::clear()` method) so that new events can be tracked.
 * The `rollup` flag (default true) causes roll up of the exterior bins.
     * Events before `startBin` are added to the first bin.
     * Events at or after `endBin` are added to the last bin (at `endBin-1`)
 
-For example, calling `LogBinTableRenderer::printTo(Serial, 2, 16)` prints
+For example, calling `LogBinTableRenderer::printTo(Serial, 2, 13)` prints
 something like this:
 
 ```
@@ -1403,7 +1412,7 @@ readPin      65535  1128     0     0     0     0     0     0     0     0     0
 blinkLed     65535   800     0     0     0     0     0     0     0     0     0
 ```
 
-And calling `LogBinJsonRenderer::printTo(Serial, 2, 16)` prints something like
+And calling `LogBinJsonRenderer::printTo(Serial, 2, 13)` prints something like
 this:
 
 ```

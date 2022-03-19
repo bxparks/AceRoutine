@@ -2,9 +2,10 @@
 
 [![AUnit Tests](https://github.com/bxparks/AceRoutine/actions/workflows/aunit_tests.yml/badge.svg)](https://github.com/bxparks/AceRoutine/actions/workflows/aunit_tests.yml)
 
-**Breaking Changes in v1.3**: Breaking changes were made in v1.3 to reduce the
-flash memory consumption of `Coroutine` instances by 800-1000 bytes. See the
-[CHANGELOG.md](CHANGELOG.md) for a complete list.
+**NEW: Profiling in v1.5**: Version 1.5 adds the ability to profile the
+execution time of `Coroutine::runCoroutine()` and render the histogram as a
+table or a JSON object. See [Coroutine
+Profiling](USER_GUIDE.md#CoroutineProfiling) for details.
 
 A low-memory, fast-switching, cooperative multitasking library using
 stackless coroutines on Arduino platforms.
@@ -16,15 +17,28 @@ using a `yield()` or `delay()` functionality to allow other coroutines to
 execute. When the scheduler makes its way back to the original coroutine, the
 execution continues right after the `yield()` or `delay()`.
 
-There are only 3 classes in this library:
-* `Coroutine` class provides the context variables for all coroutines,
-* `CoroutineScheduler` class optionally handles the scheduling,
+There are only 2 core classes in this library:
+
+* `Coroutine` class provides the context variables for all coroutines
+* `CoroutineScheduler` class handles the scheduling (optional)
+
+The following classes are used for profiling:
+
+* `CoroutineProfiler` interface
+* `LogBinProfiler` provides an implementation that tracks the execution time
+  in 32 logarithmic bins between 1us to 4295s.
+* `LogBinTableRenderer` prints the histogram as a table
+* `LogBinJsonRenderer` prints the history as a JSON object
+
+The following is an experimental feature:
+
 * `Channel` class allows coroutines to send messages to each other. This is
   an experimental feature whose API and feature may change considerably
   in the future.
 
 The library provides a number of macros to help create coroutines and manage
 their life cycle:
+
 * `COROUTINE()`: defines an instance of the `Coroutine` class or an
   instance of a user-defined subclass of `Coroutine`
 * `COROUTINE_BEGIN()`: must occur at the start of a coroutine body
@@ -44,6 +58,7 @@ their life cycle:
 
 Here are some of the compelling features of this library compared to
 others (in my opinion of course):
+
 * low memory usage
     * 8-bit (e.g. AVR) processors:
         * the first `Coroutine` consumes about 230 bytes of flash
@@ -84,6 +99,7 @@ others (in my opinion of course):
 * fully unit tested using [AUnit](https://github.com/bxparks/AUnit)
 
 Some limitations are:
+
 * A `Coroutine` cannot return any values.
 * A `Coroutine` is stackless and therefore cannot preserve local stack variables
   across multiple calls. Often the class member variables or function static
@@ -104,7 +120,7 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.4.2 (2022-02-04)
+**Version**: 1.5.0 (2022-03-19)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -393,7 +409,7 @@ blinkLed     65535   830     0     0     0     0     0     0     0     0     0
 
 The [HelloSchedulerWithProfiler.ino](examples/HelloSchedulerWithProfiler) sketch
 implements the same thing as `HelloCoroutineWithProfiler` using 2 techniques to
-handle larger numbers of coroutines:
+handle more than a handful of coroutines:
 
 * use `LogBinProfiler::createProfilers()` to automatically create the profilers
   on the heap and assign them to all coroutines
@@ -480,22 +496,22 @@ blinkLed     65535   830     0     0     0     0     0     0     0     0     0
 <a name="Installation"></a>
 ## Installation
 
-The latest stable release is available in the Arduino IDE Library Manager. Only
-a single library needs to be installed since v1.1:
+The latest stable release is available in the Arduino IDE Library Manager. Two
+libraries need to be installed as of v1.5.0:
 
 * Search for "AceRoutine". Click Install.
+* It should automatically install (or prompt you to install) the "AceCommon"
+  library.
 
-The direct dependency to the [AceCommon](https://github.com/bxparks/AceCommon)
-library was removed in v1.4.2, but some of the programs under `tests/` and
-`examples/` may still require the `AceCommon` library to be installed.
-
-The development version can be installed by cloning the following git repo:
+The development version can be installed by cloning the following git repos:
 
 * AceRoutine (https://github.com/bxparks/AceRoutine)
+* AceCommon (https://github.com/bxparks/AceCommon)
 
-You can copy this directory to the `./libraries` directory used by the
-Arduino IDE. (The result is a directory named `./libraries/AceRoutine`). Or you
-can create symlinks from `/.libraries` to this directory.
+You can copy these directories to the `./libraries` directory used by the
+Arduino IDE. (You should see 2 directories,  named `./libraries/AceRoutine` and
+`./libraries/AceCommon). Or you can create symlinks from `/.libraries` to these
+directories.
 
 The `develop` branch contains the latest working version.
 The `master` branch contains the stable release.
@@ -504,6 +520,7 @@ The `master` branch contains the stable release.
 ### Source Code
 
 The source files are organized as follows:
+
 * `src/AceRoutine.h` - main header file
 * `src/ace_routine/` - implementation files
 * `src/ace_routine/testing/` - internal testing files

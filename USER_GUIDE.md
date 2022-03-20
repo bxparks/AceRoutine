@@ -1158,17 +1158,13 @@ memory is consumed. The static RAM usage does increase by 2 bytes (8-bits) and 4
 bytes (32-bits) per coroutine.
 
 The following classes and API methods were added to support the profiling
-feature. The `CoroutineProfiler` class is an interface that allows an object to
-receive information about the execution time of the `Coroutine::runCoroutine()`
-method:
+feature. The `CoroutineProfiler` class is an interface whose
+`updateElapsedMicros()` should be called with the execution time of the
+`Coroutine::runCoroutine()` method:
 
 ```C++
 class CoroutineProfiler {
   public:
-    /**
-     * Process the completion of the runCoroutine() method which took
-     * `micros` microseconds.
-     */
     virtual void updateElapsedMicros(uint32_t micros) = 0;
 };
 ```
@@ -1187,6 +1183,9 @@ class Coroutine {
   ...
 };
 ```
+
+The `runCoroutineWithProfiler()` method calls `runCoroutine()`, measures the
+elapsed time in microseconds, then calls the `profiler->updateElapsedMicros()`.
 
 **Note**: When creating Coroutines with profiling enabled, it will probably be
 necessary to assign human-readable names to each coroutine for identification
@@ -1242,7 +1241,7 @@ COROUTINE(coroutine1) {
   ...
 }
 
-COROUTINE(coroutine1) {
+COROUTINE(coroutine2) {
   ...
 }
 
@@ -1275,9 +1274,11 @@ COROUTINE(coroutine1) {
   ...
 }
 
-COROUTINE(coroutine1) {
+COROUTINE(coroutine2) {
   ...
 }
+
+...
 
 void setup() {
   ...
@@ -1422,6 +1423,9 @@ this:
 "blinkLed":[65535,800,0,0,0,0,0,0,0,0,0]
 }
 ```
+
+The `LogBinProfiler` uses a `uint16_t` counter, so the maximum value is
+saturated to `65535`.
 
 <a name="ProfilerResourceConsumption"></a>
 ### Profiler Resource Consumption

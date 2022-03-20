@@ -1459,13 +1459,13 @@ If the profiling feature is enabled, the
 
 The [AutoBenchmark](examples/AutoBenchmark) program shows that calling the
 profiler-enabled methods, `Coroutine::runCoroutineWithProfiler()` and
-`CoroutineScheduler::loopWithProfiler(), increases latency by:
+`CoroutineScheduler::loopWithProfiler()`, increases latency by:
 
-* 3 - 3.2 micros on AVR
+* 2.2 - 3.0 micros on AVR
 * 0.4 micros on STM32F1
 * 0.2 - 0.3 micros on ESP8266
 * 0.1 micros on ESP32
-* 0.033 - 0.166 micros on Teensy 3.2
+* 0.03 - 0.17 micros on Teensy 3.2
 
 On 32-bit processors, the overhead seems neglegible. On 8-bit processors, the 3
 microsecond of overhead might be an issue with sensitive applications.

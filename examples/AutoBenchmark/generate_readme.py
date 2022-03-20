@@ -148,11 +148,11 @@ $ make README.md
 * v1.5.0
     * Add `CoroutineProfiler` to `CoroutineScheduler`.
         * `CoroutineScheduler::runCoroutine()` becomes slightly slower:
-        * 0.100 microseconds (AVR)
-        * 0.133 microseconds (STM32)
-        * 0.100 microseconds (ESP8266)
-        * 0.033 microseconds (ESP32)
-        * 0.133 microseconds (Teensy 3.2)
+        * 2.2-3 microseconds (AVR)
+        * 0.4 microseconds (STM32)
+        * 0.2-0.3 microseconds (ESP8266)
+        * 0.1 microseconds (ESP32)
+        * 0.03-0.17 microseconds (Teensy 3.2)
 
 ## Arduino Nano
 

@@ -1153,9 +1153,16 @@ about 14 bytes of flash per invocation.
 
 Version 1.5 added the ability to profile the execution time of
 `Coroutine::runCoroutine()` and render the information as a formatted table, or
-as a JSON object. If the profiling feature is not used, no additional flash
-memory is consumed. The static RAM usage does increase by 2 bytes (8-bits) and 4
-bytes (32-bits) per coroutine.
+as a JSON object. (Thanks to peufeu2@ who proposed the idea and provided the
+initial proof of concept in
+[Discussion#50](https://github.com/bxparks/AceRoutine/discussions/50)).
+
+If the profiling feature is not used, no additional flash memory is consumed.
+The static RAM usage does increase by 2 bytes (8-bits) and 4 bytes (32-bits) per
+coroutine even if this feature is not used. The feature seemed useful enough to
+accept this small increase in static memory size, because most applications will
+not use more than 5-10 coroutines, and that translates into only 10-20 bytes of
+additional static RAM usage on 8-bit processors.
 
 The following classes and API methods were added to support the profiling
 feature. The `CoroutineProfiler` class is an interface whose

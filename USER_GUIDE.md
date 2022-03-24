@@ -1399,7 +1399,7 @@ class LogBinJsonRenderer{
 
 * The `printer` is usually the `Serial` object, but can be changed to something
   else if needed.
-* The `startBin` (0-31) and `endBin` (0-32) identify the bins which should be
+* The `startBin` [0-31] and `endBin` [0-32] identify the bins which should be
   printed.
     * A range of something like [2, 13) is useful to keep the width of the table
       reasonable.

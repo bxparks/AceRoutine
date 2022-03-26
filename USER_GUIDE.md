@@ -1201,7 +1201,7 @@ purposes. See [Coroutine Names](#CoroutineNames) for information on the
 methods. Each coroutine name will consume additional flash memory.
 
 Currently only a single implementation of `CoroutineProfiler` is provided, the
-`LogBinProfiler`. It contains 32 bins of `uint16_t` which tracks the number of
+`LogBinProfiler`. It contains 32 bins of `uint16_t` which track the number of
 times a `micros` was seen. The bins are logarithmically scaled, so that Bin 0
 collects all events `<2us`, Bin 1 collects events `<4us`, Bin 2 collects events
 `<8us`, ..., Bin 30 collects events `<2147s`, and the last Bin 31 collects

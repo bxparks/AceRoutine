@@ -74,10 +74,12 @@ class __FlashStringHelper;
 #elif defined(EPOXY_DUINO)
   #include <pgmspace.h>
 
+#elif defined(ARDUINO_NRF52840_CIRCUITPLAY)
+  #include <avr/pgmspace.h>
+  #define FPSTR(p) (reinterpret_cast<const __FlashStringHelper *>(p))
+
 #else
-  #ifndef ACEROUTINE_SUPPRESS_UNTESTED_PLATFORM
   #warning Untested platform, AceRoutine may still work...
-  #endif
 
   #include <avr/pgmspace.h>
   #ifndef FPSTR

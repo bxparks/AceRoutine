@@ -510,7 +510,7 @@ The development version can be installed by cloning the following git repos:
 
 You can copy these directories to the `./libraries` directory used by the
 Arduino IDE. (You should see 2 directories,  named `./libraries/AceRoutine` and
-`./libraries/AceCommon). Or you can create symlinks from `/.libraries` to these
+`./libraries/AceCommon`). Or you can create symlinks from `/.libraries` to these
 directories.
 
 The `develop` branch contains the latest working version.

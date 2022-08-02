@@ -75,7 +75,9 @@ class __FlashStringHelper;
   #include <pgmspace.h>
 
 #else
+  #ifndef ACEROUTINE_SUPPRESS_UNTESTED_PLATFORM
   #warning Untested platform, AceRoutine may still work...
+  #endif
 
   #include <avr/pgmspace.h>
   #ifndef FPSTR

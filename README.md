@@ -880,12 +880,16 @@ These boards are tested on each release:
 
 **Tier 2: Should work**
 
-These boards should work but I don't test them as often:
+These boards should work, but they are not tested frequently by me, or I don't
+own the specific hardware so they were tested by a community member:
 
 * ATtiny85 (8 MHz ATtiny85)
 * Arduino Pro Mini (16 MHz ATmega328P)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 * Teensy LC (48 MHz ARM Cortex-M0+)
+* [Adafruit nRF52 Boards](https://github.com/adafruit/Adafruit_nRF52_Arduino)
+    * [Circuit Playground Bluefruit](https://www.adafruit.com/product/4333)
+      tested by a community member
 
 **Tier 3: May work, but not supported**
 
@@ -924,6 +928,7 @@ This library was developed and tested using:
 * [ESP8266 Arduino 3.0.2](https://github.com/esp8266/Arduino)
 * [ESP32 Arduino 2.0.2](https://github.com/espressif/arduino-esp32)
 * [Teensyduino 1.56](https://www.pjrc.com/teensy/td_download.html)
+* [Adafruit nRF52 1.3.0](https://github.com/adafruit/Adafruit_nRF52_Arduino)
 
 This library is *not* compatible with:
 

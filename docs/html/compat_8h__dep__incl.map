@@ -1,9 +1,9 @@
 <map id="/home/brian/src/AceRoutine/src/ace_routine/compat.h" name="/home/brian/src/AceRoutine/src/ace_routine/compat.h">
-<area shape="rect" id="node1" title=" " alt="" coords="198,5,399,47"/>
-<area shape="rect" id="node2" href="$Coroutine_8h.html" title=" " alt="" coords="295,95,499,136"/>
-<area shape="rect" id="node5" href="$Coroutine_8cpp_source.html" title=" " alt="" coords="5,184,224,225"/>
-<area shape="rect" id="node3" href="$Channel_8h_source.html" title=" " alt="" coords="73,273,274,315"/>
-<area shape="rect" id="node4" href="$AceRoutine_8h_source.html" title=" " alt="" coords="349,363,550,404"/>
+<area shape="rect" id="node1" title="Various macros to smooth over the differences among the various platforms with regards to their suppo..." alt="" coords="198,5,399,47"/>
+<area shape="rect" id="node2" href="$Coroutine_8cpp_source.html" title=" " alt="" coords="5,184,224,225"/>
+<area shape="rect" id="node3" href="$Coroutine_8h.html" title="All coroutines are instances of the Coroutine base class." alt="" coords="295,95,499,136"/>
+<area shape="rect" id="node4" href="$Channel_8h_source.html" title=" " alt="" coords="73,273,274,315"/>
+<area shape="rect" id="node5" href="$AceRoutine_8h_source.html" title=" " alt="" coords="349,363,550,404"/>
 <area shape="rect" id="node6" href="$CoroutineScheduler_8h_source.html" title=" " alt="" coords="349,184,616,225"/>
 <area shape="rect" id="node7" href="$LogBinJsonRenderer_8h_source.html" title=" " alt="" coords="401,273,671,315"/>
 <area shape="rect" id="node8" href="$LogBinProfiler_8h_source.html" title=" " alt="" coords="691,184,922,225"/>

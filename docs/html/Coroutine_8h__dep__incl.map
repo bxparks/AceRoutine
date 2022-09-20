@@ -1,5 +1,5 @@
 <map id="/home/brian/src/AceRoutine/src/ace_routine/Coroutine.h" name="/home/brian/src/AceRoutine/src/ace_routine/Coroutine.h">
-<area shape="rect" id="node1" title=" " alt="" coords="556,5,760,47"/>
+<area shape="rect" id="node1" title="All coroutines are instances of the Coroutine base class." alt="" coords="556,5,760,47"/>
 <area shape="rect" id="node2" href="$Channel_8h_source.html" title=" " alt="" coords="5,184,207,225"/>
 <area shape="rect" id="node3" href="$AceRoutine_8h_source.html" title=" " alt="" coords="461,273,663,315"/>
 <area shape="rect" id="node4" href="$Coroutine_8cpp_source.html" title=" " alt="" coords="282,95,501,136"/>

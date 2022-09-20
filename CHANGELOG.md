@@ -1,6 +1,15 @@
 # Changelog
 
 * Unreleased
+* 1.5.1 (2022-09-20)
+    * Add Adafruit nRF52 boards to "Tier 2" after validation by community
+      member.
+    * Upgrade tool chain
+        * Arduino CLI from 0.19.2 to 0.27.1
+        * Arduino AVR Core from 1.8.4 to 1.8.5
+        * STM32duino from 2.2.0 to 2.3.0
+        * ESP32 Core from 2.0.2 to 2.0.5
+        * Teensyduino from 1.56 to 1.57
 * 1.5.0 (2022-03-19)
     * (Re)add support for human-readable coroutine names.
         * See [Coroutine Names](USER_GUIDE.md#CoroutineNames) in the

@@ -120,7 +120,7 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.5.0 (2022-03-19)
+**Version**: 1.5.1 (2022-09-20)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -510,7 +510,7 @@ The development version can be installed by cloning the following git repos:
 
 You can copy these directories to the `./libraries` directory used by the
 Arduino IDE. (You should see 2 directories,  named `./libraries/AceRoutine` and
-`./libraries/AceCommon). Or you can create symlinks from `/.libraries` to these
+`./libraries/AceCommon`). Or you can create symlinks from `/.libraries` to these
 directories.
 
 The `develop` branch contains the latest working version.
@@ -834,13 +834,13 @@ Arduino Nano:
 +---------------------------------+--------+-------------+--------+
 | Functionality                   |  iters | micros/iter |   diff |
 |---------------------------------+--------+-------------+--------|
-| EmptyLoop                       |  10000 |       1.900 |  0.000 |
+| EmptyLoop                       |  10000 |       1.700 |  0.000 |
 |---------------------------------+--------+-------------+--------|
-| DirectScheduling                |  10000 |       2.800 |  0.900 |
-| DirectSchedulingWithProfiler    |  10000 |       5.800 |  3.900 |
+| DirectScheduling                |  10000 |       2.900 |  1.200 |
+| DirectSchedulingWithProfiler    |  10000 |       5.700 |  4.000 |
 |---------------------------------+--------+-------------+--------|
-| CoroutineScheduling             |  10000 |       7.000 |  5.100 |
-| CoroutineSchedulingWithProfiler |  10000 |       9.300 |  7.400 |
+| CoroutineScheduling             |  10000 |       7.100 |  5.400 |
+| CoroutineSchedulingWithProfiler |  10000 |       9.300 |  7.600 |
 +---------------------------------+--------+-------------+--------+
 ```
 
@@ -850,13 +850,13 @@ ESP8266:
 +---------------------------------+--------+-------------+--------+
 | Functionality                   |  iters | micros/iter |   diff |
 |---------------------------------+--------+-------------+--------|
-| EmptyLoop                       |  10000 |       0.100 |  0.000 |
+| EmptyLoop                       |  10000 |       0.200 |  0.000 |
 |---------------------------------+--------+-------------+--------|
-| DirectScheduling                |  10000 |       0.500 |  0.400 |
-| DirectSchedulingWithProfiler    |  10000 |       0.800 |  0.700 |
+| DirectScheduling                |  10000 |       0.500 |  0.300 |
+| DirectSchedulingWithProfiler    |  10000 |       0.800 |  0.600 |
 |---------------------------------+--------+-------------+--------|
-| CoroutineScheduling             |  10000 |       0.900 |  0.800 |
-| CoroutineSchedulingWithProfiler |  10000 |       1.100 |  1.000 |
+| CoroutineScheduling             |  10000 |       0.900 |  0.700 |
+| CoroutineSchedulingWithProfiler |  10000 |       1.100 |  0.900 |
 +---------------------------------+--------+-------------+--------+
 ```
 
@@ -880,12 +880,16 @@ These boards are tested on each release:
 
 **Tier 2: Should work**
 
-These boards should work but I don't test them as often:
+These boards should work, but they are not tested frequently by me, or I don't
+own the specific hardware so they were tested by a community member:
 
 * ATtiny85 (8 MHz ATtiny85)
 * Arduino Pro Mini (16 MHz ATmega328P)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 * Teensy LC (48 MHz ARM Cortex-M0+)
+* [Adafruit nRF52 Boards](https://github.com/adafruit/Adafruit_nRF52_Arduino)
+    * [Circuit Playground Bluefruit](https://www.adafruit.com/product/4333)
+      tested by a community member
 
 **Tier 3: May work, but not supported**
 
@@ -924,6 +928,7 @@ This library was developed and tested using:
 * [ESP8266 Arduino 3.0.2](https://github.com/esp8266/Arduino)
 * [ESP32 Arduino 2.0.2](https://github.com/espressif/arduino-esp32)
 * [Teensyduino 1.56](https://www.pjrc.com/teensy/td_download.html)
+* [Adafruit nRF52 1.3.0](https://github.com/adafruit/Adafruit_nRF52_Arduino)
 
 This library is *not* compatible with:
 

@@ -1,9 +1,14 @@
+SIZEOF
+sizeof(Coroutine): 28
+sizeof(CoroutineScheduler): 4
+sizeof(Channel<int>): 12
+sizeof(LogBinProfiler): 68
 sizeof(LogBinTableRenderer): 1
 sizeof(LogBinJsonRenderer): 1
 BENCHMARKS
 EmptyLoop 0.166 30000
 DirectScheduling 0.533 30000
 DirectSchedulingWithProfiler 0.933 30000
-CoroutineScheduling 1.066 30000
+CoroutineScheduling 1.100 30000
 CoroutineSchedulingWithProfiler 1.466 30000
 END

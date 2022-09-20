@@ -4,7 +4,7 @@ See the [README.md](README.md) for installation instructions and other
 background information. This document describes how to use the library once it
 is installed.
 
-**Version**: 1.5.0 (2022-03-19)
+**Version**: 1.5.1 (2022-09-20)
 
 ## Table of Contents
 
@@ -1153,22 +1153,25 @@ about 14 bytes of flash per invocation.
 
 Version 1.5 added the ability to profile the execution time of
 `Coroutine::runCoroutine()` and render the information as a formatted table, or
-as a JSON object. If the profiling feature is not used, no additional flash
-memory is consumed. The static RAM usage does increase by 2 bytes (8-bits) and 4
-bytes (32-bits) per coroutine.
+as a JSON object. (Thanks to peufeu2@ who proposed the idea and provided the
+initial proof of concept in
+[Discussion#50](https://github.com/bxparks/AceRoutine/discussions/50)).
+
+If the profiling feature is not used, no additional flash memory is consumed.
+The static RAM usage does increase by 2 bytes (8-bits) and 4 bytes (32-bits) per
+coroutine even if this feature is not used. The feature seemed useful enough to
+accept this small increase in static memory size, because most applications will
+not use more than 5-10 coroutines, and that translates into only 10-20 bytes of
+additional static RAM usage on 8-bit processors.
 
 The following classes and API methods were added to support the profiling
-feature. The `CoroutineProfiler` class is an interface that allows an object to
-receive information about the execution time of the `Coroutine::runCoroutine()`
-method:
+feature. The `CoroutineProfiler` class is an interface whose
+`updateElapsedMicros()` should be called with the execution time of the
+`Coroutine::runCoroutine()` method:
 
 ```C++
 class CoroutineProfiler {
   public:
-    /**
-     * Process the completion of the runCoroutine() method which took
-     * `micros` microseconds.
-     */
     virtual void updateElapsedMicros(uint32_t micros) = 0;
 };
 ```
@@ -1188,6 +1191,9 @@ class Coroutine {
 };
 ```
 
+The `runCoroutineWithProfiler()` method calls `runCoroutine()`, measures the
+elapsed time in microseconds, then calls the `profiler->updateElapsedMicros()`.
+
 **Note**: When creating Coroutines with profiling enabled, it will probably be
 necessary to assign human-readable names to each coroutine for identification
 purposes. See [Coroutine Names](#CoroutineNames) for information on the
@@ -1195,7 +1201,7 @@ purposes. See [Coroutine Names](#CoroutineNames) for information on the
 methods. Each coroutine name will consume additional flash memory.
 
 Currently only a single implementation of `CoroutineProfiler` is provided, the
-`LogBinProfiler`. It contains 32 bins of `uint16_t` which tracks the number of
+`LogBinProfiler`. It contains 32 bins of `uint16_t` which track the number of
 times a `micros` was seen. The bins are logarithmically scaled, so that Bin 0
 collects all events `<2us`, Bin 1 collects events `<4us`, Bin 2 collects events
 `<8us`, ..., Bin 30 collects events `<2147s`, and the last Bin 31 collects
@@ -1242,7 +1248,7 @@ COROUTINE(coroutine1) {
   ...
 }
 
-COROUTINE(coroutine1) {
+COROUTINE(coroutine2) {
   ...
 }
 
@@ -1275,9 +1281,11 @@ COROUTINE(coroutine1) {
   ...
 }
 
-COROUTINE(coroutine1) {
+COROUTINE(coroutine2) {
   ...
 }
+
+...
 
 void setup() {
   ...
@@ -1391,7 +1399,7 @@ class LogBinJsonRenderer{
 
 * The `printer` is usually the `Serial` object, but can be changed to something
   else if needed.
-* The `startBin` (0-31) and `endBin` (0-32) identify the bins which should be
+* The `startBin` [0-31] and `endBin` [0-32] identify the bins which should be
   printed.
     * A range of something like [2, 13) is useful to keep the width of the table
       reasonable.
@@ -1422,6 +1430,9 @@ this:
 "blinkLed":[65535,800,0,0,0,0,0,0,0,0,0]
 }
 ```
+
+The `LogBinProfiler` uses a `uint16_t` counter, so the maximum value is
+saturated to `65535`.
 
 <a name="ProfilerResourceConsumption"></a>
 ### Profiler Resource Consumption
@@ -1459,13 +1470,13 @@ If the profiling feature is enabled, the
 
 The [AutoBenchmark](examples/AutoBenchmark) program shows that calling the
 profiler-enabled methods, `Coroutine::runCoroutineWithProfiler()` and
-`CoroutineScheduler::loopWithProfiler(), increases latency by:
+`CoroutineScheduler::loopWithProfiler()`, increases latency by:
 
-* 3 - 3.2 micros on AVR
+* 2.2 - 3.0 micros on AVR
 * 0.4 micros on STM32F1
 * 0.2 - 0.3 micros on ESP8266
 * 0.1 micros on ESP32
-* 0.033 - 0.166 micros on Teensy 3.2
+* 0.03 - 0.17 micros on Teensy 3.2
 
 On 32-bit processors, the overhead seems neglegible. On 8-bit processors, the 3
 microsecond of overhead might be an issue with sensitive applications.

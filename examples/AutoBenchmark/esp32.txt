@@ -7,7 +7,7 @@ sizeof(LogBinTableRenderer): 1
 sizeof(LogBinJsonRenderer): 1
 BENCHMARKS
 EmptyLoop 0.033 30000
-DirectScheduling 0.133 30000
+DirectScheduling 0.100 30000
 DirectSchedulingWithProfiler 0.233 30000
 CoroutineScheduling 0.333 30000
 CoroutineSchedulingWithProfiler 0.433 30000

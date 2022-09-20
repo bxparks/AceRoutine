@@ -36,9 +36,9 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**NOTE**: This file was auto-generated using `make README.md`. DO NOT EDIT.
+**DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
-**Version**: AceRoutine v1.5
+**Version**: AceRoutine v1.5.1
 
 **Changes**:
 
@@ -146,6 +146,13 @@ calculated flash size can jump around in unexpected ways.
         * Adds about 900 bytes of flash and ~20 bytes of RAM on AVR.
         * Adds about 1300 bytes of flash and ~0 bytes of RAM on ESP8266.
 
+* v1.5.1
+    * Upgrade tool chain
+        * Arduino CLI from 0.19.2 to 0.27.1
+        * Arduino AVR Core from 1.8.4 to 1.8.5
+        * STM32duino from 2.2.0 to 2.3.0
+        * ESP32 Core from 2.0.2 to 2.0.5
+        * Teensyduino from 1.56 to 1.57
 
 ## How to Generate
 
@@ -205,7 +212,7 @@ $ make README.md
 ### ATtiny85
 
 * 8MHz ATtiny85
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
 * SpenceKonde/ATTinyCore 1.5.2
 
 ```
@@ -215,8 +222,8 @@ $ make README.md
 ### Arduino Nano
 
 * 16MHz ATmega328P
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* Arduino AVR Boards 1.8.4
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
+* Arduino AVR Boards 1.8.5
 
 ```
 {nano_results}
@@ -225,7 +232,7 @@ $ make README.md
 ### SparkFun Pro Micro
 
 * 16 MHz ATmega32U4
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
 * SparkFun AVR Boards 1.1.13
 
 ```
@@ -235,8 +242,8 @@ $ make README.md
 ### STM32 Blue Pill
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* STM32duino 2.2.0
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
+* STM32duino 2.3.0
 
 ```
 {stm32_results}
@@ -245,7 +252,7 @@ $ make README.md
 ### ESP8266
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
 * ESP8266 Boards 3.0.2
 
 ```
@@ -255,8 +262,8 @@ $ make README.md
 ### ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* ESP32 Boards 2.0.2
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
+* ESP32 Boards 2.0.5
 
 ```
 {esp32_results}
@@ -265,8 +272,8 @@ $ make README.md
 ### Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* Teensyduino 1.56
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
+* Teensyduino 1.57
 * Compiler options: "Faster"
 
 ```

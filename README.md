@@ -120,7 +120,7 @@ AceRoutine is a self-contained library that works on any platform supporting the
 Arduino API (AVR, Teensy, ESP8266, ESP32, etc), and it provides a handful of
 additional macros that can reduce boilerplate code.
 
-**Version**: 1.5.0 (2022-03-19)
+**Version**: 1.5.1 (2022-09-20)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -834,13 +834,13 @@ Arduino Nano:
 +---------------------------------+--------+-------------+--------+
 | Functionality                   |  iters | micros/iter |   diff |
 |---------------------------------+--------+-------------+--------|
-| EmptyLoop                       |  10000 |       1.900 |  0.000 |
+| EmptyLoop                       |  10000 |       1.700 |  0.000 |
 |---------------------------------+--------+-------------+--------|
-| DirectScheduling                |  10000 |       2.800 |  0.900 |
-| DirectSchedulingWithProfiler    |  10000 |       5.800 |  3.900 |
+| DirectScheduling                |  10000 |       2.900 |  1.200 |
+| DirectSchedulingWithProfiler    |  10000 |       5.700 |  4.000 |
 |---------------------------------+--------+-------------+--------|
-| CoroutineScheduling             |  10000 |       7.000 |  5.100 |
-| CoroutineSchedulingWithProfiler |  10000 |       9.300 |  7.400 |
+| CoroutineScheduling             |  10000 |       7.100 |  5.400 |
+| CoroutineSchedulingWithProfiler |  10000 |       9.300 |  7.600 |
 +---------------------------------+--------+-------------+--------+
 ```
 
@@ -850,13 +850,13 @@ ESP8266:
 +---------------------------------+--------+-------------+--------+
 | Functionality                   |  iters | micros/iter |   diff |
 |---------------------------------+--------+-------------+--------|
-| EmptyLoop                       |  10000 |       0.100 |  0.000 |
+| EmptyLoop                       |  10000 |       0.200 |  0.000 |
 |---------------------------------+--------+-------------+--------|
-| DirectScheduling                |  10000 |       0.500 |  0.400 |
-| DirectSchedulingWithProfiler    |  10000 |       0.800 |  0.700 |
+| DirectScheduling                |  10000 |       0.500 |  0.300 |
+| DirectSchedulingWithProfiler    |  10000 |       0.800 |  0.600 |
 |---------------------------------+--------+-------------+--------|
-| CoroutineScheduling             |  10000 |       0.900 |  0.800 |
-| CoroutineSchedulingWithProfiler |  10000 |       1.100 |  1.000 |
+| CoroutineScheduling             |  10000 |       0.900 |  0.700 |
+| CoroutineSchedulingWithProfiler |  10000 |       1.100 |  0.900 |
 +---------------------------------+--------+-------------+--------+
 ```
 

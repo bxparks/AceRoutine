@@ -12,9 +12,9 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**NOTE**: This file was auto-generated using `make README.md`. DO NOT EDIT.
+**DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
-**Version**: AceRoutine v1.5
+**Version**: AceRoutine v1.5.1
 
 **Changes**:
 
@@ -122,6 +122,13 @@ calculated flash size can jump around in unexpected ways.
         * Adds about 900 bytes of flash and ~20 bytes of RAM on AVR.
         * Adds about 1300 bytes of flash and ~0 bytes of RAM on ESP8266.
 
+* v1.5.1
+    * Upgrade tool chain
+        * Arduino CLI from 0.19.2 to 0.27.1
+        * Arduino AVR Core from 1.8.4 to 1.8.5
+        * STM32duino from 2.2.0 to 2.3.0
+        * ESP32 Core from 2.0.2 to 2.0.5
+        * Teensyduino from 1.56 to 1.57
 
 ## How to Generate
 
@@ -181,7 +188,7 @@ $ make README.md
 ### ATtiny85
 
 * 8MHz ATtiny85
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
 * SpenceKonde/ATTinyCore 1.5.2
 
 ```
@@ -224,8 +231,8 @@ $ make README.md
 | Scheduler, Two Coroutines, Profiler   |   1582/  133 |   556/   52 |
 |---------------------------------------+--------------+-------------|
 | Scheduler, LogBinProfiler             |   1512/  181 |   486/  100 |
-| Scheduler, LogBinTableRenderer        |   2876/  193 |  1850/  112 |
-| Scheduler, LogBinJsonRenderer         |   2410/  197 |  1384/  116 |
+| Scheduler, LogBinTableRenderer        |   2924/  193 |  1898/  112 |
+| Scheduler, LogBinJsonRenderer         |   2426/  197 |  1400/  116 |
 |---------------------------------------+--------------+-------------|
 | Blink Function                        |   1176/   84 |   150/    3 |
 | Blink Coroutine                       |   1330/  107 |   304/   26 |
@@ -236,8 +243,8 @@ $ make README.md
 ### Arduino Nano
 
 * 16MHz ATmega328P
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* Arduino AVR Boards 1.8.4
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
+* Arduino AVR Boards 1.8.5
 
 ```
 +--------------------------------------------------------------------+
@@ -291,7 +298,7 @@ $ make README.md
 ### SparkFun Pro Micro
 
 * 16 MHz ATmega32U4
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
 * SparkFun AVR Boards 1.1.13
 
 ```
@@ -346,54 +353,54 @@ $ make README.md
 ### STM32 Blue Pill
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* STM32duino 2.2.0
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
+* STM32duino 2.3.0
 
 ```
 +--------------------------------------------------------------------+
 | functionality                         |  flash/  ram |       delta |
 |---------------------------------------+--------------+-------------|
-| Baseline                              |  21932/ 3540 |     0/    0 |
+| Baseline                              |  21384/ 3556 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| One Delay Function                    |  21960/ 3544 |    28/    4 |
-| Two Delay Functions                   |  22008/ 3544 |    76/    4 |
+| One Delay Function                    |  21412/ 3560 |    28/    4 |
+| Two Delay Functions                   |  21460/ 3560 |    76/    4 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (millis)                |  22064/ 3572 |   132/   32 |
-| Two Coroutines (millis)               |  22212/ 3600 |   280/   60 |
+| One Coroutine (millis)                |  21516/ 3588 |   132/   32 |
+| Two Coroutines (millis)               |  21664/ 3616 |   280/   60 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (micros)                |  22128/ 3572 |   196/   32 |
-| Two Coroutines (micros)               |  22276/ 3600 |   344/   60 |
+| One Coroutine (micros)                |  21592/ 3588 |   208/   32 |
+| Two Coroutines (micros)               |  21740/ 3616 |   356/   60 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (seconds)               |  22080/ 3572 |   148/   32 |
-| Two Coroutines (seconds)              |  22244/ 3600 |   312/   60 |
+| One Coroutine (seconds)               |  21532/ 3588 |   148/   32 |
+| Two Coroutines (seconds)              |  21696/ 3616 |   312/   60 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine, Profiler               |  22172/ 3572 |   240/   32 |
-| Two Coroutines, Profiler              |  22328/ 3600 |   396/   60 |
+| One Coroutine, Profiler               |  21636/ 3588 |   252/   32 |
+| Two Coroutines, Profiler              |  21792/ 3616 |   408/   60 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (millis)     |  22132/ 3576 |   200/   36 |
-| Scheduler, Two Coroutines (millis)    |  22236/ 3604 |   304/   64 |
+| Scheduler, One Coroutine (millis)     |  21584/ 3592 |   200/   36 |
+| Scheduler, Two Coroutines (millis)    |  21688/ 3620 |   304/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     |  22196/ 3576 |   264/   36 |
-| Scheduler, Two Coroutines (micros)    |  22300/ 3604 |   368/   64 |
+| Scheduler, One Coroutine (micros)     |  21660/ 3592 |   276/   36 |
+| Scheduler, Two Coroutines (micros)    |  21764/ 3620 |   380/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    |  22148/ 3576 |   216/   36 |
-| Scheduler, Two Coroutines (seconds)   |  22268/ 3604 |   336/   64 |
+| Scheduler, One Coroutine (seconds)    |  21600/ 3592 |   216/   36 |
+| Scheduler, Two Coroutines (seconds)   |  21720/ 3620 |   336/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      |  22152/ 3576 |   220/   36 |
-| Scheduler, Two Coroutines (setup)     |  22284/ 3604 |   352/   64 |
+| Scheduler, One Coroutine (setup)      |  21604/ 3592 |   220/   36 |
+| Scheduler, Two Coroutines (setup)     |  21736/ 3620 |   352/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  |  22144/ 3576 |   212/   36 |
-| Scheduler, Two Coroutines (man setup) |  22276/ 3604 |   344/   64 |
+| Scheduler, One Coroutine (man setup)  |  21596/ 3592 |   212/   36 |
+| Scheduler, Two Coroutines (man setup) |  21728/ 3620 |   344/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine, Profiler    |  22232/ 3576 |   300/   36 |
-| Scheduler, Two Coroutines, Profiler   |  22336/ 3604 |   404/   64 |
+| Scheduler, One Coroutine, Profiler    |  21696/ 3592 |   312/   36 |
+| Scheduler, Two Coroutines, Profiler   |  21800/ 3620 |   416/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             |  22368/ 3644 |   436/  104 |
-| Scheduler, LogBinTableRenderer        |  23752/ 3644 |  1820/  104 |
-| Scheduler, LogBinJsonRenderer         |  23212/ 3644 |  1280/  104 |
+| Scheduler, LogBinProfiler             |  21832/ 3660 |   448/  104 |
+| Scheduler, LogBinTableRenderer        |  23216/ 3660 |  1832/  104 |
+| Scheduler, LogBinJsonRenderer         |  22676/ 3660 |  1292/  104 |
 |---------------------------------------+--------------+-------------|
-| Blink Function                        |  22168/ 3544 |   236/    4 |
-| Blink Coroutine                       |  22280/ 3572 |   348/   32 |
+| Blink Function                        |  21620/ 3560 |   236/    4 |
+| Blink Coroutine                       |  21732/ 3588 |   348/   32 |
 +--------------------------------------------------------------------+
 
 ```
@@ -401,7 +408,7 @@ $ make README.md
 ### ESP8266
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
 * ESP8266 Boards 3.0.2
 
 ```
@@ -456,54 +463,54 @@ $ make README.md
 ### ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* ESP32 Boards 2.0.2
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
+* ESP32 Boards 2.0.5
 
 ```
 +--------------------------------------------------------------------+
 | functionality                         |  flash/  ram |       delta |
 |---------------------------------------+--------------+-------------|
-| Baseline                              | 230413/16220 |     0/    0 |
+| Baseline                              | 241149/16384 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| One Delay Function                    | 230953/16260 |   540/   40 |
-| Two Delay Functions                   | 231025/16260 |   612/   40 |
+| One Delay Function                    | 241529/16384 |   380/    0 |
+| Two Delay Functions                   | 241601/16384 |   452/    0 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (millis)                | 231065/16292 |   652/   72 |
-| Two Coroutines (millis)               | 231237/16316 |   824/   96 |
+| One Coroutine (millis)                | 241653/16416 |   504/   32 |
+| Two Coroutines (millis)               | 241829/16440 |   680/   56 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (micros)                | 231077/16292 |   664/   72 |
-| Two Coroutines (micros)               | 231249/16316 |   836/   96 |
+| One Coroutine (micros)                | 241665/16416 |   516/   32 |
+| Two Coroutines (micros)               | 241841/16440 |   692/   56 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (seconds)               | 231081/16292 |   668/   72 |
-| Two Coroutines (seconds)              | 231269/16316 |   856/   96 |
+| One Coroutine (seconds)               | 241669/16416 |   520/   32 |
+| Two Coroutines (seconds)              | 241861/16440 |   712/   56 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine, Profiler               | 231117/16292 |   704/   72 |
-| Two Coroutines, Profiler              | 231333/16316 |   920/   96 |
+| One Coroutine, Profiler               | 241705/16416 |   556/   32 |
+| Two Coroutines, Profiler              | 241925/16440 |   776/   56 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (millis)     | 231129/16292 |   716/   72 |
-| Scheduler, Two Coroutines (millis)    | 231269/16324 |   856/  104 |
+| Scheduler, One Coroutine (millis)     | 241713/16416 |   564/   32 |
+| Scheduler, Two Coroutines (millis)    | 241857/16448 |   708/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     | 231141/16292 |   728/   72 |
-| Scheduler, Two Coroutines (micros)    | 231281/16324 |   868/  104 |
+| Scheduler, One Coroutine (micros)     | 241725/16416 |   576/   32 |
+| Scheduler, Two Coroutines (micros)    | 241869/16448 |   720/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    | 231145/16292 |   732/   72 |
-| Scheduler, Two Coroutines (seconds)   | 231301/16324 |   888/  104 |
+| Scheduler, One Coroutine (seconds)    | 241729/16416 |   580/   32 |
+| Scheduler, Two Coroutines (seconds)   | 241889/16448 |   740/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      | 231157/16292 |   744/   72 |
-| Scheduler, Two Coroutines (setup)     | 231329/16324 |   916/  104 |
+| Scheduler, One Coroutine (setup)      | 241741/16416 |   592/   32 |
+| Scheduler, Two Coroutines (setup)     | 241917/16448 |   768/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  | 231145/16292 |   732/   72 |
-| Scheduler, Two Coroutines (man setup) | 231321/16324 |   908/  104 |
+| Scheduler, One Coroutine (man setup)  | 241729/16416 |   580/   32 |
+| Scheduler, Two Coroutines (man setup) | 241909/16448 |   760/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine, Profiler    | 231181/16292 |   768/   72 |
-| Scheduler, Two Coroutines, Profiler   | 231321/16324 |   908/  104 |
+| Scheduler, One Coroutine, Profiler    | 241765/16416 |   616/   32 |
+| Scheduler, Two Coroutines, Profiler   | 241909/16448 |   760/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             | 231321/16364 |   908/  144 |
-| Scheduler, LogBinTableRenderer        | 232653/16364 |  2240/  144 |
-| Scheduler, LogBinJsonRenderer         | 232101/16364 |  1688/  144 |
+| Scheduler, LogBinProfiler             | 241913/16488 |   764/  104 |
+| Scheduler, LogBinTableRenderer        | 243445/16488 |  2296/  104 |
+| Scheduler, LogBinJsonRenderer         | 242893/16488 |  1744/  104 |
 |---------------------------------------+--------------+-------------|
-| Blink Function                        | 231301/16268 |   888/   48 |
-| Blink Coroutine                       | 231413/16300 |  1000/   80 |
+| Blink Function                        | 241757/16384 |   608/    0 |
+| Blink Coroutine                       | 241881/16416 |   732/   32 |
 +--------------------------------------------------------------------+
 
 ```
@@ -511,55 +518,55 @@ $ make README.md
 ### Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
-* Arduino IDE 1.8.19, Arduino CLI 0.19.2
-* Teensyduino 1.56
+* Arduino IDE 1.8.19, Arduino CLI 0.27.1
+* Teensyduino 1.57
 * Compiler options: "Faster"
 
 ```
 +--------------------------------------------------------------------+
 | functionality                         |  flash/  ram |       delta |
 |---------------------------------------+--------------+-------------|
-| Baseline                              |  10648/ 4156 |     0/    0 |
+| Baseline                              |  10696/ 4156 |     0/    0 |
 |---------------------------------------+--------------+-------------|
-| One Delay Function                    |  10680/ 4160 |    32/    4 |
-| Two Delay Functions                   |  10708/ 4160 |    60/    4 |
+| One Delay Function                    |  10728/ 4160 |    32/    4 |
+| Two Delay Functions                   |  10756/ 4160 |    60/    4 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (millis)                |  10804/ 4188 |   156/   32 |
-| Two Coroutines (millis)               |  10924/ 4216 |   276/   60 |
+| One Coroutine (millis)                |  10852/ 4188 |   156/   32 |
+| Two Coroutines (millis)               |  10972/ 4216 |   276/   60 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (micros)                |  10860/ 4188 |   212/   32 |
-| Two Coroutines (micros)               |  10968/ 4216 |   320/   60 |
+| One Coroutine (micros)                |  10908/ 4188 |   212/   32 |
+| Two Coroutines (micros)               |  11016/ 4216 |   320/   60 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine (seconds)               |  10824/ 4188 |   176/   32 |
-| Two Coroutines (seconds)              |  10964/ 4216 |   316/   60 |
+| One Coroutine (seconds)               |  10872/ 4188 |   176/   32 |
+| Two Coroutines (seconds)              |  11012/ 4216 |   316/   60 |
 |---------------------------------------+--------------+-------------|
-| One Coroutine, Profiler               |  10904/ 4188 |   256/   32 |
-| Two Coroutines, Profiler              |  11072/ 4216 |   424/   60 |
+| One Coroutine, Profiler               |  10952/ 4188 |   256/   32 |
+| Two Coroutines, Profiler              |  11120/ 4216 |   424/   60 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (millis)     |  10868/ 4192 |   220/   36 |
-| Scheduler, Two Coroutines (millis)    |  10984/ 4220 |   336/   64 |
+| Scheduler, One Coroutine (millis)     |  10920/ 4192 |   224/   36 |
+| Scheduler, Two Coroutines (millis)    |  11036/ 4220 |   340/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (micros)     |  10924/ 4192 |   276/   36 |
-| Scheduler, Two Coroutines (micros)    |  11028/ 4220 |   380/   64 |
+| Scheduler, One Coroutine (micros)     |  10976/ 4192 |   280/   36 |
+| Scheduler, Two Coroutines (micros)    |  11080/ 4220 |   384/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (seconds)    |  10888/ 4192 |   240/   36 |
-| Scheduler, Two Coroutines (seconds)   |  11024/ 4220 |   376/   64 |
+| Scheduler, One Coroutine (seconds)    |  10940/ 4192 |   244/   36 |
+| Scheduler, Two Coroutines (seconds)   |  11076/ 4220 |   380/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (setup)      |  10904/ 4192 |   256/   36 |
-| Scheduler, Two Coroutines (setup)     |  11052/ 4220 |   404/   64 |
+| Scheduler, One Coroutine (setup)      |  10956/ 4192 |   260/   36 |
+| Scheduler, Two Coroutines (setup)     |  11104/ 4220 |   408/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine (man setup)  |  10880/ 4192 |   232/   36 |
-| Scheduler, Two Coroutines (man setup) |  11032/ 4220 |   384/   64 |
+| Scheduler, One Coroutine (man setup)  |  10932/ 4192 |   236/   36 |
+| Scheduler, Two Coroutines (man setup) |  11080/ 4220 |   384/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, One Coroutine, Profiler    |  10976/ 4192 |   328/   36 |
-| Scheduler, Two Coroutines, Profiler   |  11092/ 4220 |   444/   64 |
+| Scheduler, One Coroutine, Profiler    |  11028/ 4192 |   332/   36 |
+| Scheduler, Two Coroutines, Profiler   |  11144/ 4220 |   448/   64 |
 |---------------------------------------+--------------+-------------|
-| Scheduler, LogBinProfiler             |  11396/ 4268 |   748/  112 |
-| Scheduler, LogBinTableRenderer        |  14120/ 4284 |  3472/  128 |
-| Scheduler, LogBinJsonRenderer         |  13476/ 4284 |  2828/  128 |
+| Scheduler, LogBinProfiler             |  11444/ 4268 |   748/  112 |
+| Scheduler, LogBinTableRenderer        |  14184/ 4284 |  3488/  128 |
+| Scheduler, LogBinJsonRenderer         |  13476/ 4284 |  2780/  128 |
 |---------------------------------------+--------------+-------------|
-| Blink Function                        |  11104/ 4164 |   456/    8 |
-| Blink Coroutine                       |  11236/ 4188 |   588/   32 |
+| Blink Function                        |  11152/ 4164 |   456/    8 |
+| Blink Coroutine                       |  11284/ 4188 |   588/   32 |
 +--------------------------------------------------------------------+
 
 ```

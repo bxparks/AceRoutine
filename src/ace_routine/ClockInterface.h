@@ -40,10 +40,10 @@ namespace ace_routine {
 class ClockInterface {
   public:
     /** Get the current millis. */
-    static unsigned long millis() { return ::millis(); }
+    static unsigned long (millis)() { return ::millis(); }
 
     /** Get the current micros. */
-    static unsigned long micros() { return ::micros(); }
+    static unsigned long (micros)() { return ::micros(); }
 
     /**
      * Get the current seconds. This is derived by dividing millis() by 1000,
